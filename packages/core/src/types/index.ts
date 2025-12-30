@@ -1,0 +1,257 @@
+import { z } from 'zod';
+
+// ============================================================================
+// Core Entity Types
+// ============================================================================
+
+export const TenantSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  settings: z.record(z.unknown()).optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type Tenant = z.infer<typeof TenantSchema>;
+
+export const UserSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  email: z.string().email(),
+  name: z.string(),
+  avatarUrl: z.string().optional(),
+  role: z.enum(['admin', 'pm', 'viewer', 'guest']),
+  permissions: z.array(z.string()),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type User = z.infer<typeof UserSchema>;
+
+export type UserRole = User['role'];
+
+// ============================================================================
+// Job Types
+// ============================================================================
+
+export const JobTypeSchema = z.enum([
+  'daily_brief',
+  'meeting_prep',
+  'voc_clustering',
+  'competitor_intel',
+  'roadmap_alignment',
+  'prd_draft',
+]);
+export type JobType = z.infer<typeof JobTypeSchema>;
+
+export const JobStatusSchema = z.enum([
+  'pending',
+  'queued',
+  'running',
+  'completed',
+  'failed',
+  'cancelled',
+]);
+export type JobStatus = z.infer<typeof JobStatusSchema>;
+
+export const JobSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  type: JobTypeSchema,
+  status: JobStatusSchema,
+  triggeredBy: z.string(),
+  config: z.record(z.unknown()).optional(),
+  result: z.record(z.unknown()).optional(),
+  error: z.string().optional(),
+  startedAt: z.date().optional(),
+  completedAt: z.date().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type Job = z.infer<typeof JobSchema>;
+
+// ============================================================================
+// Tool Call Types (MCP)
+// ============================================================================
+
+export const ToolCallStatusSchema = z.enum(['pending', 'success', 'error', 'skipped']);
+export type ToolCallStatus = z.infer<typeof ToolCallStatusSchema>;
+
+export const ToolCallSchema = z.object({
+  id: z.string(),
+  jobId: z.string(),
+  tenantId: z.string(),
+  toolName: z.string(),
+  serverName: z.string(),
+  input: z.record(z.unknown()),
+  output: z.record(z.unknown()).optional(),
+  status: ToolCallStatusSchema,
+  durationMs: z.number().optional(),
+  error: z.string().optional(),
+  createdAt: z.date(),
+});
+export type ToolCall = z.infer<typeof ToolCallSchema>;
+
+// ============================================================================
+// Proposal Types (Draft-Only Pattern)
+// ============================================================================
+
+export const ProposalStatusSchema = z.enum([
+  'draft',
+  'pending_review',
+  'approved',
+  'rejected',
+  'expired',
+]);
+export type ProposalStatus = z.infer<typeof ProposalStatusSchema>;
+
+export const ProposalTypeSchema = z.enum([
+  'jira_epic',
+  'jira_story',
+  'confluence_page',
+  'slack_message',
+  'prd_document',
+  'release_notes',
+]);
+export type ProposalType = z.infer<typeof ProposalTypeSchema>;
+
+export const ProposalSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  jobId: z.string(),
+  type: ProposalTypeSchema,
+  status: ProposalStatusSchema,
+  title: z.string(),
+  preview: z.string(),
+  diff: z.string().optional(),
+  bundle: z.record(z.unknown()),
+  targetSystem: z.string(),
+  targetId: z.string().optional(),
+  createdBy: z.string(),
+  reviewedBy: z.string().optional(),
+  reviewedAt: z.date().optional(),
+  expiresAt: z.date().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type Proposal = z.infer<typeof ProposalSchema>;
+
+// ============================================================================
+// Artifact Types
+// ============================================================================
+
+export const ArtifactTypeSchema = z.enum([
+  'brief',
+  'meeting_pack',
+  'voc_report',
+  'competitor_diff',
+  'alignment_memo',
+  'prd',
+  'sprint_review',
+  'release_notes',
+]);
+export type ArtifactType = z.infer<typeof ArtifactTypeSchema>;
+
+export const ArtifactSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  jobId: z.string(),
+  type: ArtifactTypeSchema,
+  title: z.string(),
+  format: z.enum(['markdown', 'html', 'pdf', 'json']),
+  content: z.string(),
+  metadata: z.record(z.unknown()).optional(),
+  storageKey: z.string().optional(),
+  createdAt: z.date(),
+});
+export type Artifact = z.infer<typeof ArtifactSchema>;
+
+// ============================================================================
+// Source Types (for traceability)
+// ============================================================================
+
+export const SourceTypeSchema = z.enum([
+  'slack_message',
+  'jira_issue',
+  'confluence_page',
+  'gong_call',
+  'zendesk_ticket',
+  'community_post',
+  'analytics_event',
+  'competitor_page',
+  'internal_doc',
+]);
+export type SourceType = z.infer<typeof SourceTypeSchema>;
+
+export const SourceSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  type: SourceTypeSchema,
+  externalId: z.string(),
+  title: z.string(),
+  url: z.string().optional(),
+  content: z.string(),
+  metadata: z.record(z.unknown()).optional(),
+  fetchedAt: z.date(),
+  createdAt: z.date(),
+});
+export type Source = z.infer<typeof SourceSchema>;
+
+// ============================================================================
+// Audit Log Types
+// ============================================================================
+
+export const AuditActionSchema = z.enum([
+  'job.created',
+  'job.started',
+  'job.completed',
+  'job.failed',
+  'job.cancelled',
+  'tool.called',
+  'tool.completed',
+  'tool.failed',
+  'proposal.created',
+  'proposal.approved',
+  'proposal.rejected',
+  'artifact.created',
+  'artifact.downloaded',
+  'user.login',
+  'user.logout',
+  'permission.checked',
+  'permission.denied',
+]);
+export type AuditAction = z.infer<typeof AuditActionSchema>;
+
+export const AuditLogSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  userId: z.string().optional(),
+  action: AuditActionSchema,
+  resourceType: z.string(),
+  resourceId: z.string(),
+  details: z.record(z.unknown()).optional(),
+  ipAddress: z.string().optional(),
+  userAgent: z.string().optional(),
+  createdAt: z.date(),
+});
+export type AuditLog = z.infer<typeof AuditLogSchema>;
+
+// ============================================================================
+// Demo Arc Types (for guided demo experience)
+// ============================================================================
+
+export const DemoArcSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  steps: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      jobType: JobTypeSchema,
+      config: z.record(z.unknown()).optional(),
+    })
+  ),
+});
+export type DemoArc = z.infer<typeof DemoArcSchema>;
+

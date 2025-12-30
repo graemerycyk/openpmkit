@@ -1,0 +1,364 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Tenant & User Models
+// ============================================================================
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  settings  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users      User[]
+  jobs       Job[]
+  toolCalls  ToolCall[]
+  proposals  Proposal[]
+  artifacts  Artifact[]
+  sources    Source[]
+  auditLogs  AuditLog[]
+
+  @@map("tenants")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  tenantId    String
+  email       String
+  name        String
+  avatarUrl   String?
+  role        UserRole @default(viewer)
+  permissions String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  jobs      Job[]
+  proposals Proposal[] @relation("ProposalCreator")
+  reviews   Proposal[] @relation("ProposalReviewer")
+  auditLogs AuditLog[]
+
+  @@unique([tenantId, email])
+  @@map("users")
+}
+
+enum UserRole {
+  admin
+  pm
+  viewer
+  guest
+}
+
+// ============================================================================
+// Job Models
+// ============================================================================
+
+model Job {
+  id          String    @id @default(cuid())
+  tenantId    String
+  type        JobType
+  status      JobStatus @default(pending)
+  triggeredBy String
+  config      Json?
+  result      Json?
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [triggeredBy], references: [id])
+  toolCalls ToolCall[]
+  proposals Proposal[]
+  artifacts Artifact[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, type])
+  @@map("jobs")
+}
+
+enum JobType {
+  daily_brief
+  meeting_prep
+  voc_clustering
+  competitor_intel
+  roadmap_alignment
+  prd_draft
+}
+
+enum JobStatus {
+  pending
+  queued
+  running
+  completed
+  failed
+  cancelled
+}
+
+// ============================================================================
+// Tool Call Models (MCP)
+// ============================================================================
+
+model ToolCall {
+  id         String         @id @default(cuid())
+  jobId      String
+  tenantId   String
+  toolName   String
+  serverName String
+  input      Json
+  output     Json?
+  status     ToolCallStatus @default(pending)
+  durationMs Int?
+  error      String?
+  createdAt  DateTime       @default(now())
+
+  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([tenantId, createdAt])
+  @@map("tool_calls")
+}
+
+enum ToolCallStatus {
+  pending
+  success
+  error
+  skipped
+}
+
+// ============================================================================
+// Proposal Models (Draft-Only Pattern)
+// ============================================================================
+
+model Proposal {
+  id           String         @id @default(cuid())
+  tenantId     String
+  jobId        String
+  type         ProposalType
+  status       ProposalStatus @default(draft)
+  title        String
+  preview      String         @db.Text
+  diff         String?        @db.Text
+  bundle       Json
+  targetSystem String
+  targetId     String?
+  createdBy    String
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  job      Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  creator  User   @relation("ProposalCreator", fields: [createdBy], references: [id])
+  reviewer User?  @relation("ProposalReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([tenantId, status])
+  @@index([jobId])
+  @@map("proposals")
+}
+
+enum ProposalType {
+  jira_epic
+  jira_story
+  confluence_page
+  slack_message
+  prd_document
+  release_notes
+}
+
+enum ProposalStatus {
+  draft
+  pending_review
+  approved
+  rejected
+  expired
+}
+
+// ============================================================================
+// Artifact Models
+// ============================================================================
+
+model Artifact {
+  id         String       @id @default(cuid())
+  tenantId   String
+  jobId      String
+  type       ArtifactType
+  title      String
+  format     String       @default("markdown")
+  content    String       @db.Text
+  metadata   Json?
+  storageKey String?
+  createdAt  DateTime     @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, type])
+  @@index([jobId])
+  @@map("artifacts")
+}
+
+enum ArtifactType {
+  brief
+  meeting_pack
+  voc_report
+  competitor_diff
+  alignment_memo
+  prd
+  sprint_review
+  release_notes
+}
+
+// ============================================================================
+// Source Models (for traceability)
+// ============================================================================
+
+model Source {
+  id         String     @id @default(cuid())
+  tenantId   String
+  type       SourceType
+  externalId String
+  title      String
+  url        String?
+  content    String     @db.Text
+  metadata   Json?
+  fetchedAt  DateTime   @default(now())
+  createdAt  DateTime   @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, type, externalId])
+  @@index([tenantId, type])
+  @@map("sources")
+}
+
+enum SourceType {
+  slack_message
+  jira_issue
+  confluence_page
+  gong_call
+  zendesk_ticket
+  community_post
+  analytics_event
+  competitor_page
+  internal_doc
+}
+
+// ============================================================================
+// Audit Log Models
+// ============================================================================
+
+model AuditLog {
+  id           String      @id @default(cuid())
+  tenantId     String
+  userId       String?
+  action       AuditAction
+  resourceType String
+  resourceId   String
+  details      Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime    @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, resourceType, resourceId])
+  @@index([userId])
+  @@map("audit_logs")
+}
+
+enum AuditAction {
+  job_created
+  job_started
+  job_completed
+  job_failed
+  job_cancelled
+  tool_called
+  tool_completed
+  tool_failed
+  proposal_created
+  proposal_approved
+  proposal_rejected
+  artifact_created
+  artifact_downloaded
+  user_login
+  user_logout
+  permission_checked
+  permission_denied
+}
+
+// ============================================================================
+// NextAuth Models
+// ============================================================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model AuthUser {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("auth_users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+

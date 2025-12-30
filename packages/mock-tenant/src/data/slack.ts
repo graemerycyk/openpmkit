@@ -1,0 +1,200 @@
+import type { SlackMessage, SlackChannel } from '@pmkit/mcp-servers';
+
+export const slackData = {
+  channels: [
+    {
+      id: 'C001',
+      name: 'product',
+      description: 'Product team discussions',
+      isPrivate: false,
+      memberCount: 45,
+    },
+    {
+      id: 'C002',
+      name: 'eng-backend',
+      description: 'Backend engineering team',
+      isPrivate: false,
+      memberCount: 28,
+    },
+    {
+      id: 'C003',
+      name: 'customer-feedback',
+      description: 'Customer feedback and insights',
+      isPrivate: false,
+      memberCount: 62,
+    },
+    {
+      id: 'C004',
+      name: 'support-escalations',
+      description: 'Escalated support issues',
+      isPrivate: true,
+      memberCount: 15,
+    },
+    {
+      id: 'C005',
+      name: 'general',
+      description: 'General company discussions',
+      isPrivate: false,
+      memberCount: 150,
+    },
+  ] satisfies SlackChannel[],
+
+  messages: [
+    // Product channel
+    {
+      id: 'msg-001',
+      channelId: 'C001',
+      channelName: 'product',
+      userId: 'U001',
+      userName: 'Sarah Chen',
+      text: 'Just got off a call with Globex Corp - they\'re really pushing for better search. Said it\'s blocking their expansion from 50 to 200 seats. This is the 3rd enterprise customer this month mentioning search.',
+      reactions: [
+        { name: 'eyes', count: 5 },
+        { name: '+1', count: 3 },
+      ],
+      timestamp: '2025-12-28T09:15:00Z',
+    },
+    {
+      id: 'msg-002',
+      channelId: 'C001',
+      channelName: 'product',
+      userId: 'U002',
+      userName: 'Marcus Johnson',
+      text: 'Agreed. I\'ve been tracking this - we have 47 support tickets about search in Q4 alone. The search improvements epic is our top priority for Sprint 42.',
+      threadTs: 'msg-001',
+      reactions: [{ name: 'check', count: 2 }],
+      timestamp: '2025-12-28T09:18:00Z',
+    },
+    {
+      id: 'msg-003',
+      channelId: 'C001',
+      channelName: 'product',
+      userId: 'U003',
+      userName: 'Alex Rivera',
+      text: 'The community feature request for search filters has 89 votes now. Customers are asking for date range filters and content type filters specifically.',
+      reactions: [{ name: 'chart_with_upwards_trend', count: 2 }],
+      timestamp: '2025-12-28T09:22:00Z',
+    },
+    {
+      id: 'msg-004',
+      channelId: 'C001',
+      channelName: 'product',
+      userId: 'U001',
+      userName: 'Sarah Chen',
+      text: 'Quick update on Sprint 42: Search ranking improvements (ACME-343) is in review, filters (ACME-342) is 70% done. We should have the core improvements shipped by end of sprint.',
+      reactions: [{ name: 'rocket', count: 4 }],
+      timestamp: '2025-12-28T14:30:00Z',
+    },
+
+    // Eng-backend channel
+    {
+      id: 'msg-010',
+      channelId: 'C002',
+      channelName: 'eng-backend',
+      userId: 'U010',
+      userName: 'Dev Team',
+      text: '🚨 Found a critical bug in search - special characters in queries cause 500 errors. Created ACME-350 as P1. Working on a fix now.',
+      reactions: [
+        { name: 'eyes', count: 8 },
+        { name: 'pray', count: 3 },
+      ],
+      timestamp: '2025-12-26T16:45:00Z',
+    },
+    {
+      id: 'msg-011',
+      channelId: 'C002',
+      channelName: 'eng-backend',
+      userId: 'U010',
+      userName: 'Dev Team',
+      text: 'Update on ACME-350: Root cause identified - missing input sanitization in the query parser. Fix is ready for review.',
+      threadTs: 'msg-010',
+      reactions: [{ name: 'tada', count: 5 }],
+      timestamp: '2025-12-27T10:30:00Z',
+    },
+
+    // Customer feedback channel
+    {
+      id: 'msg-020',
+      channelId: 'C003',
+      channelName: 'customer-feedback',
+      userId: 'U020',
+      userName: 'Support Team',
+      text: 'NPS response from Initech: "Love the product but search is painful. We\'ve created workarounds using tags but it\'s not sustainable. Would love to see search filters." Score: 7',
+      reactions: [{ name: 'memo', count: 2 }],
+      timestamp: '2025-12-27T11:00:00Z',
+    },
+    {
+      id: 'msg-021',
+      channelId: 'C003',
+      channelName: 'customer-feedback',
+      userId: 'U020',
+      userName: 'Support Team',
+      text: 'Gong insight from Umbrella Corp call: Customer mentioned they evaluated 3 competitors and chose us, but search was the main concern. They\'re on a 6-month trial.',
+      reactions: [
+        { name: 'warning', count: 3 },
+        { name: 'eyes', count: 4 },
+      ],
+      timestamp: '2025-12-27T14:20:00Z',
+    },
+    {
+      id: 'msg-022',
+      channelId: 'C003',
+      channelName: 'customer-feedback',
+      userId: 'U001',
+      userName: 'Sarah Chen',
+      text: 'Great signal everyone. I\'m compiling all of this for the Q4 VoC report. Search is clearly theme #1. Keep the feedback coming!',
+      reactions: [{ name: '+1', count: 6 }],
+      timestamp: '2025-12-27T15:00:00Z',
+    },
+
+    // Support escalations
+    {
+      id: 'msg-030',
+      channelId: 'C004',
+      channelName: 'support-escalations',
+      userId: 'U020',
+      userName: 'Support Team',
+      text: '🔴 ESCALATION: Globex Corp (Enterprise) - Dashboard widgets not loading for 12 users. Started ~2 hours ago. Ticket #4521. Paging on-call.',
+      reactions: [{ name: 'rotating_light', count: 2 }],
+      timestamp: '2025-12-27T08:30:00Z',
+    },
+    {
+      id: 'msg-031',
+      channelId: 'C004',
+      channelName: 'support-escalations',
+      userId: 'U010',
+      userName: 'Dev Team',
+      text: 'On it. Looks like a caching issue. Investigating.',
+      threadTs: 'msg-030',
+      reactions: [],
+      timestamp: '2025-12-27T08:35:00Z',
+    },
+    {
+      id: 'msg-032',
+      channelId: 'C004',
+      channelName: 'support-escalations',
+      userId: 'U010',
+      userName: 'Dev Team',
+      text: 'Found it - Redis connection pool exhaustion during peak load. Temporary fix deployed, working on permanent solution. Created ACME-351.',
+      threadTs: 'msg-030',
+      reactions: [{ name: 'check', count: 3 }],
+      timestamp: '2025-12-27T09:45:00Z',
+    },
+
+    // General channel
+    {
+      id: 'msg-040',
+      channelId: 'C005',
+      channelName: 'general',
+      userId: 'U002',
+      userName: 'Marcus Johnson',
+      text: '📊 Weekly metrics update: DAU up 12% WoW, but search usage is down 5%. Likely related to the frustration we\'re hearing. Good news: the customers who do use search are using it more intensively.',
+      reactions: [
+        { name: 'chart_with_upwards_trend', count: 4 },
+        { name: 'thinking_face', count: 2 },
+      ],
+      timestamp: '2025-12-23T10:00:00Z',
+    },
+  ] satisfies SlackMessage[],
+};
+
