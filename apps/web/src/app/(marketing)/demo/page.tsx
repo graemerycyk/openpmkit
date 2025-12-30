@@ -13,12 +13,13 @@ import {
   Play,
   Clock,
   Database,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Demo',
   description:
-    'Try the pmkit Agent Console with a complete mock enterprise dataset. Run all 6 cadence jobs end-to-end.',
+    'Try the pmkit Agent Console with a complete mock enterprise dataset. Run all 7 PM workflow jobs end-to-end.',
   openGraph: {
     title: 'pmkit Demo',
     description: 'Try the Agent Console with a complete mock enterprise dataset.',
@@ -32,7 +33,7 @@ const jobs = [
     description: 'Synthesize overnight activity from Slack, Jira, support, and community.',
     icon: FileText,
     duration: '~30s',
-    sources: ['Slack', 'Jira', 'Zendesk', 'Community'],
+    sources: ['Slack', 'Jira', 'Zendesk', 'Discourse'],
   },
   {
     id: 'meeting_prep',
@@ -48,15 +49,15 @@ const jobs = [
     description: 'Cluster customer feedback into actionable themes with evidence.',
     icon: BarChart3,
     duration: '~45s',
-    sources: ['Zendesk', 'Gong', 'Community'],
+    sources: ['Zendesk', 'Gong', 'Discourse', 'Social Crawler'],
   },
   {
     id: 'competitor_intel',
     name: 'Competitor Intel',
-    description: 'Track competitor changes with strategic implications.',
+    description: 'Track competitor changes across social, web, and news.',
     icon: Target,
     duration: '~20s',
-    sources: ['Competitor'],
+    sources: ['Social Crawler', 'Web Search', 'News Crawler'],
   },
   {
     id: 'roadmap_alignment',
@@ -64,7 +65,7 @@ const jobs = [
     description: 'Generate alignment memos with options, trade-offs, and recommendations.',
     icon: GitBranch,
     duration: '~35s',
-    sources: ['Jira', 'Analytics', 'Community', 'Competitor'],
+    sources: ['Jira', 'Amplitude', 'Discourse', 'News Crawler'],
   },
   {
     id: 'prd_draft',
@@ -72,7 +73,15 @@ const jobs = [
     description: 'Draft PRDs grounded in customer evidence and context.',
     icon: FileText,
     duration: '~40s',
-    sources: ['Community', 'Gong', 'Analytics', 'Confluence'],
+    sources: ['Discourse', 'Gong', 'Amplitude', 'Confluence'],
+  },
+  {
+    id: 'sprint_review',
+    name: 'Sprint Review',
+    description: 'Generate sprint review packs with shipped work, metrics, and follow-ups.',
+    icon: CheckCircle2,
+    duration: '~35s',
+    sources: ['Jira', 'Confluence', 'Slack', 'Amplitude'],
   },
 ];
 
@@ -113,13 +122,19 @@ export default function DemoPage() {
               Try the Agent Console
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Run all 6 cadence jobs with a complete mock enterprise dataset. See tool calls,
+              Run all 7 PM workflow jobs with a complete mock enterprise dataset. See tool calls,
               sources, and downloadable artifacts.
             </p>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" asChild>
                 <Link href="/demo/console">
                   Launch Dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/demo/launcher">
+                  Try Slack/Email Launcher
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -132,7 +147,7 @@ export default function DemoPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">6 Cadence Jobs</h2>
+            <h2 className="font-heading text-3xl font-bold">7 PM Workflow Jobs</h2>
             <p className="mt-4 text-muted-foreground">
               Run any job to see the complete workflow; tool calls, sources, and artifacts.
             </p>

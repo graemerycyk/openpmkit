@@ -325,8 +325,8 @@ export default function HomePage() {
       <section className="py-20 md:py-32">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="outline" className="mb-4">
-              Coming Soon
+            <Badge variant="outline" className="mb-4 border-cobalt-200 bg-cobalt-50 text-cobalt-700">
+              Try the Demo
             </Badge>
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
               Trigger pmkit from where you already work
@@ -399,12 +399,12 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              Slack integration available now in beta.{' '}
-              <Link href="/contact" className="font-medium text-cobalt-600 hover:underline">
-                Request early access →
+            <Button asChild>
+              <Link href="/demo/launcher">
+                Try the Launcher Demo
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-            </p>
+            </Button>
           </div>
         </div>
       </section>

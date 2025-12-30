@@ -148,23 +148,30 @@ export default function HowItWorksPage() {
               </div>
               <div className="flex-1">
                 <div className="rounded-lg border bg-card p-6">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Link2 className="h-4 w-4" />
-                    Integrations
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Link2 className="h-4 w-4" />
+                      Integrations
+                    </div>
+                    <span className="text-xs italic">Illustrative</span>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-3">
-                    {['Jira', 'Confluence', 'Slack', 'Gong', 'Zendesk', 'Analytics'].map((tool) => (
+                    {['Jira', 'Confluence', 'Slack', 'Gong', 'Zendesk', 'Amplitude'].map((tool) => (
                       <div key={tool} className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded bg-cobalt-100">
                           <Database className="h-4 w-4 text-cobalt-600" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">{tool}</p>
-                          <p className="text-xs text-green-600">Connected</p>
+                          <p className="text-xs text-amber-600">Demo (Mock)</p>
                         </div>
                       </div>
                     ))}
                   </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    In demo mode, all connectors return simulated data.{' '}
+                    <Link href="/contact" className="underline hover:no-underline">Contact sales</Link> to connect real tools.
+                  </p>
                 </div>
               </div>
             </div>
