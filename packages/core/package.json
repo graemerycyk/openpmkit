@@ -3,32 +3,44 @@
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./types": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/types/index.js"
+      "require": "./dist/types/index.js",
+      "import": "./dist/types/index.js",
+      "default": "./dist/types/index.js"
     },
     "./rbac": {
       "types": "./dist/rbac/index.d.ts",
-      "import": "./dist/rbac/index.js"
+      "require": "./dist/rbac/index.js",
+      "import": "./dist/rbac/index.js",
+      "default": "./dist/rbac/index.js"
     },
     "./audit": {
       "types": "./dist/audit/index.d.ts",
-      "import": "./dist/audit/index.js"
+      "require": "./dist/audit/index.js",
+      "import": "./dist/audit/index.js",
+      "default": "./dist/audit/index.js"
     },
     "./jobs": {
       "types": "./dist/jobs/index.d.ts",
-      "import": "./dist/jobs/index.js"
+      "require": "./dist/jobs/index.js",
+      "import": "./dist/jobs/index.js",
+      "default": "./dist/jobs/index.js"
     },
     "./storage": {
       "types": "./dist/storage/index.d.ts",
-      "import": "./dist/storage/index.js"
+      "require": "./dist/storage/index.js",
+      "import": "./dist/storage/index.js",
+      "default": "./dist/storage/index.js"
     }
   },
   "scripts": {

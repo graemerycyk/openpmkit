@@ -3,35 +3,50 @@
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./jira": {
       "types": "./dist/jira/index.d.ts",
-      "import": "./dist/jira/index.js"
+      "require": "./dist/jira/index.js",
+      "import": "./dist/jira/index.js",
+      "default": "./dist/jira/index.js"
     },
     "./confluence": {
       "types": "./dist/confluence/index.d.ts",
-      "import": "./dist/confluence/index.js"
+      "require": "./dist/confluence/index.js",
+      "import": "./dist/confluence/index.js",
+      "default": "./dist/confluence/index.js"
     },
     "./slack": {
       "types": "./dist/slack/index.d.ts",
-      "import": "./dist/slack/index.js"
+      "require": "./dist/slack/index.js",
+      "import": "./dist/slack/index.js",
+      "default": "./dist/slack/index.js"
     },
     "./gong": {
       "types": "./dist/gong/index.d.ts",
-      "import": "./dist/gong/index.js"
+      "require": "./dist/gong/index.js",
+      "import": "./dist/gong/index.js",
+      "default": "./dist/gong/index.js"
     },
     "./zendesk": {
       "types": "./dist/zendesk/index.d.ts",
-      "import": "./dist/zendesk/index.js"
+      "require": "./dist/zendesk/index.js",
+      "import": "./dist/zendesk/index.js",
+      "default": "./dist/zendesk/index.js"
     },
     "./analytics": {
       "types": "./dist/analytics/index.d.ts",
-      "import": "./dist/analytics/index.js"
+      "require": "./dist/analytics/index.js",
+      "import": "./dist/analytics/index.js",
+      "default": "./dist/analytics/index.js"
     }
   },
   "scripts": {

@@ -3,23 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./keywords": {
       "types": "./dist/keywords.d.ts",
-      "import": "./dist/keywords.js"
+      "require": "./dist/keywords.js",
+      "import": "./dist/keywords.js",
+      "default": "./dist/keywords.js"
     },
     "./resources": {
       "types": "./dist/resources.d.ts",
-      "import": "./dist/resources.js"
+      "require": "./dist/resources.js",
+      "import": "./dist/resources.js",
+      "default": "./dist/resources.js"
     },
     "./blog": {
       "types": "./dist/blog.d.ts",
-      "import": "./dist/blog.js"
+      "require": "./dist/blog.js",
+      "import": "./dist/blog.js",
+      "default": "./dist/blog.js"
     }
   },
   "scripts": {
