@@ -1,2 +1,3 @@
-# Using Dockerfile-based deployment, ignore function detection
-*
+# Ignore everything for buildpack detection - we use Dockerfile
+node_modules
+.git
