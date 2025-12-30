@@ -51,21 +51,23 @@ interface Connector {
   name: string;
   icon: typeof FileText;
   status: ConnectorStatus;
+  type: 'mcp' | 'crawler';
+  description?: string;
 }
 
 const connectors: Connector[] = [
   // Tool Integrations (MCP Connectors)
-  { id: 'jira', name: 'Jira', icon: FileText, status: 'connected_mock' },
-  { id: 'confluence', name: 'Confluence', icon: Database, status: 'connected_mock' },
-  { id: 'slack', name: 'Slack', icon: MessageSquare, status: 'connected_mock' },
-  { id: 'gong', name: 'Gong', icon: Phone, status: 'connected_mock' },
-  { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_mock' },
-  { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_mock' },
-  { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_mock' },
+  { id: 'jira', name: 'Jira', icon: FileText, status: 'connected_mock', type: 'mcp' },
+  { id: 'confluence', name: 'Confluence', icon: Database, status: 'connected_mock', type: 'mcp' },
+  { id: 'slack', name: 'Slack', icon: MessageSquare, status: 'connected_mock', type: 'mcp' },
+  { id: 'gong', name: 'Gong', icon: Phone, status: 'connected_mock', type: 'mcp' },
+  { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_mock', type: 'mcp' },
+  { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_mock', type: 'mcp' },
+  { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_mock', type: 'mcp' },
   // AI Crawlers
-  { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_mock' },
-  { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_mock' },
-  { id: 'news_crawler', name: 'News Crawler', icon: Newspaper, status: 'connected_mock' },
+  { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_mock', type: 'crawler', description: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
+  { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_mock', type: 'crawler', description: 'Google & Bing' },
+  { id: 'news_crawler', name: 'News Crawler', icon: Newspaper, status: 'connected_mock', type: 'crawler', description: 'Industry news & press releases' },
 ];
 
 function ConnectorStatusBadge({ status }: { status: ConnectorStatus }) {
@@ -1058,24 +1060,50 @@ export default function ConsolePage() {
                       </CardContent>
                     </Card>
 
-                    {/* Connector Grid */}
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {connectors.map((connector) => (
-                        <Card key={connector.id}>
-                          <CardContent className="flex items-center justify-between pt-6">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                                <connector.icon className="h-5 w-5 text-muted-foreground" />
+                    {/* MCP Connectors */}
+                    <div className="mb-6">
+                      <h4 className="mb-3 text-sm font-medium text-muted-foreground">Tool Integrations</h4>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {connectors.filter(c => c.type === 'mcp').map((connector) => (
+                          <Card key={connector.id}>
+                            <CardContent className="flex items-center justify-between pt-6">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                                  <connector.icon className="h-5 w-5 text-muted-foreground" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{connector.name}</p>
+                                  <p className="text-xs text-muted-foreground">MCP Connector</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-medium">{connector.name}</p>
-                                <p className="text-xs text-muted-foreground">MCP Connector</p>
+                              <ConnectorStatusBadge status={connector.status} />
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* AI Crawlers */}
+                    <div>
+                      <h4 className="mb-3 text-sm font-medium text-muted-foreground">AI Crawlers</h4>
+                      <div className="grid gap-4 md:grid-cols-1">
+                        {connectors.filter(c => c.type === 'crawler').map((connector) => (
+                          <Card key={connector.id}>
+                            <CardContent className="flex items-center justify-between pt-6">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-100">
+                                  <connector.icon className="h-5 w-5 text-cobalt-600" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{connector.name}</p>
+                                  <p className="text-xs text-muted-foreground">{connector.description}</p>
+                                </div>
                               </div>
-                            </div>
-                            <ConnectorStatusBadge status={connector.status} />
-                          </CardContent>
-                        </Card>
-                      ))}
+                              <ConnectorStatusBadge status={connector.status} />
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
