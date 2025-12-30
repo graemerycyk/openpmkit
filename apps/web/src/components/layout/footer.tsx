@@ -6,7 +6,6 @@ const footerLinks = {
     { name: 'How It Works', href: '/how-it-works' },
     { name: 'Demo', href: '/demo' },
     { name: 'Pricing', href: '/pricing' },
-    { name: 'Changelog', href: '/changelog' },
   ],
   agents: [
     { name: 'Product Management Agent', href: '/resources/product-management-agent' },

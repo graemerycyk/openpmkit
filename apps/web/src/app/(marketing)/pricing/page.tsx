@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -183,19 +183,106 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* What's Coming */}
       <section className="py-16 md:py-24">
         <div className="container">
+          <div className="mx-auto max-w-3xl">
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                <Sparkles className="h-6 w-6 text-cobalt-600" />
+              </div>
+              <h2 className="font-heading text-3xl font-bold">What&apos;s coming</h2>
+              <p className="mt-4 text-muted-foreground">
+                We&apos;re actively building new features based on customer feedback.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-8 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Real Integrations</CardTitle>
+                  <CardDescription>Connect your actual tools</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      Jira Cloud OAuth integration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      Slack app with slash commands
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      Persistent job history
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      Team workspaces
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Enterprise Features</CardTitle>
+                  <CardDescription>Security and compliance</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      SSO/SAML authentication
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      Custom job templates
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      API access
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cobalt-600" />
+                      Webhook notifications
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                Want early access to new features?{' '}
+                <Link href="/contact" className="font-medium text-cobalt-600 hover:underline">
+                  Contact us
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-cobalt-600 py-16 md:py-24">
+        <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">Ready to get started?</h2>
-            <p className="mt-4 text-muted-foreground">
+            <h2 className="font-heading text-3xl font-bold text-white">Ready to get started?</h2>
+            <p className="mt-4 text-cobalt-100">
               Try the demo or contact sales for a personalized walkthrough.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button size="lg" asChild>
+              <Button size="lg" variant="secondary" asChild>
                 <Link href="/demo">Try the Demo</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white bg-white text-cobalt-600 hover:bg-white/90"
+                asChild
+              >
                 <Link href="/contact">Contact Sales</Link>
               </Button>
             </div>
