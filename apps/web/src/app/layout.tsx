@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Space_Grotesk } from 'next/font/google';
@@ -88,16 +89,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        {/* Simple Analytics */}
-        {process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN && (
-          <script
-            async
-            defer
-            src="https://scripts.simpleanalyticscdn.com/latest.js"
-          />
-        )}
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">{children}</body>
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );
 }
