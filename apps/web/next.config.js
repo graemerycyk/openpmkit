@@ -14,16 +14,20 @@ const nextConfig = {
   images: {
     domains: ['getpmkit.com'],
   },
+  experimental: {
+    // Enable external packages resolution for monorepos
+    externalDir: true,
+  },
   webpack: (config, { isServer }) => {
-    // Resolve workspace packages from monorepo root
+    // Resolve workspace packages to their source files for transpilation
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@pmkit/content': path.resolve(__dirname, '../../packages/content/dist'),
-      '@pmkit/core': path.resolve(__dirname, '../../packages/core/dist'),
-      '@pmkit/mcp': path.resolve(__dirname, '../../packages/mcp/dist'),
-      '@pmkit/mcp-servers': path.resolve(__dirname, '../../packages/mcp-servers/dist'),
-      '@pmkit/mock-tenant': path.resolve(__dirname, '../../packages/mock-tenant/dist'),
-      '@pmkit/prompts': path.resolve(__dirname, '../../packages/prompts/dist'),
+      '@pmkit/content': path.resolve(__dirname, '../../packages/content/src/index.ts'),
+      '@pmkit/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
+      '@pmkit/mcp': path.resolve(__dirname, '../../packages/mcp/src/index.ts'),
+      '@pmkit/mcp-servers': path.resolve(__dirname, '../../packages/mcp-servers/src/index.ts'),
+      '@pmkit/mock-tenant': path.resolve(__dirname, '../../packages/mock-tenant/src/index.ts'),
+      '@pmkit/prompts': path.resolve(__dirname, '../../packages/prompts/src/index.ts'),
     };
     return config;
   },
