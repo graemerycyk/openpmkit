@@ -1,8 +1,2 @@
-# Ignore directories that shouldn't be scanned for serverless functions
-packages/
-apps/worker/
-docker/
-prisma/
-tests/
-*.md
-
+# Using Dockerfile-based deployment, ignore function detection
+*
