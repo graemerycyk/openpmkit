@@ -694,7 +694,7 @@ export default function ConsolePage() {
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Job Selection */}
-        <aside className="w-64 border-r bg-muted/30">
+        <aside className="flex w-64 flex-col border-r bg-muted/30">
           <div className="p-4">
             <h2 className="font-heading text-sm font-semibold text-muted-foreground">
               PM WORKFLOWS
@@ -729,18 +729,35 @@ export default function ConsolePage() {
           </nav>
 
           {/* Connectors Status */}
-          <div className="mt-6 border-t p-4">
+          <div className="mt-6 flex-1 overflow-y-auto border-t p-4">
             <div className="flex items-center gap-2">
               <Plug className="h-4 w-4 text-muted-foreground" />
               <h2 className="font-heading text-sm font-semibold text-muted-foreground">
                 CONNECTORS
               </h2>
             </div>
+            
+            {/* Tool Integrations */}
             <div className="mt-3 space-y-2">
-              {connectors.slice(0, 6).map((connector) => (
+              <p className="text-xs font-medium text-muted-foreground/70">Tool Integrations</p>
+              {connectors.filter(c => c.type === 'mcp').map((connector) => (
                 <div key={connector.id} className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
                     <connector.icon className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-muted-foreground">{connector.name}</span>
+                  </div>
+                  <ConnectorStatusBadge status={connector.status} />
+                </div>
+              ))}
+            </div>
+
+            {/* AI Crawlers */}
+            <div className="mt-4 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground/70">AI Crawlers</p>
+              {connectors.filter(c => c.type === 'crawler').map((connector) => (
+                <div key={connector.id} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <connector.icon className="h-3 w-3 text-cobalt-600" />
                     <span className="text-muted-foreground">{connector.name}</span>
                   </div>
                   <ConnectorStatusBadge status={connector.status} />
