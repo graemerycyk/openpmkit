@@ -349,9 +349,9 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 md:py-32">
+      <section className="bg-cobalt-600 py-20 text-white md:py-32">
         <div className="container">
-          <div className="mx-auto max-w-3xl rounded-2xl bg-cobalt-600 p-8 text-center text-white md:p-12">
+          <div className="mx-auto max-w-3xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
               Ready to try pmkit?
             </h2>

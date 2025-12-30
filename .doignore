@@ -1,0 +1,8 @@
+# Ignore directories that shouldn't be scanned for serverless functions
+packages/
+apps/worker/
+docker/
+prisma/
+tests/
+*.md
+

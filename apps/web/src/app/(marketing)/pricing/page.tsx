@@ -129,7 +129,7 @@ export default function PricingPage() {
             {plans.map((plan) => (
               <Card
                 key={plan.name}
-                className={plan.highlighted ? 'border-cobalt-600 shadow-lg' : ''}
+                className={`flex flex-col ${plan.highlighted ? 'border-cobalt-600 shadow-lg' : ''}`}
               >
                 <CardHeader>
                   {plan.highlighted && (
@@ -143,8 +143,8 @@ export default function PricingPage() {
                     <span className="text-3xl font-bold">{plan.price}</span>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
+                <CardContent className="flex flex-1 flex-col">
+                  <ul className="flex-1 space-y-3">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />

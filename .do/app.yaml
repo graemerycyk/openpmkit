@@ -1,0 +1,24 @@
+name: pmkit
+region: sfo
+services:
+  - name: web
+    github:
+      branch: main
+      deploy_on_push: true
+    source_dir: /
+    build_command: npm ci && npm run build
+    run_command: npm run start --workspace=apps/web
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+    http_port: 3000
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: NEXTAUTH_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: NEXTAUTH_SECRET
+        scope: RUN_TIME
+        type: SECRET
+

@@ -1,0 +1,12 @@
+[project]
+name = "pmkit"
+
+[build]
+builder = "heroku/builder:22"
+
+[[build.buildpacks]]
+id = "heroku/nodejs"
+
+[build.env]
+NODE_ENV = "production"
+
