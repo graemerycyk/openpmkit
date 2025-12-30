@@ -1,6 +1,6 @@
 # Draft-only AI agents: how to get autonomy without losing control
 
-The promise of AI agents is autonomy—systems that can execute complex workflows without constant human intervention. But in enterprise environments, autonomy creates anxiety. What if the agent writes something wrong to Jira? What if it sends an embarrassing Slack message? What if it makes a commitment to a customer?
+The promise of AI agents is autonomy; systems that can execute complex workflows without constant human intervention. But in enterprise environments, autonomy creates anxiety. What if the agent writes something wrong to Jira? What if it sends an embarrassing Slack message? What if it makes a commitment to a customer?
 
 The draft-only pattern solves this tension. It gives agents the freedom to work independently while ensuring humans approve every external action.
 
@@ -21,7 +21,7 @@ The instinct is to add more guardrails: more rules, more constraints, more appro
 
 ## The Draft-Only Pattern
 
-Draft-only agents take a different approach. Instead of executing actions directly, they produce **proposals**—drafts that describe what they would do if approved.
+Draft-only agents take a different approach. Instead of executing actions directly, they produce **proposals**; drafts that describe what they would do if approved.
 
 ```
 Agent Workflow:
@@ -34,7 +34,7 @@ Agent Workflow:
 
 The key insight: **steps 1-3 are completely autonomous**. The agent can read from any connected system, process information, and generate sophisticated proposals without any human intervention.
 
-Only step 5—the actual write—requires approval.
+Only step 5; the actual write; requires approval.
 
 ## What Counts as a "Write"?
 
@@ -126,7 +126,7 @@ Because writes require approval, you can experiment with agent capabilities safe
 
 ### 4. Graceful Degradation
 
-If the agent makes a mistake, you catch it before it affects external systems. A hallucinated feature request stays as a proposal—it never becomes a real Jira ticket.
+If the agent makes a mistake, you catch it before it affects external systems. A hallucinated feature request stays as a proposal; it never becomes a real Jira ticket.
 
 ### 5. Human Judgment Where It Matters
 
@@ -136,7 +136,7 @@ The draft-only pattern keeps humans in the loop for decisions that matter: what 
 
 ### Batching Proposals
 
-For workflows that generate many writes, batch proposals together. A sprint planning agent might generate 10 Jira tickets—present them as a batch for review rather than 10 individual approvals.
+For workflows that generate many writes, batch proposals together. A sprint planning agent might generate 10 Jira tickets; present them as a batch for review rather than 10 individual approvals.
 
 ### Proposal Expiration
 
@@ -159,7 +159,7 @@ pmkit is built on draft-only principles:
 - **Full audit logging**: Every proposal, approval, and rejection is logged
 - **Batch operations**: Multiple proposals can be reviewed and approved together
 
-The demo console shows this in action—run a job and see how proposals are generated with full traceability.
+The demo console shows this in action; run a job and see how proposals are generated with full traceability.
 
 ## Common Objections
 

@@ -28,12 +28,12 @@ export const resources: ResourcePage[] = [
       {
         question: 'What is a product management agent?',
         answer:
-          'A product management agent is an AI system that executes multi-step PM workflows—like generating daily briefs, preparing for meetings, or drafting PRDs—by connecting to your existing tools (Jira, Slack, Gong) and synthesizing information across sources.',
+          'A product management agent is an AI system that executes multi-step PM workflows; like generating daily briefs, preparing for meetings, or drafting PRDs; by connecting to your existing tools (Jira, Slack, Gong) and synthesizing information across sources.',
       },
       {
         question: 'How is a PM agent different from a copilot?',
         answer:
-          'A copilot assists with single tasks (like writing a paragraph). An agent runs complete workflows autonomously—gathering data from multiple sources, synthesizing insights, and producing artifacts—while keeping humans in the loop for approvals.',
+          'A copilot assists with single tasks (like writing a paragraph). An agent runs complete workflows autonomously; gathering data from multiple sources, synthesizing insights, and producing artifacts; while keeping humans in the loop for approvals.',
       },
       {
         question: 'Can PM agents write directly to Jira or Confluence?',
@@ -46,7 +46,7 @@ export const resources: ResourcePage[] = [
     slug: 'ai-product-manager-assistant',
     title: 'AI Product Manager Assistant: Your Daily PM Toolkit',
     description:
-      'Discover how an AI product manager assistant handles briefs, themes, and PRDs—giving PMs more time for strategy and customer conversations.',
+      'Discover how an AI product manager assistant handles briefs, themes, and PRDs; giving PMs more time for strategy and customer conversations.',
     primaryKeyword: 'AI product manager assistant',
     secondaryKeywords: ['PM copilot', 'AI PM tool', 'product management AI'],
     category: 'agents',
@@ -60,7 +60,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'Will an AI assistant replace product managers?',
         answer:
-          'No. AI assistants handle information synthesis and document drafting—the operational work. PMs focus on strategy, customer relationships, and decision-making that requires human judgment.',
+          'No. AI assistants handle information synthesis and document drafting; the operational work. PMs focus on strategy, customer relationships, and decision-making that requires human judgment.',
       },
       {
         question: 'How does pmkit ensure AI output quality?',
@@ -73,7 +73,7 @@ export const resources: ResourcePage[] = [
     slug: 'agentic-product-management',
     title: 'Agentic Product Management: Multi-Step AI Workflows',
     description:
-      'Explore agentic product management—where AI agents run complete PM workflows across tools, with governance and traceability built in.',
+      'Explore agentic product management; where AI agents run complete PM workflows across tools, with governance and traceability built in.',
     primaryKeyword: 'agentic product management',
     secondaryKeywords: ['AI PM workflows', 'autonomous PM agent', 'multi-step PM automation'],
     category: 'agents',
@@ -82,7 +82,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What makes product management "agentic"?',
         answer:
-          'Agentic PM means AI agents execute multi-step workflows—not just single prompts. An agent might pull Slack messages, cross-reference Jira tickets, analyze Gong transcripts, and produce a synthesized brief—all in one job.',
+          'Agentic PM means AI agents execute multi-step workflows; not just single prompts. An agent might pull Slack messages, cross-reference Jira tickets, analyze Gong transcripts, and produce a synthesized brief; all in one job.',
       },
       {
         question: 'How do agentic workflows maintain quality?',
@@ -102,7 +102,7 @@ export const resources: ResourcePage[] = [
     slug: 'prd-automation',
     title: 'PRD Automation: Draft Product Requirements with Evidence',
     description:
-      'Automate PRD drafts that include customer evidence, analytics signals, and open questions—without hallucination.',
+      'Automate PRD drafts that include customer evidence, analytics signals, and open questions; without hallucination.',
     primaryKeyword: 'PRD automation',
     secondaryKeywords: ['AI PRD generator', 'product requirements document AI', 'automated PRD'],
     category: 'workflows',
@@ -212,7 +212,7 @@ export const resources: ResourcePage[] = [
     slug: 'slack-to-jira-draft-epics',
     title: 'Slack to Jira: Draft Epics from Conversations',
     description:
-      'Turn Slack discussions into draft Jira epics with context, requirements, and acceptance criteria—ready for review.',
+      'Turn Slack discussions into draft Jira epics with context, requirements, and acceptance criteria; ready for review.',
     primaryKeyword: 'Slack to Jira',
     secondaryKeywords: ['Slack Jira integration AI', 'conversation to epic', 'Slack to ticket'],
     category: 'integrations',
@@ -444,7 +444,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What Confluence workflows are supported?',
         answer:
-          'pmkit can draft PRD pages, update roadmap documents, create meeting notes, and generate VoC reports—all as proposals for your review.',
+          'pmkit can draft PRD pages, update roadmap documents, create meeting notes, and generate VoC reports; all as proposals for your review.',
       },
       {
         question: 'Does pmkit support Jira Cloud and Data Center?',
@@ -530,7 +530,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'How do analytics insights inform product decisions?',
         answer:
-          'Analytics insights feed into VoC reports, PRD evidence sections, and roadmap alignment memos—grounding decisions in quantitative data.',
+          'Analytics insights feed into VoC reports, PRD evidence sections, and roadmap alignment memos; grounding decisions in quantitative data.',
       },
     ],
   },
@@ -552,7 +552,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What actions can I take on detected risks?',
         answer:
-          'pmkit can draft Slack messages to dependent teams, propose Jira comments, or escalate to stakeholders—all as proposals for your review.',
+          'pmkit can draft Slack messages to dependent teams, propose Jira comments, or escalate to stakeholders; all as proposals for your review.',
       },
       {
         question: 'Can I configure which dependencies to monitor?',

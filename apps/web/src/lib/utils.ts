@@ -43,7 +43,7 @@ export function getReadingTime(content: string): number {
 
 export const siteConfig = {
   name: 'pmkit',
-  description: 'Your daily PM toolkit—briefs, meetings, and PRDs made simple.',
+  description: 'Your daily PM toolkit - briefs, meetings, and PRDs made simple.',
   url: 'https://getpmkit.com',
   ogImage: 'https://getpmkit.com/og.png',
   links: {

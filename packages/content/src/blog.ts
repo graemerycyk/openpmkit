@@ -44,7 +44,7 @@ export const blogPosts: BlogPost[] = [
     slug: 'draft-only-ai-agents',
     title: 'Draft-only AI agents: how to get autonomy without losing control',
     description:
-      'Explore the draft-only pattern for AI agents—how to give agents autonomy over workflows while keeping humans in control of all external writes.',
+      'Explore the draft-only pattern for AI agents; how to give agents autonomy over workflows while keeping humans in control of all external writes.',
     publishedAt: '2025-12-25',
     author: 'pmkit team',
     authorRole: 'Product',
@@ -184,7 +184,7 @@ export const blogPosts: BlogPost[] = [
     slug: 'product-ops-automation',
     title: 'Product ops automation: what to standardize first in an enterprise team',
     description:
-      'A prioritization framework for product ops automation—which workflows to standardize first and how to measure success.',
+      'A prioritization framework for product ops automation; which workflows to standardize first and how to measure success.',
     publishedAt: '2025-11-06',
     author: 'pmkit team',
     authorRole: 'Product',

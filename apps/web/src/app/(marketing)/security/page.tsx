@@ -37,7 +37,7 @@ const securityFeatures = [
     icon: Users,
     title: 'SSO & OAuth',
     description:
-      'Enterprise SSO integration with Google and Microsoft. No passwords stored—authentication delegated to your identity provider.',
+      'Enterprise SSO integration with Google and Microsoft. No passwords stored; authentication delegated to your identity provider.',
   },
   {
     icon: Server,

@@ -31,7 +31,7 @@ const steps = [
     number: '01',
     title: 'Connect Your Tools',
     description:
-      'MCP (Model Context Protocol) connectors link pmkit to your existing tools—Jira, Confluence, Slack, Gong, Zendesk, and more. Each connector authenticates securely and logs every interaction.',
+      'MCP (Model Context Protocol) connectors link pmkit to your existing tools; Jira, Confluence, Slack, Gong, Zendesk, and more. Each connector authenticates securely and logs every interaction.',
     icon: Database,
     details: [
       'OAuth 2.0 or API key authentication',
@@ -44,7 +44,7 @@ const steps = [
     number: '02',
     title: 'Configure Jobs',
     description:
-      'Set up the PM jobs you want to run—daily briefs, meeting prep, VoC clustering, competitor intel, roadmap alignment, or PRD drafts. Configure sources, schedules, and output destinations.',
+      'Set up the PM jobs you want to run; daily briefs, meeting prep, VoC clustering, competitor intel, roadmap alignment, or PRD drafts. Configure sources, schedules, and output destinations.',
     icon: Workflow,
     details: [
       'Six pre-built job types',
@@ -57,7 +57,7 @@ const steps = [
     number: '03',
     title: 'Run with Traceability',
     description:
-      'When a job runs, pmkit executes a multi-step workflow—calling tools, synthesizing data, and generating artifacts. Every step is logged with timing, inputs, and outputs.',
+      'When a job runs, pmkit executes a multi-step workflow; calling tools, synthesizing data, and generating artifacts. Every step is logged with timing, inputs, and outputs.',
     icon: Eye,
     details: [
       'Real-time job progress tracking',
@@ -162,7 +162,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">Step by Step</h2>
             <p className="mt-4 text-muted-foreground">
-              From connecting tools to reviewing proposals—here's how a pmkit workflow runs.
+              From connecting tools to reviewing proposals; here's how a pmkit workflow runs.
             </p>
           </div>
           <div className="mt-16 space-y-16">

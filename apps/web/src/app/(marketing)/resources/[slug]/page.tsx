@@ -64,7 +64,7 @@ Understanding ${resource.primaryKeyword} is essential for modern product teams l
 
 ## Why ${resource.primaryKeyword} Matters
 
-Product managers today face an overwhelming amount of information from multiple sources—Slack messages, Jira tickets, support conversations, customer calls, and community feedback. Manually synthesizing this information is time-consuming and error-prone.
+Product managers today face an overwhelming amount of information from multiple sources; Slack messages, Jira tickets, support conversations, customer calls, and community feedback. Manually synthesizing this information is time-consuming and error-prone.
 
 ${resource.primaryKeyword} addresses this challenge by:
 
@@ -142,7 +142,7 @@ Ready to try ${resource.primaryKeyword}? Here's how to get started:
 When implementing ${resource.primaryKeyword}, keep these best practices in mind:
 
 1. **Start with one job type** and expand as you see value
-2. **Review proposals carefully** before approving—the draft-only model is there for a reason
+2. **Review proposals carefully** before approving; the draft-only model is there for a reason
 3. **Use the audit log** to understand how insights are generated
 4. **Iterate on templates** based on what's most useful for your team
 5. **Train your team** on the review and approval workflow

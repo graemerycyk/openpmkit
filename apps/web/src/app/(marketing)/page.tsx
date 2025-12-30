@@ -21,7 +21,7 @@ const features = [
     icon: FileText,
     title: 'Daily Briefs',
     description:
-      'Start each day with a synthesized brief from Slack, Jira, support, and community—automatically.',
+      'Start each day with a synthesized brief from Slack, Jira, support, and community; automatically.',
   },
   {
     icon: Users,
@@ -39,7 +39,7 @@ const features = [
     icon: Target,
     title: 'Competitor Intel',
     description:
-      'Track competitor changes—pricing, features, messaging—with strategic implications.',
+      'Track competitor changes; pricing, features, messaging; with strategic implications.',
   },
   {
     icon: GitBranch,
@@ -89,7 +89,7 @@ export default function HomePage() {
             url: 'https://getpmkit.com',
             logo: 'https://getpmkit.com/logo.png',
             description:
-              'Your daily PM toolkit—briefs, meetings, and PRDs made simple.',
+              'Your daily PM toolkit - briefs, meetings, and PRDs made simple.',
             sameAs: [
               'https://twitter.com/getpmkit',
               'https://github.com/getpmkit',
@@ -145,12 +145,12 @@ export default function HomePage() {
               Now in Beta
             </Badge>
             <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Your daily PM toolkit—
+              Your daily PM toolkit; 
               <span className="text-cobalt-600">briefs, meetings, and PRDs</span> made simple.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Draft smarter. Decide faster. pmkit runs your PM workflows—daily briefs, meeting
-              prep, VoC themes, and PRD drafts—while you focus on strategy.
+              Draft smarter. Decide faster. pmkit runs your PM workflows; daily briefs, meeting
+              prep, VoC themes, and PRD drafts; while you focus on strategy.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
@@ -179,7 +179,7 @@ export default function HomePage() {
               The kit every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              AI briefs, themes, and draft PRDs—run end-to-end with traceability and governance.
+              AI briefs, themes, and draft PRDs; run end-to-end with traceability and governance.
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -226,7 +226,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-heading text-lg font-semibold">Connect Your Tools</h3>
               <p className="mt-2 text-muted-foreground">
-                MCP connectors link to Jira, Slack, Gong, and more—securely and with audit logging.
+                MCP connectors link to Jira, Slack, Gong, and more; securely and with audit logging.
               </p>
             </div>
             <div className="text-center">
@@ -238,7 +238,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-heading text-lg font-semibold">Run Jobs</h3>
               <p className="mt-2 text-muted-foreground">
-                Trigger daily briefs, meeting prep, VoC clustering, or PRD drafts—on demand or
+                Trigger daily briefs, meeting prep, VoC clustering, or PRD drafts; on demand or
                 scheduled.
               </p>
             </div>
@@ -356,7 +356,7 @@ export default function HomePage() {
               Ready to try pmkit?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
-              Run all 6 cadence jobs in the demo—daily brief, meeting prep, VoC clustering,
+              Run all 6 cadence jobs in the demo; daily brief, meeting prep, VoC clustering,
               competitor intel, roadmap alignment, and PRD draft.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

@@ -119,7 +119,7 @@ export default function DemoPage() {
             <div className="mt-8">
               <Button size="lg" asChild>
                 <Link href="/demo/console">
-                  Launch Console
+                  Launch Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -134,7 +134,7 @@ export default function DemoPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">6 Cadence Jobs</h2>
             <p className="mt-4 text-muted-foreground">
-              Run any job to see the complete workflow—tool calls, sources, and artifacts.
+              Run any job to see the complete workflow; tool calls, sources, and artifacts.
             </p>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -239,13 +239,13 @@ export default function DemoPage() {
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/demo/console">
                   <Play className="mr-2 h-4 w-4" />
-                  Launch Console
+                  Launch Dashboard
                 </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white/10"
+                className="border-white bg-white text-cobalt-600 hover:bg-white/90"
                 asChild
               >
                 <Link href="/contact">Contact Sales</Link>
