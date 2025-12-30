@@ -4,8 +4,13 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { ArrowRight, ArrowLeft, CheckCircle2, Lightbulb, Target, Zap } from 'lucide-react';
 import { getResourceBySlug, getAllResourceSlugs, type ResourcePage } from '@pmkit/content';
 import { siteConfig } from '@/lib/utils';
 
@@ -52,108 +57,7 @@ const categoryLabels: Record<ResourcePage['category'], string> = {
   voc: 'Voice of Customer',
 };
 
-// Generate long-form content for each resource
-function generateResourceContent(resource: ResourcePage): string {
-  // This would typically come from MDX files, but for the MVP we generate it
-  return `
-## What is ${resource.title.split(':')[0]}?
-
-${resource.description}
-
-Understanding ${resource.primaryKeyword} is essential for modern product teams looking to scale their operations while maintaining quality and governance. This guide covers everything you need to know about implementing ${resource.primaryKeyword} in your organization.
-
-## Why ${resource.primaryKeyword} Matters
-
-Product managers today face an overwhelming amount of information from multiple sources; Slack messages, Jira tickets, support conversations, customer calls, and community feedback. Manually synthesizing this information is time-consuming and error-prone.
-
-${resource.primaryKeyword} addresses this challenge by:
-
-- **Automating information gathering** across your tool stack
-- **Synthesizing insights** from multiple sources into coherent artifacts
-- **Maintaining traceability** so every insight can be traced back to its source
-- **Enabling governance** through draft-only workflows and audit logging
-
-## Key Concepts
-
-### Multi-Step Workflows
-
-Unlike simple AI assistants that respond to single prompts, ${resource.primaryKeyword} involves running complete workflows that span multiple tools and data sources. A typical workflow might:
-
-1. Pull recent messages from Slack product channels
-2. Cross-reference with open Jira tickets
-3. Analyze Gong call transcripts for related mentions
-4. Synthesize everything into a coherent brief or document
-
-### Draft-Only Pattern
-
-One of the most important aspects of ${resource.primaryKeyword} is the draft-only pattern. This means:
-
-- Agents **never write directly** to external systems
-- All outputs are **proposals** for human review
-- You can **edit and refine** before publishing
-- Full **audit trail** of what was proposed vs. approved
-
-### MCP Connectors
-
-pmkit uses MCP (Model Context Protocol) connectors to integrate with your tools. This architecture means:
-
-- **Standardized integration** patterns across all tools
-- **Swap mock for real** connectors without changing job logic
-- **Secure authentication** with OAuth 2.0 or API keys
-- **Audit logging** for every API call
-
-## How pmkit Handles This
-
-pmkit provides a complete solution for ${resource.primaryKeyword}:
-
-### Pre-Built Job Types
-
-- **Daily Brief**: Synthesize overnight activity from Slack, Jira, support, and community
-- **Meeting Prep**: Prepare for customer meetings with context from calls and tickets
-- **VoC Clustering**: Cluster feedback into actionable themes with evidence
-- **Competitor Intel**: Track competitor changes with strategic implications
-- **Roadmap Alignment**: Generate alignment memos with options and trade-offs
-- **PRD Draft**: Draft PRDs grounded in customer evidence
-
-### Enterprise Governance
-
-- Role-based access control (RBAC)
-- Permission simulation for testing
-- Comprehensive audit logging
-- Proposal expiration policies
-
-### Traceability
-
-- Every insight cites its source
-- Tool call timeline with durations
-- Downloadable artifacts in multiple formats
-
-## Getting Started
-
-Ready to try ${resource.primaryKeyword}? Here's how to get started:
-
-1. **Try the Demo**: Run all six job types with mock enterprise data
-2. **Contact Sales**: Get a personalized walkthrough for your team
-3. **Configure Connectors**: Connect to your existing tools
-4. **Run Your First Job**: Start with a daily brief to see the value immediately
-
-## Best Practices
-
-When implementing ${resource.primaryKeyword}, keep these best practices in mind:
-
-1. **Start with one job type** and expand as you see value
-2. **Review proposals carefully** before approving; the draft-only model is there for a reason
-3. **Use the audit log** to understand how insights are generated
-4. **Iterate on templates** based on what's most useful for your team
-5. **Train your team** on the review and approval workflow
-
-## Related Resources
-
-Explore these related topics to deepen your understanding:
-`;
-}
-
-export default async function ResourcePage({ params }: PageProps) {
+export default async function ResourcePageComponent({ params }: PageProps) {
   const { slug } = await params;
   const resource = getResourceBySlug(slug);
 
@@ -161,14 +65,12 @@ export default async function ResourcePage({ params }: PageProps) {
     notFound();
   }
 
-  const content = generateResourceContent(resource);
-
   // Get related resources
   const relatedResources = resource.relatedPages
     .filter((path) => path.startsWith('/resources/'))
     .map((path) => {
-      const slug = path.replace('/resources/', '');
-      return getResourceBySlug(slug);
+      const relatedSlug = path.replace('/resources/', '');
+      return getResourceBySlug(relatedSlug);
     })
     .filter((r): r is ResourcePage => r !== undefined)
     .slice(0, 3);
@@ -226,72 +128,258 @@ export default async function ResourcePage({ params }: PageProps) {
                 </Badge>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Content */}
-      <section className="pb-16">
-        <div className="container">
-          <div className="mx-auto max-w-3xl">
-            <div className="prose" dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br/>').replace(/## /g, '</p><h2>').replace(/### /g, '</p><h3>').replace(/- \*\*/g, '<li><strong>').replace(/\*\*/g, '</strong>').replace(/<\/strong> /g, '</strong>: ') }} />
-
-            {/* CTA */}
-            <div className="mt-12 rounded-lg bg-cobalt-50 p-8">
-              <h3 className="font-heading text-xl font-bold">Try it in the pmkit demo</h3>
-              <p className="mt-2 text-muted-foreground">
-                See {resource.primaryKeyword} in action with a complete mock enterprise dataset.
-              </p>
-              <Button className="mt-4" asChild>
+            <div className="mt-8 flex gap-4">
+              <Button asChild>
                 <Link href="/demo">
                   Try the Demo
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+              <Button variant="outline" asChild>
+                <Link href="/contact">Contact Sales</Link>
+              </Button>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* FAQ */}
-            <div className="mt-16">
-              <h2 className="font-heading text-2xl font-bold">Frequently Asked Questions</h2>
-              <Accordion type="single" collapsible className="mt-6">
-                {resource.faqItems.map((item, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="text-left">
-                      {item.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      {item.answer}
-                    </AccordionContent>
-                  </AccordionItem>
+      {/* Key Benefits */}
+      {resource.keyBenefits && (
+        <section className="border-t bg-muted/30 py-12">
+          <div className="container">
+            <div className="mx-auto max-w-3xl">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {resource.keyBenefits.map((benefit, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="rounded-full bg-green-100 p-1">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    </div>
+                    <span className="text-sm font-medium">{benefit}</span>
+                  </div>
                 ))}
-              </Accordion>
-            </div>
-
-            {/* Related Resources */}
-            {relatedResources.length > 0 && (
-              <div className="mt-16">
-                <h2 className="font-heading text-2xl font-bold">Related Resources</h2>
-                <div className="mt-6 grid gap-4">
-                  {relatedResources.map((related) => (
-                    <Link key={related.slug} href={`/resources/${related.slug}`}>
-                      <Card className="transition-shadow hover:shadow-md">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg">{related.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {related.description}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
               </div>
-            )}
+            </div>
+          </div>
+        </section>
+      )}
 
-            {/* Contact CTA */}
-            <div className="mt-16 rounded-lg border p-8 text-center">
+      {/* Worked Example */}
+      {resource.workedExample && (
+        <section className="py-12 md:py-16">
+          <div className="container">
+            <div className="mx-auto max-w-3xl">
+              <div className="flex items-center gap-2 text-cobalt-600">
+                <Lightbulb className="h-5 w-5" />
+                <span className="text-sm font-semibold uppercase tracking-wide">
+                  Real Example
+                </span>
+              </div>
+              <h2 className="mt-2 font-heading text-2xl font-bold">
+                {resource.workedExample.title}
+              </h2>
+              <p className="mt-4 text-muted-foreground">{resource.workedExample.scenario}</p>
+
+              <div className="mt-8 rounded-lg border bg-card p-6">
+                <h3 className="font-semibold">How it works:</h3>
+                <ol className="mt-4 space-y-3">
+                  {resource.workedExample.steps.map((step, index) => (
+                    <li key={index} className="flex gap-3">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cobalt-100 text-xs font-semibold text-cobalt-700">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm text-muted-foreground">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <div className="mt-6 rounded-lg border-l-4 border-green-500 bg-green-50 p-4">
+                <div className="flex items-center gap-2 font-semibold text-green-800">
+                  <Target className="h-4 w-4" />
+                  Outcome
+                </div>
+                <p className="mt-1 text-sm text-green-700">{resource.workedExample.outcome}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Is This Right For You? Checklist */}
+      {resource.checklist && (
+        <section className="border-t bg-muted/30 py-12 md:py-16">
+          <div className="container">
+            <div className="mx-auto max-w-3xl">
+              <h2 className="font-heading text-2xl font-bold">Is this right for you?</h2>
+              <p className="mt-2 text-muted-foreground">
+                If you answer &quot;yes&quot; to any of these, {resource.primaryKeyword} can help.
+              </p>
+              <div className="mt-8 space-y-4">
+                {resource.checklist.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 rounded-lg border bg-card p-4"
+                  >
+                    <div className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-cobalt-300" />
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* How pmkit Handles This */}
+      <section className="py-12 md:py-16">
+        <div className="container">
+          <div className="mx-auto max-w-3xl">
+            <div className="flex items-center gap-2 text-cobalt-600">
+              <Zap className="h-5 w-5" />
+              <span className="text-sm font-semibold uppercase tracking-wide">
+                The pmkit Solution
+              </span>
+            </div>
+            <h2 className="mt-2 font-heading text-2xl font-bold">
+              How pmkit handles {resource.primaryKeyword}
+            </h2>
+
+            <div className="mt-8 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Pre-Built Job Types</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>
+                      • <strong>Daily Brief</strong>: Synthesize overnight activity from Slack,
+                      Jira, support, and community
+                    </li>
+                    <li>
+                      • <strong>Meeting Prep</strong>: Prepare for customer meetings with context
+                      from calls and tickets
+                    </li>
+                    <li>
+                      • <strong>VoC Clustering</strong>: Cluster feedback into actionable themes
+                      with evidence
+                    </li>
+                    <li>
+                      • <strong>Competitor Intel</strong>: Track competitor changes with strategic
+                      implications
+                    </li>
+                    <li>
+                      • <strong>Roadmap Alignment</strong>: Generate alignment memos with options
+                      and trade-offs
+                    </li>
+                    <li>
+                      • <strong>PRD Draft</strong>: Draft PRDs grounded in customer evidence
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Draft-Only Pattern</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    pmkit never writes directly to external systems. All outputs are proposals that
+                    you review, edit, and approve before anything is published. This gives you AI
+                    autonomy with human control.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Enterprise Governance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Role-based access control (RBAC)</li>
+                    <li>• Comprehensive audit logging</li>
+                    <li>• SSO integration (SAML/OIDC)</li>
+                    <li>• Every insight cites its source</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-cobalt-600 py-12">
+        <div className="container">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="font-heading text-2xl font-bold text-white">
+              Try {resource.primaryKeyword} in the demo
+            </h2>
+            <p className="mt-2 text-cobalt-100">
+              See it in action with a complete mock enterprise dataset. No signup required.
+            </p>
+            <Button className="mt-6 bg-white text-cobalt-600 hover:bg-cobalt-50" asChild>
+              <Link href="/demo">
+                Launch Demo
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-12 md:py-16">
+        <div className="container">
+          <div className="mx-auto max-w-3xl">
+            <h2 className="font-heading text-2xl font-bold">Frequently Asked Questions</h2>
+            <Accordion type="single" collapsible className="mt-6">
+              {resource.faqItems.map((item, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Resources */}
+      {relatedResources.length > 0 && (
+        <section className="border-t bg-muted/30 py-12 md:py-16">
+          <div className="container">
+            <div className="mx-auto max-w-3xl">
+              <h2 className="font-heading text-2xl font-bold">Related Resources</h2>
+              <div className="mt-6 grid gap-4">
+                {relatedResources.map((related) => (
+                  <Link key={related.slug} href={`/resources/${related.slug}`}>
+                    <Card className="transition-shadow hover:shadow-md">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">{related.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                          {related.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Contact CTA */}
+      <section className="py-12 md:py-16">
+        <div className="container">
+          <div className="mx-auto max-w-3xl">
+            <div className="rounded-lg border p-8 text-center">
               <h3 className="font-heading text-xl font-bold">Ready to get started?</h3>
               <p className="mt-2 text-muted-foreground">
                 Contact sales for a personalized demo and pricing.
@@ -317,4 +405,3 @@ export default async function ResourcePage({ params }: PageProps) {
     </>
   );
 }
-

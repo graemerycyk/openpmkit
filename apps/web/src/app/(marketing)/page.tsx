@@ -14,6 +14,8 @@ import {
   Link2,
   Play,
   ClipboardCheck,
+  MessageSquare,
+  Mail,
 } from 'lucide-react';
 
 const features = [
@@ -311,6 +313,94 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trigger From Where You Work Section */}
+      <section className="py-20 md:py-32">
+        <div className="container">
+          <div className="mx-auto max-w-3xl text-center">
+            <Badge variant="outline" className="mb-4">
+              Coming Soon
+            </Badge>
+            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
+              Trigger pmkit from where you already work
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Start jobs from Slack, Teams, or email. No dashboard required.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-3">
+            {/* Slack */}
+            <Card className="border-2">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#4A154B] p-2">
+                    <MessageSquare className="h-5 w-5 text-white" />
+                  </div>
+                  <CardTitle className="text-lg">Slack</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <code className="block rounded bg-muted p-3 text-sm font-mono">
+                  /pmkit run daily brief
+                </code>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  DM the agent or use slash commands in any channel.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Teams */}
+            <Card className="border-2">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#5059C9] p-2">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <CardTitle className="text-lg">Teams</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <code className="block rounded bg-muted p-3 text-sm font-mono">
+                  @pmkit prep meeting Acme
+                </code>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Mention the bot in any Teams channel or chat.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Email */}
+            <Card className="border-2">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-cobalt-600 p-2">
+                    <Mail className="h-5 w-5 text-white" />
+                  </div>
+                  <CardTitle className="text-lg">Email</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <code className="block rounded bg-muted p-3 text-sm font-mono">
+                  Subject: weekly themes
+                </code>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Email your agent address with job instructions.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Slack integration available now in beta.{' '}
+              <Link href="/contact" className="font-medium text-cobalt-600 hover:underline">
+                Request early access →
+              </Link>
+            </p>
           </div>
         </div>
       </section>

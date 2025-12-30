@@ -2,6 +2,13 @@
 // Resources Page Definitions
 // ============================================================================
 
+export interface WorkedExample {
+  title: string;
+  scenario: string;
+  steps: string[];
+  outcome: string;
+}
+
 export interface ResourcePage {
   slug: string;
   title: string;
@@ -11,6 +18,11 @@ export interface ResourcePage {
   category: 'agents' | 'workflows' | 'integrations' | 'governance' | 'competitive' | 'voc';
   relatedPages: string[];
   faqItems: { question: string; answer: string }[];
+  // SEO-enhanced fields
+  workedExample?: WorkedExample;
+  checklist?: string[];
+  keyBenefits?: string[];
+  useCases?: string[];
 }
 
 export const resources: ResourcePage[] = [
@@ -24,21 +36,56 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['AI PM agent', 'PM automation', 'agentic product management'],
     category: 'agents',
     relatedPages: ['/demo', '/resources/agentic-product-management', '/resources/draft-only-ai-agent'],
+    workedExample: {
+      title: 'Daily Brief Generation in Action',
+      scenario: 'Sarah, a PM at a B2B SaaS company, starts her day at 8am. Instead of spending 45 minutes checking Slack, Jira, and support tickets, she runs the Daily Brief job.',
+      steps: [
+        'Agent pulls 47 messages from #product-feedback and #customer-success Slack channels',
+        'Cross-references 12 open Jira tickets in the current sprint with their status changes',
+        'Identifies 3 enterprise escalations from Zendesk with P1 priority',
+        'Analyzes 8 community posts mentioning search functionality',
+        'Synthesizes all data into a structured brief with urgency rankings',
+      ],
+      outcome: 'Sarah spends 5 minutes reviewing a prioritized brief instead of 45 minutes gathering information. She identifies a critical bug affecting enterprise customers before her first meeting.',
+    },
+    checklist: [
+      'Do you spend more than 30 minutes daily gathering information from multiple tools?',
+      'Are customer signals scattered across Slack, support tickets, and call recordings?',
+      'Do stakeholders frequently ask for the same status updates?',
+      'Is your team missing important customer escalations until they become critical?',
+      'Do you wish you had a synthesized view of overnight activity each morning?',
+    ],
+    keyBenefits: [
+      'Reduce information gathering time by 80%',
+      'Never miss critical customer escalations',
+      'Start every day with prioritized action items',
+      'Keep stakeholders informed without manual updates',
+    ],
     faqItems: [
       {
         question: 'What is a product management agent?',
         answer:
-          'A product management agent is an AI system that executes multi-step PM workflows; like generating daily briefs, preparing for meetings, or drafting PRDs; by connecting to your existing tools (Jira, Slack, Gong) and synthesizing information across sources.',
+          'A product management agent is an AI system that executes multi-step PM workflows—like generating daily briefs, preparing for meetings, or drafting PRDs—by connecting to your existing tools (Jira, Slack, Gong) and synthesizing information across sources.',
       },
       {
         question: 'How is a PM agent different from a copilot?',
         answer:
-          'A copilot assists with single tasks (like writing a paragraph). An agent runs complete workflows autonomously; gathering data from multiple sources, synthesizing insights, and producing artifacts; while keeping humans in the loop for approvals.',
+          'A copilot assists with single tasks (like writing a paragraph). An agent runs complete workflows autonomously—gathering data from multiple sources, synthesizing insights, and producing artifacts—while keeping humans in the loop for approvals.',
       },
       {
         question: 'Can PM agents write directly to Jira or Confluence?',
         answer:
           'pmkit uses a draft-only approach: agents propose changes (new epics, PRD pages, Slack messages) but never write directly. You review, edit, and approve before anything is published.',
+      },
+      {
+        question: 'What tools does a PM agent connect to?',
+        answer:
+          'pmkit agents connect to Jira, Confluence, Slack, Gong, Zendesk, community forums (Discourse, GitHub), and analytics platforms via MCP connectors. Enterprise customers can add custom integrations.',
+      },
+      {
+        question: 'How long does it take to set up a PM agent?',
+        answer:
+          'Most teams are running their first jobs within 30 minutes. Connect your tools via OAuth, configure your first job template, and run it. No engineering required.',
       },
     ],
   },
@@ -46,11 +93,36 @@ export const resources: ResourcePage[] = [
     slug: 'ai-product-manager-assistant',
     title: 'AI Product Manager Assistant: Your Daily PM Toolkit',
     description:
-      'Discover how an AI product manager assistant handles briefs, themes, and PRDs; giving PMs more time for strategy and customer conversations.',
+      'Discover how an AI product manager assistant handles briefs, themes, and PRDs—giving PMs more time for strategy and customer conversations.',
     primaryKeyword: 'AI product manager assistant',
     secondaryKeywords: ['PM copilot', 'AI PM tool', 'product management AI'],
     category: 'agents',
     relatedPages: ['/demo', '/resources/product-management-agent', '/pricing'],
+    workedExample: {
+      title: 'Meeting Prep That Actually Prepares You',
+      scenario: 'Before a QBR with Globex Corp, Marcus needs context on the account. The AI assistant prepares a comprehensive meeting pack.',
+      steps: [
+        'Pulls last 5 Gong call transcripts with Globex stakeholders',
+        'Extracts pain points mentioned: search frustration (mentioned 12 times), dashboard performance (8 times)',
+        'Retrieves open support tickets and their resolution status',
+        'Identifies expansion opportunity: they mentioned 4x seat growth if issues resolved',
+        'Compiles talking points aligned with their specific concerns',
+      ],
+      outcome: 'Marcus walks into the meeting knowing exactly what matters to Globex. He addresses their search concerns proactively and secures verbal commitment for the expansion.',
+    },
+    checklist: [
+      'Do you scramble to prepare for customer meetings at the last minute?',
+      'Have you missed important context from previous customer conversations?',
+      'Do you struggle to remember which customers mentioned which pain points?',
+      'Is your meeting prep inconsistent across different accounts?',
+      'Do you wish you had a system that remembered every customer interaction?',
+    ],
+    keyBenefits: [
+      'Walk into every meeting fully prepared',
+      'Never forget important customer context',
+      'Identify expansion opportunities automatically',
+      'Consistent preparation across all accounts',
+    ],
     faqItems: [
       {
         question: 'What tasks can an AI PM assistant handle?',
@@ -60,12 +132,17 @@ export const resources: ResourcePage[] = [
       {
         question: 'Will an AI assistant replace product managers?',
         answer:
-          'No. AI assistants handle information synthesis and document drafting; the operational work. PMs focus on strategy, customer relationships, and decision-making that requires human judgment.',
+          'No. AI assistants handle information synthesis and document drafting—the operational work. PMs focus on strategy, customer relationships, and decision-making that requires human judgment.',
       },
       {
         question: 'How does pmkit ensure AI output quality?',
         answer:
           'Every artifact includes sources and citations, so you can trace insights back to original data. The draft-only model means you always review before publishing.',
+      },
+      {
+        question: 'Can I customize what the assistant focuses on?',
+        answer:
+          'Yes. Configure job templates to prioritize specific data sources, customer segments, or topics. Enterprise customers can create fully custom workflows.',
       },
     ],
   },
@@ -73,16 +150,41 @@ export const resources: ResourcePage[] = [
     slug: 'agentic-product-management',
     title: 'Agentic Product Management: Multi-Step AI Workflows',
     description:
-      'Explore agentic product management; where AI agents run complete PM workflows across tools, with governance and traceability built in.',
+      'Explore agentic product management—where AI agents run complete PM workflows across tools, with governance and traceability built in.',
     primaryKeyword: 'agentic product management',
     secondaryKeywords: ['AI PM workflows', 'autonomous PM agent', 'multi-step PM automation'],
     category: 'agents',
     relatedPages: ['/demo', '/resources/product-management-agent', '/how-it-works'],
+    workedExample: {
+      title: 'From Customer Feedback to PRD in One Workflow',
+      scenario: 'The product team needs to prioritize the next major feature. An agentic workflow synthesizes evidence from multiple sources into a decision-ready PRD.',
+      steps: [
+        'Agent queries Gong for pain points mentioned in last 30 days (finds 47 mentions of "search")',
+        'Pulls community feature requests and vote counts (89 votes for search filters)',
+        'Analyzes support ticket themes from Zendesk (35% mention search frustration)',
+        'Checks competitor landscape for recent search-related launches',
+        'Drafts PRD with problem statement, evidence, and proposed solution',
+      ],
+      outcome: 'The team has a PRD grounded in customer evidence, not assumptions. Every claim links to a source. Decision-makers can trust the prioritization.',
+    },
+    checklist: [
+      'Are your PRDs based on evidence or intuition?',
+      'Do you struggle to synthesize feedback from multiple channels?',
+      'Is there a gap between what customers say and what gets built?',
+      'Do you wish you could trace every product decision to customer evidence?',
+      'Are your competitors shipping features you should have prioritized?',
+    ],
+    keyBenefits: [
+      'PRDs grounded in real customer evidence',
+      'Synthesize feedback from all channels automatically',
+      'Trace every decision to its source',
+      'Move faster with confidence',
+    ],
     faqItems: [
       {
-        question: 'What makes product management "agentic"?',
+        question: "What makes product management 'agentic'?",
         answer:
-          'Agentic PM means AI agents execute multi-step workflows; not just single prompts. An agent might pull Slack messages, cross-reference Jira tickets, analyze Gong transcripts, and produce a synthesized brief; all in one job.',
+          'Agentic PM means AI agents execute multi-step workflows—not just single prompts. An agent might pull Slack messages, cross-reference Jira tickets, analyze Gong transcripts, and produce a synthesized brief—all in one job.',
       },
       {
         question: 'How do agentic workflows maintain quality?',
@@ -92,7 +194,12 @@ export const resources: ResourcePage[] = [
       {
         question: 'What integrations support agentic PM?',
         answer:
-          'pmkit connects to Jira, Confluence, Slack, Gong, Zendesk, community forums, and analytics platforms via MCP (Model Context Protocol) connectors.',
+          'pmkit connects to Jira, Confluence, Slack, Gong, Zendesk, community platforms, and analytics tools via MCP (Model Context Protocol) connectors.',
+      },
+      {
+        question: 'How is this different from just using ChatGPT?',
+        answer:
+          'ChatGPT requires you to copy-paste context. Agentic workflows connect directly to your tools, pull real-time data, and execute multi-step processes automatically with full traceability.',
       },
     ],
   },
@@ -102,16 +209,41 @@ export const resources: ResourcePage[] = [
     slug: 'prd-automation',
     title: 'PRD Automation: Draft Product Requirements with Evidence',
     description:
-      'Automate PRD drafts that include customer evidence, analytics signals, and open questions; without hallucination.',
+      'Automate PRD drafts that include customer evidence, analytics signals, and open questions—without hallucination.',
     primaryKeyword: 'PRD automation',
     secondaryKeywords: ['AI PRD generator', 'product requirements document AI', 'automated PRD'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/product-management-agent', '/blog'],
+    workedExample: {
+      title: 'Evidence-Based PRD for Search Filters',
+      scenario: 'The team needs a PRD for the most-requested feature: search filters. Instead of starting from scratch, the PM runs the PRD Draft job.',
+      steps: [
+        'Agent identifies "search filters" as top community request (89 votes)',
+        'Pulls 12 Gong call excerpts where customers mention search frustration',
+        'Retrieves 47 support tickets tagged with search-related issues',
+        'Finds existing Confluence docs on search architecture',
+        'Drafts PRD with problem statement, user stories, and success metrics',
+      ],
+      outcome: 'The PRD includes 15 customer quotes, 3 competitor comparisons, and specific success metrics. Engineering has the context they need to estimate and build.',
+    },
+    checklist: [
+      'Do your PRDs take days to write?',
+      'Are you missing customer evidence in your requirements?',
+      'Do engineers ask for more context after reading your PRDs?',
+      'Is there inconsistency in PRD quality across your team?',
+      'Do you struggle to prioritize which features to specify first?',
+    ],
+    keyBenefits: [
+      'Draft PRDs in minutes, not days',
+      'Every requirement backed by customer evidence',
+      'Consistent quality across all PRDs',
+      'Engineers get the context they need upfront',
+    ],
     faqItems: [
       {
         question: 'How does PRD automation work?',
         answer:
-          'pmkit gathers customer evidence (VoC themes, feature requests, call transcripts), existing documentation, and analytics signals. It then drafts a PRD following your template, with sources cited for every claim.',
+          "pmkit gathers customer evidence (VoC themes, feature requests, call transcripts), existing documentation, and analytics signals. It then drafts a PRD following your template, with sources cited for every claim.",
       },
       {
         question: 'Will automated PRDs hallucinate requirements?',
@@ -121,7 +253,12 @@ export const resources: ResourcePage[] = [
       {
         question: 'Can I customize the PRD template?',
         answer:
-          'Yes. Enterprise customers can configure PRD templates to match their organization\'s format, required sections, and approval workflows.',
+          "Yes. Enterprise customers can configure PRD templates to match their organization's format, required sections, and approval workflows.",
+      },
+      {
+        question: 'How do I know the evidence is accurate?',
+        answer:
+          'Every piece of evidence links to its source—the specific Gong call timestamp, support ticket, or community post. You can verify any claim with one click.',
       },
     ],
   },
@@ -134,6 +271,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['VoC AI', 'customer feedback analysis', 'theme clustering'],
     category: 'voc',
     relatedPages: ['/demo', '/resources/gong-transcripts-to-product-insights', '/blog'],
+    workedExample: {
+      title: 'Quarterly VoC Report in 10 Minutes',
+      scenario: 'Before the quarterly planning session, the PM needs a comprehensive view of customer feedback. The VoC Clustering job analyzes 3 months of data.',
+      steps: [
+        'Analyzes 156 support tickets from Zendesk',
+        'Processes 89 Gong call transcripts for pain points and requests',
+        'Reviews 234 community posts and their engagement',
+        'Clusters feedback into 7 major themes with mention counts',
+        'Identifies trending topics (up/down vs. last quarter)',
+      ],
+      outcome: 'The planning session starts with data, not opinions. The team aligns on priorities based on actual customer pain points, with quotes they can reference.',
+    },
+    checklist: [
+      'Is customer feedback scattered across multiple tools?',
+      'Do you struggle to identify the most common pain points?',
+      'Are product decisions based on the loudest voices rather than patterns?',
+      'Do you wish you could quantify which issues matter most?',
+      'Is your team surprised by churn that "came out of nowhere"?',
+    ],
+    keyBenefits: [
+      'See patterns across all feedback channels',
+      'Quantify which issues matter most',
+      'Make decisions based on data, not opinions',
+      'Predict churn before it happens',
+    ],
     faqItems: [
       {
         question: 'What sources does VoC clustering analyze?',
@@ -148,7 +310,12 @@ export const resources: ResourcePage[] = [
       {
         question: 'How often should I run VoC clustering?',
         answer:
-          'Most teams run weekly or bi-weekly VoC jobs to stay current. You can also trigger ad-hoc runs before roadmap planning sessions.',
+          "Most teams run weekly or bi-weekly VoC jobs to stay current. You can also trigger ad-hoc runs before roadmap planning sessions.",
+      },
+      {
+        question: 'Can I filter by customer segment?',
+        answer:
+          'Yes. Filter VoC analysis by customer tier (enterprise, mid-market, SMB), industry, or custom attributes from your CRM.',
       },
     ],
   },
@@ -161,6 +328,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['competitive intelligence AI', 'competitor monitoring', 'market tracking'],
     category: 'competitive',
     relatedPages: ['/demo', '/resources/product-management-agent', '/blog'],
+    workedExample: {
+      title: 'Catching a Competitor Price Cut Before Sales Does',
+      scenario: 'The weekly Competitor Intel job runs Sunday night. Monday morning, the PM sees a critical alert.',
+      steps: [
+        'Agent detects Coda reduced enterprise pricing by 20%',
+        'Identifies 3 new feature launches from Notion (AI search)',
+        'Flags Monday.com partnership announcement with Slack',
+        'Compares feature gaps across all tracked competitors',
+        'Suggests talking points for sales team',
+      ],
+      outcome: 'Sales is briefed before their Monday calls. They have responses ready for "why are you more expensive than Coda?" and can highlight features competitors lack.',
+    },
+    checklist: [
+      'Do you find out about competitor changes from customers?',
+      'Is your competitive intel outdated by the time you use it?',
+      'Do sales reps get surprised by competitor pricing in negotiations?',
+      'Are you tracking competitors manually (or not at all)?',
+      'Do you wish you had a systematic way to monitor the market?',
+    ],
+    keyBenefits: [
+      'Never be surprised by competitor moves',
+      'Arm sales with current competitive intel',
+      'Identify feature gaps before customers mention them',
+      'Systematic market monitoring without manual effort',
+    ],
     faqItems: [
       {
         question: 'What competitor changes does pmkit track?',
@@ -177,6 +369,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Each diff summarizes changes by competitor, assesses strategic implications, compares to your capabilities, and suggests potential responses.',
       },
+      {
+        question: 'How many competitors can I track?',
+        answer:
+          'Standard plans include 5 competitors. Enterprise plans offer unlimited competitor tracking with custom alerting rules.',
+      },
     ],
   },
   {
@@ -188,9 +385,34 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['meeting prep AI', 'PM meeting preparation', 'customer meeting prep'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/gong-transcripts-to-product-insights', '/blog'],
+    workedExample: {
+      title: 'From Calendar Invite to Full Context in 2 Minutes',
+      scenario: 'A PM has a customer call in 30 minutes with an account they haven\'t spoken to in 6 weeks. They run Meeting Prep.',
+      steps: [
+        'Agent identifies the account from the calendar invite',
+        'Retrieves last 3 call transcripts and extracts key discussion points',
+        'Pulls current support ticket status (2 open, 1 escalated)',
+        'Finds the feature request they submitted 2 months ago (now shipped)',
+        'Generates talking points: celebrate shipped feature, address escalation',
+      ],
+      outcome: 'The PM opens with "I know you\'ve been waiting for date filters—they shipped last week!" The customer is impressed. The escalation is addressed proactively.',
+    },
+    checklist: [
+      'Do you scramble to remember account context before calls?',
+      'Have you ever been surprised by an issue the customer assumed you knew about?',
+      'Do you miss opportunities to celebrate wins with customers?',
+      'Is your prep time eating into your actual meeting time?',
+      'Do you wish you had a "cheat sheet" for every customer call?',
+    ],
+    keyBenefits: [
+      'Full account context in 2 minutes',
+      'Never be caught off-guard by open issues',
+      'Celebrate wins customers forgot they requested',
+      'More time for conversation, less for prep',
+    ],
     faqItems: [
       {
-        question: 'What\'s included in a meeting prep pack?',
+        question: "What's included in a meeting prep pack?",
         answer:
           'Each pack includes account summary, recent interaction history, open support tickets, key insights from past calls, suggested talking points, and risks/opportunities to watch.',
       },
@@ -204,6 +426,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Yes. Configure the meeting prep job for internal contexts like sprint reviews, roadmap discussions, or stakeholder updates.',
       },
+      {
+        question: 'Does it integrate with my calendar?',
+        answer:
+          'Yes. pmkit can pull meeting context from Google Calendar or Outlook, automatically identifying the account and attendees.',
+      },
     ],
   },
 
@@ -212,11 +439,36 @@ export const resources: ResourcePage[] = [
     slug: 'slack-to-jira-draft-epics',
     title: 'Slack to Jira: Draft Epics from Conversations',
     description:
-      'Turn Slack discussions into draft Jira epics with context, requirements, and acceptance criteria; ready for review.',
+      'Turn Slack discussions into draft Jira epics with context, requirements, and acceptance criteria—ready for review.',
     primaryKeyword: 'Slack to Jira',
     secondaryKeywords: ['Slack Jira integration AI', 'conversation to epic', 'Slack to ticket'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/jira-and-confluence-ai-workflows', '/blog'],
+    workedExample: {
+      title: 'From Slack Thread to Jira Epic in 30 Seconds',
+      scenario: 'A 47-message Slack thread about a customer issue needs to become a Jira epic. Instead of reading and summarizing manually, the PM triggers the Slack-to-Jira job.',
+      steps: [
+        'Agent reads the full thread and identifies the core problem',
+        'Extracts requirements mentioned by different stakeholders',
+        'Identifies the customer impact and urgency signals',
+        'Drafts epic with summary, description, and acceptance criteria',
+        'Proposes the epic for review (not created until approved)',
+      ],
+      outcome: 'The PM reviews a well-structured epic draft, makes minor edits, and approves. The epic is created in Jira with full context. No information lost from the thread.',
+    },
+    checklist: [
+      'Do Slack discussions get lost before becoming tickets?',
+      'Do you spend time manually summarizing threads into Jira?',
+      'Is context lost when conversations become requirements?',
+      'Do different PMs create inconsistent Jira tickets?',
+      'Do you wish Slack threads could auto-convert to epics?',
+    ],
+    keyBenefits: [
+      'Never lose context from Slack discussions',
+      'Consistent epic quality across the team',
+      'Save 10+ minutes per epic creation',
+      'Full traceability from conversation to ticket',
+    ],
     faqItems: [
       {
         question: 'How does Slack to Jira work?',
@@ -233,6 +485,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Yes. Configure which channels to monitor and set up filters for specific topics, reactions, or participants.',
       },
+      {
+        question: 'What if the thread has irrelevant messages?',
+        answer:
+          'The agent filters for product-relevant content and ignores off-topic messages. You can also highlight specific messages to include.',
+      },
     ],
   },
   {
@@ -244,6 +501,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['Gong AI analysis', 'call transcript insights', 'Gong to PRD'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/voice-of-customer-clustering', '/blog'],
+    workedExample: {
+      title: 'Mining 50 Sales Calls for Product Signal',
+      scenario: 'The PM wants to understand what customers are really saying in sales calls. Running Gong analysis on the last 50 calls surfaces patterns.',
+      steps: [
+        'Agent processes 50 call transcripts (32 hours of audio)',
+        'Extracts 127 pain point mentions across 23 unique themes',
+        'Identifies 45 feature requests with customer context',
+        'Flags 18 competitor mentions (Notion: 12, Coda: 6)',
+        'Ranks themes by frequency and customer segment',
+      ],
+      outcome: 'The PM discovers that enterprise customers mention "audit logging" 3x more than SMB. This insight shifts the roadmap priority for compliance features.',
+    },
+    checklist: [
+      'Are valuable insights trapped in call recordings?',
+      'Do you rely on sales to remember and relay customer feedback?',
+      'Is there a gap between what customers say and what product hears?',
+      'Do you wish you could search across all customer calls?',
+      'Are competitor mentions going untracked?',
+    ],
+    keyBenefits: [
+      'Unlock insights from every customer call',
+      'Hear directly from customers, not filtered through sales',
+      'Track competitor mentions automatically',
+      'Search across all calls for specific topics',
+    ],
     faqItems: [
       {
         question: 'What insights does pmkit extract from Gong?',
@@ -260,6 +542,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Yes. The Gong MCP connector supports full-text search across transcripts, filtered by date, account, or speaker role.',
       },
+      {
+        question: 'Does this work with other call recording tools?',
+        answer:
+          'Currently pmkit supports Gong natively. Chorus and other tools are on the roadmap. Contact us for specific integration requests.',
+      },
     ],
   },
   {
@@ -271,6 +558,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['feature request management', 'community feedback roadmap', 'idea management'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/voice-of-customer-clustering', '/blog'],
+    workedExample: {
+      title: 'Prioritizing Community Requests for Q1',
+      scenario: 'The community has 200+ open feature requests. The PM needs to identify which ones to prioritize for Q1 planning.',
+      steps: [
+        'Agent retrieves all open feature requests with vote counts',
+        'Segments requests by customer tier (enterprise votes weighted 3x)',
+        'Identifies requests that align with strategic themes',
+        'Cross-references with support tickets for pain point overlap',
+        'Produces ranked list with evidence for each priority',
+      ],
+      outcome: 'The PM presents a data-driven priority list to leadership. Each recommendation includes vote counts, customer segments, and support ticket correlation.',
+    },
+    checklist: [
+      'Is your community feedback disconnected from your roadmap?',
+      'Do you struggle to prioritize hundreds of feature requests?',
+      'Are enterprise customer votes weighted appropriately?',
+      'Do you wish feature requests linked to support pain points?',
+      'Is your community feeling unheard?',
+    ],
+    keyBenefits: [
+      'Connect community voice to roadmap decisions',
+      'Prioritize based on customer value, not volume',
+      'Show customers their feedback matters',
+      'Data-driven prioritization for leadership',
+    ],
     faqItems: [
       {
         question: 'Which community platforms does pmkit support?',
@@ -280,12 +592,17 @@ export const resources: ResourcePage[] = [
       {
         question: 'How are feature requests prioritized?',
         answer:
-          'pmkit surfaces requests by vote count, comment activity, and customer segment. You can filter by status (open, planned, completed) and category.',
+          "pmkit surfaces requests by vote count, comment activity, and customer segment. You can filter by status (open, planned, completed) and category.",
       },
       {
         question: 'Can I link community requests to Jira epics?',
         answer:
           'Yes. When drafting Jira epics, pmkit can include links to related community requests and their vote counts.',
+      },
+      {
+        question: 'How do I close the loop with the community?',
+        answer:
+          'pmkit can draft community update posts when features ship, linking back to the original requests that influenced the decision.',
       },
     ],
   },
@@ -298,6 +615,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['product operations AI', 'PM workflow automation', 'product ops tools'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/ai-release-notes-and-sprint-review-packs', '/blog'],
+    workedExample: {
+      title: 'Automated Weekly Stakeholder Update',
+      scenario: 'Every Friday, the PM sends a stakeholder update. Instead of spending 2 hours compiling it, they run the weekly update job.',
+      steps: [
+        'Agent pulls sprint progress from Jira (velocity, completed stories)',
+        'Summarizes customer feedback themes from the week',
+        'Highlights key wins and blockers',
+        'Drafts update email in the team\'s standard format',
+        'Proposes the update for PM review before sending',
+      ],
+      outcome: 'The PM spends 10 minutes reviewing and personalizing instead of 2 hours compiling. Stakeholders get consistent, comprehensive updates every week.',
+    },
+    checklist: [
+      'Do recurring updates take hours to compile?',
+      'Is update quality inconsistent across the team?',
+      'Do stakeholders complain about lack of visibility?',
+      'Are you duplicating effort across similar reports?',
+      'Do you wish updates wrote themselves?',
+    ],
+    keyBenefits: [
+      'Consistent updates without the effort',
+      'More time for strategic work',
+      'Stakeholders always informed',
+      'Standardized across the team',
+    ],
     faqItems: [
       {
         question: 'What product ops tasks can be automated?',
@@ -314,6 +656,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Yes. Enterprise customers can create custom job templates with specific sources, output formats, and distribution rules.',
       },
+      {
+        question: 'What happens if a job fails?',
+        answer:
+          'Failed jobs are logged with error details. You can configure alerts via Slack or email when jobs fail.',
+      },
     ],
   },
   {
@@ -325,9 +672,34 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['roadmap decision making', 'product strategy memos', 'alignment documents'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/agentic-product-management', '/blog'],
+    workedExample: {
+      title: 'SSO vs. Search: Making the Call',
+      scenario: 'Leadership needs to decide Q1 priority: Enterprise SSO or AI Search. The PM generates an alignment memo with evidence for both options.',
+      steps: [
+        'Agent quantifies SSO impact: 3 deals worth $450K blocked',
+        'Quantifies Search impact: 52 VoC mentions, 89-vote community request',
+        'Estimates engineering effort for each (SSO: 8 weeks, Search: 10 weeks)',
+        'Identifies dependencies and risks for each option',
+        'Drafts memo with recommendation and reasoning',
+      ],
+      outcome: 'Leadership makes an informed decision with clear trade-offs. The memo becomes the record of why the decision was made.',
+    },
+    checklist: [
+      'Do roadmap decisions lack clear evidence?',
+      'Is it hard to articulate trade-offs to leadership?',
+      'Do you wish you had a structured format for decision memos?',
+      'Are past decisions poorly documented?',
+      'Do stakeholders question prioritization without data?',
+    ],
+    keyBenefits: [
+      'Evidence-based roadmap decisions',
+      'Clear trade-off articulation',
+      'Documented decision rationale',
+      'Executive-ready format',
+    ],
     faqItems: [
       {
-        question: 'What\'s included in an alignment memo?',
+        question: "What's included in an alignment memo?",
         answer:
           'Each memo includes the decision context, 2-3 options with pros/cons/evidence, resource requirements, timeline, a recommendation, and open questions.',
       },
@@ -340,6 +712,11 @@ export const resources: ResourcePage[] = [
         question: 'Can I share memos with stakeholders?',
         answer:
           'Yes. Export memos to Confluence, Google Docs, or Notion. You can also generate PDF versions for executive reviews.',
+      },
+      {
+        question: 'How do I customize the memo format?',
+        answer:
+          'Enterprise customers can configure memo templates to match their organization\'s decision-making framework.',
       },
     ],
   },
@@ -354,6 +731,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['PM RBAC', 'product management audit', 'enterprise PM tools'],
     category: 'governance',
     relatedPages: ['/pricing', '/resources/draft-only-ai-agent', '/how-it-works'],
+    workedExample: {
+      title: 'Audit Trail for SOC 2 Compliance',
+      scenario: 'During a SOC 2 audit, the security team needs to demonstrate that AI-generated content is reviewed before publication.',
+      steps: [
+        'Auditor requests log of all AI-generated artifacts',
+        'pmkit exports complete audit trail with timestamps and approvers',
+        'Each artifact shows: who ran the job, what data was accessed, who approved',
+        'Logs include permission checks and any denied access attempts',
+        'Export includes cryptographic verification of log integrity',
+      ],
+      outcome: 'The audit passes with flying colors. The auditor notes that the draft-only model provides stronger controls than most AI tools.',
+    },
+    checklist: [
+      'Does your AI tooling meet enterprise compliance requirements?',
+      'Can you prove who approved AI-generated content?',
+      'Do you have audit logs for all AI actions?',
+      'Is access to sensitive data properly controlled?',
+      'Can you demonstrate AI governance to auditors?',
+    ],
+    keyBenefits: [
+      'SOC 2 and GDPR compliant',
+      'Complete audit trail for all actions',
+      'Role-based access control',
+      'Demonstrate AI governance to stakeholders',
+    ],
     faqItems: [
       {
         question: 'What governance features does pmkit include?',
@@ -361,7 +763,7 @@ export const resources: ResourcePage[] = [
           'pmkit includes role-based access control (admin, PM, viewer, guest), comprehensive audit logging, permission simulation, and SSO integration (SAML/OIDC).',
       },
       {
-        question: 'What\'s logged in the audit trail?',
+        question: "What's logged in the audit trail?",
         answer:
           'Every job run, tool call, proposal creation, approval, and artifact download is logged with user, timestamp, and relevant metadata.',
       },
@@ -369,6 +771,11 @@ export const resources: ResourcePage[] = [
         question: 'Can I export audit logs for compliance?',
         answer:
           'Yes. Export audit logs to CSV, JSON, or integrate with your SIEM solution via webhook.',
+      },
+      {
+        question: 'What compliance certifications does pmkit have?',
+        answer:
+          'pmkit is SOC 2 Type II certified. We also support GDPR, HIPAA (with BAA), and custom compliance requirements for enterprise customers.',
       },
     ],
   },
@@ -381,6 +788,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['safe AI agent', 'human-in-the-loop AI', 'controlled AI automation'],
     category: 'governance',
     relatedPages: ['/how-it-works', '/resources/enterprise-pm-governance', '/demo'],
+    workedExample: {
+      title: 'Catching an Error Before It Ships',
+      scenario: 'An agent drafts a Slack announcement about a feature launch. Before approval, the PM notices an error.',
+      steps: [
+        'Agent drafts announcement: "Search filters now available for all users"',
+        'PM reviews and catches error: filters are enterprise-only initially',
+        'PM edits the draft to clarify availability',
+        'PM approves the corrected version',
+        'Only the corrected message is posted to Slack',
+      ],
+      outcome: 'A potentially embarrassing miscommunication is caught before it reaches customers. The draft-only model prevented the error from going live.',
+    },
+    checklist: [
+      'Are you worried about AI making mistakes in production?',
+      'Do you need human review before AI outputs go live?',
+      'Is your team hesitant to adopt AI due to risk concerns?',
+      'Do you need to demonstrate AI controls to leadership?',
+      'Have you seen AI tools make embarrassing errors?',
+    ],
+    keyBenefits: [
+      'AI autonomy with human control',
+      'Catch errors before they go live',
+      'Build trust in AI gradually',
+      'Demonstrate responsible AI to stakeholders',
+    ],
     faqItems: [
       {
         question: 'What does "draft-only" mean?',
@@ -390,12 +822,17 @@ export const resources: ResourcePage[] = [
       {
         question: 'Why is draft-only important for enterprises?',
         answer:
-          'Draft-only ensures that AI mistakes don\'t propagate to production systems. Every change is reviewed by a human, maintaining quality and accountability.',
+          "Draft-only ensures that AI mistakes don't propagate to production systems. Every change is reviewed by a human, maintaining quality and accountability.",
       },
       {
         question: 'Can I skip the review step for low-risk actions?',
         answer:
           'Enterprise customers can configure auto-approval rules for specific action types, while maintaining review requirements for high-impact changes.',
+      },
+      {
+        question: 'How does this compare to other AI tools?',
+        answer:
+          'Most AI tools either have no external actions (just chat) or allow direct writes. pmkit\'s draft-only model provides the best of both: autonomous workflows with human oversight.',
       },
     ],
   },
@@ -408,6 +845,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['Model Context Protocol', 'enterprise AI integration', 'MCP servers'],
     category: 'governance',
     relatedPages: ['/how-it-works', '/resources/jira-and-confluence-ai-workflows', '/demo'],
+    workedExample: {
+      title: 'Adding a Custom CRM Connector',
+      scenario: 'An enterprise customer uses a custom CRM that pmkit doesn\'t support natively. They need to integrate it for meeting prep.',
+      steps: [
+        'Customer provides API documentation for their CRM',
+        'pmkit team builds custom MCP connector with required endpoints',
+        'Connector is tested in staging with sample data',
+        'Customer configures OAuth credentials in pmkit',
+        'Meeting prep now includes CRM data (deal stage, contacts, notes)',
+      ],
+      outcome: 'Meeting prep packs now include deal context from the custom CRM. The PM knows the deal stage, key contacts, and recent notes before every call.',
+    },
+    checklist: [
+      'Do you use tools that aren\'t supported by standard integrations?',
+      'Is your data spread across many specialized systems?',
+      'Do you need secure, auditable connections to enterprise tools?',
+      'Are you concerned about data security with AI integrations?',
+      'Do you want a standardized way to add new integrations?',
+    ],
+    keyBenefits: [
+      'Standardized integration protocol',
+      'Secure, auditable connections',
+      'Custom connectors for any tool',
+      'Enterprise-grade security',
+    ],
     faqItems: [
       {
         question: 'What is MCP (Model Context Protocol)?',
@@ -424,6 +886,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Connectors use OAuth 2.0 or API key authentication, with credentials stored encrypted. All tool calls are logged in the audit trail.',
       },
+      {
+        question: 'Can I build my own MCP connector?',
+        answer:
+          'Enterprise customers can request custom connectors or use our MCP SDK to build their own. All connectors go through security review before deployment.',
+      },
     ],
   },
   {
@@ -435,6 +902,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['Atlassian AI', 'Jira automation AI', 'Confluence AI'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/slack-to-jira-draft-epics', '/blog'],
+    workedExample: {
+      title: 'PRD to Jira Epics in One Click',
+      scenario: 'A PRD is approved. Now it needs to become Jira epics and stories. Instead of manual creation, the PM runs the PRD-to-Jira job.',
+      steps: [
+        'Agent parses the PRD for requirements and user stories',
+        'Creates draft epic with summary and description',
+        'Breaks requirements into individual story drafts',
+        'Links stories to the epic with proper hierarchy',
+        'Proposes all tickets for review before creation',
+      ],
+      outcome: 'The PM reviews 1 epic and 8 stories, makes minor edits, and approves. All tickets are created in Jira with proper linking. 30 minutes saved.',
+    },
+    checklist: [
+      'Do you manually create Jira tickets from PRDs?',
+      'Is there inconsistency in how epics and stories are structured?',
+      'Do you spend time on Jira administration instead of product work?',
+      'Are your Confluence pages disconnected from Jira tickets?',
+      'Do you wish Atlassian workflows were more automated?',
+    ],
+    keyBenefits: [
+      'PRD to Jira in one click',
+      'Consistent ticket structure',
+      'Connected Confluence and Jira',
+      'Less admin, more product work',
+    ],
     faqItems: [
       {
         question: 'What Jira workflows can pmkit automate?',
@@ -444,12 +936,17 @@ export const resources: ResourcePage[] = [
       {
         question: 'What Confluence workflows are supported?',
         answer:
-          'pmkit can draft PRD pages, update roadmap documents, create meeting notes, and generate VoC reports; all as proposals for your review.',
+          'pmkit can draft PRD pages, update roadmap documents, create meeting notes, and generate VoC reports—all as proposals for your review.',
       },
       {
         question: 'Does pmkit support Jira Cloud and Data Center?',
         answer:
           'Yes. The Jira MCP connector supports both Jira Cloud and Jira Data Center deployments.',
+      },
+      {
+        question: 'Can I customize the Jira ticket templates?',
+        answer:
+          'Yes. Configure templates for epics, stories, and bugs to match your team\'s conventions.',
       },
     ],
   },
@@ -462,6 +959,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['sprint review automation', 'release notes generator', 'sprint summary AI'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/product-ops-automation', '/blog'],
+    workedExample: {
+      title: 'Release Notes in 5 Minutes Instead of 2 Hours',
+      scenario: 'It\'s release day. The PM needs customer-facing release notes. Instead of reading 47 Jira tickets, they run the release notes job.',
+      steps: [
+        'Agent retrieves all tickets in the release (47 completed)',
+        'Categorizes by type: 12 features, 28 fixes, 7 improvements',
+        'Writes customer-friendly descriptions (no Jira jargon)',
+        'Highlights top 3 features with benefits',
+        'Drafts release notes in the team\'s standard format',
+      ],
+      outcome: 'The PM reviews and publishes release notes in 5 minutes. Customers see a polished update. Marketing has content for the announcement.',
+    },
+    checklist: [
+      'Do release notes take hours to write?',
+      'Is there inconsistency in release note quality?',
+      'Do you struggle to translate Jira tickets to customer language?',
+      'Are sprint reviews missing important context?',
+      'Do you wish release notes wrote themselves?',
+    ],
+    keyBenefits: [
+      'Release notes in minutes',
+      'Customer-friendly language',
+      'Consistent quality every release',
+      'Sprint reviews with full context',
+    ],
     faqItems: [
       {
         question: 'How are release notes generated?',
@@ -469,7 +991,7 @@ export const resources: ResourcePage[] = [
           'pmkit pulls completed Jira tickets, categorizes them by type (feature, fix, improvement), and generates customer-facing release notes with appropriate language.',
       },
       {
-        question: 'What\'s in a sprint review pack?',
+        question: "What's in a sprint review pack?",
         answer:
           'Sprint review packs include velocity metrics, completed vs. planned work, blockers encountered, key learnings, and recommendations for the next sprint.',
       },
@@ -477,6 +999,11 @@ export const resources: ResourcePage[] = [
         question: 'Can I customize the release notes format?',
         answer:
           'Yes. Configure templates for different audiences (customers, internal, executives) with appropriate detail levels and formatting.',
+      },
+      {
+        question: 'Does it include git commit information?',
+        answer:
+          'Yes. pmkit can correlate Jira tickets with git commits for technical audiences who want to see what code changed.',
       },
     ],
   },
@@ -489,6 +1016,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['escalation management', 'incident to fix', 'customer issue resolution'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/voice-of-customer-clustering', '/blog'],
+    workedExample: {
+      title: 'From P1 Escalation to Fix Spec in 10 Minutes',
+      scenario: 'An enterprise customer escalates a critical issue. Engineering needs a fix spec immediately.',
+      steps: [
+        'Agent retrieves the escalation ticket and full history',
+        'Pulls related support tickets from other customers',
+        'Identifies the customer\'s environment and configuration',
+        'Drafts fix spec with problem statement and reproduction steps',
+        'Proposes scope, success criteria, and rollback plan',
+      ],
+      outcome: 'Engineering has a clear fix spec in 10 minutes instead of 2 hours of investigation. The fix ships same-day. The customer is retained.',
+    },
+    checklist: [
+      'Do escalations take too long to turn into fix specs?',
+      'Is context lost between support and engineering?',
+      'Do you struggle to identify related issues quickly?',
+      'Are fix specs inconsistent in quality?',
+      'Do you wish escalation response was faster?',
+    ],
+    keyBenefits: [
+      'Fix specs in minutes, not hours',
+      'Full context for engineering',
+      'Identify related issues automatically',
+      'Faster customer resolution',
+    ],
     faqItems: [
       {
         question: 'How does escalation to fix spec work?',
@@ -505,6 +1057,11 @@ export const resources: ResourcePage[] = [
         answer:
           'Fix specs are typically generated in under 2 minutes, giving engineering immediate context for rapid response.',
       },
+      {
+        question: 'Does it suggest solutions?',
+        answer:
+          'The agent proposes potential solutions based on similar past issues, but the final approach is always decided by engineering.',
+      },
     ],
   },
   {
@@ -516,6 +1073,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['product analytics AI', 'Algolia insights', 'feature usage analysis'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/voice-of-customer-clustering', '/blog'],
+    workedExample: {
+      title: 'Discovering a Content Gap from Search Data',
+      scenario: 'The PM wants to understand what users are searching for but not finding. They run the search analytics job.',
+      steps: [
+        'Agent retrieves no-results queries from the last 30 days',
+        'Identifies top 10 queries with zero results (integration, API, export)',
+        'Cross-references with feature requests and support tickets',
+        'Discovers "API documentation" is searched 200x/week with no results',
+        'Drafts recommendation to create API docs section',
+      ],
+      outcome: 'The PM prioritizes API documentation. After launch, no-results queries drop 40%. Support tickets about API questions drop 60%.',
+    },
+    checklist: [
+      'Do you know what users search for but don\'t find?',
+      'Is feature usage data disconnected from product decisions?',
+      'Do you wish analytics insights surfaced automatically?',
+      'Are you making decisions without usage data?',
+      'Do you struggle to identify content gaps?',
+    ],
+    keyBenefits: [
+      'Discover content gaps automatically',
+      'Connect usage data to decisions',
+      'Identify underused features',
+      'Data-driven prioritization',
+    ],
     faqItems: [
       {
         question: 'What analytics sources does pmkit analyze?',
@@ -530,7 +1112,12 @@ export const resources: ResourcePage[] = [
       {
         question: 'How do analytics insights inform product decisions?',
         answer:
-          'Analytics insights feed into VoC reports, PRD evidence sections, and roadmap alignment memos; grounding decisions in quantitative data.',
+          'Analytics insights feed into VoC reports, PRD evidence sections, and roadmap alignment memos—grounding decisions in quantitative data.',
+      },
+      {
+        question: 'Can I set up alerts for specific patterns?',
+        answer:
+          'Yes. Configure alerts for spikes in no-results queries, drops in feature usage, or other patterns that indicate issues.',
       },
     ],
   },
@@ -543,6 +1130,31 @@ export const resources: ResourcePage[] = [
     secondaryKeywords: ['dependency management', 'cross-team coordination', 'sprint risk detection'],
     category: 'workflows',
     relatedPages: ['/demo', '/resources/product-ops-automation', '/blog'],
+    workedExample: {
+      title: 'Catching a Blocked Dependency Before Standup',
+      scenario: 'The Daily Brief job runs at 7am. It surfaces a dependency risk before the 9am standup.',
+      steps: [
+        'Agent scans linked Jira tickets across teams',
+        'Identifies that PLATFORM-123 (your dependency) moved to "Blocked"',
+        'Checks the blocker: waiting on external vendor',
+        'Calculates impact: your ACME-456 is now at risk',
+        'Drafts alert with context and suggested actions',
+      ],
+      outcome: 'The PM addresses the risk at standup. The team re-plans before losing a day. The sprint is saved.',
+    },
+    checklist: [
+      'Do you find out about blocked dependencies too late?',
+      'Is cross-team coordination a constant pain point?',
+      'Do you manually check linked tickets for status?',
+      'Are sprints derailed by surprise blockers?',
+      'Do you wish dependencies monitored themselves?',
+    ],
+    keyBenefits: [
+      'Early warning on blocked dependencies',
+      'Automated cross-team monitoring',
+      'Sprints protected from surprise blockers',
+      'Proactive instead of reactive',
+    ],
     faqItems: [
       {
         question: 'How does pmkit detect dependency drift?',
@@ -552,12 +1164,17 @@ export const resources: ResourcePage[] = [
       {
         question: 'What actions can I take on detected risks?',
         answer:
-          'pmkit can draft Slack messages to dependent teams, propose Jira comments, or escalate to stakeholders; all as proposals for your review.',
+          'pmkit can draft Slack messages to dependent teams, propose Jira comments, or escalate to stakeholders—all as proposals for your review.',
       },
       {
         question: 'Can I configure which dependencies to monitor?',
         answer:
           'Yes. Set up monitoring rules based on Jira link types, labels, or custom fields to focus on critical dependencies.',
+      },
+      {
+        question: 'How often are dependencies checked?',
+        answer:
+          'Dependencies are checked with each Daily Brief job (typically morning). You can also configure more frequent checks for critical paths.',
       },
     ],
   },
@@ -574,4 +1191,3 @@ export function getResourcesByCategory(category: ResourcePage['category']): Reso
 export function getAllResourceSlugs(): string[] {
   return resources.map((r) => r.slug);
 }
-

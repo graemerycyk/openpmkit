@@ -16,6 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/login',
     '/privacy',
     '/terms',
+    '/changelog',
+    '/security',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
