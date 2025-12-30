@@ -28,6 +28,9 @@ import {
   Database,
   Plug,
   Info,
+  Globe,
+  Newspaper,
+  Hash,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -51,14 +54,18 @@ interface Connector {
 }
 
 const connectors: Connector[] = [
+  // Tool Integrations (MCP Connectors)
   { id: 'jira', name: 'Jira', icon: FileText, status: 'connected_mock' },
   { id: 'confluence', name: 'Confluence', icon: Database, status: 'connected_mock' },
   { id: 'slack', name: 'Slack', icon: MessageSquare, status: 'connected_mock' },
   { id: 'gong', name: 'Gong', icon: Phone, status: 'connected_mock' },
   { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_mock' },
-  { id: 'analytics', name: 'Analytics', icon: BarChart3, status: 'connected_mock' },
-  { id: 'community', name: 'Community', icon: Users, status: 'connected_mock' },
-  { id: 'competitor', name: 'Competitor Intel', icon: Target, status: 'connected_mock' },
+  { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_mock' },
+  { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_mock' },
+  // AI Crawlers
+  { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_mock' },
+  { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_mock' },
+  { id: 'news_crawler', name: 'News Crawler', icon: Newspaper, status: 'connected_mock' },
 ];
 
 function ConnectorStatusBadge({ status }: { status: ConnectorStatus }) {
@@ -122,12 +129,12 @@ const jobConfigs: Record<
     name: 'Daily Brief',
     description: 'Synthesize overnight activity',
     icon: FileText,
-    sources: ['slack', 'jira', 'zendesk', 'community'],
+    sources: ['slack', 'jira', 'zendesk', 'discourse'],
     toolCalls: [
       { name: 'get_channel_messages', server: 'slack', input: { channelId: 'C001', limit: 50 } },
       { name: 'get_sprint_issues', server: 'jira', input: { sprintId: 'sprint-42' } },
       { name: 'get_tickets', server: 'zendesk', input: { status: 'open', limit: 25 } },
-      { name: 'get_posts', server: 'community', input: { limit: 20 } },
+      { name: 'get_posts', server: 'discourse', input: { limit: 20 } },
     ],
   },
   meeting_prep: {
@@ -145,46 +152,47 @@ const jobConfigs: Record<
     name: 'VoC Clustering',
     description: 'Cluster customer feedback into themes',
     icon: BarChart3,
-    sources: ['zendesk', 'gong', 'community'],
+    sources: ['zendesk', 'gong', 'discourse', 'social_crawler'],
     toolCalls: [
       { name: 'get_tickets', server: 'zendesk', input: { limit: 50 } },
       { name: 'get_insights', server: 'gong', input: { limit: 50 } },
-      { name: 'get_feature_requests', server: 'community', input: { status: 'open', limit: 25 } },
-      { name: 'get_posts', server: 'community', input: { limit: 30 } },
+      { name: 'get_feature_requests', server: 'discourse', input: { status: 'open', limit: 25 } },
+      { name: 'get_posts', server: 'discourse', input: { limit: 30 } },
+      { name: 'search_mentions', server: 'social_crawler', input: { channels: ['x', 'reddit', 'linkedin'], limit: 50 } },
     ],
   },
   competitor_intel: {
     name: 'Competitor Intel',
     description: 'Track competitor changes',
     icon: Target,
-    sources: ['competitor'],
+    sources: ['social_crawler', 'web_search', 'news_crawler'],
     toolCalls: [
-      { name: 'get_competitors', server: 'competitor', input: {} },
-      { name: 'get_recent_changes', server: 'competitor', input: { limit: 25 } },
-      { name: 'get_feature_comparison', server: 'competitor', input: {} },
+      { name: 'search_mentions', server: 'social_crawler', input: { query: 'competitor:notion OR competitor:coda', channels: ['x', 'reddit', 'linkedin', 'discord'], limit: 50 } },
+      { name: 'search_web', server: 'web_search', input: { query: 'notion pricing OR coda features', engines: ['google', 'bing'], limit: 20 } },
+      { name: 'search_news', server: 'news_crawler', input: { query: 'notion coda monday.com', limit: 25 } },
     ],
   },
   roadmap_alignment: {
     name: 'Roadmap Alignment',
     description: 'Generate alignment memo',
     icon: GitBranch,
-    sources: ['jira', 'analytics', 'community', 'competitor'],
+    sources: ['jira', 'amplitude', 'discourse', 'news_crawler'],
     toolCalls: [
       { name: 'get_epics', server: 'jira', input: { projectKey: 'ACME' } },
-      { name: 'get_feature_usage', server: 'analytics', input: { period: 'week' } },
-      { name: 'get_top_feature_requests', server: 'community', input: { limit: 10 } },
-      { name: 'get_significant_changes', server: 'competitor', input: { minSignificance: 'high' } },
+      { name: 'get_feature_usage', server: 'amplitude', input: { period: 'week' } },
+      { name: 'get_top_feature_requests', server: 'discourse', input: { limit: 10 } },
+      { name: 'search_news', server: 'news_crawler', input: { query: 'competitor announcements', limit: 10 } },
     ],
   },
   prd_draft: {
     name: 'PRD Draft',
     description: 'Draft PRD with evidence',
     icon: FileText,
-    sources: ['community', 'gong', 'analytics', 'confluence'],
+    sources: ['discourse', 'gong', 'amplitude', 'confluence'],
     toolCalls: [
-      { name: 'get_top_feature_requests', server: 'community', input: { limit: 10 } },
+      { name: 'get_top_feature_requests', server: 'discourse', input: { limit: 10 } },
       { name: 'get_pain_points', server: 'gong', input: { limit: 20 } },
-      { name: 'get_no_results_queries', server: 'analytics', input: { minCount: 10 } },
+      { name: 'get_no_results_queries', server: 'amplitude', input: { minCount: 10 } },
       { name: 'search_pages', server: 'confluence', input: { query: 'search', spaceKey: 'PROD' } },
     ],
   },
@@ -197,7 +205,7 @@ const artifactContent: Record<JobType, { title: string; content: string }> = {
     content: `# Daily Brief - December 29, 2025
 
 ## TL;DR
-Search improvements are progressing well (70% complete), but we have a critical bug (ACME-350) affecting special characters in search. One enterprise escalation from Globex Corp regarding dashboard loading. Community sentiment around search is improving with the announcement of upcoming filters.
+Search improvements are progressing well (70% complete), but we have a critical bug (ACME-350) affecting special characters in search. One enterprise escalation from Globex Corp regarding dashboard loading. Discourse community sentiment around search is improving with the announcement of upcoming filters.
 
 ## 🚨 Urgent Items
 
@@ -312,7 +320,7 @@ Search improvements are progressing well (70% complete), but we have a critical 
 
 **Period**: Last 30 days
 **Generated**: December 29, 2025
-**Data Sources**: Support (47), Gong (32 calls), Community (45), NPS (28)
+**Data Sources**: Zendesk (47), Gong (32 calls), Discourse (45), Social Crawler (128 mentions)
 
 ## Executive Summary
 
@@ -331,7 +339,7 @@ Search improvements are progressing well (70% complete), but we have a critical 
 
 **Representative Quotes**:
 > "I spend more time searching than working" - Globex Corp
-> "Search never finds what I'm looking for" - Community
+> "Search never finds what I'm looking for" - Discourse
 > "We've created workarounds using tags but it's not sustainable" - Initech
 
 **Product Implications**:
@@ -354,7 +362,7 @@ Search improvements are progressing well (70% complete), but we have a critical 
 3. **Rebuild Slack integration** - Address reliability concerns
 
 ---
-*Generated by pmkit • 4 tool calls • 4 sources*`,
+*Generated by pmkit • 5 tool calls • 4 sources (Zendesk, Gong, Discourse, Social Crawler)*`,
   },
   competitor_intel: {
     title: 'Competitor Intel Diff',
@@ -362,14 +370,30 @@ Search improvements are progressing well (70% complete), but we have a critical 
 
 **Period**: Last 14 days
 **Generated**: December 29, 2025
+**Data Sources**: Social Crawler (X, Reddit, LinkedIn, Discord), Web Search (Google, Bing), News Crawler
 
 ## Key Changes Summary
 
-| Competitor | Change | Significance |
-|------------|--------|--------------|
-| Notion | AI-powered search launch | 🔴 High |
-| Coda | 20% enterprise price cut | 🔴 High |
-| Monday.com | Native Slack integration | 🟡 Medium |
+| Competitor | Change | Source | Significance |
+|------------|--------|--------|--------------|
+| Notion | AI-powered search launch | News, X | 🔴 High |
+| Coda | 20% enterprise price cut | Web Search | 🔴 High |
+| Monday.com | Native Slack integration | LinkedIn | 🟡 Medium |
+
+## Social Signal Analysis
+
+### X/Twitter Mentions (Last 14 days)
+- **Notion**: 847 mentions (+23% vs prior period)
+- **Coda**: 312 mentions (-5%)
+- **Monday.com**: 523 mentions (+8%)
+
+### Reddit Discussions
+- r/ProductManagement: 12 threads mentioning Notion AI search
+- r/SaaS: 8 threads on Coda pricing changes
+
+### LinkedIn Activity
+- Notion CEO post on AI search: 2.4K reactions
+- Monday.com Slack announcement: 890 reactions
 
 ## Detailed Analysis
 
@@ -407,10 +431,10 @@ Search improvements are progressing well (70% complete), but we have a critical 
 
 1. **Prioritize search improvements** - Close the gap
 2. **Evaluate AI search** - Begin discovery for Q1
-3. **Fix Slack integration** - Address reliability issues
+3. **Monitor Coda pricing impact** - Track win/loss against Coda
 
 ---
-*Generated by pmkit • 3 tool calls • 1 source*`,
+*Generated by pmkit • 3 tool calls • 3 sources (Social Crawler, Web Search, News Crawler)*`,
   },
   roadmap_alignment: {
     title: 'Roadmap Alignment Memo',
@@ -436,7 +460,7 @@ We need to decide the primary focus for Q1 2026 engineering capacity. Both Searc
 - Enterprise deals remain blocked
 - Longer time to revenue impact
 
-**Evidence**: 52 VoC mentions, 89-vote community request
+**Evidence**: 52 VoC mentions, 89-vote Discourse request, 34 X/Reddit mentions
 
 ### Option B: Enterprise SSO First
 
@@ -495,7 +519,7 @@ Users cannot efficiently find content because search results lack filtering capa
 |--------|-------|-----------|
 | Support tickets | 47 | "I spend more time searching than working" |
 | Gong calls | 12 | "Date filters would be huge" |
-| Community | 89 votes | "Filter by content type please" |
+| Discourse | 89 votes | "Filter by content type please" |
 
 ## 3. Solution
 

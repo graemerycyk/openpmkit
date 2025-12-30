@@ -41,7 +41,7 @@ const features = [
     icon: Target,
     title: 'Competitor Intel',
     description:
-      'Track competitor changes; pricing, features, messaging; with strategic implications.',
+      'Track competitor mentions across X, Reddit, LinkedIn, and news; pricing, features, messaging; with strategic implications.',
   },
   {
     icon: GitBranch,
@@ -67,6 +67,7 @@ const benefits = [
 ];
 
 const integrations = [
+  // Tool Integrations
   { name: 'Jira', category: 'Project Management' },
   { name: 'Confluence', category: 'Documentation' },
   { name: 'Slack', category: 'Communication' },
@@ -74,7 +75,10 @@ const integrations = [
   { name: 'Zendesk', category: 'Support' },
   { name: 'Discourse', category: 'Community' },
   { name: 'Amplitude', category: 'Analytics' },
-  { name: 'Algolia', category: 'Search Analytics' },
+  // AI Crawlers
+  { name: 'Social Crawler', category: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
+  { name: 'Web Search', category: 'Google & Bing' },
+  { name: 'News Crawler', category: 'Industry News' },
 ];
 
 export default function HomePage() {
