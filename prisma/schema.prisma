@@ -22,13 +22,24 @@ model Tenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users      User[]
-  jobs       Job[]
-  toolCalls  ToolCall[]
-  proposals  Proposal[]
-  artifacts  Artifact[]
-  sources    Source[]
-  auditLogs  AuditLog[]
+  users              User[]
+  jobs               Job[]
+  toolCalls          ToolCall[]
+  proposals          Proposal[]
+  artifacts          Artifact[]
+  sources            Source[]
+  auditLogs          AuditLog[]
+  subscription       Subscription?
+  seatAssignments    SeatAssignment[]
+  entitlements       Entitlement[]
+  usageEvents        UsageEvent[]
+  usageRollupsDaily  UsageRollupDaily[]
+  ssoConnections     SSOConnection[]
+  scimDirectories    SCIMDirectory[]
+  groupRoleMappings  GroupRoleMapping[]
+  connectorInstalls  ConnectorInstall[]
+  connectorPolicies  ConnectorPolicy[]
+  policyDecisionLogs PolicyDecisionLog[]
 
   @@map("tenants")
 }
@@ -44,11 +55,14 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  jobs      Job[]
-  proposals Proposal[] @relation("ProposalCreator")
-  reviews   Proposal[] @relation("ProposalReviewer")
-  auditLogs AuditLog[]
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  jobs            Job[]
+  proposals       Proposal[] @relation("ProposalCreator")
+  reviews         Proposal[] @relation("ProposalReviewer")
+  auditLogs       AuditLog[]
+  seatAssignment  SeatAssignment?
+  usageEvents     UsageEvent[]
+  connectorInstalls ConnectorInstall[]
 
   @@unique([tenantId, email])
   @@map("users")
@@ -57,8 +71,272 @@ model User {
 enum UserRole {
   admin
   pm
+  eng
+  cs
+  sales
+  exec
   viewer
   guest
+}
+
+// ============================================================================
+// Billing & Subscription Models
+// ============================================================================
+
+enum PlanKey {
+  TEAMS
+  ENTERPRISE
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  tenantId             String             @unique
+  planKey              PlanKey
+  status               SubscriptionStatus @default(active)
+  seatsPurchased       Int
+  billingProvider      String             @default("stripe")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  active
+  past_due
+  canceled
+  trialing
+  paused
+}
+
+model SeatAssignment {
+  id        String               @id @default(cuid())
+  tenantId  String
+  userId    String               @unique
+  status    SeatAssignmentStatus @default(active)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@map("seat_assignments")
+}
+
+enum SeatAssignmentStatus {
+  active
+  inactive
+  pending
+}
+
+model Entitlement {
+  id        String   @id @default(cuid())
+  tenantId  String
+  key       String
+  valueJson Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, key])
+  @@map("entitlements")
+}
+
+// ============================================================================
+// Usage Analytics Models
+// ============================================================================
+
+model UsageEvent {
+  id              String   @id @default(cuid())
+  tenantId        String
+  userId          String?
+  jobRunId        String?
+  eventType       String
+  units           Int      @default(1)
+  costEstimateUsd Decimal? @db.Decimal(10, 6)
+  metaJson        Json?
+  createdAt       DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, eventType])
+  @@index([userId, createdAt])
+  @@map("usage_events")
+}
+
+model UsageRollupDaily {
+  id         String   @id @default(cuid())
+  tenantId   String
+  date       DateTime @db.Date
+  totalsJson Json
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, date])
+  @@map("usage_rollups_daily")
+}
+
+// ============================================================================
+// SSO & Directory Models
+// ============================================================================
+
+model SSOConnection {
+  id              String          @id @default(cuid())
+  tenantId        String
+  type            SSOType
+  provider        String
+  domainAllowlist String[]
+  metadataJson    Json?
+  status          SSOStatus       @default(pending)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, provider])
+  @@map("sso_connections")
+}
+
+enum SSOType {
+  OIDC
+  SAML
+}
+
+enum SSOStatus {
+  pending
+  active
+  disabled
+}
+
+model GroupRoleMapping {
+  id              String   @id @default(cuid())
+  tenantId        String
+  externalGroupId String
+  role            UserRole
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, externalGroupId])
+  @@map("group_role_mappings")
+}
+
+model SCIMDirectory {
+  id         String     @id @default(cuid())
+  tenantId   String     @unique
+  provider   String
+  status     SCIMStatus @default(pending)
+  configJson Json?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("scim_directories")
+}
+
+enum SCIMStatus {
+  pending
+  active
+  disabled
+}
+
+// ============================================================================
+// Connector Models
+// ============================================================================
+
+model ConnectorInstall {
+  id           String          @id @default(cuid())
+  tenantId     String
+  connectorKey String
+  status       ConnectorStatus @default(mock)
+  createdBy    String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  tenant      Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator     User                  @relation(fields: [createdBy], references: [id])
+  credentials ConnectorCredential[]
+
+  @@unique([tenantId, connectorKey])
+  @@map("connector_installs")
+}
+
+enum ConnectorStatus {
+  mock
+  real
+  disabled
+}
+
+model ConnectorCredential {
+  id            String    @id @default(cuid())
+  installId     String
+  encryptedBlob String    @db.Text
+  scopesJson    Json?
+  expiresAt     DateTime?
+  refreshable   Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  install ConnectorInstall @relation(fields: [installId], references: [id], onDelete: Cascade)
+
+  @@index([installId])
+  @@map("connector_credentials")
+}
+
+model ConnectorPolicy {
+  id                  String   @id @default(cuid())
+  tenantId            String
+  connectorKey        String
+  allowedToolsJson    Json?
+  allowedResourcesJson Json?
+  proposalOnly        Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, connectorKey])
+  @@map("connector_policies")
+}
+
+// ============================================================================
+// Policy Decision Log
+// ============================================================================
+
+model PolicyDecisionLog {
+  id          String         @id @default(cuid())
+  tenantId    String
+  jobRunId    String?
+  toolCallId  String?
+  decision    PolicyDecision
+  reason      String
+  ruleMatched String?
+  createdAt   DateTime       @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([jobRunId])
+  @@map("policy_decision_logs")
+}
+
+enum PolicyDecision {
+  ALLOW
+  DENY
 }
 
 // ============================================================================
@@ -204,12 +482,14 @@ model Artifact {
   content    String       @db.Text
   metadata   Json?
   storageKey String?
+  expiresAt  DateTime?
   createdAt  DateTime     @default(now())
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, type])
+  @@index([tenantId, expiresAt])
   @@index([jobId])
   @@map("artifacts")
 }
@@ -303,6 +583,14 @@ enum AuditAction {
   user_logout
   permission_checked
   permission_denied
+  connector_installed
+  connector_oauth_completed
+  subscription_created
+  subscription_updated
+  seat_assigned
+  seat_unassigned
+  sso_configured
+  entitlement_updated
 }
 
 // ============================================================================
@@ -361,4 +649,3 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
-

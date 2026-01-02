@@ -17,9 +17,12 @@ import { mockZendeskServer } from './zendesk';
 import { mockAnalyticsServer } from './analytics';
 import { mockCompetitorServer } from './competitor';
 import { mockCommunityServer } from './community';
-import { MCPClient } from '@pmkit/mcp';
+import { MCPClient, ConnectorFactory, type ConnectorKey } from '@pmkit/mcp';
 
-// Create a pre-configured MCP client with all mock servers
+// ============================================================================
+// Create Mock MCP Client (for demo/development)
+// ============================================================================
+
 export function createMockMCPClient(): MCPClient {
   const client = new MCPClient();
 
@@ -35,7 +38,38 @@ export function createMockMCPClient(): MCPClient {
   return client;
 }
 
+// ============================================================================
+// Register Mock Servers with Factory
+// ============================================================================
+
+/**
+ * Register all mock servers with a connector factory.
+ * This enables the factory to return mock servers when USE_MOCK_CONNECTORS=true
+ */
+export function registerMockServers(factory: ConnectorFactory): void {
+  factory.registerMockServer('jira', mockJiraServer);
+  factory.registerMockServer('confluence', mockConfluenceServer);
+  factory.registerMockServer('slack', mockSlackServer);
+  factory.registerMockServer('gong', mockGongServer);
+  factory.registerMockServer('zendesk', mockZendeskServer);
+}
+
+// ============================================================================
+// MVP Connector Keys
+// ============================================================================
+
+export const MVP_CONNECTORS: ConnectorKey[] = [
+  'jira',
+  'confluence',
+  'slack',
+  'gong',
+  'zendesk',
+];
+
+// ============================================================================
 // Export individual servers for direct access
+// ============================================================================
+
 export {
   mockJiraServer,
   mockConfluenceServer,
@@ -46,4 +80,3 @@ export {
   mockCompetitorServer,
   mockCommunityServer,
 };
-

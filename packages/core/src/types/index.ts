@@ -14,20 +14,23 @@ export const TenantSchema = z.object({
 });
 export type Tenant = z.infer<typeof TenantSchema>;
 
+export const UserRoleSchema = z.enum(['admin', 'pm', 'eng', 'cs', 'sales', 'exec', 'viewer', 'guest']);
+export type UserRole = z.infer<typeof UserRoleSchema>;
+
 export const UserSchema = z.object({
   id: z.string(),
   tenantId: z.string(),
   email: z.string().email(),
   name: z.string(),
   avatarUrl: z.string().optional(),
-  role: z.enum(['admin', 'pm', 'viewer', 'guest']),
+  role: UserRoleSchema,
   permissions: z.array(z.string()),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
 export type User = z.infer<typeof UserSchema>;
 
-export type UserRole = User['role'];
+// UserRole is now exported from UserRoleSchema above
 
 // ============================================================================
 // Job Types
