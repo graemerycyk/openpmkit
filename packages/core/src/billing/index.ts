@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ConnectorKey } from '../connectors';
 
 // ============================================================================
 // Plan Definitions
@@ -22,13 +23,6 @@ export type SeatAssignmentStatus = z.infer<typeof SeatAssignmentStatusSchema>;
 // ============================================================================
 // Connector Definitions (MVP)
 // ============================================================================
-
-export type ConnectorKey =
-  | 'jira'
-  | 'confluence'
-  | 'slack'
-  | 'gong'
-  | 'zendesk';
 
 // MVP connectors - available to all plans
 export const MVP_CONNECTORS: ConnectorKey[] = [

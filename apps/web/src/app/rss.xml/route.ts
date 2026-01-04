@@ -16,7 +16,7 @@ export async function GET() {
       <guid isPermaLink="true">${baseUrl}/blog/${post.slug}</guid>
       <description><![CDATA[${post.description}]]></description>
       <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
-      <author>hello@getpmkit.com (${post.author})</author>
+      <author>support@getpmkit.com (${post.author})</author>
       ${post.tags.map((tag) => `<category>${tag}</category>`).join('\n      ')}
     </item>`
     )

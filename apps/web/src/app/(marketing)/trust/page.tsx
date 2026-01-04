@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Shield,
@@ -14,7 +14,6 @@ import {
   Database,
   Clock,
   AlertTriangle,
-  CheckCircle2,
   ExternalLink,
   FileText,
   Brain,
@@ -448,10 +447,10 @@ export default function TrustPage() {
                     We take security seriously and appreciate the work of security researchers. If
                     you discover a vulnerability, please report it to{' '}
                     <a
-                      href="mailto:security@getpmkit.com"
+                      href="mailto:support@getpmkit.com"
                       className="text-cobalt-600 hover:underline"
                     >
-                      security@getpmkit.com
+                      support@getpmkit.com
                     </a>
                     . We will acknowledge within 48 hours and work with you to address the issue.
                     We do not pursue legal action against good-faith security research.
@@ -477,7 +476,7 @@ export default function TrustPage() {
                 <Link href="/contact?subject=security">Contact Security Team</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <a href="mailto:security@getpmkit.com">security@getpmkit.com</a>
+                <a href="mailto:support@getpmkit.com">support@getpmkit.com</a>
               </Button>
             </div>
           </div>

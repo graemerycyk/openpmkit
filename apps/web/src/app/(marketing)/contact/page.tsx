@@ -49,10 +49,10 @@ export default function ContactPage() {
                   For general inquiries and support
                 </CardDescription>
                 <a
-                  href="mailto:hello@getpmkit.com"
+                  href="mailto:support@getpmkit.com"
                   className="text-cobalt-600 hover:underline"
                 >
-                  hello@getpmkit.com
+                  support@getpmkit.com
                 </a>
               </CardContent>
             </Card>
@@ -88,10 +88,10 @@ export default function ContactPage() {
                   Custom pricing and deployment options
                 </CardDescription>
                 <a
-                  href="mailto:enterprise@getpmkit.com"
+                  href="mailto:sales@getpmkit.com"
                   className="text-cobalt-600 hover:underline"
                 >
-                  enterprise@getpmkit.com
+                  sales@getpmkit.com
                 </a>
               </CardContent>
             </Card>

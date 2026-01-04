@@ -4,7 +4,7 @@
 export const demoUser = {
   id: 'demo-user-1',
   name: 'Demo User',
-  email: 'demo@getpmkit.com',
+  email: 'demo_user@getpmkit.com',
   role: 'pm',
   avatar: null,
 };

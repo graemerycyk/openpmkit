@@ -120,8 +120,8 @@ export default function SecurityPage() {
             <p className="mt-4 text-muted-foreground">
               We take security seriously and appreciate the work of security researchers. If you
               discover a vulnerability, please report it to{' '}
-              <a href="mailto:security@getpmkit.com" className="text-primary underline">
-                security@getpmkit.com
+              <a href="mailto:support@getpmkit.com" className="text-primary underline">
+                support@getpmkit.com
               </a>
               . We will respond within 48 hours and work with you to address the issue.
             </p>

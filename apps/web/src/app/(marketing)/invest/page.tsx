@@ -2,24 +2,17 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import {
   ArrowRight,
-  TrendingUp,
-  Users,
   Target,
-  Zap,
   Shield,
-  Globe,
   CheckCircle2,
-  BarChart3,
   Layers,
-  Clock,
   FileText,
   MessageSquare,
   Mail,
   Lock,
-  Eye,
   Calendar,
   Play,
   ExternalLink,
@@ -899,11 +892,11 @@ export default function InvestPage() {
 
             <div className="mt-8">
               <a
-                href="mailto:invest@getpmkit.com"
+                href="mailto:grae@getpmkit.com"
                 className="text-cobalt-200 hover:text-white transition-colors inline-flex items-center gap-2"
               >
                 <Mail className="h-4 w-4" />
-                invest@getpmkit.com
+                grae@getpmkit.com
               </a>
             </div>
           </div>

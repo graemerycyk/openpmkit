@@ -93,7 +93,7 @@ export default function PrivacyPage() {
             <h2>8. Contact Us</h2>
             <p>
               If you have questions about this Privacy Policy, please contact us at{' '}
-              <a href="mailto:privacy@getpmkit.com">privacy@getpmkit.com</a>.
+              <a href="mailto:support@getpmkit.com">support@getpmkit.com</a>.
             </p>
           </div>
         </div>

@@ -15,7 +15,29 @@ export const metadata: Metadata = {
   },
 };
 
-const plans = [
+interface PlanFeature {
+  name: string;
+  included: boolean;
+  detail?: string;
+  isHeader?: boolean;
+}
+
+interface Plan {
+  name: string;
+  description: string;
+  price: string;
+  priceDetail: string;
+  billingNote: string | null;
+  minSeats: number;
+  badge: string | null;
+  features: PlanFeature[];
+  cta: string;
+  ctaHref: string;
+  ctaVariant: 'default' | 'outline';
+  highlighted: boolean;
+}
+
+const plans: Plan[] = [
   {
     name: 'Teams',
     description: 'For product teams with SSO, core connectors, and governance',

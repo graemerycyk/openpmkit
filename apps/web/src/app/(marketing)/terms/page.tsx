@@ -88,7 +88,7 @@ export default function TermsPage() {
             <h2>11. Contact</h2>
             <p>
               If you have questions about these Terms of Service, please contact us at{' '}
-              <a href="mailto:legal@getpmkit.com">legal@getpmkit.com</a>.
+              <a href="mailto:support@getpmkit.com">support@getpmkit.com</a>.
             </p>
           </div>
         </div>

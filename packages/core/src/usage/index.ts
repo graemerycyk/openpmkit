@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { nanoid } from 'nanoid';
 import type { JobType } from '../types';
 import type { PlanKey, Subscription } from '../billing';
-import { getPlan, type ConnectorKey } from '../billing';
+import { getPlan } from '../billing';
+import type { ConnectorKey } from '../connectors';
 
 // ============================================================================
 // Usage Event Types
