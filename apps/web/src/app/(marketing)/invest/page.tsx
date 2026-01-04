@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { MailtoButton } from '@/components/ui/mailto-button';
 import {
   ArrowRight,
   Target,
@@ -227,16 +228,14 @@ export default function InvestPage() {
             </div>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button
+              <MailtoButton
+                user="grae"
                 size="lg"
                 className="bg-cobalt-500 hover:bg-cobalt-600 text-white"
-                asChild
               >
-                <a href="mailto:grae@getpmkit.com">
-                  Book Founder Call
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
+                Book Founder Call
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </MailtoButton>
               <Button
                 size="lg"
                 variant="outline"
@@ -867,16 +866,14 @@ export default function InvestPage() {
             </div>
 
             <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button
+              <MailtoButton
+                user="grae"
                 size="lg"
                 className="bg-white text-cobalt-700 hover:bg-white/90"
-                asChild
               >
-                <a href="mailto:grae@getpmkit.com">
-                  Book Founder Call
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
+                Book Founder Call
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </MailtoButton>
               <Button
                 size="lg"
                 variant="outline"
@@ -891,13 +888,13 @@ export default function InvestPage() {
             </div>
 
             <div className="mt-8">
-              <a
-                href="mailto:grae@getpmkit.com"
+              <Link
+                href="/contact"
                 className="text-cobalt-200 hover:text-white transition-colors inline-flex items-center gap-2"
               >
                 <Mail className="h-4 w-4" />
-                grae@getpmkit.com
-              </a>
+                Contact the Founder
+              </Link>
             </div>
           </div>
         </div>

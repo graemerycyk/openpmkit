@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Shield, Lock, Eye, FileCheck, Users, Server } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Security',
@@ -135,12 +137,14 @@ export default function SecurityPage() {
             <h2 className="font-heading text-3xl font-bold">Responsible Disclosure</h2>
             <p className="mt-4 text-muted-foreground">
               We take security seriously and appreciate the work of security researchers. If you
-              discover a vulnerability, please report it to{' '}
-              <a href="mailto:support@getpmkit.com" className="text-primary underline">
-                support@getpmkit.com
-              </a>
-              . We will respond within 48 hours and work with you to address the issue.
+              discover a vulnerability, please report it via our contact form. We will respond
+              within 48 hours and work with you to address the issue.
             </p>
+            <div className="mt-6">
+              <Button variant="outline" asChild>
+                <Link href="/contact?subject=security">Report a Vulnerability</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

@@ -163,14 +163,14 @@ export default function HowItWorksPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium">{tool}</p>
-                          <p className="text-xs text-amber-600">Demo (Mock)</p>
+                          <p className="text-xs text-muted-foreground">Connected</p>
                         </div>
                       </div>
                     ))}
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground">
-                    In demo mode, all connectors return simulated data.{' '}
-                    <Link href="/contact" className="underline hover:no-underline">Contact sales</Link> to connect real tools.
+                    OAuth connections to your existing tools.{' '}
+                    <Link href="/contact" className="underline hover:no-underline">Contact sales</Link> to get started.
                   </p>
                 </div>
               </div>

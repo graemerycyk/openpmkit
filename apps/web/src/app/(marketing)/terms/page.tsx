@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -87,8 +88,11 @@ export default function TermsPage() {
 
             <h2>11. Contact</h2>
             <p>
-              If you have questions about these Terms of Service, please contact us at{' '}
-              <a href="mailto:support@getpmkit.com">support@getpmkit.com</a>.
+              If you have questions about these Terms of Service, please{' '}
+              <Link href="/contact" className="text-cobalt-600 hover:underline">
+                contact us
+              </Link>
+              .
             </p>
           </div>
         </div>

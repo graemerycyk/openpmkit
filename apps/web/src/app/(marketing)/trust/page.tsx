@@ -439,13 +439,13 @@ export default function TrustPage() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
                     We take security seriously and appreciate the work of security researchers. If
-                    you discover a vulnerability, please report it to{' '}
-                    <a
-                      href="mailto:support@getpmkit.com"
+                    you discover a vulnerability, please{' '}
+                    <Link
+                      href="/contact?subject=security"
                       className="text-cobalt-600 hover:underline"
                     >
-                      support@getpmkit.com
-                    </a>
+                      report it via our contact form
+                    </Link>
                     . We will acknowledge within 48 hours and work with you to address the issue.
                     We do not pursue legal action against good-faith security research.
                   </p>
