@@ -2,6 +2,34 @@
 
 > Documentation for AI programming agents working in this codebase.
 
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Install dependencies | `npm install` |
+| Build all packages | `npm run build` |
+| Start dev server | `npm run dev` |
+| Run tests | `npm run test` |
+| Type check | `npm run typecheck` |
+| Lint | `npm run lint` |
+| Generate Prisma client | `npm run db:generate` |
+| Push schema to DB | `npm run db:push` |
+
+### Critical Files at a Glance
+
+| What | Where |
+|------|-------|
+| Domain types | `packages/core/src/types/index.ts` |
+| MCP framework | `packages/mcp/src/index.ts` |
+| Job runner | `packages/core/src/jobs/index.ts` |
+| Prompt templates | `packages/prompts/src/index.ts` |
+| Database schema | `prisma/schema.prisma` |
+| Demo data | `packages/mock-tenant/src/data/` |
+| Web app | `apps/web/src/app/` |
+| UI components | `apps/web/src/components/ui/` |
+
+---
+
 ## Agent Behavior Guidelines
 
 This section provides guidance for AI agents (Claude 4.x models) working in this codebase, based on [Claude 4 best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices).
@@ -697,4 +725,155 @@ REDIS_URL=...             # Uses inline fallback if not set
 - Run `npm run build` from root (Turborepo handles order)
 - Check for TypeScript errors with `npm run typecheck`
 - Ensure all package dependencies are correct in `package.json`
+
+## Common Pitfalls
+
+### ❌ Direct Write Tools
+
+Never create tools that write directly to external systems:
+
+```typescript
+// ❌ WRONG - Direct write
+this.registerTool({ name: 'create_jira_issue', ... });
+
+// ✅ CORRECT - Proposal tool
+this.registerTool(createProposalTool('jira_issue', ...));
+```
+
+### ❌ TypeScript Enums
+
+Never use TypeScript enums. Use Zod schemas instead:
+
+```typescript
+// ❌ WRONG
+enum JobStatus { Pending, Running, Completed }
+
+// ✅ CORRECT
+export const JobStatusSchema = z.enum(['pending', 'running', 'completed']);
+export type JobStatus = z.infer<typeof JobStatusSchema>;
+```
+
+### ❌ Missing Schema Updates
+
+When adding new types, you must update BOTH:
+1. Zod schema in `packages/core/src/types/index.ts`
+2. Prisma enum in `prisma/schema.prisma`
+
+Forgetting either will cause runtime or build errors.
+
+### ❌ Hardcoded Tenant Data
+
+All data must be scoped by `tenantId`. Never hardcode tenant-specific values:
+
+```typescript
+// ❌ WRONG
+const issues = await getIssues('ACME-123');
+
+// ✅ CORRECT
+const issues = await getIssues(context.tenantId, 'ACME-123');
+```
+
+### ❌ Over-Engineering
+
+Keep changes minimal and focused:
+- Don't add features not requested
+- Don't refactor surrounding code when fixing bugs
+- Don't add error handling for impossible scenarios
+- Don't create abstractions for one-time operations
+
+## Testing Patterns
+
+### Unit Testing MCP Tools
+
+```typescript
+import { MockJiraMCPServer } from '@pmkit/mcp-servers';
+
+describe('Jira MCP Server', () => {
+  const server = new MockJiraMCPServer();
+
+  it('should search issues', async () => {
+    const result = await server.callTool('search_issues', {
+      jql: 'project = ACME',
+    });
+    expect(result.success).toBe(true);
+    expect(result.data.issues).toBeDefined();
+  });
+});
+```
+
+### Testing Job Handlers
+
+```typescript
+import { JobRunner, createTestContext } from '@pmkit/core';
+
+describe('Daily Brief Job', () => {
+  it('should generate brief artifact', async () => {
+    const ctx = createTestContext({
+      jobType: 'daily_brief',
+      tenantId: 'test-tenant',
+    });
+    
+    await jobRunner.runJob(ctx);
+    
+    expect(ctx.artifacts).toHaveLength(1);
+    expect(ctx.artifacts[0].type).toBe('brief');
+  });
+});
+```
+
+### Testing with Mock Data
+
+Demo mode uses mock servers from `packages/mock-tenant/src/data/`. All tests can run without external services:
+
+```typescript
+// Mock data is automatically available
+import { mockJiraData } from '@pmkit/mock-tenant';
+
+expect(mockJiraData.issues).toContainEqual(
+  expect.objectContaining({ key: 'ACME-101' })
+);
+```
+
+### Integration Testing
+
+For end-to-end tests, use the demo console at `/demo/console`:
+
+1. All connectors are simulated
+2. Jobs run with stub responses
+3. Proposals are created but not executed
+4. Full audit trail is logged
+
+## Environment Variables Reference
+
+### Required for Production
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Session encryption key |
+
+### Optional (Demo Works Without)
+
+| Variable | Purpose | Fallback |
+|----------|---------|----------|
+| `OPENAI_API_KEY` | LLM inference | Stub responses |
+| `REDIS_URL` | Job queue | Inline processing |
+| `S3_*` | Artifact storage | Local filesystem |
+| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth | Demo auth only |
+| `MICROSOFT_CLIENT_ID/SECRET` | Microsoft OAuth | Demo auth only |
+
+### Analytics & SEO
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN` | Simple Analytics |
+| `NEXT_PUBLIC_GSC_VERIFICATION` | Google Search Console |
+| `NEXT_PUBLIC_BING_VERIFICATION` | Bing Webmaster Tools |
+
+## Related Files
+
+- `CLAUDE.md` - Quick reference for Claude Code
+- `.cursorrules` - Cursor IDE configuration
+- `CONTRIBUTING.md` - Human contributor guide
+- `README.md` - Project overview
 

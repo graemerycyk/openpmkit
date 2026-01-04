@@ -170,6 +170,132 @@ Jobs are executed by the BullMQ worker:
 5. Run linting: `npm run lint`
 6. Submit a pull request
 
+## Cursor Rules
+
+# Cursor Rules for pmkit
+
+## Primary Documentation
+
+Read `AGENTS.md` for complete project documentation before making changes.
+
+## Core Principles
+
+### Draft-Only Pattern
+All external writes MUST use proposal tools. Never create direct write tools.
+
+```typescript
+// ✅ Correct
+this.registerTool(createProposalTool('jira_epic', ...));
+
+// ❌ Wrong
+this.registerTool({ name: 'create_jira_epic', ... });
+```
+
+### Type Definitions
+Use Zod schemas with inferred types. Never use TypeScript enums.
+
+```typescript
+// ✅ Correct
+export const StatusSchema = z.enum(['pending', 'active', 'done']);
+export type Status = z.infer<typeof StatusSchema>;
+
+// ❌ Wrong
+enum Status { Pending, Active, Done }
+```
+
+### Tool Naming
+- Read tools: `get_*`, `search_*`, `list_*`, `find_*`
+- Write tools: `propose_*` (never direct writes)
+- All tool names are snake_case
+
+## File Locations
+
+| What | Where |
+|------|-------|
+| Domain types | `packages/core/src/types/index.ts` |
+| MCP tools | `packages/mcp-servers/src/{connector}/index.ts` |
+| Prompt templates | `packages/prompts/src/index.ts` |
+| Demo data | `packages/mock-tenant/src/data/` |
+| Database schema | `prisma/schema.prisma` |
+| Web pages | `apps/web/src/app/` |
+| UI components | `apps/web/src/components/ui/` |
+
+## Frontend Conventions
+
+### Typography
+- Headings: Space Grotesk (`font-heading`)
+- Body: Geist Sans (`font-sans`)
+- Code: Geist Mono (`font-mono`)
+
+### Colors
+Primary brand color is cobalt/indigo:
+- `text-cobalt-600` for links and primary text
+- `bg-cobalt-100` for icon backgrounds
+- `bg-cobalt-600` for primary buttons
+
+### Components
+Use shadcn/ui components from `apps/web/src/components/ui/`.
+Badge variants: `default`, `secondary`, `destructive`, `outline`, `cobalt`
+
+### Animations
+Use Tailwind animations: `animate-fade-in`, `animate-fade-up`
+Stagger with: `animate-delay-100`, `animate-delay-200`, etc.
+
+## Common Tasks
+
+### Adding a Connector
+1. Create MCP server in `packages/mcp-servers/src/{connector}/`
+2. Add mock data in `packages/mock-tenant/src/data/{connector}.ts`
+3. Export from `packages/mcp-servers/src/index.ts`
+4. Add to ConnectorKeySchema if needed
+
+### Adding a Job Type
+1. Add to `JobTypeSchema` in `packages/core/src/types/index.ts`
+2. Add prompt template in `packages/prompts/src/index.ts`
+3. Add stub generator function
+4. Update Prisma enum in `prisma/schema.prisma`
+5. Create job handler
+
+### Adding a Page
+1. Create in `apps/web/src/app/(marketing)/` for marketing pages
+2. Use the established layout patterns (Hero → Features → CTA)
+3. Export metadata for SEO
+4. Follow the cobalt accent color scheme
+
+## Testing
+
+```bash
+npm run test        # Run all tests
+npm run test:watch  # Watch mode
+npm run typecheck   # TypeScript checks
+npm run lint        # ESLint
+```
+
+## Database
+
+```bash
+npm run db:generate  # Generate Prisma client
+npm run db:push      # Push schema to dev database
+npm run db:migrate   # Create and run migrations
+```
+
+## Build
+
+```bash
+npm run build        # Build all packages (Turborepo)
+npm run dev          # Start dev servers
+```
+
+## Avoid
+
+- Over-engineering or adding features not requested
+- Direct write tools (use proposals)
+- TypeScript enums (use Zod)
+- Speculating about code without reading it first
+- Adding error handling for impossible scenarios
+- Creating abstractions for one-time operations
+
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
