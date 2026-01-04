@@ -207,7 +207,7 @@ export function Footer() {
               </svg>
             </Link>
             <Link
-              href="https://x.com/getpmkit"
+              href="https://www.linkedin.com/company/pmkit/"
               className="text-muted-foreground hover:text-cobalt-600"
               target="_blank"
               rel="noopener noreferrer"
