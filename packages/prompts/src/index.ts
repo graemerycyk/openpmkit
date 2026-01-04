@@ -936,3 +936,132 @@ Add filter controls to search results with:
 **Total**: 7 weeks`;
 }
 
+// ============================================================================
+// Job Executor (integrates LLM with prompts)
+// ============================================================================
+
+import type {
+  LLMService,
+  LLMCompletionResponse,
+  LLMMessage,
+} from '@pmkit/core';
+
+export interface JobExecutionResult {
+  content: string;
+  model: string;
+  usage: {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+  };
+  latencyMs: number;
+  estimatedCostUsd: number;
+  isStub: boolean;
+}
+
+export interface JobExecutorOptions {
+  maxTokens?: number;
+  temperature?: number;
+}
+
+/**
+ * Execute a job using the LLM service
+ */
+export async function executeJob(
+  llmService: LLMService,
+  tenantId: string,
+  jobType: JobType,
+  context: PromptContext,
+  options: JobExecutorOptions = {}
+): Promise<JobExecutionResult> {
+  const template = PROMPT_TEMPLATES[jobType];
+  
+  // Check if using stubs
+  if (llmService.isUsingStubs()) {
+    const stubContent = generateStubResponse(jobType, context);
+    return {
+      content: stubContent,
+      model: 'stub',
+      usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+      latencyMs: 100,
+      estimatedCostUsd: 0,
+      isStub: true,
+    };
+  }
+
+  // Render the prompt
+  const { system, user } = renderPrompt(template, context);
+
+  // Build messages
+  const messages: LLMMessage[] = [
+    { role: 'system', content: system },
+    { role: 'user', content: user },
+  ];
+
+  // Execute the completion
+  const response = await llmService.complete(tenantId, {
+    messages,
+    maxTokens: options.maxTokens,
+    temperature: options.temperature,
+  });
+
+  // Calculate cost
+  const modelInfo = llmService.getModelForTenant(tenantId);
+  const estimatedCostUsd =
+    (response.usage.inputTokens / 1_000_000) * modelInfo.inputPricePerMillion +
+    (response.usage.outputTokens / 1_000_000) * modelInfo.outputPricePerMillion;
+
+  return {
+    content: response.content,
+    model: response.model,
+    usage: response.usage,
+    latencyMs: response.latencyMs,
+    estimatedCostUsd,
+    isStub: false,
+  };
+}
+
+/**
+ * Create a stub generator function for the LLM service
+ * This allows the LLM service to generate contextual stubs
+ */
+export function createStubGenerator(): (messages: LLMMessage[]) => string {
+  return (messages: LLMMessage[]) => {
+    // Try to extract job type from the system prompt
+    const systemPrompt = messages.find((m) => m.role === 'system')?.content || '';
+    
+    // Default context
+    const context: PromptContext = {
+      tenantName: 'Demo Company',
+      productName: 'Demo Product',
+      currentDate: new Date().toISOString().split('T')[0],
+      userName: 'Demo User',
+    };
+
+    // Try to identify job type from system prompt
+    if (systemPrompt.includes('daily brief')) {
+      return generateStubResponse('daily_brief', context);
+    } else if (systemPrompt.includes('meeting prep') || systemPrompt.includes('customer meetings')) {
+      return generateStubResponse('meeting_prep', context);
+    } else if (systemPrompt.includes('voice of customer') || systemPrompt.includes('VoC')) {
+      return generateStubResponse('voc_clustering', context);
+    } else if (systemPrompt.includes('competitor') || systemPrompt.includes('competitive')) {
+      return generateStubResponse('competitor_research', context);
+    } else if (systemPrompt.includes('roadmap') || systemPrompt.includes('alignment')) {
+      return generateStubResponse('roadmap_alignment', context);
+    } else if (systemPrompt.includes('PRD') || systemPrompt.includes('product requirements')) {
+      return generateStubResponse('prd_draft', context);
+    }
+
+    // Generic fallback
+    return `# Generated Response
+
+This is a stub response generated for development/testing.
+
+To use real LLM responses, set \`USE_STUB_LLM=false\` and provide an \`OPENAI_API_KEY\`.
+
+---
+*Generated at ${new Date().toISOString()}*`;
+  };
+}
+

@@ -41,6 +41,12 @@
       "require": "./dist/storage/index.js",
       "import": "./dist/storage/index.js",
       "default": "./dist/storage/index.js"
+    },
+    "./llm": {
+      "types": "./dist/llm/index.d.ts",
+      "require": "./dist/llm/index.js",
+      "import": "./dist/llm/index.js",
+      "default": "./dist/llm/index.js"
     }
   },
   "scripts": {

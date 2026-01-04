@@ -185,8 +185,8 @@ export default function PricingPage() {
                     {plan.badge && (
                       <Badge variant="outline" className="text-xs">
                         {plan.badge}
-                      </Badge>
-                    )}
+                    </Badge>
+                  )}
                   </div>
                   <CardDescription className="mt-2">{plan.description}</CardDescription>
                   <div className="mt-6">
@@ -215,7 +215,7 @@ export default function PricingPage() {
                         className={`flex items-start gap-2 ${feature.isHeader ? 'font-medium text-foreground' : ''}`}
                       >
                         {!feature.isHeader && (
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />
                         )}
                         <span className={`text-sm ${feature.isHeader ? '' : ''}`}>
                           {feature.name}

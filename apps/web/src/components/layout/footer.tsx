@@ -179,9 +179,9 @@ export function Footer() {
         {/* Copyright and legal */}
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex flex-col items-center gap-4 md:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} pmkit. All rights reserved.
-            </p>
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} pmkit. All rights reserved.
+          </p>
             <div className="flex items-center gap-4">
               {footerLinks.legal.map((link) => (
                 <Link
