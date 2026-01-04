@@ -40,7 +40,7 @@ export const JobTypeSchema = z.enum([
   'daily_brief',
   'meeting_prep',
   'voc_clustering',
-  'competitor_intel',
+  'competitor_research',
   'roadmap_alignment',
   'prd_draft',
 ]);
@@ -146,7 +146,7 @@ export const ArtifactTypeSchema = z.enum([
   'brief',
   'meeting_pack',
   'voc_report',
-  'competitor_diff',
+  'competitor_report',
   'alignment_memo',
   'prd',
   'sprint_review',

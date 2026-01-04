@@ -93,7 +93,7 @@ export const keywords: KeywordEntry[] = [
     searchVolume: 'low',
     difficulty: 'low',
     intent: 'informational',
-    relatedPages: ['/resources/competitor-intel-diff', '/demo'],
+    relatedPages: ['/resources/competitor-research', '/demo'],
   },
 
   // Integration-Intent Keywords

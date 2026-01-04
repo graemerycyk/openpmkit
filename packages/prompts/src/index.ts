@@ -162,21 +162,21 @@ Create a VoC report with:
     requiredContext: ['supportTickets', 'gongInsights', 'communityFeedback'],
   },
 
-  competitor_intel: {
-    id: 'competitor-intel-v1',
-    name: 'Competitor Intel Diff',
-    description: 'Generate a diff of recent competitor changes',
-    jobType: 'competitor_intel',
-    systemPrompt: `You are a competitive intelligence analyst helping PMs track market changes.
-Your job is to synthesize competitor updates into strategic insights.
+  competitor_research: {
+    id: 'competitor-research-v1',
+    name: 'Competitor Research Report',
+    description: 'Track competitor product changes and releases',
+    jobType: 'competitor_research',
+    systemPrompt: `You are a product research analyst helping PMs track competitor product developments.
+Your job is to synthesize competitor product updates into strategic insights.
 
 Guidelines:
-- Focus on actionable changes (not noise)
-- Assess strategic implications
-- Compare to our capabilities
+- Focus on actionable product changes (not noise)
+- Assess strategic implications for your product
+- Compare to your capabilities
 - Suggest responses where appropriate
 - Be objective and fact-based`,
-    userPromptTemplate: `Generate a competitor intel diff for {{tenantName}}.
+    userPromptTemplate: `Generate a competitor research report for {{tenantName}}.
 
 ## Time Period
 From: {{fromDate}}
@@ -378,8 +378,8 @@ export function generateStubResponse(
       return generateMeetingPrepStub(context, date);
     case 'voc_clustering':
       return generateVocClusteringStub(context, date);
-    case 'competitor_intel':
-      return generateCompetitorIntelStub(context, date);
+    case 'competitor_research':
+      return generateCompetitorResearchStub(context, date);
     case 'roadmap_alignment':
       return generateRoadmapAlignmentStub(context, date);
     case 'prd_draft':
@@ -594,8 +594,8 @@ function generateVocClusteringStub(context: PromptContext, date: string): string
 4. **Add performance monitoring** - Proactive issue detection`;
 }
 
-function generateCompetitorIntelStub(context: PromptContext, date: string): string {
-  return `# Competitor Intel Diff
+function generateCompetitorResearchStub(context: PromptContext, date: string): string {
+  return `# Competitor Research Report
 
 **Period**: Last 14 days
 **Generated**: ${date}

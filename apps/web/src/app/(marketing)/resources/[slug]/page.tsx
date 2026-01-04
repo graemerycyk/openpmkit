@@ -264,8 +264,8 @@ export default async function ResourcePageComponent({ params }: PageProps) {
                       with evidence
                     </li>
                     <li>
-                      • <strong>Competitor Intel</strong>: Track competitor changes with strategic
-                      implications
+                      • <strong>Competitor Research</strong>: Track competitor product changes and
+                      releases
                     </li>
                     <li>
                       • <strong>Roadmap Alignment</strong>: Generate alignment memos with options

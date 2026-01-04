@@ -184,7 +184,7 @@ export default function HowItWorksPage() {
                   <h3 className="font-heading text-2xl font-bold">Configure Jobs</h3>
                 </div>
                 <p className="mt-4 text-muted-foreground">
-                  Set up the PM jobs you want to run; daily briefs, meeting prep, VoC clustering, competitor intel, roadmap alignment, or PRD drafts. Configure sources, schedules, and output destinations.
+                  Set up the PM jobs you want to run; daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, or PRD drafts. Configure sources, schedules, and output destinations.
                 </p>
                 <ul className="mt-6 space-y-2">
                   <li className="flex items-center gap-2">
@@ -215,7 +215,7 @@ export default function HowItWorksPage() {
                     {[
                       { name: 'Daily Brief', schedule: 'Every day at 8am', icon: FileText },
                       { name: 'VoC Clustering', schedule: 'Every Monday', icon: BarChart3 },
-                      { name: 'Competitor Intel', schedule: 'Every Friday', icon: Eye },
+                      { name: 'Competitor Research', schedule: 'Every Friday', icon: Eye },
                     ].map((job) => (
                       <div key={job.name} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
                         <div className="flex items-center gap-3">
@@ -379,8 +379,8 @@ export default function HowItWorksPage() {
                 frequency: 'Weekly',
               },
               {
-                name: 'Competitor Intel',
-                description: 'Track competitor changes with strategic implications.',
+                name: 'Competitor Research',
+                description: 'Track competitor product changes and releases.',
                 frequency: 'Weekly',
               },
               {

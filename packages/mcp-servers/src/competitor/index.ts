@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { BaseMCPServer } from '@pmkit/mcp';
 
 // ============================================================================
-// Competitor Intel Data Types
+// Competitor Research Data Types
 // ============================================================================
 
 export const CompetitorSchema = z.object({
@@ -55,7 +55,7 @@ export const CompetitorFeatureSchema = z.object({
 export type CompetitorFeature = z.infer<typeof CompetitorFeatureSchema>;
 
 // ============================================================================
-// Mock Competitor Intel MCP Server
+// Mock Competitor Research MCP Server
 // ============================================================================
 
 export class MockCompetitorMCPServer extends BaseMCPServer {
@@ -66,7 +66,7 @@ export class MockCompetitorMCPServer extends BaseMCPServer {
   constructor() {
     super({
       name: 'competitor',
-      description: 'Competitor intelligence integration for tracking market changes',
+      description: 'Competitor research integration for tracking product changes',
       version: '1.0.0',
     });
 
@@ -259,7 +259,7 @@ export class MockCompetitorMCPServer extends BaseMCPServer {
     });
 
     this.registerTool({
-      name: 'generate_competitor_diff',
+      name: 'generate_competitor_report',
       description: 'Generate a diff summary of competitor changes over a period',
       inputSchema: z.object({
         competitorId: z.string(),

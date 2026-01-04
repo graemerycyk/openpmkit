@@ -2,11 +2,11 @@
 
 > Your daily PM toolkit - briefs, meetings, and PRDs made simple.
 
-pmkit is an AI-powered product management agent that runs daily briefs, meeting prep, VoC clustering, competitor intel, roadmap alignment, and PRD drafts; all with draft-only governance and full traceability.
+pmkit is an AI-powered product management agent that runs daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, and PRD drafts; all with draft-only governance and full traceability.
 
 ## Features
 
-- **6 Cadence Jobs**: Daily brief, meeting prep, VoC clustering, competitor intel, roadmap alignment, PRD draft
+- **6 Cadence Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft
 - **Draft-Only**: Agents propose changes but never write directly to external systems
 - **Full Traceability**: Every tool call, source, and artifact is logged
 - **Enterprise Governance**: RBAC, permission simulation, audit logging

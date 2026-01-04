@@ -60,7 +60,7 @@ export interface PlanFeatures {
   // Jobs
   scheduledDailyBrief: boolean;
   scheduledWeeklyThemes: boolean;
-  scheduledCompetitorDiff: boolean;
+  scheduledCompetitorResearch: boolean;
   maxOnDemandMeetingPrepPerSeatPerMonth: number;
   maxOnDemandPrdPackPerSeatPerMonth: number;
   maxOnDemandRoadmapMemoPerSeatPerMonth: number;
@@ -110,7 +110,7 @@ export const TEAMS_PLAN: PlanConfig = {
     // Scheduled jobs
     scheduledDailyBrief: true,
     scheduledWeeklyThemes: true,
-    scheduledCompetitorDiff: true,
+    scheduledCompetitorResearch: true,
 
     // On-demand limits per seat per month
     maxOnDemandMeetingPrepPerSeatPerMonth: 10,
@@ -159,7 +159,7 @@ export const ENTERPRISE_PLAN: PlanConfig = {
     // Scheduled jobs
     scheduledDailyBrief: true,
     scheduledWeeklyThemes: true,
-    scheduledCompetitorDiff: true,
+    scheduledCompetitorResearch: true,
 
     // Higher on-demand limits
     maxOnDemandMeetingPrepPerSeatPerMonth: 50,
@@ -245,7 +245,7 @@ export const EntitlementKeySchema = z.enum([
   // Scheduled job toggles
   'jobs.scheduledDailyBrief',
   'jobs.scheduledWeeklyThemes',
-  'jobs.scheduledCompetitorDiff',
+  'jobs.scheduledCompetitorResearch',
   
   // Retention
   'retention.artifactDays',
@@ -358,7 +358,7 @@ export class EntitlementService {
     await this.store.upsert(tenantId, 'jobs.maxConcurrentRunsPer10Seats', features.maxConcurrentRunsPer10Seats);
     await this.store.upsert(tenantId, 'jobs.scheduledDailyBrief', features.scheduledDailyBrief);
     await this.store.upsert(tenantId, 'jobs.scheduledWeeklyThemes', features.scheduledWeeklyThemes);
-    await this.store.upsert(tenantId, 'jobs.scheduledCompetitorDiff', features.scheduledCompetitorDiff);
+    await this.store.upsert(tenantId, 'jobs.scheduledCompetitorResearch', features.scheduledCompetitorResearch);
     await this.store.upsert(tenantId, 'retention.artifactDays', features.defaultRetentionDays);
     await this.store.upsert(tenantId, 'retention.auditDays', features.auditRetentionDays);
     await this.store.upsert(tenantId, 'sso.oidcEnabled', features.ssoOidc);
@@ -391,8 +391,8 @@ export class EntitlementService {
         return features.scheduledDailyBrief;
       case 'jobs.scheduledWeeklyThemes':
         return features.scheduledWeeklyThemes;
-      case 'jobs.scheduledCompetitorDiff':
-        return features.scheduledCompetitorDiff;
+      case 'jobs.scheduledCompetitorResearch':
+        return features.scheduledCompetitorResearch;
       case 'retention.artifactDays':
         return features.defaultRetentionDays;
       case 'retention.auditDays':

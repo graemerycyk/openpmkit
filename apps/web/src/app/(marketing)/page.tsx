@@ -39,7 +39,7 @@ const features = [
   },
   {
     icon: Target,
-    title: 'Competitor Intel',
+    title: 'Competitor Research',
     description:
       'Track competitor mentions across X, Reddit, LinkedIn, and news; pricing, features, messaging; with strategic implications.',
   },
@@ -451,7 +451,7 @@ export default function HomePage() {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
               Run all 6 cadence jobs in the demo; daily brief, meeting prep, VoC clustering,
-              competitor intel, roadmap alignment, and PRD draft.
+              competitor research, roadmap alignment, and PRD draft.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

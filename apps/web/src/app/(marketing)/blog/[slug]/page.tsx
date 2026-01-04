@@ -176,7 +176,7 @@ Ready to experience ${post.primaryKeyword} firsthand? The pmkit demo lets you ru
 - **Daily Brief**: See how overnight activity is synthesized
 - **Meeting Prep**: Generate a prep pack for a mock customer meeting
 - **VoC Clustering**: Watch themes emerge from support and call data
-- **Competitor Intel**: Track mock competitor changes
+- **Competitor Research**: Track mock competitor product changes
 - **Roadmap Alignment**: Generate an alignment memo with options
 - **PRD Draft**: Create a PRD grounded in customer evidence
 

@@ -372,7 +372,7 @@ enum JobType {
   daily_brief
   meeting_prep
   voc_clustering
-  competitor_intel
+  competitor_research
   roadmap_alignment
   prd_draft
 }
@@ -498,7 +498,7 @@ enum ArtifactType {
   brief
   meeting_pack
   voc_report
-  competitor_diff
+  competitor_report
   alignment_memo
   prd
   sprint_review

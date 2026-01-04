@@ -127,7 +127,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What tasks can an AI PM assistant handle?',
         answer:
-          'An AI PM assistant can generate daily briefs from overnight activity, prepare meeting packs with customer context, cluster voice-of-customer feedback into themes, draft PRDs with evidence, and create competitor intel diffs.',
+          'An AI PM assistant can generate daily briefs from overnight activity, prepare meeting packs with customer context, cluster voice-of-customer feedback into themes, draft PRDs with evidence, and create competitor research reports.',
       },
       {
         question: 'Will an AI assistant replace product managers?',
@@ -320,17 +320,17 @@ export const resources: ResourcePage[] = [
     ],
   },
   {
-    slug: 'competitor-intel-diff',
-    title: 'Competitor Intel Diff: Track Market Changes',
+    slug: 'competitor-research',
+    title: 'Competitor Research: Track Product Changes',
     description:
-      'Generate competitor intelligence diffs that highlight pricing changes, feature launches, and strategic implications.',
-    primaryKeyword: 'competitor intel diff',
-    secondaryKeywords: ['competitive intelligence AI', 'competitor monitoring', 'market tracking'],
+      'Generate competitor research reports that highlight product changes, feature launches, and strategic implications.',
+    primaryKeyword: 'competitor research',
+    secondaryKeywords: ['competitor product tracking', 'competitor monitoring', 'product research'],
     category: 'competitive',
     relatedPages: ['/demo', '/resources/product-management-agent', '/blog'],
     workedExample: {
       title: 'Catching a Competitor Price Cut Before Sales Does',
-      scenario: 'The weekly Competitor Intel job runs Sunday night. Monday morning, the PM sees a critical alert.',
+      scenario: 'The weekly Competitor Research job runs Sunday night. Monday morning, the PM sees a critical alert.',
       steps: [
         'Agent detects Coda reduced enterprise pricing by 20%',
         'Identifies 3 new feature launches from Notion (AI search)',
@@ -342,14 +342,14 @@ export const resources: ResourcePage[] = [
     },
     checklist: [
       'Do you find out about competitor changes from customers?',
-      'Is your competitive intel outdated by the time you use it?',
+      'Is your competitor research outdated by the time you use it?',
       'Do sales reps get surprised by competitor pricing in negotiations?',
       'Are you tracking competitors manually (or not at all)?',
       'Do you wish you had a systematic way to monitor the market?',
     ],
     keyBenefits: [
       'Never be surprised by competitor moves',
-      'Arm sales with current competitive intel',
+      'Arm sales with current competitor research',
       'Identify feature gaps before customers mention them',
       'Systematic market monitoring without manual effort',
     ],
@@ -365,9 +365,9 @@ export const resources: ResourcePage[] = [
           'The competitor MCP connector aggregates signals from product pages, press releases, social media, and industry sources. Changes are classified by type and significance.',
       },
       {
-        question: 'What does a competitor diff include?',
+        question: 'What does a competitor research report include?',
         answer:
-          'Each diff summarizes changes by competitor, assesses strategic implications, compares to your capabilities, and suggests potential responses.',
+          'Each report summarizes changes by competitor, assesses strategic implications, compares to your capabilities, and suggests potential responses.',
       },
       {
         question: 'How many competitors can I track?',
@@ -644,7 +644,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What product ops tasks can be automated?',
         answer:
-          'pmkit automates daily briefs, sprint review packs, release notes, stakeholder updates, VoC reports, and competitor intel diffs.',
+          'pmkit automates daily briefs, sprint review packs, release notes, stakeholder updates, VoC reports, and competitor research reports.',
       },
       {
         question: 'How do I set up recurring jobs?',

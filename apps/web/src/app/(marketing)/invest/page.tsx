@@ -48,8 +48,8 @@ const cadenceOutputs = [
     description: 'Clustered feedback with evidence links and trend signals',
   },
   {
-    name: 'Competitor Diff',
-    description: 'Mentions, pricing changes, feature launches with strategic implications',
+    name: 'Competitor Research',
+    description: 'Product changes, feature launches, and releases with strategic implications',
   },
   {
     name: 'Roadmap Memo',

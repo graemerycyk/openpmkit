@@ -23,7 +23,7 @@ export type BlogTag =
   | 'roadmaps'
   | 'integrations'
   | 'security-governance'
-  | 'competitive-intel';
+  | 'competitor-research';
 
 export const blogPosts: BlogPost[] = [
   {
@@ -97,17 +97,17 @@ export const blogPosts: BlogPost[] = [
     relatedPosts: ['gong-transcripts-to-product-insights', 'voice-of-customer-at-scale'],
   },
   {
-    slug: 'competitor-intel-diffs',
-    title: 'Competitor intel diffs: tracking what changed and why it matters',
+    slug: 'competitor-research',
+    title: 'Competitor research: tracking product changes and why they matter',
     description:
-      'A systematic approach to competitive intelligence that tracks pricing, features, and messaging changes with strategic implications.',
+      'A systematic approach to competitor product research that tracks pricing, features, and releases with strategic implications.',
     publishedAt: '2025-12-09',
     author: 'pmkit team',
     authorRole: 'Product',
-    primaryKeyword: 'competitor intel diff',
-    tags: ['competitive-intel', 'product-management'],
+    primaryKeyword: 'competitor research',
+    tags: ['competitor-research', 'product-management'],
     readingTime: 10,
-    relatedResources: ['competitor-intel-diff', 'roadmap-alignment-memos'],
+    relatedResources: ['competitor-research', 'roadmap-alignment-memos'],
     relatedPosts: ['roadmap-alignment-memos', 'agentic-roadmaps'],
   },
   {
@@ -122,7 +122,7 @@ export const blogPosts: BlogPost[] = [
     tags: ['roadmaps', 'product-management'],
     readingTime: 11,
     relatedResources: ['roadmap-alignment-memos', 'agentic-product-management'],
-    relatedPosts: ['agentic-roadmaps', 'competitor-intel-diffs'],
+    relatedPosts: ['agentic-roadmaps', 'competitor-research'],
   },
   {
     slug: 'prd-automation-without-hallucination',
@@ -315,6 +315,6 @@ export const blogTags: { value: BlogTag; label: string }[] = [
   { value: 'roadmaps', label: 'Roadmaps' },
   { value: 'integrations', label: 'Integrations' },
   { value: 'security-governance', label: 'Security/Governance' },
-  { value: 'competitive-intel', label: 'Competitive Intel' },
+  { value: 'competitor-research', label: 'Competitor Research' },
 ];
 

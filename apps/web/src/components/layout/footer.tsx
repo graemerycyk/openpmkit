@@ -35,7 +35,7 @@ const footerLinks = {
   ],
   voc: [
     { name: 'VoC Clustering', href: '/resources/voice-of-customer-clustering' },
-    { name: 'Competitor Intel', href: '/resources/competitor-intel-diff' },
+    { name: 'Competitor Research', href: '/resources/competitor-research' },
     { name: 'Customer Escalations', href: '/resources/customer-escalation-to-fix-spec' },
     { name: 'Search Analytics', href: '/resources/search-product-analytics-insights' },
   ],

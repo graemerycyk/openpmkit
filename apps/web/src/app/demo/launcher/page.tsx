@@ -31,7 +31,7 @@ type JobType =
   | 'daily_brief'
   | 'meeting_prep'
   | 'voc_clustering'
-  | 'competitor_intel'
+  | 'competitor_research'
   | 'roadmap_alignment'
   | 'prd_draft'
   | 'sprint_review';
@@ -59,9 +59,9 @@ const jobTypeMap: Record<string, { type: JobType; name: string; icon: typeof Fil
   voc: { type: 'voc_clustering', name: 'VoC Clustering', icon: BarChart3 },
   voc_clustering: { type: 'voc_clustering', name: 'VoC Clustering', icon: BarChart3 },
   themes: { type: 'voc_clustering', name: 'VoC Clustering', icon: BarChart3 },
-  competitor: { type: 'competitor_intel', name: 'Competitor Intel', icon: Target },
-  competitor_intel: { type: 'competitor_intel', name: 'Competitor Intel', icon: Target },
-  intel: { type: 'competitor_intel', name: 'Competitor Intel', icon: Target },
+  competitor: { type: 'competitor_research', name: 'Competitor Research', icon: Target },
+  competitor_research: { type: 'competitor_research', name: 'Competitor Research', icon: Target },
+  research: { type: 'competitor_research', name: 'Competitor Research', icon: Target },
   roadmap: { type: 'roadmap_alignment', name: 'Roadmap Alignment', icon: GitBranch },
   roadmap_alignment: { type: 'roadmap_alignment', name: 'Roadmap Alignment', icon: GitBranch },
   alignment: { type: 'roadmap_alignment', name: 'Roadmap Alignment', icon: GitBranch },
@@ -77,7 +77,7 @@ const exampleCommands: Record<Channel, string[]> = {
     '/pmkit run daily brief',
     '/pmkit prep meeting Globex Corp',
     '@pmkit voc themes last 30 days',
-    '/pmkit competitor intel',
+    '/pmkit competitor research',
   ],
   teams: [
     '@pmkit run daily brief',

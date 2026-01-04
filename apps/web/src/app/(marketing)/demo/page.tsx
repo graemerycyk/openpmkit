@@ -52,9 +52,9 @@ const jobs = [
     sources: ['Zendesk', 'Gong', 'Discourse', 'Social Crawler'],
   },
   {
-    id: 'competitor_intel',
-    name: 'Competitor Intel',
-    description: 'Track competitor changes across social, web, and news.',
+    id: 'competitor_research',
+    name: 'Competitor Research',
+    description: 'Track competitor product changes and releases.',
     icon: Target,
     duration: '~20s',
     sources: ['Social Crawler', 'Web Search', 'News Crawler'],

@@ -14,7 +14,7 @@ export const UsageEventTypeSchema = z.enum([
   'job.run.daily_brief',
   'job.run.meeting_prep',
   'job.run.voc_clustering',
-  'job.run.competitor_intel',
+  'job.run.competitor_research',
   'job.run.roadmap_alignment',
   'job.run.prd_draft',
   
@@ -320,7 +320,7 @@ export class UsageTracker {
         daily_brief: 0,
         meeting_prep: 0,
         voc_clustering: 0,
-        competitor_intel: 0,
+        competitor_research: 0,
         roadmap_alignment: 0,
         prd_draft: 0,
       },

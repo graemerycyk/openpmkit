@@ -93,7 +93,7 @@ const plans: Plan[] = [
 const jobTypes = [
   { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: false },
   { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: false },
-  { name: 'Competitor Diff', schedule: '1/week/workspace', onDemand: false },
+  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: false },
   { name: 'Meeting Prep Pack', schedule: null, onDemand: '10/month/seat' },
   { name: 'PRD Pack', schedule: null, onDemand: '4/month/seat' },
   { name: 'Roadmap Alignment Memo', schedule: null, onDemand: '4/month/seat' },
@@ -113,7 +113,7 @@ const faqs = [
   {
     question: 'Are there usage limits?',
     answer:
-      'Yes. Scheduled jobs (Daily Brief, Weekly Themes, Competitor Diff) run at fixed cadences per workspace. On-demand jobs (Meeting Prep, PRD Pack, Roadmap Memo) have per-seat monthly limits. Enterprise customers can purchase additional capacity.',
+      'Yes. Scheduled jobs (Daily Brief, Weekly Themes, Competitor Research) run at fixed cadences per workspace. On-demand jobs (Meeting Prep, PRD Pack, Roadmap Memo) have per-seat monthly limits. Enterprise customers can purchase additional capacity.',
   },
   {
     question: 'What about concurrency?',
