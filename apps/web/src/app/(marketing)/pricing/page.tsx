@@ -51,7 +51,7 @@ const plans: Plan[] = [
       { name: 'Annual billing only', included: true },
       { name: 'SSO (Google Workspace + Microsoft Entra ID)', included: true, detail: 'OIDC' },
       { name: 'All connectors: Jira, Confluence, Slack, Gong, Zendesk', included: true },
-      { name: 'All 6 cadence jobs', included: true },
+      { name: 'All 7 workflow jobs', included: true },
       { name: 'Team usage analytics', included: true },
       { name: 'RBAC + proposal approvals', included: true },
       { name: 'Audit logs (view)', included: true },
@@ -97,6 +97,7 @@ const jobTypes = [
   { name: 'Meeting Prep Pack', schedule: null, onDemand: '10/month/seat' },
   { name: 'PRD Pack', schedule: null, onDemand: '4/month/seat' },
   { name: 'Roadmap Alignment Memo', schedule: null, onDemand: '4/month/seat' },
+  { name: 'Sprint Review Pack', schedule: null, onDemand: '2/month/seat' },
 ];
 
 const faqs = [
@@ -133,7 +134,7 @@ const faqs = [
   {
     question: 'Can I try before I buy?',
     answer:
-      'Yes! The demo runs all 6 jobs with realistic mock data. For a trial with your own data, contact sales to discuss a pilot program.',
+      'Yes! The demo runs all 7 jobs with realistic mock data. For a trial with your own data, contact sales to discuss a pilot program.',
   },
   {
     question: 'What SSO providers are supported?',
@@ -157,7 +158,7 @@ export default function PricingPage() {
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
               Two plans: Teams for growing product orgs, Enterprise for custom deployments.
-              Both include all connectors, all 6 cadence jobs, and full audit trails.
+              Both include all connectors, all 7 workflow jobs, and full audit trails.
             </p>
           </div>
         </div>

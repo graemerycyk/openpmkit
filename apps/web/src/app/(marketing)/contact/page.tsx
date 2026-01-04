@@ -40,26 +40,6 @@ export default function ContactPage() {
             <Card className="text-center">
               <CardHeader>
                 <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-cobalt-100">
-                  <Mail className="h-6 w-6 text-cobalt-600" />
-                </div>
-                <CardTitle>Email Us</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="mb-4">
-                  For general inquiries and support
-                </CardDescription>
-                <a
-                  href="mailto:support@getpmkit.com"
-                  className="text-cobalt-600 hover:underline"
-                >
-                  support@getpmkit.com
-                </a>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-cobalt-100">
                   <Calendar className="h-6 w-6 text-cobalt-600" />
                 </div>
                 <CardTitle>Book a Demo</CardTitle>
@@ -87,12 +67,30 @@ export default function ContactPage() {
                 <CardDescription className="mb-4">
                   Custom pricing and deployment options
                 </CardDescription>
-                <a
-                  href="mailto:sales@getpmkit.com"
-                  className="text-cobalt-600 hover:underline"
-                >
-                  sales@getpmkit.com
-                </a>
+                <Button variant="outline" asChild>
+                  <a href="https://calendly.com/pmkit/demo" target="_blank" rel="noopener noreferrer">
+                    Schedule Call
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-cobalt-100">
+                  <Mail className="h-6 w-6 text-cobalt-600" />
+                </div>
+                <CardTitle>General Inquiries</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  Questions about pmkit or partnerships
+                </CardDescription>
+                <Button variant="outline" asChild>
+                  <a href="https://calendly.com/pmkit/demo" target="_blank" rel="noopener noreferrer">
+                    Get in Touch
+                  </a>
+                </Button>
               </CardContent>
             </Card>
           </div>

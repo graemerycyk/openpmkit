@@ -92,7 +92,7 @@ const privacyControls = [
   {
     title: 'No Training on Your Data',
     description:
-      'We use the OpenAI API with business/enterprise terms where data is not used for training by default. Enterprise customers can use their own LLM endpoints for additional control.',
+      'We use the OpenAI API for inference. Per OpenAI\'s API data usage policy, data sent via the API is not used for training models. Enterprise customers can use their own LLM endpoints (Azure OpenAI, self-hosted) for additional control.',
     link: {
       text: 'OpenAI API Data Usage Policy',
       href: 'https://openai.com/policies/api-data-usage-policies',
@@ -101,12 +101,12 @@ const privacyControls = [
   {
     title: 'Data Retention',
     description:
-      'Teams: 90 days default (30 days available on request). Enterprise: Configurable up to unlimited. Artifacts and audit logs have separate retention policies.',
+      'Default: 90 days for artifacts and job outputs (30-day option available). Audit logs retained for subscription duration + 90 days. Raw connector data (Slack messages, Jira issues) is cached temporarily during job execution only and not persisted.',
   },
   {
     title: 'Data Minimization',
     description:
-      'We only fetch and store data necessary for job execution. Source content is cached temporarily and expired based on your retention settings.',
+      'We only fetch data necessary for job execution. LLM conversation context is not persisted after job completion. Source content is cached temporarily and expired based on your retention settings.',
   },
 ];
 
@@ -295,8 +295,8 @@ export default function TrustPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    We are actively working toward SOC 2 Type II certification. Target completion:
-                    Q2 2025. Contact us for our current security questionnaire responses.
+                    We are actively working toward SOC 2 Type II certification. Contact us for our
+                    current security questionnaire responses and timeline.
                   </p>
                 </CardContent>
               </Card>
@@ -304,16 +304,15 @@ export default function TrustPage() {
               <Card>
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                      In Progress
+                    <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+                      Planned
                     </Badge>
                   </div>
                   <CardTitle className="mt-2">ISO 27001</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    ISO 27001 certification is on our roadmap following SOC 2 completion. Target:
-                    Q4 2025.
+                    ISO 27001 certification is on our roadmap following SOC 2 completion.
                   </p>
                 </CardContent>
               </Card>
@@ -409,17 +408,12 @@ export default function TrustPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Real-time system status and incident history.
+                    System status and incident communication. Status page coming soon.
                   </p>
-                  <a
-                    href="https://status.getpmkit.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1 text-sm text-cobalt-600 hover:underline"
-                  >
+                  <span className="mt-3 inline-flex items-center gap-1 text-sm text-muted-foreground">
                     status.getpmkit.com
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
+                    <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
+                  </span>
                 </CardContent>
               </Card>
 
@@ -462,8 +456,82 @@ export default function TrustPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Security & Data Processing Pack */}
       <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="mx-auto max-w-3xl">
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                <FileText className="h-6 w-6 text-cobalt-600" />
+              </div>
+              <h2 className="font-heading text-3xl font-bold">Security & Data Processing Pack</h2>
+              <p className="mt-4 text-muted-foreground">
+                Available on request for procurement and security reviews.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2">
+              <Card>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold">Data Processing Agreement (DPA)</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    GDPR-compliant DPA with Standard Contractual Clauses for cross-border transfers.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold">Subprocessor List</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Current list of third-party services that process customer data (see table above).
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold">RBAC Model Documentation</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Role definitions, permission matrix, and access control implementation details.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold">Audit Log Scope</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    What events are logged, retention periods, and export capabilities.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold">LLM Data Handling</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    How data flows to LLM providers, API terms, and BYO LLM options for Enterprise.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold">Security Questionnaire</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Pre-filled responses for common security questionnaire formats (CAIQ, SIG, custom).
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Button asChild>
+                <Link href="/contact?subject=security">Request Security Pack</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-muted/30 py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">Questions about security?</h2>
@@ -474,9 +542,6 @@ export default function TrustPage() {
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
                 <Link href="/contact?subject=security">Contact Security Team</Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <a href="mailto:support@getpmkit.com">support@getpmkit.com</a>
               </Button>
             </div>
           </div>

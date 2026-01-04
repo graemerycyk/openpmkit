@@ -43,7 +43,7 @@ const securityFeatures = [
     icon: Server,
     title: 'Infrastructure Security',
     description:
-      'Hosted on SOC 2 compliant infrastructure with regular security audits, penetration testing, and vulnerability scanning.',
+      'Hosted on managed cloud infrastructure (Vercel, Neon) with encryption, access controls, and monitoring. SOC 2 certification in progress.',
   },
 ];
 
@@ -85,27 +85,43 @@ export default function SecurityPage() {
       <section className="py-16">
         <div className="container">
           <div className="mx-auto max-w-3xl">
-            <h2 className="font-heading text-3xl font-bold">Compliance & Certifications</h2>
+            <h2 className="font-heading text-3xl font-bold">Compliance Status</h2>
             <div className="mt-8 space-y-6">
               <div>
-                <h3 className="text-xl font-semibold">SOC 2 Type II</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-semibold">SOC 2 Type II</h3>
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                    In Progress
+                  </span>
+                </div>
                 <p className="mt-2 text-muted-foreground">
-                  Our infrastructure and processes are audited annually for security, availability,
-                  and confidentiality controls.
+                  We are actively working toward SOC 2 Type II certification. Contact us for our
+                  current security questionnaire responses.
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">GDPR Compliant</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-semibold">GDPR</h3>
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                    DPA Available
+                  </span>
+                </div>
                 <p className="mt-2 text-muted-foreground">
-                  We comply with GDPR requirements for data protection, including data subject
-                  rights, data processing agreements, and cross-border transfers.
+                  Data Processing Agreement available on request. Subprocessors listed in our Trust
+                  Center. Configurable data retention (default: 90 days). Data subject rights
+                  supported via support request.
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Data Residency</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-semibold">Data Residency</h3>
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                    Enterprise
+                  </span>
+                </div>
                 <p className="mt-2 text-muted-foreground">
-                  Enterprise customers can choose their data residency region. Contact sales for
-                  options.
+                  Enterprise customers can request data residency options. Not all regions available
+                  at launch. Contact sales for details.
                 </p>
               </div>
             </div>

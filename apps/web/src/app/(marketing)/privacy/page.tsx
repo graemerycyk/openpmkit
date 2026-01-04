@@ -74,9 +74,26 @@ export default function PrivacyPage() {
 
             <h2>6. Data Retention</h2>
             <p>
-              We retain your data for as long as your account is active. You can request deletion
-              of your data at any time by contacting us.
+              Default retention period is 90 days for artifacts and job outputs (30-day option
+              available on request). Audit logs are retained for the duration of your subscription
+              plus 90 days. Account data is retained for as long as your account is active. You can
+              request deletion of your data at any time by contacting us.
             </p>
+            <p>
+              <strong>What we retain:</strong>
+            </p>
+            <ul>
+              <li>Artifacts (briefs, PRDs, reports) — 90 days default</li>
+              <li>Audit logs (tool calls, job runs) — subscription + 90 days</li>
+              <li>Account and user data — while account is active</li>
+            </ul>
+            <p>
+              <strong>What we don't retain:</strong>
+            </p>
+            <ul>
+              <li>Raw connector data (Slack messages, Jira issues) — cached temporarily during job execution only</li>
+              <li>LLM conversation context — not persisted after job completion</li>
+            </ul>
 
             <h2>7. Your Rights</h2>
             <p>

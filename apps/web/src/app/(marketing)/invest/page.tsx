@@ -232,10 +232,10 @@ export default function InvestPage() {
                 className="bg-cobalt-500 hover:bg-cobalt-600 text-white"
                 asChild
               >
-                <Link href="/contact">
+                <a href="mailto:grae@getpmkit.com">
                   Book Founder Call
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                </a>
               </Button>
               <Button
                 size="lg"
@@ -367,7 +367,7 @@ export default function InvestPage() {
               <Play className="mx-auto h-12 w-12 text-cobalt-400" />
               <h3 className="mt-4 font-heading text-xl font-semibold">See it in action</h3>
               <p className="mt-2 text-muted-foreground">
-                Run all 6 cadence jobs in the interactive demo with mock data.
+                Run all 7 workflow jobs in the interactive demo with mock data.
               </p>
               <Button className="mt-6" asChild>
                 <Link href="/demo">
@@ -682,8 +682,8 @@ export default function InvestPage() {
 
               <div className="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <p className="text-sm text-amber-800">
-                  <span className="font-semibold">Compliance:</span> SOC 2 Type II and ISO 27001 in
-                  progress. Target completion Q3 2026.
+                  <span className="font-semibold">Compliance:</span> SOC 2 Type II in progress.
+                  ISO 27001 planned post-SOC 2. DPA available on request.
                 </p>
               </div>
 
@@ -872,10 +872,10 @@ export default function InvestPage() {
                 className="bg-white text-cobalt-700 hover:bg-white/90"
                 asChild
               >
-                <Link href="/contact">
+                <a href="mailto:grae@getpmkit.com">
                   Book Founder Call
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                </a>
               </Button>
               <Button
                 size="lg"

@@ -189,7 +189,7 @@ export default function HowItWorksPage() {
                 <ul className="mt-6 space-y-2">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-cobalt-600" />
-                    <span className="text-sm">Six pre-built job types</span>
+                    <span className="text-sm">Seven pre-built job types</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-cobalt-600" />
@@ -356,7 +356,7 @@ export default function HowItWorksPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">Six Cadence Jobs</h2>
+            <h2 className="font-heading text-3xl font-bold">Seven Workflow Jobs</h2>
             <p className="mt-4 text-muted-foreground">
               Pre-built workflows for the most common PM tasks. Run on-demand or on a schedule.
             </p>
@@ -393,6 +393,11 @@ export default function HowItWorksPage() {
                 description: 'Draft PRDs grounded in customer evidence and context.',
                 frequency: 'On-demand',
               },
+              {
+                name: 'Sprint Review',
+                description: 'Generate sprint summaries with completed work and release notes.',
+                frequency: 'On-demand',
+              },
             ].map((job) => (
               <Card key={job.name}>
                 <CardHeader>
@@ -416,7 +421,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See It In Action</h2>
             <p className="mt-4 text-cobalt-100">
-              Try all six jobs in the interactive demo with a complete mock enterprise dataset.
+              Try all seven jobs in the interactive demo with a complete mock enterprise dataset.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

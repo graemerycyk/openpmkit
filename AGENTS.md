@@ -2,6 +2,56 @@
 
 > Documentation for AI programming agents working in this codebase.
 
+## Agent Behavior Guidelines
+
+This section provides guidance for AI agents (Claude 4.x models) working in this codebase, based on [Claude 4 best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices).
+
+### Code Exploration
+
+**Always read before editing.** Never speculate about code you haven't inspected:
+
+- If a file/path is referenced, open and inspect it before explaining or proposing fixes
+- Be rigorous and persistent in searching code for key facts
+- Thoroughly review the style, conventions, and abstractions before implementing new features
+- Give grounded, hallucination-free answers based on actual code
+
+### Avoid Over-Engineering
+
+Keep solutions minimal and focused:
+
+- Only make changes that are directly requested or clearly necessary
+- Don't add features, refactor code, or make "improvements" beyond what was asked
+- Don't add error handling or validation for scenarios that can't happen
+- Don't create helpers, utilities, or abstractions for one-time operations
+- Don't design for hypothetical future requirements
+- Reuse existing abstractions where possible (follow DRY principle)
+
+### Tool Usage
+
+Be explicit about taking action:
+
+- When asked to make changes, implement them rather than just suggesting
+- Use parallel tool calls when operations are independent
+- Read multiple files at once to build context faster
+- Execute independent searches/reads simultaneously
+
+### State Tracking for Long Tasks
+
+For complex multi-step work:
+
+- Use structured formats (JSON) for tracking test results and task status
+- Use git for state tracking across sessions
+- Focus on incremental progress—complete components before moving on
+- Track progress in structured files when working across context windows
+
+### Communication Style
+
+Be direct and efficient:
+
+- Provide fact-based progress reports rather than self-celebratory updates
+- Skip unnecessary elaboration unless more detail is requested
+- Jump directly to the next action after tool calls (unless summaries are helpful)
+
 ## Project Overview
 
 pmkit is an AI-powered product management agent platform using a **draft-only governance pattern**. Agents propose changes but never write directly to external systems. All tool calls, sources, and artifacts are logged for full traceability.
@@ -129,8 +179,171 @@ enum JobStatus { Pending, Running, ... }
 - `prisma/schema.prisma` - Database schema (source of truth for data model)
 
 ### Web App
+- `apps/web/src/app/(marketing)/` - Marketing pages (uses shared layout with header/footer)
 - `apps/web/src/app/demo/console/` - Demo console UI
+- `apps/web/src/app/demo/launcher/` - Slack/Teams/Email launcher demo
+- `apps/web/src/components/layout/` - Header and Footer components
 - `apps/web/src/components/ui/` - Shared UI components (shadcn/ui)
+- `apps/web/src/lib/utils.ts` - Utilities including `cn()` and `siteConfig`
+- `apps/web/src/styles/globals.css` - CSS variables and base styles
+
+## Website & Brand Information
+
+### Site Configuration
+- **Name**: pmkit
+- **Tagline**: "Your daily PM toolkit - briefs, meetings, and PRDs made simple."
+- **URL**: https://getpmkit.com
+- **Twitter**: @getpmkit
+- **GitHub**: github.com/getpmkit
+
+### Navigation Structure
+Main nav: How It Works → Demo → Resources → Blog → Pricing
+
+Footer sections:
+- Product: How It Works, Demo, Pricing, Trust Center
+- Agents: Product Management Agent, AI PM Assistant, Agentic PM, Draft-Only Agents
+- PM Workflows: PRD Automation, Meeting Prep Packs, Roadmap Alignment, Product Ops Automation, Sprint Review Packs
+- Integrations: Slack to Jira, Gong Insights, Community to Roadmap, Jira & Confluence, MCP Connectors
+- VoC & Intel: VoC Clustering, Competitor Research, Customer Escalations, Search Analytics
+
+## Frontend Design System
+
+### Current Typography
+
+The site uses a deliberate font pairing:
+
+| Purpose | Font | CSS Variable | Usage |
+|---------|------|--------------|-------|
+| Body/Sans | Geist Sans | `--font-geist-sans` | All body text, paragraphs, lists |
+| Headings | Space Grotesk | `--font-space-grotesk` | h1-h6, section titles, card titles |
+| Monospace | Geist Mono | `--font-geist-mono` | Code blocks, audit logs, technical content |
+
+```typescript
+// Font configuration in layout.tsx
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { Space_Grotesk } from 'next/font/google';
+```
+
+### Current Color Palette
+
+**Brand Color: Cobalt/Indigo** - The primary accent throughout the site.
+
+```css
+/* Cobalt scale (tailwind.config.ts) */
+cobalt-50:  #eef2ff   /* Backgrounds, badges */
+cobalt-100: #e0e7ff   /* Icon backgrounds, hover states */
+cobalt-200: #c7d2fe   /* Borders, subtle accents */
+cobalt-500: #6366f1   /* Primary buttons, links */
+cobalt-600: #4f46e5   /* Primary brand color, CTAs */
+cobalt-700: #4338ca   /* Hover states, emphasis */
+cobalt-950: #1e1b4b   /* Dark mode primary */
+```
+
+**CSS Variables (globals.css)**:
+```css
+/* Light mode */
+--primary: 238 84% 60%;        /* Cobalt/Indigo */
+--background: 0 0% 100%;       /* White */
+--foreground: 222.2 84% 4.9%;  /* Near-black */
+--muted: 210 40% 96.1%;        /* Light gray backgrounds */
+--muted-foreground: 215.4 16.3% 46.9%;  /* Gray text */
+
+/* Dark mode */
+--primary: 238 84% 67%;
+--background: 222.2 84% 4.9%;
+--foreground: 210 40% 98%;
+```
+
+### UI Components
+
+Located in `apps/web/src/components/ui/` (shadcn/ui based):
+
+| Component | File | Key Variants |
+|-----------|------|--------------|
+| Button | `button.tsx` | `default`, `destructive`, `outline`, `secondary`, `ghost`, `link` |
+| Badge | `badge.tsx` | `default`, `secondary`, `destructive`, `outline`, `cobalt` |
+| Card | `card.tsx` | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter |
+| Tabs | `tabs.tsx` | Tabs, TabsList, TabsTrigger, TabsContent |
+| Accordion | `accordion.tsx` | For collapsible content |
+| Separator | `separator.tsx` | Horizontal/vertical dividers |
+| ScrollArea | `scroll-area.tsx` | Custom scrollbars |
+| Textarea | `textarea.tsx` | Multi-line input |
+
+### Animation System
+
+Defined in `tailwind.config.ts`:
+
+```typescript
+// Keyframes
+'fade-in':  { from: { opacity: '0' }, to: { opacity: '1' } }
+'fade-up':  { from: { opacity: '0', transform: 'translateY(10px)' }, to: { opacity: '1', transform: 'translateY(0)' } }
+'slide-in-right': { from: { transform: 'translateX(100%)' }, to: { transform: 'translateX(0)' } }
+'accordion-down/up': Radix accordion animations
+
+// Animation classes
+animate-fade-in, animate-fade-up, animate-slide-in-right
+```
+
+**Staggered delays** (globals.css):
+```css
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+/* ... up to 500ms */
+```
+
+### Layout Patterns
+
+**Container**: Centered, max-width 1400px, 2rem padding
+```typescript
+container: { center: true, padding: '2rem', screens: { '2xl': '1400px' } }
+```
+
+**Section spacing**: `py-20 md:py-32` for major sections
+
+**Hero pattern**:
+- Gradient background: `bg-gradient-to-b from-cobalt-50/50 to-background`
+- Blurred decorative circle: `bg-cobalt-100/30 blur-3xl`
+- Badge → h1 → description → CTA buttons
+
+**Card grid**: `grid gap-8 md:grid-cols-2 lg:grid-cols-3`
+
+**Feature cards**: Icon in cobalt-100 circle → Title → Description
+
+### Prose Styling
+
+For blog/resources content (`.prose` class):
+- Headings use `font-heading` (Space Grotesk)
+- Body uses `font-sans` (Geist Sans)
+- Links: `text-cobalt-600 hover:text-cobalt-700`
+- Blockquotes: `border-l-4 border-cobalt-500`
+- Code: `bg-muted` with rounded corners
+
+### Icon System
+
+Uses Lucide React icons throughout:
+```typescript
+import { FileText, Users, BarChart3, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
+```
+
+Common icons:
+- `ArrowRight` - CTAs and links
+- `CheckCircle2` - Benefits/features lists
+- `Shield` - Security/governance
+- `FileText` - Documents/PRDs
+- `Users` - Teams/meetings
+- `BarChart3` - Analytics/metrics
+
+### Design Principles for New Work
+
+When adding new pages or components:
+
+1. **Maintain cobalt as the accent** - Use `text-cobalt-600`, `bg-cobalt-100`, `border-cobalt-*`
+2. **Use the established font pairing** - Space Grotesk for headings, Geist Sans for body
+3. **Follow section rhythm** - Alternate between white and `bg-muted/30` backgrounds
+4. **Add motion thoughtfully** - Use `animate-fade-up` with staggered delays for card grids
+5. **Keep CTAs consistent** - Primary button for main action, outline for secondary
+6. **Use the Badge component** - `variant="cobalt"` for status indicators
 
 ## Adding a New Connector
 

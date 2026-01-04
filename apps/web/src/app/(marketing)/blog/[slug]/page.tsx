@@ -171,7 +171,7 @@ A PM was spending 3-4 hours researching and drafting each PRD. After implementin
 
 ## Try It Yourself
 
-Ready to experience ${post.primaryKeyword} firsthand? The pmkit demo lets you run all six cadence jobs with a complete mock enterprise dataset:
+Ready to experience ${post.primaryKeyword} firsthand? The pmkit demo lets you run all seven workflow jobs with a complete mock enterprise dataset:
 
 - **Daily Brief**: See how overnight activity is synthesized
 - **Meeting Prep**: Generate a prep pack for a mock customer meeting
@@ -179,6 +179,7 @@ Ready to experience ${post.primaryKeyword} firsthand? The pmkit demo lets you ru
 - **Competitor Research**: Track mock competitor product changes
 - **Roadmap Alignment**: Generate an alignment memo with options
 - **PRD Draft**: Create a PRD grounded in customer evidence
+- **Sprint Review**: Generate sprint summaries and release notes
 
 Each job shows the full tool call timeline, sources, and downloadable artifacts.
 

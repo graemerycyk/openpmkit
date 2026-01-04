@@ -326,13 +326,13 @@ export default function HomePage() {
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
             <Badge variant="outline" className="mb-4 border-cobalt-200 bg-cobalt-50 text-cobalt-700">
-              Try the Demo
+              Demo Preview
             </Badge>
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
               Trigger pmkit from where you already work
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Start jobs from Slack, Teams, or email. No dashboard required.
+              Start jobs from Slack, Teams, or email. The demo shows how triggers work with mock data.
             </p>
           </div>
 
@@ -340,11 +340,14 @@ export default function HomePage() {
             {/* Slack */}
             <Card className="border-2">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-[#4A154B] p-2">
-                    <MessageSquare className="h-5 w-5 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-[#4A154B] p-2">
+                      <MessageSquare className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle className="text-lg">Slack</CardTitle>
                   </div>
-                  <CardTitle className="text-lg">Slack</CardTitle>
+                  <Badge variant="outline" className="text-xs">Demo</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -360,11 +363,14 @@ export default function HomePage() {
             {/* Teams */}
             <Card className="border-2">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-[#5059C9] p-2">
-                    <Users className="h-5 w-5 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-[#5059C9] p-2">
+                      <Users className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle className="text-lg">Teams</CardTitle>
                   </div>
-                  <CardTitle className="text-lg">Teams</CardTitle>
+                  <Badge variant="outline" className="text-xs">Demo</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -380,11 +386,14 @@ export default function HomePage() {
             {/* Email */}
             <Card className="border-2">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-cobalt-600 p-2">
-                    <Mail className="h-5 w-5 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-cobalt-600 p-2">
+                      <Mail className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle className="text-lg">Email</CardTitle>
                   </div>
-                  <CardTitle className="text-lg">Email</CardTitle>
+                  <Badge variant="outline" className="text-xs">Demo</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -397,6 +406,14 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Demo shows trigger patterns with mock data.{' '}
+            <Link href="/contact" className="text-cobalt-600 hover:underline">
+              Contact sales
+            </Link>{' '}
+            to set up real Slack/Teams integrations.
+          </p>
 
           <div className="mt-8 text-center">
             <Button asChild>
@@ -417,8 +434,8 @@ export default function HomePage() {
               Connects to your stack
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              MCP connectors for the tools you already use. Swap mock connectors for real ones
-              without changing job logic.
+              MCP connectors for the tools you already use. Demo uses mock data;
+              paying customers get real OAuth connections.
             </p>
           </div>
           <div className="mt-12 flex flex-wrap justify-center gap-4">
@@ -432,7 +449,14 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            All connectors shown as mock in demo.{' '}
+            <Link href="/contact" className="text-cobalt-600 hover:underline">
+              Contact sales
+            </Link>{' '}
+            to connect your real tools.
+          </p>
+          <div className="mt-6 text-center">
             <Button variant="outline" asChild>
               <Link href="/resources/mcp-connectors-for-enterprise-tools">
                 View All Integrations
@@ -450,8 +474,8 @@ export default function HomePage() {
               Ready to try pmkit?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
-              Run all 6 cadence jobs in the demo; daily brief, meeting prep, VoC clustering,
-              competitor research, roadmap alignment, and PRD draft.
+              Run all 7 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
+              competitor research, roadmap alignment, PRD draft, and sprint review.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

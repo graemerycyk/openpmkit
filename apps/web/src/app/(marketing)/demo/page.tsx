@@ -147,7 +147,7 @@ export default function DemoPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">7 PM Workflow Jobs</h2>
+            <h2 className="font-heading text-3xl font-bold">7 Product Manager Workflow Jobs</h2>
             <p className="mt-4 text-muted-foreground">
               Run any job to see the complete workflow; tool calls, sources, and artifacts.
             </p>
