@@ -79,7 +79,7 @@ const differentiators = [
     icon: Layers,
     title: 'MCP-Native Connectors',
     description:
-      'Swap mock connectors for real ones without rewriting workflows. Clean abstraction layer.',
+      'Swap demo connectors for real ones without rewriting workflows. Clean abstraction layer.',
   },
   {
     icon: Target,
@@ -366,7 +366,7 @@ export default function InvestPage() {
               <Play className="mx-auto h-12 w-12 text-cobalt-400" />
               <h3 className="mt-4 font-heading text-xl font-semibold">See it in action</h3>
               <p className="mt-2 text-muted-foreground">
-                Run all 7 workflow jobs in the interactive demo with mock data.
+                Run all 7 workflow jobs in the interactive demo with simulated data.
               </p>
               <Button className="mt-6" asChild>
                 <Link href="/demo">

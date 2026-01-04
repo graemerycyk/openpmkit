@@ -19,10 +19,10 @@ import {
 export const metadata: Metadata = {
   title: 'Demo',
   description:
-    'Try the pmkit Agent Console with a complete mock enterprise dataset. Run all 7 PM workflow jobs end-to-end.',
+    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 7 PM workflow jobs end-to-end.',
   openGraph: {
     title: 'pmkit Demo',
-    description: 'Try the Agent Console with a complete mock enterprise dataset.',
+    description: 'Try the Agent Console with a complete demo enterprise dataset.',
   },
 };
 
@@ -87,7 +87,7 @@ const jobs = [
 
 const demoFeatures = [
   {
-    title: 'Mock Connectors',
+    title: 'Demo Connectors',
     description:
       'All connectors use simulated data. Real OAuth connectors available for paying customers.',
   },
@@ -122,7 +122,7 @@ export default function DemoPage() {
               Try the Agent Console
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Run all 7 PM workflow jobs with a complete mock enterprise dataset. See tool calls,
+              Run all 7 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
               sources, and downloadable artifacts.
             </p>
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -251,7 +251,7 @@ export default function DemoPage() {
               Launch the Agent Console and run your first job in seconds.
             </p>
             <p className="mt-2 text-sm text-cobalt-200">
-              Demo uses mock data. Contact sales to connect your real tools.
+              Demo uses simulated data. Contact sales to connect your real tools.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

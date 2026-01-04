@@ -55,7 +55,7 @@ const principles = [
     icon: Zap,
     title: 'MCP Architecture',
     description:
-      'Swap mock connectors for real ones without changing job logic. Standardized tool integration.',
+      'Swap demo connectors for real ones without changing job logic. Standardized tool integration.',
   },
 ];
 
@@ -421,7 +421,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See It In Action</h2>
             <p className="mt-4 text-cobalt-100">
-              Try all seven jobs in the interactive demo with a complete mock enterprise dataset.
+              Try all seven jobs in the interactive demo with a complete demo enterprise dataset.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

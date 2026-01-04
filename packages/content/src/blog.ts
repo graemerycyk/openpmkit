@@ -31,7 +31,7 @@ export const blogPosts: BlogPost[] = [
     title: 'What is a Product Management Agent? A practical guide for enterprise SaaS',
     description:
       'Learn what product management agents are, how they differ from copilots, and how enterprise teams use them to automate PM workflows while maintaining control.',
-    publishedAt: '2025-12-29',
+    publishedAt: '2026-01-04',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'product management agent',
@@ -45,7 +45,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Draft-only AI agents: how to get autonomy without losing control',
     description:
       'Explore the draft-only pattern for AI agents; how to give agents autonomy over workflows while keeping humans in control of all external writes.',
-    publishedAt: '2025-12-25',
+    publishedAt: '2026-01-03',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'draft-only AI agent',
@@ -59,7 +59,7 @@ export const blogPosts: BlogPost[] = [
     title: 'From Slack to PRD: turning internal signal into scoped product work',
     description:
       'A practical guide to capturing product signal from Slack conversations and transforming it into well-scoped PRDs with AI assistance.',
-    publishedAt: '2025-12-21',
+    publishedAt: '2026-01-02',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'Slack to PRD',
@@ -73,7 +73,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Voice of Customer at scale: clustering themes from support, community, and calls',
     description:
       'How to synthesize customer feedback from multiple sources into actionable themes using AI-powered clustering and evidence-based analysis.',
-    publishedAt: '2025-12-17',
+    publishedAt: '2026-01-01',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'voice of customer clustering',
@@ -87,7 +87,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Meeting prep packs for PMs: the fastest way to compound product insight',
     description:
       'Learn how AI-generated meeting prep packs help PMs arrive prepared with customer context, open issues, and strategic talking points.',
-    publishedAt: '2025-12-13',
+    publishedAt: '2025-12-31',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'meeting prep for PMs',
@@ -101,7 +101,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Competitor research: tracking product changes and why they matter',
     description:
       'A systematic approach to competitor product research that tracks pricing, features, and releases with strategic implications.',
-    publishedAt: '2025-12-09',
+    publishedAt: '2025-12-30',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'competitor research',
@@ -115,7 +115,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Roadmap alignment memos: options, trade-offs, and executive-ready decisions',
     description:
       'How to create alignment memos that present roadmap options with evidence, trade-offs, and clear recommendations for stakeholder decisions.',
-    publishedAt: '2025-12-05',
+    publishedAt: '2025-12-29',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'roadmap alignment',
@@ -129,7 +129,7 @@ export const blogPosts: BlogPost[] = [
     title: 'PRD automation that doesn\'t hallucinate: evidence, assumptions, and open questions',
     description:
       'How to use AI for PRD drafting while avoiding hallucination through evidence grounding, explicit assumptions, and structured open questions.',
-    publishedAt: '2025-11-30',
+    publishedAt: '2025-12-28',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'PRD automation',
@@ -143,7 +143,7 @@ export const blogPosts: BlogPost[] = [
     title: 'How to design agent workflows with MCP connectors (and why it matters)',
     description:
       'A technical guide to designing AI agent workflows using MCP (Model Context Protocol) connectors for enterprise tool integration.',
-    publishedAt: '2025-11-24',
+    publishedAt: '2025-12-27',
     author: 'pmkit team',
     authorRole: 'Engineering',
     primaryKeyword: 'MCP connectors',
@@ -157,7 +157,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Gong transcripts to product insights: extracting problems, quotes, and success criteria',
     description:
       'How to systematically extract product insights from Gong call transcripts including pain points, feature requests, and competitive mentions.',
-    publishedAt: '2025-11-18',
+    publishedAt: '2025-12-26',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'Gong transcripts to product insights',
@@ -171,7 +171,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Customer escalations: building a repeatable escalation → fix pipeline',
     description:
       'How to turn customer escalations into fix specifications with root cause analysis, scope definition, and success criteria.',
-    publishedAt: '2025-11-12',
+    publishedAt: '2025-12-25',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'customer escalation to fix spec',
@@ -185,7 +185,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Product ops automation: what to standardize first in an enterprise team',
     description:
       'A prioritization framework for product ops automation; which workflows to standardize first and how to measure success.',
-    publishedAt: '2025-11-06',
+    publishedAt: '2025-12-24',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'product ops automation',
@@ -199,7 +199,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Cross-team dependencies: how agents detect drift before it burns a sprint',
     description:
       'Using AI agents to monitor cross-team dependencies, detect risks early, and facilitate proactive communication.',
-    publishedAt: '2025-10-31',
+    publishedAt: '2025-12-23',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'cross-team dependencies',
@@ -213,7 +213,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Jira + Confluence + Slack: a practical operating system for product delivery',
     description:
       'How to configure Jira, Confluence, and Slack as an integrated operating system for product teams with AI automation.',
-    publishedAt: '2025-10-27',
+    publishedAt: '2025-12-23',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'Jira Confluence Slack',
@@ -227,7 +227,7 @@ export const blogPosts: BlogPost[] = [
     title: 'AI for search products: using analytics signals to prioritize what matters',
     description:
       'How product teams can use search analytics (no-results queries, CTR, trends) to inform roadmap priorities and content strategy.',
-    publishedAt: '2025-10-24',
+    publishedAt: '2025-12-23',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'search product analytics',
@@ -241,7 +241,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Agentic roadmaps: building strategy that updates with real customer evidence',
     description:
       'How to create living roadmaps that automatically incorporate customer evidence, competitive changes, and analytics signals.',
-    publishedAt: '2025-10-22',
+    publishedAt: '2025-12-23',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'agentic roadmaps',
@@ -255,7 +255,7 @@ export const blogPosts: BlogPost[] = [
     title: 'The enterprise PM toolkit: briefs, themes, PRDs, and sprint review packs',
     description:
       'A comprehensive guide to the essential PM artifacts for enterprise teams and how AI agents can automate their creation.',
-    publishedAt: '2025-10-21',
+    publishedAt: '2025-12-23',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'enterprise PM toolkit',
@@ -269,7 +269,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Why "AI PM copilot" is not enough: the case for multi-step PM jobs',
     description:
       'Why single-prompt copilots fall short for PM work and how multi-step agents that run complete workflows deliver better results.',
-    publishedAt: '2025-10-20',
+    publishedAt: '2025-12-23',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'AI PM copilot',

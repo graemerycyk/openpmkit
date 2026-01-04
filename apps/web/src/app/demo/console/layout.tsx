@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Agent Console | pmkit Demo',
-  description: 'Interactive demo of the pmkit Agent Console with mock enterprise data.',
+  description: 'Interactive demo of the pmkit Agent Console with demo enterprise data.',
 };
 
 export default function ConsoleLayout({ children }: { children: React.ReactNode }) {

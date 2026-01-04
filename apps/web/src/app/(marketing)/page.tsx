@@ -332,7 +332,7 @@ export default function HomePage() {
               Trigger pmkit from where you already work
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Start jobs from Slack, Teams, or email. The demo shows how triggers work with mock data.
+              Start jobs from Slack, Teams, or email. The demo shows how triggers work with simulated data.
             </p>
           </div>
 
@@ -408,7 +408,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Demo shows trigger patterns with mock data.{' '}
+            Demo shows trigger patterns with simulated data.{' '}
             <Link href="/contact" className="text-cobalt-600 hover:underline">
               Contact sales
             </Link>{' '}
@@ -434,7 +434,7 @@ export default function HomePage() {
               Connects to your stack
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              MCP connectors for the tools you already use. Demo uses mock data;
+              MCP connectors for the tools you already use. Demo uses simulated data;
               paying customers get real OAuth connections.
             </p>
           </div>
@@ -450,7 +450,7 @@ export default function HomePage() {
             ))}
           </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            All connectors shown as mock in demo.{' '}
+            All connectors use simulated data in demo.{' '}
             <Link href="/contact" className="text-cobalt-600 hover:underline">
               Contact sales
             </Link>{' '}

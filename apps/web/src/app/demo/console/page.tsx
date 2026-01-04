@@ -45,7 +45,7 @@ type JobType =
 
 type JobStatus = 'idle' | 'running' | 'completed' | 'error';
 
-type ConnectorStatus = 'not_connected' | 'connected_mock' | 'connected_real';
+type ConnectorStatus = 'not_connected' | 'connected_demo' | 'connected_real';
 
 interface Connector {
   id: string;
@@ -58,24 +58,24 @@ interface Connector {
 
 const connectors: Connector[] = [
   // Tool Integrations (MCP Connectors)
-  { id: 'jira', name: 'Jira', icon: FileText, status: 'connected_mock', type: 'mcp' },
-  { id: 'confluence', name: 'Confluence', icon: Database, status: 'connected_mock', type: 'mcp' },
-  { id: 'slack', name: 'Slack', icon: MessageSquare, status: 'connected_mock', type: 'mcp' },
-  { id: 'gong', name: 'Gong', icon: Phone, status: 'connected_mock', type: 'mcp' },
-  { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_mock', type: 'mcp' },
-  { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_mock', type: 'mcp' },
-  { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_mock', type: 'mcp' },
+  { id: 'jira', name: 'Jira', icon: FileText, status: 'connected_demo', type: 'mcp' },
+  { id: 'confluence', name: 'Confluence', icon: Database, status: 'connected_demo', type: 'mcp' },
+  { id: 'slack', name: 'Slack', icon: MessageSquare, status: 'connected_demo', type: 'mcp' },
+  { id: 'gong', name: 'Gong', icon: Phone, status: 'connected_demo', type: 'mcp' },
+  { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_demo', type: 'mcp' },
+  { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_demo', type: 'mcp' },
+  { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_demo', type: 'mcp' },
   // AI Crawlers
-  { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_mock', type: 'crawler', description: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
-  { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_mock', type: 'crawler', description: 'Google & Bing' },
-  { id: 'news_crawler', name: 'News Crawler', icon: Newspaper, status: 'connected_mock', type: 'crawler', description: 'Industry news & press releases' },
+  { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_demo', type: 'crawler', description: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
+  { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_demo', type: 'crawler', description: 'Google & Bing' },
+  { id: 'news_crawler', name: 'News Crawler', icon: Newspaper, status: 'connected_demo', type: 'crawler', description: 'Industry news & press releases' },
 ];
 
 function ConnectorStatusBadge({ status }: { status: ConnectorStatus }) {
-  if (status === 'connected_mock') {
+  if (status === 'connected_demo') {
     return (
       <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
-        Mock
+        Demo
       </Badge>
     );
   }
@@ -759,7 +759,7 @@ export default function ConsolePage() {
     const config = jobConfigs[jobType];
     return config.sources.map((sourceId) => {
       const connector = connectors.find((c) => c.id === sourceId);
-      return connector || { id: sourceId, name: sourceId, icon: Database, status: 'connected_mock' as ConnectorStatus };
+      return connector || { id: sourceId, name: sourceId, icon: Database, status: 'connected_demo' as ConnectorStatus };
     });
   };
 
@@ -794,7 +794,7 @@ export default function ConsolePage() {
       <div className="flex items-center gap-2 border-b bg-amber-50 px-4 py-2 text-sm text-amber-800">
         <Info className="h-4 w-4 shrink-0" />
         <span>
-          <strong>Demo Mode:</strong> All connectors are mocked. Data is simulated. No real systems
+          <strong>Demo Mode:</strong> All connectors use simulated data. No real systems
           are connected.{' '}
           <Link href="/contact" className="font-medium underline hover:no-underline">
             Contact Sales
@@ -986,7 +986,7 @@ export default function ConsolePage() {
                                 variant="outline"
                                 className="border-amber-200 bg-amber-50 text-amber-700"
                               >
-                                Mock
+                                Demo
                               </Badge>
                               <span className="font-mono text-muted-foreground">{tc.server}.</span>
                               <span className="font-mono">{tc.name}</span>
@@ -1078,7 +1078,7 @@ export default function ConsolePage() {
                                     variant="outline"
                                     className="border-amber-200 bg-amber-50 text-xs text-amber-700"
                                   >
-                                    Mock
+                                    Demo
                                   </Badge>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
@@ -1135,7 +1135,7 @@ export default function ConsolePage() {
                               <p className="mt-0.5 text-xs text-amber-700">
                                 Data sources:{' '}
                                 {getJobSources(selectedJob)
-                                  .map((s) => `${s.name} (Mock)`)
+                                  .map((s) => `${s.name} (Demo)`)
                                   .join(', ')}
                               </p>
                               <p className="text-xs text-amber-700">
@@ -1173,7 +1173,7 @@ export default function ConsolePage() {
                       <CardContent className="flex items-start gap-3 pt-6">
                         <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
                         <div>
-                          <h3 className="font-semibold text-amber-900">Demo Mode - All Mocked</h3>
+                          <h3 className="font-semibold text-amber-900">Demo Mode - Simulated Data</h3>
                           <p className="mt-1 text-sm text-amber-800">
                             In this demo, all connectors return simulated data. To connect your
                             real Jira, Slack, Gong, and other tools, contact our sales team for

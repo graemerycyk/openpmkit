@@ -91,13 +91,13 @@ const plans: Plan[] = [
 ];
 
 const jobTypes = [
-  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: false },
-  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: false },
-  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: false },
-  { name: 'Meeting Prep Pack', schedule: null, onDemand: '10/month/seat' },
-  { name: 'PRD Pack', schedule: null, onDemand: '4/month/seat' },
-  { name: 'Roadmap Alignment Memo', schedule: null, onDemand: '4/month/seat' },
-  { name: 'Sprint Review Pack', schedule: null, onDemand: '2/month/seat' },
+  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: 'Included in schedule' },
+  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: 'Included in schedule' },
+  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: 'Included in schedule' },
+  { name: 'Meeting Prep Pack', schedule: 'On-demand only', onDemand: '10/month/seat' },
+  { name: 'PRD Pack', schedule: 'On-demand only', onDemand: '4/month/seat' },
+  { name: 'Roadmap Alignment Memo', schedule: 'On-demand only', onDemand: '4/month/seat' },
+  { name: 'Sprint Review Pack', schedule: 'On-demand only', onDemand: '2/month/seat' },
 ];
 
 const faqs = [
@@ -124,7 +124,7 @@ const faqs = [
   {
     question: 'How do real connectors work vs. the demo?',
     answer:
-      'The demo uses mock data to show the experience. Paying customers get real OAuth connections to Jira, Confluence, Slack, Gong, and Zendesk. Connector credentials are encrypted and scoped to your permissions.',
+      'The demo uses simulated data to show the experience. Paying customers get real OAuth connections to Jira, Confluence, Slack, Gong, and Zendesk. Connector credentials are encrypted and scoped to your permissions.',
   },
   {
     question: 'What does "no training on your data" mean?',
@@ -134,7 +134,7 @@ const faqs = [
   {
     question: 'Can I try before I buy?',
     answer:
-      'Yes! The demo runs all 7 jobs with realistic mock data. For a trial with your own data, contact sales to discuss a pilot program.',
+      'Yes! The demo runs all 7 jobs with realistic simulated data. For a trial with your own data, contact sales to discuss a pilot program.',
   },
   {
     question: 'What SSO providers are supported?',
@@ -268,10 +268,10 @@ export default function PricingPage() {
                     <tr key={job.name} className={idx % 2 === 0 ? '' : 'bg-muted/20'}>
                       <td className="px-4 py-3 text-sm font-medium">{job.name}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {job.schedule || '—'}
+                        {job.schedule}
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {job.onDemand || '—'}
+                        {job.onDemand}
                       </td>
                     </tr>
                   ))}
@@ -337,7 +337,7 @@ export default function PricingPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold text-white">Ready to get started?</h2>
             <p className="mt-4 text-cobalt-100">
-              Try the demo with mock data, or contact sales for a personalized walkthrough with your
+              Try the demo with simulated data, or contact sales for a personalized walkthrough with your
               own tools.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

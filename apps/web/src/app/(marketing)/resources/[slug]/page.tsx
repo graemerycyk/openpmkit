@@ -274,6 +274,10 @@ export default async function ResourcePageComponent({ params }: PageProps) {
                     <li>
                       • <strong>PRD Draft</strong>: Draft PRDs grounded in customer evidence
                     </li>
+                    <li>
+                      • <strong>Sprint Review</strong>: Generate sprint summaries with completed
+                      work and release notes
+                    </li>
                   </ul>
                 </CardContent>
               </Card>
@@ -317,7 +321,7 @@ export default async function ResourcePageComponent({ params }: PageProps) {
               Try {resource.primaryKeyword} in the demo
             </h2>
             <p className="mt-2 text-cobalt-100">
-              See it in action with a complete mock enterprise dataset. No signup required.
+              See it in action with a complete demo enterprise dataset. No signup required.
             </p>
             <Button className="mt-6 bg-white text-cobalt-600 hover:bg-cobalt-50" asChild>
               <Link href="/demo">
