@@ -87,9 +87,9 @@ const jobs = [
 
 const demoFeatures = [
   {
-    title: 'Complete Mock Dataset',
+    title: 'Mock Connectors',
     description:
-      'A realistic enterprise dataset with Jira issues, Slack messages, Gong calls, support tickets, and more.',
+      'All connectors use simulated data. Real OAuth connectors available for paying customers.',
   },
   {
     title: 'Full Traceability',
@@ -250,6 +250,9 @@ export default function DemoPage() {
             <p className="mt-4 text-cobalt-100">
               Launch the Agent Console and run your first job in seconds.
             </p>
+            <p className="mt-2 text-sm text-cobalt-200">
+              Demo uses mock data. Contact sales to connect your real tools.
+            </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/demo/console">
@@ -263,7 +266,7 @@ export default function DemoPage() {
                 className="border-white bg-white text-cobalt-600 hover:bg-white/90"
                 asChild
               >
-                <Link href="/contact">Contact Sales</Link>
+                <Link href="/contact">Connect Real Tools</Link>
               </Button>
             </div>
           </div>

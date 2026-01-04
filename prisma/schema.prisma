@@ -375,6 +375,7 @@ enum JobType {
   competitor_research
   roadmap_alignment
   prd_draft
+  sprint_review
 }
 
 enum JobStatus {

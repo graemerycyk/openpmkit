@@ -111,12 +111,12 @@ const privacyControls = [
 ];
 
 const subprocessors = [
-  { name: 'Vercel', purpose: 'Application hosting', location: 'US' },
-  { name: 'Neon', purpose: 'PostgreSQL database', location: 'US/EU' },
+  { name: 'DigitalOcean', purpose: 'Application hosting', location: 'EU/US' },
+  { name: 'PostgreSQL (managed)', purpose: 'Database', location: 'EU/US' },
+  { name: 'Redis (managed)', purpose: 'Cache & queues', location: 'EU/US' },
+  { name: 'Stripe', purpose: 'Payment processing', location: 'EU/US' },
   { name: 'OpenAI', purpose: 'LLM inference', location: 'US' },
-  { name: 'Stripe', purpose: 'Payment processing', location: 'US' },
-  { name: 'Resend', purpose: 'Transactional email', location: 'US' },
-  { name: 'PostHog', purpose: 'Product analytics', location: 'EU' },
+  { name: 'Simple Analytics', purpose: 'Website analytics', location: 'EU/US' },
 ];
 
 const controlsLibrary = [

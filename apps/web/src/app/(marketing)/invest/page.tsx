@@ -546,7 +546,7 @@ export default function InvestPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium mb-2">Cadence Jobs</div>
-                  <p className="text-sm text-muted-foreground">All 6 workflows included</p>
+                  <p className="text-sm text-muted-foreground">All 7 workflows included</p>
                 </div>
                 <div>
                   <div className="text-sm font-medium mb-2">Connectors</div>

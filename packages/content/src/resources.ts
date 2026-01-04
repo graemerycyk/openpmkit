@@ -732,16 +732,16 @@ export const resources: ResourcePage[] = [
     category: 'governance',
     relatedPages: ['/pricing', '/resources/draft-only-ai-agent', '/how-it-works'],
     workedExample: {
-      title: 'Audit Trail for SOC 2 Compliance',
-      scenario: 'During a SOC 2 audit, the security team needs to demonstrate that AI-generated content is reviewed before publication.',
+      title: 'Audit Evidence for Compliance Reviews',
+      scenario: 'During a security review, the team needs to demonstrate that AI-generated content is reviewed before publication.',
       steps: [
-        'Auditor requests log of all AI-generated artifacts',
+        'Reviewer requests log of all AI-generated artifacts',
         'pmkit exports complete audit trail with timestamps and approvers',
         'Each artifact shows: who ran the job, what data was accessed, who approved',
         'Logs include permission checks and any denied access attempts',
-        'Export includes cryptographic verification of log integrity',
+        'Export provides evidence for RBAC and approval controls',
       ],
-      outcome: 'The audit passes with flying colors. The auditor notes that the draft-only model provides stronger controls than most AI tools.',
+      outcome: 'The review demonstrates that the draft-only model provides stronger controls than most AI tools. Audit evidence is readily available.',
     },
     checklist: [
       'Does your AI tooling meet enterprise compliance requirements?',
@@ -751,7 +751,7 @@ export const resources: ResourcePage[] = [
       'Can you demonstrate AI governance to auditors?',
     ],
     keyBenefits: [
-      'SOC 2 and GDPR compliant',
+      'Supports SOC 2 audit evidence (RBAC, audit logs, approvals)',
       'Complete audit trail for all actions',
       'Role-based access control',
       'Demonstrate AI governance to stakeholders',
@@ -760,7 +760,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What governance features does pmkit include?',
         answer:
-          'pmkit includes role-based access control (admin, PM, viewer, guest), comprehensive audit logging, permission simulation, and SSO integration (SAML/OIDC).',
+          'pmkit includes role-based access control (admin, PM, viewer, guest), comprehensive audit logging, permission simulation, and SSO integration (OIDC for Teams, SAML for Enterprise).',
       },
       {
         question: "What's logged in the audit trail?",
@@ -770,12 +770,12 @@ export const resources: ResourcePage[] = [
       {
         question: 'Can I export audit logs for compliance?',
         answer:
-          'Yes. Export audit logs to CSV, JSON, or integrate with your SIEM solution via webhook.',
+          'Yes. Export audit logs to CSV or JSON. Enterprise customers can integrate with SIEM solutions via webhook.',
       },
       {
-        question: 'What compliance certifications does pmkit have?',
+        question: 'What is pmkit\'s compliance status?',
         answer:
-          'pmkit is SOC 2 Type II certified. We also support GDPR, HIPAA (with BAA), and custom compliance requirements for enterprise customers.',
+          'SOC 2 Type II certification is in progress. DPA available on request for GDPR compliance. Contact us for current security questionnaire responses.',
       },
     ],
   },

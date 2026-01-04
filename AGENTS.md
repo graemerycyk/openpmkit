@@ -136,7 +136,7 @@ enum JobStatus { Pending, Running, ... }
 
 ### Jobs
 
-- 6 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`
+- 7 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`
 - Job handlers implement `JobHandler` interface
 - All jobs produce artifacts in markdown format
 - Jobs run via `JobRunner.runJob()` which creates a `JobContext`

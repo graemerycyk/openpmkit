@@ -43,6 +43,7 @@ export const JobTypeSchema = z.enum([
   'competitor_research',
   'roadmap_alignment',
   'prd_draft',
+  'sprint_review',
 ]);
 export type JobType = z.infer<typeof JobTypeSchema>;
 

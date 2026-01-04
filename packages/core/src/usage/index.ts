@@ -323,6 +323,7 @@ export class UsageTracker {
         competitor_research: 0,
         roadmap_alignment: 0,
         prd_draft: 0,
+        sprint_review: 0,
       },
       toolCalls: 0,
       llmTokens: { input: 0, output: 0 },
