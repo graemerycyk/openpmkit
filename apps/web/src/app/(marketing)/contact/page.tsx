@@ -49,7 +49,7 @@ export default function ContactPage() {
                   See pmkit in action with your use case
                 </CardDescription>
                 <Button variant="outline" asChild>
-                  <a href="https://calendly.com/pmkit/demo" target="_blank" rel="noopener noreferrer">
+                  <a href="https://calendly.com/grae-getpmkit/30min" target="_blank" rel="noopener noreferrer">
                     Schedule Demo
                   </a>
                 </Button>
@@ -68,7 +68,7 @@ export default function ContactPage() {
                   Custom pricing and deployment options
                 </CardDescription>
                 <Button variant="outline" asChild>
-                  <a href="https://calendly.com/pmkit/demo" target="_blank" rel="noopener noreferrer">
+                  <a href="https://calendly.com/grae-getpmkit/30min" target="_blank" rel="noopener noreferrer">
                     Schedule Call
                   </a>
                 </Button>
@@ -87,7 +87,7 @@ export default function ContactPage() {
                   Questions about pmkit or partnerships
                 </CardDescription>
                 <Button variant="outline" asChild>
-                  <a href="https://calendly.com/pmkit/demo" target="_blank" rel="noopener noreferrer">
+                  <a href="https://calendly.com/grae-getpmkit/30min" target="_blank" rel="noopener noreferrer">
                     Get in Touch
                   </a>
                 </Button>
