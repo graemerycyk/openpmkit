@@ -39,6 +39,13 @@ const footerLinks = {
     { name: 'Customer Escalations', href: '/resources/customer-escalation-to-fix-spec' },
     { name: 'Search Analytics', href: '/resources/search-product-analytics-insights' },
   ],
+  compare: [
+    { name: 'vs Automation Tools', href: '/compare/automation-tools' },
+    { name: 'vs ChatPRD', href: '/compare/chatprd' },
+    { name: 'vs Nalin', href: '/compare/nalin' },
+    { name: 'vs Jira Product Discovery', href: '/compare/jira-product-discovery' },
+    { name: 'vs Productboard', href: '/compare/productboard' },
+  ],
   company: [
     { name: 'Blog', href: '/blog' },
     { name: 'Contact Sales', href: '/contact' },
@@ -55,7 +62,7 @@ export function Footer() {
     <footer className="border-t bg-muted/30">
       <div className="container py-12 md:py-16">
         {/* Main footer grid */}
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-7">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
             <Link href="/" className="text-xl font-bold text-cobalt-600">
@@ -134,11 +141,28 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* VoC & Intel */}
+          {/* Discovery */}
           <div>
-            <h3 className="font-heading text-sm font-semibold">VoC & Intel</h3>
+            <h3 className="font-heading text-sm font-semibold">Discovery</h3>
             <ul className="mt-3 space-y-2">
               {footerLinks.voc.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-cobalt-600"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Compare */}
+          <div>
+            <h3 className="font-heading text-sm font-semibold">Compare</h3>
+            <ul className="mt-3 space-y-2">
+              {footerLinks.compare.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
