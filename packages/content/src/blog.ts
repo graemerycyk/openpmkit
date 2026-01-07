@@ -23,9 +23,24 @@ export type BlogTag =
   | 'roadmaps'
   | 'integrations'
   | 'security-governance'
-  | 'competitor-research';
+  | 'competitor-research'
+  | 'founders-notes';
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: '2026-year-of-ai-agents-manus-meta',
+    title: "Why 2026 Will Be the Year of AI Agents (and What Meta's Manus Deal Signals)",
+    description:
+      "A 2025 AI recap and a 2026 forecast: why agents didn't break out last year, what changed, and what the Meta-Manus deal signals.",
+    publishedAt: '2026-01-07',
+    author: 'Graeme Rycyk',
+    authorRole: 'Founder',
+    primaryKeyword: 'AI agents 2026',
+    tags: ['founders-notes', 'agents'],
+    readingTime: 10,
+    relatedResources: ['product-management-agent', 'mcp-connectors-for-enterprise-tools', 'draft-only-ai-agent'],
+    relatedPosts: ['what-is-a-product-management-agent', 'draft-only-ai-agents', 'agent-workflows-with-mcp'],
+  },
   {
     slug: 'what-is-a-product-management-agent',
     title: 'What is a Product Management Agent? A practical guide for enterprise SaaS',
@@ -316,5 +331,6 @@ export const blogTags: { value: BlogTag; label: string }[] = [
   { value: 'integrations', label: 'Integrations' },
   { value: 'security-governance', label: 'Security/Governance' },
   { value: 'competitor-research', label: 'Competitor Research' },
+  { value: 'founders-notes', label: "Founder's Notes" },
 ];
 

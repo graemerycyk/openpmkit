@@ -47,6 +47,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // Unique content for each blog post to ensure SEO distinctiveness
 const blogContentMap: Record<string, { intro: string; challenge: string; approach: string; example: string; metrics: string }> = {
+  '2026-year-of-ai-agents-manus-meta': {
+    intro: "2026 is the year AI stops being something you chat with and becomes something that does work for you. Not as a vibe. As a product category. As a default workflow layer. Meta's acquisition of Manus signals that the agent race has moved from lab-grade prototypes into distribution-grade productization.",
+    challenge: "2025 had agents everywhere in marketing but not everywhere in outcomes. Reliability wasn't good enough for true delegation. Integration was still a tax you paid N times. Governance and permissioning were adoption killers. Most agents were still a destination, not embedded where work happens.",
+    approach: "The shift from 'AI = chat' to 'AI = delegation' means the default mental model becomes: you describe intent, the system plans and executes, you supervise outcomes. Standards like MCP make tools interoperable so the same agent brain can plug into different contexts without rewriting the world each time.",
+    example: "Meta's acquisition of Manus, reported around $2B and facing regulatory scrutiny, signals that distribution is now the battleground for agents. The buyers are no longer just buying models. They're buying agent operating systems. Agents are becoming the next interface layer, not just a feature.",
+    metrics: "The agent boom won't be measured by demos but by boring adoption metrics: interoperability becoming table stakes, permissioning and audit trails becoming product features, agent UX shifting from chat to controls (previews, dry-runs, checklists, human-in-the-loop gates).",
+  },
   'what-is-a-product-management-agent': {
     intro: 'Product management agents represent a fundamental shift from reactive to proactive PM work. Unlike simple chatbots or copilots, these agents execute complete workflows autonomously—gathering data from Jira, synthesizing Gong calls, clustering Zendesk tickets—while keeping humans in control of final decisions.',
     challenge: 'The average enterprise PM spends 60% of their time on information gathering rather than strategic thinking. With data scattered across 8-12 tools, synthesizing a complete picture requires hours of manual work that repeats daily.',
