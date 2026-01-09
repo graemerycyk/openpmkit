@@ -164,7 +164,7 @@ export class OpenAIClient implements LLMClient {
         model: model,
         messages: request.messages,
         max_completion_tokens: request.maxTokens || this.config.maxTokens,
-        temperature: request.temperature ?? this.config.temperature,
+        // Note: GPT-5 models only support temperature=1, so we omit it
       }),
     });
 
