@@ -4,11 +4,12 @@ import { z } from 'zod';
 // LLM Configuration
 // ============================================================================
 
+// GPT-5 series models
 export const LLMModelSchema = z.enum([
-  'gpt-5.2',
-  'gpt-5.2-pro',
-  'gpt-5-mini',
-  'stub',
+  'gpt-5.2',       // Best quality for production
+  'gpt-5-mini',    // Cost-effective for demos
+  'gpt-5-nano',    // Ultra cost-effective for testing
+  'stub',          // For development without API
 ]);
 export type LLMModel = z.infer<typeof LLMModelSchema>;
 
@@ -62,6 +63,7 @@ export interface ModelInfo {
   description: string;
 }
 
+// OpenAI GPT-5 series pricing (Jan 2026)
 export const MODEL_INFO: Record<LLMModel, ModelInfo> = {
   'gpt-5.2': {
     id: 'gpt-5.2',
@@ -69,17 +71,8 @@ export const MODEL_INFO: Record<LLMModel, ModelInfo> = {
     provider: 'openai',
     contextWindow: 400_000,
     inputPricePerMillion: 1.75,
-    outputPricePerMillion: 14.0,
+    outputPricePerMillion: 14.00,
     description: 'Best quality for production workloads',
-  },
-  'gpt-5.2-pro': {
-    id: 'gpt-5.2-pro',
-    name: 'GPT-5.2 Pro',
-    provider: 'openai',
-    contextWindow: 400_000,
-    inputPricePerMillion: 21.0,
-    outputPricePerMillion: 168.0,
-    description: 'Extended reasoning for complex tasks',
   },
   'gpt-5-mini': {
     id: 'gpt-5-mini',
@@ -87,8 +80,17 @@ export const MODEL_INFO: Record<LLMModel, ModelInfo> = {
     provider: 'openai',
     contextWindow: 128_000,
     inputPricePerMillion: 0.25,
-    outputPricePerMillion: 2.0,
-    description: 'Cost-effective for demos and simple tasks',
+    outputPricePerMillion: 2.00,
+    description: 'Cost-effective for demos',
+  },
+  'gpt-5-nano': {
+    id: 'gpt-5-nano',
+    name: 'GPT-5 nano',
+    provider: 'openai',
+    contextWindow: 64_000,
+    inputPricePerMillion: 0.10,
+    outputPricePerMillion: 0.40,
+    description: 'Ultra cost-effective for testing',
   },
   'stub': {
     id: 'stub',
@@ -133,18 +135,18 @@ export interface LLMClient {
 export class OpenAIClient implements LLMClient {
   private config: LLMConfig;
 
-  constructor(config: Partial<LLMConfig> = {}) {
+  constructor(config: Partial<LLMConfig> & { apiKey: string }) {
     this.config = {
       provider: 'openai',
       model: (config.model as LLMModel) || 'gpt-5.2',
-      apiKey: config.apiKey || process.env.OPENAI_API_KEY,
+      apiKey: config.apiKey,
       baseUrl: config.baseUrl || 'https://api.openai.com/v1',
       maxTokens: config.maxTokens || 4096,
       temperature: config.temperature ?? 0.7,
     };
 
     if (!this.config.apiKey) {
-      throw new Error('OpenAI API key is required. Set OPENAI_API_KEY environment variable.');
+      throw new Error('OpenAI API key is required.');
     }
   }
 
@@ -381,15 +383,30 @@ export class LLMService {
       this.productionClient = this.stubClient;
       this.demoClient = this.stubClient;
     } else {
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (apiKey) {
-        this.productionClient = new OpenAIClient({ model: this.config.defaultModel });
-        this.demoClient = new OpenAIClient({ model: this.config.demoModel });
+      // Use separate API keys for demo and production
+      const demoApiKey = process.env.OPENAI_API_KEY_DEMO;
+      const prodApiKey = process.env.OPENAI_API_KEY_PROD;
+
+      // Initialize demo client
+      if (demoApiKey) {
+        this.demoClient = new OpenAIClient({ 
+          apiKey: demoApiKey, 
+          model: this.config.demoModel 
+        });
       } else {
-        // Fall back to stubs if no API key
-        console.warn('OPENAI_API_KEY not set, falling back to stub LLM');
-        this.productionClient = this.stubClient;
+        console.warn('OPENAI_API_KEY_DEMO not set, demo will use stub LLM');
         this.demoClient = this.stubClient;
+      }
+
+      // Initialize production client
+      if (prodApiKey) {
+        this.productionClient = new OpenAIClient({ 
+          apiKey: prodApiKey, 
+          model: this.config.defaultModel 
+        });
+      } else {
+        console.warn('OPENAI_API_KEY_PROD not set, production will use stub LLM');
+        this.productionClient = this.stubClient;
       }
     }
 
@@ -514,4 +531,3 @@ export function initLLMService(
   defaultLLMService = new LLMService(config, rateLimitStore, stubGenerator);
   return defaultLLMService;
 }
-

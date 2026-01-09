@@ -116,6 +116,18 @@ interface JobRun {
     format: string;
   };
   error?: string;
+  // LLM metadata
+  llmMetadata?: {
+    model: string;
+    usage: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+    };
+    latencyMs: number;
+    estimatedCostUsd: number;
+    isStub: boolean;
+  };
 }
 
 const jobConfigs: Record<
@@ -698,9 +710,9 @@ export default function ConsolePage() {
     setJobRuns((prev) => ({ ...prev, [jobType]: run }));
     setActiveTab('timeline');
 
-    // Simulate tool calls
+    // Simulate tool calls (gathering data from mock connectors)
     for (let i = 0; i < run.toolCalls.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 400));
+      await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 300));
 
       setJobRuns((prev) => {
         const currentJobRun = prev[jobType];
@@ -716,28 +728,90 @@ export default function ConsolePage() {
       });
     }
 
-    // Complete with artifact
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    // Call the real LLM API to generate the artifact
+    try {
+      const response = await fetch('/api/demo/run-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobType }),
+      });
 
-    const artifact = artifactContent[jobType];
-    setJobRuns((prev) => {
-      const currentJobRun = prev[jobType];
-      if (!currentJobRun) return prev;
-      return {
-        ...prev,
-        [jobType]: {
-          ...currentJobRun,
-          status: 'completed',
-          completedAt: new Date(),
-          artifact: {
-            ...artifact,
-            format: 'markdown',
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle rate limit or other errors
+        const errorMessage = data.isRateLimited 
+          ? data.message 
+          : data.message || 'Failed to generate artifact';
+        
+        setJobRuns((prev) => {
+          const currentJobRun = prev[jobType];
+          if (!currentJobRun) return prev;
+          return {
+            ...prev,
+            [jobType]: {
+              ...currentJobRun,
+              status: 'error',
+              completedAt: new Date(),
+              error: errorMessage,
+            },
+          };
+        });
+        return;
+      }
+
+      // Success - update with real LLM-generated content
+      setJobRuns((prev) => {
+        const currentJobRun = prev[jobType];
+        if (!currentJobRun) return prev;
+        return {
+          ...prev,
+          [jobType]: {
+            ...currentJobRun,
+            status: 'completed',
+            completedAt: new Date(),
+            artifact: {
+              title: config.name,
+              content: data.content,
+              format: 'markdown',
+            },
+            llmMetadata: data.metadata,
           },
-        },
-      };
-    });
+        };
+      });
 
-    setActiveTab('artifact');
+      setActiveTab('artifact');
+    } catch (error) {
+      // Network or other error - fall back to static content
+      console.error('LLM API error, falling back to static content:', error);
+      
+      const artifact = artifactContent[jobType];
+      setJobRuns((prev) => {
+        const currentJobRun = prev[jobType];
+        if (!currentJobRun) return prev;
+        return {
+          ...prev,
+          [jobType]: {
+            ...currentJobRun,
+            status: 'completed',
+            completedAt: new Date(),
+            artifact: {
+              ...artifact,
+              format: 'markdown',
+            },
+            llmMetadata: {
+              model: 'fallback',
+              usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+              latencyMs: 0,
+              estimatedCostUsd: 0,
+              isStub: true,
+            },
+          },
+        };
+      });
+
+      setActiveTab('artifact');
+    }
   };
 
   const downloadArtifact = () => {
@@ -791,12 +865,12 @@ export default function ConsolePage() {
       </header>
 
       {/* Demo Mode Banner */}
-      <div className="flex items-center gap-2 border-b bg-amber-50 px-4 py-2 text-sm text-amber-800">
-        <Info className="h-4 w-4 shrink-0" />
-        <span>
-          <strong>Demo Mode:</strong> All connectors use simulated data. No real systems
-          are connected.{' '}
-          <Link href="/contact" className="font-medium underline hover:no-underline">
+      <div className="flex items-center gap-2 border-b bg-gradient-to-r from-amber-50 to-cobalt-50 px-4 py-2 text-sm">
+        <Info className="h-4 w-4 shrink-0 text-amber-700" />
+        <span className="text-amber-800">
+          <strong>Demo Mode:</strong> Connectors use simulated data.{' '}
+          <span className="text-cobalt-700 font-medium">AI outputs are real</span> (GPT-5 mini).{' '}
+          <Link href="/contact" className="font-medium underline hover:no-underline text-cobalt-600">
             Contact Sales
           </Link>{' '}
           to connect your real tools.
@@ -1117,9 +1191,29 @@ export default function ConsolePage() {
                             <h3 className="font-heading font-semibold">
                               {currentRun.artifact.title}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Format: {currentRun.artifact.format}
-                            </p>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <span>Format: {currentRun.artifact.format}</span>
+                              {currentRun.llmMetadata && !currentRun.llmMetadata.isStub && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-cobalt-600 font-medium">
+                                    Generated by {currentRun.llmMetadata.model}
+                                  </span>
+                                  <span>•</span>
+                                  <span>
+                                    {currentRun.llmMetadata.usage.totalTokens.toLocaleString()} tokens
+                                  </span>
+                                  <span>•</span>
+                                  <span>
+                                    {(currentRun.llmMetadata.latencyMs / 1000).toFixed(1)}s
+                                  </span>
+                                  <span>•</span>
+                                  <span>
+                                    ${currentRun.llmMetadata.estimatedCostUsd.toFixed(4)}
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
                           <Button variant="outline" size="sm" onClick={downloadArtifact}>
                             <Download className="mr-2 h-4 w-4" />
@@ -1131,7 +1225,11 @@ export default function ConsolePage() {
                           <div className="flex items-start gap-2 text-sm text-amber-800">
                             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                             <div>
-                              <p className="font-medium">Draft Proposal (Demo)</p>
+                              <p className="font-medium">
+                                {currentRun.llmMetadata?.isStub === false 
+                                  ? 'AI-Generated Draft (Real LLM)' 
+                                  : 'Draft Proposal (Demo)'}
+                              </p>
                               <p className="mt-0.5 text-xs text-amber-700">
                                 Data sources:{' '}
                                 {getJobSources(selectedJob)

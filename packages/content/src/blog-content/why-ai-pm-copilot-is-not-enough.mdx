@@ -1,0 +1,367 @@
+# Why "AI PM copilot" is not enough: the case for multi-step PM jobs
+
+AI copilots are everywhere. They help you draft emails, summarize documents, and answer questions. For product managers, copilots promise to accelerate writing PRDs, analyzing feedback, and preparing for meetings.
+
+But copilots have a fundamental limitation: they only see what you show them. Real PM work requires synthesizing information across multiple systems, executing multi-step workflows, and producing artifacts that draw from sources you didn't know to include.
+
+This is the case for moving beyond copilots to multi-step PM agents.
+
+## The Copilot Limitation
+
+Copilots work on a simple model:
+
+```
+You provide context → Copilot processes → Copilot responds
+```
+
+This works well for bounded tasks:
+- "Summarize this document"
+- "Draft a response to this email"
+- "Explain this code"
+
+But PM work rarely fits this pattern. Consider preparing a daily brief:
+
+### The Copilot Approach
+
+```markdown
+## What You'd Need to Do
+
+1. Open Slack, copy relevant messages
+2. Open Jira, export sprint status
+3. Open Zendesk, find new escalations
+4. Open Gong, review yesterday's calls
+5. Paste everything into the copilot
+6. Ask for a summary
+7. Realize you missed something
+8. Go back, get more context
+9. Paste again, ask again
+10. Format the output
+```
+
+**Time spent**: 30-40 minutes
+**Quality**: Limited by what you remembered to include
+
+### The Agent Approach
+
+```markdown
+## What You'd Do
+
+1. Run the Daily Brief job
+2. Review the output
+3. Add any personal context
+```
+
+**Time spent**: 5 minutes
+**Quality**: Comprehensive—agent pulled from all sources
+
+The difference isn't just speed. It's completeness. The agent includes signals you wouldn't have thought to look for.
+
+## What Copilots Miss
+
+### 1. Cross-System Synthesis
+
+Copilots can't connect to your systems. They only see what you paste:
+
+**Copilot sees**:
+- The Slack messages you copied
+- The Jira tickets you exported
+- The support tickets you remembered
+
+**Copilot misses**:
+- The Gong call where a customer mentioned the same issue
+- The community post with 47 upvotes on the same topic
+- The analytics showing a spike in related no-results queries
+- The competitor announcement from yesterday
+
+### 2. Historical Context
+
+Copilots have no memory of your product:
+
+**Copilot doesn't know**:
+- This customer escalated the same issue 3 months ago
+- This feature request was rejected in Q2 for technical reasons
+- This competitor claim was debunked in your last battlecard
+- This metric is actually trending down, not up
+
+### 3. Workflow Orchestration
+
+Copilots can't execute multi-step workflows:
+
+**A PRD requires**:
+1. Gathering feature requests from community
+2. Extracting pain points from support tickets
+3. Finding relevant quotes from sales calls
+4. Checking analytics for usage patterns
+5. Reviewing competitive landscape
+6. Synthesizing into structured document
+7. Identifying open questions
+8. Linking to evidence sources
+
+A copilot can help with step 6 if you do steps 1-5 manually. An agent does all of it.
+
+### 4. Proactive Intelligence
+
+Copilots are reactive—they respond to prompts:
+
+**Copilot waits for you to ask**:
+- "What are customers saying about search?"
+- "Are there any blocked deals?"
+- "What did competitors announce?"
+
+**Agent proactively surfaces**:
+- "Search frustration is up 34% this month"
+- "3 deals totaling $450K are blocked on date filters"
+- "Competitor X launched AI search yesterday"
+
+## The Multi-Step Agent Difference
+
+Multi-step agents execute complete workflows:
+
+### Workflow: VoC Clustering
+
+```typescript
+// What the agent does (you don't)
+
+// Step 1: Gather from all sources
+const zendesk = await getRecentTickets({ days: 7 });
+const gong = await getRecentCallInsights({ days: 7 });
+const community = await getRecentPosts({ days: 7 });
+const nps = await getRecentResponses({ days: 30 });
+
+// Step 2: Extract feedback items
+const feedback = [
+  ...extractFromTickets(zendesk),
+  ...extractFromCalls(gong),
+  ...extractFromPosts(community),
+  ...extractFromNPS(nps),
+];
+
+// Step 3: Cluster semantically
+const clusters = await clusterBySimilarity(feedback);
+
+// Step 4: Rank by significance
+const rankedThemes = rankBySignificance(clusters, {
+  factors: ['frequency', 'sentiment', 'segment', 'trend'],
+});
+
+// Step 5: Extract evidence
+const themes = rankedThemes.map(cluster => ({
+  name: generateThemeName(cluster),
+  mentions: cluster.items.length,
+  sentiment: averageSentiment(cluster),
+  trend: calculateTrend(cluster),
+  quotes: extractRepresentativeQuotes(cluster, 3),
+  sources: summarizeSources(cluster),
+  recommendation: generateRecommendation(cluster),
+}));
+
+// Step 6: Generate report
+return generateVoCReport(themes);
+```
+
+**With a copilot**: You'd need to do steps 1-4 manually, then ask for help with 5-6.
+
+**With an agent**: You run the job and review the output.
+
+### Workflow: Meeting Prep
+
+```typescript
+// What the agent does
+
+// Step 1: Identify the meeting
+const meeting = await getUpcomingMeeting({ id: meetingId });
+const account = await getAccount({ id: meeting.accountId });
+
+// Step 2: Gather account context
+const recentCalls = await getGongCalls({ 
+  accountId: account.id, 
+  limit: 5 
+});
+const openTickets = await getZendeskTickets({ 
+  accountId: account.id, 
+  status: 'open' 
+});
+const dealStatus = await getCRMOpportunity({ 
+  accountId: account.id 
+});
+const usageData = await getProductUsage({ 
+  accountId: account.id 
+});
+
+// Step 3: Extract insights
+const painPoints = extractPainPoints(recentCalls);
+const risks = identifyRisks({ tickets: openTickets, usage: usageData });
+const opportunities = identifyOpportunities({ deal: dealStatus, usage: usageData });
+
+// Step 4: Generate prep pack
+return generatePrepPack({
+  account,
+  meeting,
+  painPoints,
+  risks,
+  opportunities,
+  openTickets,
+  talkingPoints: generateTalkingPoints({ painPoints, risks, opportunities }),
+});
+```
+
+**With a copilot**: You'd manually check each system, then ask for help organizing.
+
+**With an agent**: Prep pack is ready 30 minutes before your meeting.
+
+## When Copilots Are Enough
+
+Copilots still have their place:
+
+### Good Copilot Use Cases
+
+- **Editing and refinement**: "Make this PRD section clearer"
+- **Brainstorming**: "What are some ways to solve this problem?"
+- **Explanation**: "Explain this technical concept simply"
+- **Translation**: "Convert this to a customer-facing message"
+- **Quick questions**: "What's the standard format for user stories?"
+
+### When You Need an Agent
+
+- **Data gathering**: Pulling from multiple systems
+- **Synthesis**: Combining signals into insights
+- **Recurring workflows**: Daily briefs, weekly reports
+- **Evidence-based artifacts**: PRDs, alignment memos
+- **Proactive monitoring**: Dependency tracking, competitive alerts
+
+## The Hybrid Approach
+
+The best workflow combines both:
+
+```markdown
+## Hybrid PM Workflow
+
+### Agent handles:
+- Daily brief generation
+- VoC theme clustering
+- Meeting prep packs
+- Competitive monitoring
+- Dependency tracking
+
+### Copilot helps with:
+- Refining agent outputs
+- Drafting ad-hoc communications
+- Explaining complex topics
+- Brainstorming solutions
+- Quick edits and formatting
+
+### Human does:
+- Strategic decisions
+- Stakeholder relationships
+- Prioritization judgment
+- Final approval of outputs
+- Creative problem-solving
+```
+
+## Evaluating AI PM Tools
+
+When evaluating AI tools for PM work, ask:
+
+### Connectivity Questions
+
+- Does it connect to my actual tools (Jira, Slack, Gong, etc.)?
+- Can it pull data without me copying and pasting?
+- Does it have access to historical context?
+
+### Workflow Questions
+
+- Can it execute multi-step workflows?
+- Does it run proactively or only when prompted?
+- Can it produce complete artifacts, not just drafts?
+
+### Trust Questions
+
+- Does it show its sources?
+- Can I trace insights back to evidence?
+- Does it operate in draft-only mode for writes?
+
+### Scale Questions
+
+- Can it process all my data, not just samples?
+- Does it work across my entire product portfolio?
+- Can it handle enterprise data volumes?
+
+## The ROI Difference
+
+Compare the time investment:
+
+### Copilot-Assisted Workflow
+
+| Task | Manual Time | Copilot Savings | Net Time |
+|------|-------------|-----------------|----------|
+| Daily brief | 45 min | 10 min | 35 min |
+| VoC synthesis | 4 hours | 1 hour | 3 hours |
+| Meeting prep | 30 min | 5 min | 25 min |
+| PRD draft | 6 hours | 2 hours | 4 hours |
+
+**Weekly savings**: ~5 hours
+**Still doing**: Data gathering, system navigation, context assembly
+
+### Agent-Powered Workflow
+
+| Task | Manual Time | Agent Time | Net Time |
+|------|-------------|------------|----------|
+| Daily brief | 45 min | 5 min review | 5 min |
+| VoC synthesis | 4 hours | 15 min review | 15 min |
+| Meeting prep | 30 min | 5 min review | 5 min |
+| PRD draft | 6 hours | 30 min review | 30 min |
+
+**Weekly savings**: ~10 hours
+**Now doing**: Review, refinement, strategic work
+
+## How pmkit Implements Multi-Step Agents
+
+pmkit is built on the multi-step agent model:
+
+### Cadence Jobs
+
+Pre-configured workflows that run complete tasks:
+- **Daily Brief**: Synthesizes overnight activity from all sources
+- **VoC Clustering**: Aggregates and clusters customer feedback
+- **Meeting Prep**: Generates prep packs before meetings
+- **PRD Draft**: Creates evidence-backed PRD drafts
+- **Competitor Research**: Monitors and analyzes competitive changes
+
+### MCP Connectors
+
+Direct connections to your tools:
+- Jira, Confluence, Slack
+- Gong, Zendesk, Intercom
+- Analytics platforms
+- Community tools
+
+### Draft-Only Pattern
+
+All outputs are proposals for human review:
+- Agent does the work
+- Human validates and approves
+- Nothing reaches external systems without approval
+
+## FAQ
+
+**Q: Can't I just use ChatGPT/Claude with my data?**
+A: You can, but you're limited to what you paste in. You lose cross-system synthesis, historical context, and workflow automation.
+
+**Q: Are agents more expensive than copilots?**
+A: Agents do more work per interaction, but the ROI is higher. Compare total time saved, not per-query cost.
+
+**Q: What about data security with agents?**
+A: Good agents use OAuth for integrations, encrypt data, and operate in draft-only mode. Security should be better than copy-pasting into consumer AI tools.
+
+**Q: Do I need to replace my copilot?**
+A: No. Use both. Agents for workflows, copilots for ad-hoc assistance. They complement each other.
+
+**Q: How long does it take to set up an agent?**
+A: Initial setup (connecting tools) takes 1-2 hours. After that, agents run automatically.
+
+**Q: What if the agent makes mistakes?**
+A: Draft-only mode means you review everything. Mistakes stay in drafts, not in production systems.
+
+---
+
+*Experience the difference between copilots and agents with the pmkit demo. Run a cadence job to see how multi-step workflows produce comprehensive artifacts.*

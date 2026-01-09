@@ -1,0 +1,390 @@
+# Roadmap alignment memos: options, trade-offs, and executive-ready decisions
+
+Roadmap decisions are where product strategy meets organizational reality. Should we build the enterprise feature or improve the core product? Invest in platform or applications? Address technical debt or ship new capabilities?
+
+These decisions require alignment across engineering, sales, marketing, and leadership. Alignment memos are the tool that makes this possible—structured documents that present options with evidence, trade-offs, and clear recommendations.
+
+## Why Alignment Memos Matter
+
+Roadmap discussions often fail for predictable reasons:
+
+### The Opinion Battle
+
+Without structure, roadmap meetings become debates where the loudest voice wins:
+- "I think we should build X"
+- "But customers are asking for Y"
+- "Engineering says Z is more important"
+
+No one changes their mind because no one has evidence.
+
+### The Context Gap
+
+Stakeholders come to roadmap discussions with different information:
+- Sales knows what deals are blocked
+- Support knows what's causing tickets
+- Engineering knows what's technically risky
+- Leadership knows strategic priorities
+
+Without a shared document, these perspectives never integrate.
+
+### The Decision Drift
+
+Even when decisions are made, they don't stick:
+- "I thought we agreed on X"
+- "That was before we learned Y"
+- "Who approved this change?"
+
+Alignment memos create a record that prevents revisionism.
+
+## Anatomy of an Alignment Memo
+
+A good alignment memo has six sections:
+
+### 1. Decision Required
+
+State the decision clearly and explain why it matters now:
+
+```markdown
+## Decision Required
+
+**Question**: Should we prioritize Enterprise SSO (Q1) or AI Search improvements (Q1)?
+
+**Why Now**: 
+- Q1 planning deadline is January 15
+- Both initiatives require the same senior engineers
+- Delaying either pushes it to Q3 (Q2 committed to platform work)
+
+**Stakes**:
+- SSO: $450K in pipeline blocked on this feature
+- Search: Top customer pain point, 52 VoC mentions
+```
+
+### 2. Context
+
+Provide the background stakeholders need:
+
+```markdown
+## Context
+
+### Enterprise SSO
+- Requested by 3 enterprise prospects (Globex, Initech, Umbrella)
+- Combined pipeline value: $450K ARR
+- Technical scope: 6-8 weeks with OAuth/SAML implementation
+- Competitive: All major competitors have SSO
+
+### AI Search Improvements
+- Top VoC theme for 3 consecutive months
+- 52 mentions across Zendesk, Gong, and community
+- Affects all customer segments, especially enterprise
+- Competitive: Competitor X just launched AI search
+- Technical scope: 8-10 weeks for date filters + relevance improvements
+```
+
+### 3. Options
+
+Present 2-4 distinct options (not just "do it" vs. "don't do it"):
+
+```markdown
+## Options
+
+### Option A: SSO First, Search Q2
+Build Enterprise SSO in Q1, push Search to Q2.
+
+**Pros**:
+- Unblocks $450K in immediate pipeline
+- Addresses competitive gap for enterprise deals
+- Clear scope, lower technical risk
+
+**Cons**:
+- Search pain continues for 6+ months
+- Risk of churn from frustrated customers
+- Competitor X extends search advantage
+
+**Resource requirement**: 2 senior engineers, 6-8 weeks
+
+### Option B: Search First, SSO Q2
+Build AI Search improvements in Q1, push SSO to Q2.
+
+**Pros**:
+- Addresses top customer pain point
+- Responds to competitive pressure
+- Benefits all customers, not just enterprise prospects
+
+**Cons**:
+- $450K pipeline remains blocked
+- Enterprise deals may go to competitors with SSO
+- Longer technical scope, higher risk
+
+**Resource requirement**: 2 senior engineers, 8-10 weeks
+
+### Option C: Parallel Tracks (Reduced Scope)
+Build basic SSO (SAML only) AND date filters (no AI) in Q1.
+
+**Pros**:
+- Partial progress on both priorities
+- Unblocks some enterprise deals
+- Addresses most urgent search pain
+
+**Cons**:
+- Neither fully complete
+- Technical debt from rushed implementation
+- May need rework in Q2
+
+**Resource requirement**: 3 senior engineers, 8 weeks
+
+### Option D: Defer Both, Accelerate Platform
+Use Q1 for platform improvements that enable faster Q2 delivery of both.
+
+**Pros**:
+- Better foundation for both features
+- Reduces Q2 timeline for both
+- Addresses technical debt
+
+**Cons**:
+- No customer-facing progress in Q1
+- Pipeline remains blocked
+- Search pain continues
+
+**Resource requirement**: 2 senior engineers, 8 weeks
+```
+
+### 4. Evidence
+
+Support each option with data:
+
+```markdown
+## Evidence
+
+### Pipeline Analysis
+| Account | ARR | SSO Blocker | Search Pain | Renewal |
+|---------|-----|-------------|-------------|---------|
+| Globex | $120K | Yes | High | Mar 2026 |
+| Initech | $200K | Yes | Medium | Jun 2026 |
+| Umbrella | $130K | Yes | Low | Sep 2026 |
+| Acme | $80K | No | High | Feb 2026 |
+| Wayne | $95K | No | High | Apr 2026 |
+
+**SSO-blocked pipeline**: $450K
+**High search pain accounts**: $295K ARR, 2 renewals in Q1
+
+### VoC Data
+- Search mentions: 52 (up 23% from last month)
+- SSO mentions: 8 (stable)
+- Search sentiment: -0.6 (negative)
+- SSO sentiment: -0.2 (slightly negative)
+
+### Competitive Position
+| Feature | Us | Competitor X | Competitor Y |
+|---------|-----|--------------|--------------|
+| SSO | ❌ | ✅ | ✅ |
+| AI Search | ⚠️ Basic | ✅ Advanced | ⚠️ Basic |
+| Date Filters | ❌ | ✅ | ✅ |
+
+### Engineering Assessment
+- SSO: Well-understood, 80% confidence in estimate
+- Search: Some unknowns in AI relevance, 60% confidence
+- Platform: Would reduce Q2 estimates by 30%
+```
+
+### 5. Recommendation
+
+State your recommendation with reasoning:
+
+```markdown
+## Recommendation
+
+**Recommended**: Option A (SSO First, Search Q2)
+
+### Reasoning
+
+1. **Revenue certainty**: $450K in pipeline is concrete; search churn risk is speculative
+2. **Competitive table stakes**: SSO is binary (have it or don't); search is a spectrum
+3. **Technical confidence**: SSO estimate is more reliable
+4. **Renewal timing**: SSO-blocked accounts renew later, giving search time
+
+### Risks and Mitigations
+
+| Risk | Likelihood | Mitigation |
+|------|------------|------------|
+| Search churn | Medium | Proactive outreach to high-pain accounts |
+| Competitor X gains | Medium | Accelerate search in Q2, communicate roadmap |
+| SSO scope creep | Low | Strict SAML-first scope, OAuth in Q2 |
+
+### Success Criteria
+- SSO shipped by March 15
+- 2 of 3 blocked deals close in Q1
+- Search improvements shipped by June 30
+- Search NPS improves to neutral by Q3
+```
+
+### 6. Decision Record
+
+After the decision, document it:
+
+```markdown
+## Decision Record
+
+**Decision**: Option A approved
+**Date**: January 10, 2026
+**Decided by**: Product Council (Sarah, Mike, Jane)
+**Dissenting views**: Engineering preferred Option D for technical reasons
+
+### Commitments
+- [ ] SSO shipped by March 15 (owner: Mike)
+- [ ] Search roadmap communicated to affected accounts (owner: Sarah)
+- [ ] Q2 planning includes Search as P0 (owner: Jane)
+
+### Review Date
+April 1, 2026 - Review SSO launch and Search progress
+```
+
+## Writing Effective Alignment Memos
+
+### Principle 1: Options, Not Opinions
+
+Present genuine alternatives, not strawmen:
+- **Bad**: "Option A (good) vs. Option B (obviously terrible)"
+- **Good**: "Option A (optimizes for X) vs. Option B (optimizes for Y)"
+
+### Principle 2: Evidence Over Assertion
+
+Back claims with data:
+- **Bad**: "Customers really want this feature"
+- **Good**: "52 VoC mentions, 3 enterprise escalations, top Gong pain point"
+
+### Principle 3: Trade-offs, Not Perfection
+
+Every option has downsides. Acknowledge them:
+- **Bad**: "This option has no drawbacks"
+- **Good**: "This option sacrifices X to achieve Y"
+
+### Principle 4: Clear Recommendation
+
+Don't hide behind "it depends":
+- **Bad**: "Each option has merit; the team should discuss"
+- **Good**: "I recommend Option A because [specific reasons]"
+
+### Principle 5: Decision-Ready Format
+
+Stakeholders should be able to decide after reading:
+- Executive summary at the top
+- Details available for those who want them
+- Clear next steps regardless of decision
+
+## Alignment Memo Templates
+
+### Quarterly Roadmap Prioritization
+
+```markdown
+# Q1 2026 Roadmap Alignment
+
+## Decision Required
+Prioritize Q1 initiatives given [constraint].
+
+## Options
+- Option A: [Initiative 1] focus
+- Option B: [Initiative 2] focus  
+- Option C: Split investment
+- Option D: Platform/foundation work
+
+## Evidence
+[Pipeline, VoC, competitive, technical data]
+
+## Recommendation
+[Your recommendation with reasoning]
+```
+
+### Build vs. Buy
+
+```markdown
+# Build vs. Buy: [Capability]
+
+## Decision Required
+Should we build [capability] internally or integrate [vendor]?
+
+## Options
+- Option A: Build internally
+- Option B: Integrate [Vendor X]
+- Option C: Integrate [Vendor Y]
+- Option D: Defer decision
+
+## Evidence
+[Cost analysis, timeline, maintenance, strategic fit]
+
+## Recommendation
+[Your recommendation with reasoning]
+```
+
+### Technical Investment
+
+```markdown
+# Technical Investment: [Area]
+
+## Decision Required
+Should we invest in [technical improvement] now?
+
+## Options
+- Option A: Full investment now
+- Option B: Incremental approach
+- Option C: Defer to [timeframe]
+
+## Evidence
+[Technical debt cost, velocity impact, risk assessment]
+
+## Recommendation
+[Your recommendation with reasoning]
+```
+
+## Automation with AI Agents
+
+Alignment memos benefit from AI assistance:
+
+### What Agents Can Do
+
+- **Gather evidence**: Pull VoC data, pipeline numbers, competitive intel
+- **Structure options**: Format consistent option presentations
+- **Calculate trade-offs**: Quantify impact of each option
+- **Draft sections**: Generate first drafts of context and evidence
+
+### What Humans Must Do
+
+- **Frame the decision**: What question are we actually answering?
+- **Define options**: What are the genuine alternatives?
+- **Make the recommendation**: What do you actually think we should do?
+- **Facilitate alignment**: Guide the discussion to decision
+
+## How pmkit Handles Alignment Memos
+
+pmkit's Roadmap Alignment cadence job helps create alignment memos:
+
+1. **Gathers evidence** from Jira, VoC themes, competitive intel, and analytics
+2. **Structures options** based on roadmap items and constraints
+3. **Quantifies trade-offs** using pipeline and customer data
+4. **Generates draft memo** for PM refinement
+5. **Tracks decisions** for future reference
+
+The output includes full traceability to source data.
+
+## FAQ
+
+**Q: How long should an alignment memo be?**
+A: 2-3 pages for most decisions. Executives should get the gist in 1 page; details available for those who want them.
+
+**Q: What if stakeholders want an option not in the memo?**
+A: Add it. The memo should evolve based on discussion. Document the new option with the same rigor.
+
+**Q: How do I handle strong disagreement?**
+A: Document dissenting views in the decision record. Disagreement is healthy; unresolved disagreement is not.
+
+**Q: Should I share the memo before the meeting?**
+A: Yes, always. Give stakeholders time to read and form opinions. Meetings should be for discussion, not first reads.
+
+**Q: What if the decision changes later?**
+A: Update the decision record with the change, reasoning, and new commitments. Decisions can change; the record should reflect reality.
+
+**Q: How do I get buy-in for this process?**
+A: Start with one important decision. When it goes smoothly, others will want the same structure.
+
+---
+
+*See alignment memo generation in action with the pmkit demo. Run the Roadmap Alignment job to see how evidence is gathered and structured for decision-making.*

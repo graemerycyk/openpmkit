@@ -1,0 +1,404 @@
+# Gong transcripts to product insights: extracting problems, quotes, and success criteria
+
+Sales calls are a goldmine of product intelligence. Every customer conversation contains pain points, feature requests, competitive mentions, and success criteria—insights that should inform your roadmap. But with 30+ hours of calls per week, no PM can listen to them all.
+
+This guide shows you how to systematically extract product insights from Gong call transcripts, turning sales conversations into actionable intelligence.
+
+## Why Gong Transcripts Matter for Product
+
+Gong captures what customers actually say, not what they write in surveys or support tickets. This raw, unfiltered feedback is uniquely valuable:
+
+### Unscripted Pain Points
+
+In support tickets, customers describe problems they've already identified. In sales calls, they reveal problems they're living with:
+
+> "We spend half our Monday just figuring out what happened last week. By the time we have context, the week is half over."
+
+This isn't a feature request—it's a workflow problem that might inspire multiple features.
+
+### Competitive Intelligence
+
+Customers compare you to competitors in real-time:
+
+> "We looked at Competitor X, and honestly their search is better. But we liked your integrations more."
+
+This tells you exactly where you're winning and losing.
+
+### Success Criteria
+
+Customers define what success looks like for them:
+
+> "If we could cut our reporting time in half, that would justify the entire investment."
+
+This becomes your success metric for that account.
+
+### Buying Signals
+
+Product decisions affect deals:
+
+> "We can't move forward without SSO. It's a security requirement."
+
+This is direct input for prioritization.
+
+## What to Extract from Transcripts
+
+Structure your extraction around five categories:
+
+### 1. Pain Points
+
+Problems customers are experiencing, whether or not they've requested a solution.
+
+**Extraction template**:
+```markdown
+**Pain Point**: [Description]
+**Speaker**: [Customer name/role]
+**Call**: [Call ID/date]
+**Timestamp**: [MM:SS]
+**Quote**: "[Exact quote]"
+**Severity**: [Blocker/Major/Minor]
+**Segment**: [Enterprise/Mid-market/SMB]
+```
+
+**Example**:
+```markdown
+**Pain Point**: Search doesn't work for historical documents
+**Speaker**: Sarah Chen, VP Operations
+**Call**: Globex QBR, Dec 15, 2025
+**Timestamp**: 12:34
+**Quote**: "I spend more time searching than actually working. Anything older than a month is basically unfindable."
+**Severity**: Major
+**Segment**: Enterprise
+```
+
+### 2. Feature Requests
+
+Specific capabilities customers ask for.
+
+**Extraction template**:
+```markdown
+**Request**: [Feature description]
+**Speaker**: [Customer name/role]
+**Call**: [Call ID/date]
+**Timestamp**: [MM:SS]
+**Quote**: "[Exact quote]"
+**Use Case**: [Why they need it]
+**Urgency**: [Blocking/Important/Nice-to-have]
+```
+
+**Example**:
+```markdown
+**Request**: Date range filters in search
+**Speaker**: Sarah Chen, VP Operations
+**Call**: Globex QBR, Dec 15, 2025
+**Timestamp**: 14:22
+**Quote**: "Can we please get date filters? This is table stakes for document management."
+**Use Case**: Finding documents from specific time periods
+**Urgency**: Blocking (mentioned as renewal risk)
+```
+
+### 3. Competitive Mentions
+
+References to competitors, positive or negative.
+
+**Extraction template**:
+```markdown
+**Competitor**: [Name]
+**Context**: [Evaluation/Comparison/Switch]
+**Speaker**: [Customer name/role]
+**Call**: [Call ID/date]
+**Timestamp**: [MM:SS]
+**Quote**: "[Exact quote]"
+**Our Position**: [Winning/Losing/Neutral]
+**Feature Gap**: [If applicable]
+```
+
+**Example**:
+```markdown
+**Competitor**: Acme Corp
+**Context**: Comparison during evaluation
+**Speaker**: Mike Torres, IT Director
+**Call**: Initech Discovery, Dec 10, 2025
+**Timestamp**: 23:15
+**Quote**: "Acme's search is definitely better, but their integrations are a nightmare."
+**Our Position**: Losing on search, winning on integrations
+**Feature Gap**: AI-powered search
+```
+
+### 4. Success Criteria
+
+How customers define success with your product.
+
+**Extraction template**:
+```markdown
+**Criterion**: [What success looks like]
+**Speaker**: [Customer name/role]
+**Call**: [Call ID/date]
+**Timestamp**: [MM:SS]
+**Quote**: "[Exact quote]"
+**Measurable**: [Yes/No]
+**Metric**: [If measurable]
+```
+
+**Example**:
+```markdown
+**Criterion**: 50% reduction in reporting time
+**Speaker**: Jane Smith, COO
+**Call**: Wayne Enterprises QBR, Dec 18, 2025
+**Timestamp**: 45:12
+**Quote**: "If we could cut our reporting time in half, that would justify the entire investment."
+**Measurable**: Yes
+**Metric**: Hours spent on weekly reporting
+```
+
+### 5. Objections and Blockers
+
+Reasons customers hesitate or can't proceed.
+
+**Extraction template**:
+```markdown
+**Objection**: [Description]
+**Type**: [Technical/Security/Price/Feature/Process]
+**Speaker**: [Customer name/role]
+**Call**: [Call ID/date]
+**Timestamp**: [MM:SS]
+**Quote**: "[Exact quote]"
+**Resolvable**: [Yes/No/Partially]
+**Resolution**: [If applicable]
+```
+
+**Example**:
+```markdown
+**Objection**: No SSO support
+**Type**: Security
+**Speaker**: Mike Torres, IT Director
+**Call**: Initech Discovery, Dec 10, 2025
+**Timestamp**: 31:45
+**Quote**: "We can't move forward without SSO. It's a security requirement for any vendor."
+**Resolvable**: Yes (on roadmap)
+**Resolution**: SSO planned for Q1 2026
+```
+
+## Building an Extraction Pipeline
+
+### Step 1: Identify High-Value Calls
+
+Not all calls deserve deep analysis. Prioritize:
+
+- **Enterprise accounts**: Higher ARR, more strategic
+- **Churned/at-risk accounts**: Learn why they're leaving
+- **Competitive evaluations**: Direct competitive intelligence
+- **QBRs and renewals**: Concentrated feedback
+- **Product feedback sessions**: Dedicated insight calls
+
+### Step 2: Automated Pre-Processing
+
+Use AI to identify relevant segments:
+
+```typescript
+// Identify segments likely to contain product insights
+const productSegments = await analyzeTranscript(transcript, {
+  patterns: [
+    'pain point indicators', // "frustrated", "wish we could", "spend too much time"
+    'feature requests',      // "would be great if", "do you have", "can you add"
+    'competitive mentions',  // competitor names, "compared to", "switched from"
+    'success criteria',      // "success would be", "ROI", "justify the investment"
+    'objections',           // "concern is", "blocker", "can't move forward"
+  ],
+});
+```
+
+### Step 3: Structured Extraction
+
+For each identified segment, extract structured data:
+
+```typescript
+interface ProductInsight {
+  type: 'pain_point' | 'feature_request' | 'competitive' | 'success_criteria' | 'objection';
+  content: string;
+  quote: string;
+  speaker: {
+    name: string;
+    role: string;
+    company: string;
+  };
+  call: {
+    id: string;
+    date: Date;
+    type: string;
+  };
+  timestamp: string;
+  metadata: {
+    segment: 'enterprise' | 'mid-market' | 'smb';
+    severity?: 'blocker' | 'major' | 'minor';
+    competitor?: string;
+  };
+}
+```
+
+### Step 4: Aggregation and Clustering
+
+Individual insights become powerful when aggregated:
+
+```typescript
+// Cluster similar insights across calls
+const themes = clusterInsights(insights, {
+  similarityThreshold: 0.8,
+  minClusterSize: 3,
+});
+
+// Output: Themes with frequency, trend, and representative quotes
+// e.g., "Search frustration" - 15 mentions across 12 calls, trending up
+```
+
+### Step 5: Integration with Product Workflow
+
+Connect insights to your product systems:
+
+- **Link to Jira**: Associate insights with existing epics/stories
+- **Feed VoC reports**: Include in weekly theme analysis
+- **Update battlecards**: Refresh competitive positioning
+- **Inform PRDs**: Use as evidence for requirements
+
+## Automation with AI Agents
+
+Gong transcript analysis is ideal for AI automation:
+
+### What Agents Can Do
+
+- **Process transcripts** at scale (all calls, not just samples)
+- **Extract structured insights** using consistent patterns
+- **Cluster and trend** across time periods
+- **Generate reports** with representative quotes
+- **Flag urgent items** (churn risks, competitive threats)
+
+### What Humans Must Do
+
+- **Validate insights** (is this interpretation correct?)
+- **Add context** (what do we know about this account?)
+- **Prioritize action** (which insights matter most?)
+- **Close the loop** (did we address this feedback?)
+
+### Sample Agent Workflow
+
+```typescript
+// Weekly Gong Analysis Job
+
+// Step 1: Get recent calls
+const calls = await mcp.call('gong', 'get_calls', {
+  dateRange: { start: lastWeek, end: today },
+  filters: { minDuration: 15 }, // Skip short calls
+});
+
+// Step 2: Extract insights from each call
+const allInsights = [];
+for (const call of calls) {
+  const transcript = await mcp.call('gong', 'get_transcript', { callId: call.id });
+  const insights = await extractInsights(transcript);
+  allInsights.push(...insights);
+}
+
+// Step 3: Cluster into themes
+const themes = clusterInsights(allInsights);
+
+// Step 4: Generate report
+const report = generateGongReport({
+  themes,
+  topPainPoints: themes.filter(t => t.type === 'pain_point').slice(0, 5),
+  competitiveIntel: themes.filter(t => t.type === 'competitive'),
+  urgentItems: allInsights.filter(i => i.metadata.severity === 'blocker'),
+});
+
+return { type: 'gong_insights', content: report };
+```
+
+## Common Extraction Mistakes
+
+### Mistake 1: Taking Quotes Out of Context
+
+A quote can mean different things depending on context:
+
+- **Bad**: "Search is terrible" (isolated quote)
+- **Good**: "Search is terrible for documents older than 30 days" (with context)
+
+Always include surrounding context when extracting quotes.
+
+### Mistake 2: Over-Weighting Loud Voices
+
+One vocal customer isn't a trend:
+
+- Track frequency across customers, not just mentions
+- Weight by segment (enterprise feedback may matter more)
+- Look for patterns, not outliers
+
+### Mistake 3: Missing Implicit Feedback
+
+Not all feedback is explicit:
+
+- **Explicit**: "We need date filters"
+- **Implicit**: "We've started using tags as a workaround for finding old documents"
+
+Train extraction to catch workarounds and frustration signals.
+
+### Mistake 4: Ignoring Positive Feedback
+
+Don't just extract problems:
+
+- What do customers love? (Protect these features)
+- What made them choose you? (Reinforce in positioning)
+- What exceeded expectations? (Double down)
+
+### Mistake 5: Stale Insights
+
+Feedback from 6 months ago may no longer be relevant:
+
+- Weight recent calls more heavily
+- Track whether issues have been addressed
+- Note when insights are from churned customers
+
+## Measuring Extraction Quality
+
+Track these metrics to improve your pipeline:
+
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| Coverage | >80% of calls processed | Are you missing insights? |
+| Precision | >90% relevant extractions | Are you extracting noise? |
+| Actionability | >50% linked to product work | Are insights being used? |
+| Freshness | <7 days from call to insight | Is the pipeline fast enough? |
+| Feedback loop | >30% insights addressed | Are you closing the loop? |
+
+## How pmkit Handles Gong Integration
+
+pmkit's Gong connector extracts product insights automatically:
+
+1. **Connects to Gong** via OAuth
+2. **Processes new calls** on a configurable schedule
+3. **Extracts structured insights** using the patterns above
+4. **Clusters into themes** for VoC reports
+5. **Links to product work** in Jira and roadmap
+
+Each insight includes the original quote, timestamp, and call link for verification.
+
+## FAQ
+
+**Q: How do I handle calls in multiple languages?**
+A: Modern transcription handles multiple languages. Extract insights in the original language, translate for reports if needed.
+
+**Q: What about calls without transcripts?**
+A: Gong transcribes automatically. For calls outside Gong, consider manual notes or alternative transcription services.
+
+**Q: How do I get sales to tag relevant calls?**
+A: Make it easy (one-click tagging) and show value (their feedback influenced the roadmap). Recognition helps.
+
+**Q: Should I share extracted insights with sales?**
+A: Yes, selectively. Competitive intel helps them sell. Pain points help them empathize. Success criteria help them close.
+
+**Q: How do I handle sensitive information in transcripts?**
+A: Implement access controls. Not everyone should see all customer conversations. Anonymize when sharing broadly.
+
+**Q: What if customers say different things to sales vs. support?**
+A: That's valuable data! Compare Gong insights to Zendesk insights. Discrepancies reveal interesting dynamics.
+
+---
+
+*See Gong transcript analysis in action with the pmkit demo. The demo includes sample call data showing how insights are extracted and clustered into themes.*

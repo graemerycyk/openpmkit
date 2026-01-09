@@ -1,0 +1,353 @@
+# Competitor research: tracking product changes and why they matter
+
+Competitive intelligence isn't about obsessing over rivals—it's about understanding the market context for your product decisions. When a competitor launches a feature, changes pricing, or shifts messaging, you need to know. Not to copy them, but to make informed decisions about your own roadmap.
+
+The challenge is scale. With 5-10 competitors making changes weekly, manual monitoring is unsustainable. This guide shows you how to build a systematic competitor research practice that keeps you informed without consuming your calendar.
+
+## Why Competitor Research Matters for Product
+
+Product managers need competitive intelligence for four reasons:
+
+### 1. Roadmap Prioritization
+
+When a competitor ships a feature your customers have been requesting, the calculus changes:
+- **Before**: "Nice to have, maybe Q3"
+- **After**: "Competitive gap, evaluate for Q1"
+
+### 2. Positioning Decisions
+
+Your messaging should differentiate, not duplicate. Knowing competitor positioning helps you:
+- Find white space they're not addressing
+- Avoid claims they can counter
+- Highlight genuine advantages
+
+### 3. Sales Enablement
+
+Sales teams face competitive objections daily. They need:
+- Feature comparison matrices
+- Objection handling guides
+- Win/loss pattern analysis
+
+### 4. Strategic Planning
+
+Market trends emerge from competitor patterns:
+- Where is investment flowing?
+- What's becoming table stakes?
+- Where are gaps opening up?
+
+## What to Track
+
+Effective competitor research monitors five dimensions:
+
+### Product Changes
+
+| Change Type | Signal Value | Example |
+|-------------|--------------|---------|
+| New features | High | "Competitor X launches AI search" |
+| Feature improvements | Medium | "Competitor Y improves export speed 3x" |
+| Deprecations | Medium | "Competitor Z sunsets mobile app" |
+| Integration additions | High | "Competitor X adds Salesforce integration" |
+| Platform changes | High | "Competitor Y launches API v2" |
+
+### Pricing Changes
+
+| Change Type | Signal Value | Example |
+|-------------|--------------|---------|
+| Price increases | High | "Enterprise tier up 20%" |
+| Price decreases | High | "Aggressive SMB pricing" |
+| New tiers | Medium | "Launches startup program" |
+| Packaging changes | Medium | "AI features now add-on" |
+| Usage-based shifts | High | "Moving to consumption pricing" |
+
+### Messaging Changes
+
+| Change Type | Signal Value | Example |
+|-------------|--------------|---------|
+| Positioning shifts | High | "Now emphasizing 'enterprise-ready'" |
+| New use cases | Medium | "Targeting healthcare vertical" |
+| Competitive claims | High | "Direct comparison ads against us" |
+| Social proof updates | Low | "New customer logos" |
+
+### Go-to-Market Changes
+
+| Change Type | Signal Value | Example |
+|-------------|--------------|---------|
+| Funding announcements | High | "Series C at $500M valuation" |
+| Leadership changes | Medium | "New CPO from Salesforce" |
+| Partnership announcements | High | "Strategic partnership with AWS" |
+| Geographic expansion | Medium | "Opening EMEA headquarters" |
+
+### Customer Signals
+
+| Change Type | Signal Value | Example |
+|-------------|--------------|---------|
+| Win/loss mentions | High | "Lost deal to Competitor X on price" |
+| Customer reviews | Medium | "G2 reviews mention new feature" |
+| Case studies | Low | "Published enterprise case study" |
+| Community sentiment | Medium | "Reddit thread comparing options" |
+
+## Building a Competitor Research System
+
+### Step 1: Define Your Competitive Set
+
+Not all competitors deserve equal attention:
+
+**Primary competitors** (track weekly):
+- Direct feature overlap
+- Same target customer
+- Frequently mentioned in sales cycles
+
+**Secondary competitors** (track monthly):
+- Partial overlap
+- Adjacent market
+- Occasional competitive encounters
+
+**Emerging competitors** (track quarterly):
+- New entrants
+- Startups in adjacent spaces
+- Big tech moves into your market
+
+### Step 2: Set Up Monitoring
+
+Create a monitoring stack:
+
+```markdown
+## Monitoring Sources
+
+### Automated Alerts
+- Google Alerts: Competitor names, product names
+- Mention/Brand24: Social media monitoring
+- BuiltWith/SimilarTech: Technology changes
+- Owler/Crunchbase: Funding and news
+
+### Manual Review (Weekly)
+- Competitor websites: Pricing, features, messaging
+- Product changelogs: New releases
+- Blog/content: Thought leadership, positioning
+- Job postings: Investment areas
+
+### Sales Intelligence
+- Gong/Chorus: Competitive mentions in calls
+- CRM: Win/loss reasons
+- Deal reviews: Competitive dynamics
+```
+
+### Step 3: Structure Your Analysis
+
+For each significant change, document:
+
+```markdown
+## Competitive Change Report
+
+**Competitor**: Acme Corp
+**Change Type**: New Feature
+**Date Detected**: January 8, 2026
+**Source**: Product changelog, customer mention
+
+### What Changed
+Acme launched "Smart Search" with AI-powered query understanding 
+and natural language filters.
+
+### Feature Details
+- Natural language search queries
+- Auto-suggested filters based on content
+- "Find similar" functionality
+- Available on Business and Enterprise tiers
+
+### Strategic Implications
+
+**For Our Roadmap**:
+- Our search improvements (Q2) now have competitive pressure
+- Consider accelerating date filter work
+- "Find similar" is a gap we should evaluate
+
+**For Sales**:
+- Update battlecard with search comparison
+- Prepare objection handling for AI search claims
+- Identify accounts at risk of competitive evaluation
+
+**For Positioning**:
+- They're claiming "AI-first search"
+- We should emphasize accuracy and enterprise features
+- Avoid direct AI search claims until we ship
+
+### Recommended Actions
+1. [ ] Brief sales team on change (this week)
+2. [ ] Update competitive battlecard (this week)
+3. [ ] Review search roadmap with engineering (next week)
+4. [ ] Monitor customer reactions (ongoing)
+```
+
+### Step 4: Distribute Intelligence
+
+Competitive intelligence is useless if it stays in one person's head:
+
+| Audience | Format | Frequency |
+|----------|--------|-----------|
+| Sales | Battlecards, alerts | Real-time for major changes |
+| Product | Digest, roadmap impact | Weekly |
+| Marketing | Positioning updates | Monthly |
+| Leadership | Strategic summary | Quarterly |
+
+## Competitive Analysis Frameworks
+
+### Feature Comparison Matrix
+
+Create and maintain a living comparison:
+
+```markdown
+| Feature | Us | Competitor A | Competitor B |
+|---------|-----|--------------|--------------|
+| Search | ✅ Basic | ✅ AI-powered | ✅ Basic |
+| Date filters | 🚧 Q1 | ✅ Yes | ❌ No |
+| Export | ✅ Yes | ✅ Yes | ✅ Limited |
+| API | ✅ Full | ✅ Full | ⚠️ Read-only |
+| SSO | ✅ Yes | ✅ Yes | 💰 Add-on |
+| Mobile | ✅ Yes | ⚠️ Limited | ✅ Yes |
+
+Legend: ✅ Yes | ⚠️ Limited | 🚧 Planned | ❌ No | 💰 Paid add-on
+```
+
+### Positioning Map
+
+Visualize competitive positioning:
+
+```
+                    Enterprise Focus
+                          ↑
+                          |
+            Competitor A  |  Us
+                 ●        |    ●
+    Simple ←──────────────┼──────────────→ Powerful
+                          |
+                 ●        |        ●
+            Competitor C  |  Competitor B
+                          |
+                          ↓
+                    SMB Focus
+```
+
+### Win/Loss Analysis
+
+Track patterns in competitive deals:
+
+```markdown
+## Q4 2025 Win/Loss vs. Competitor A
+
+**Deals Analyzed**: 23
+**Win Rate**: 52% (12 wins, 11 losses)
+
+### Why We Won
+1. Enterprise security features (7 mentions)
+2. Customer support quality (5 mentions)
+3. Integration depth (4 mentions)
+
+### Why We Lost
+1. AI search capabilities (6 mentions)
+2. Price (4 mentions)
+3. UI/UX perception (3 mentions)
+
+### Implications
+- AI search is now a competitive disadvantage
+- Security remains our strength—emphasize it
+- Consider pricing review for mid-market
+```
+
+## Automation with AI Agents
+
+Competitor research is perfect for AI automation:
+
+### What Agents Can Monitor
+
+- **Website changes**: Pricing pages, feature lists, messaging
+- **Content publishing**: Blog posts, case studies, webinars
+- **Social mentions**: Twitter, LinkedIn, Reddit discussions
+- **Review sites**: G2, Capterra, TrustRadius updates
+- **Job postings**: Hiring patterns indicate investment areas
+- **News and PR**: Funding, partnerships, leadership changes
+
+### What Agents Can Produce
+
+- **Change alerts**: Real-time notifications of significant changes
+- **Weekly digests**: Summary of all competitive activity
+- **Battlecard updates**: Suggested changes based on new intel
+- **Trend analysis**: Patterns across competitors over time
+
+### What Humans Must Do
+
+- **Validate significance**: Is this change actually important?
+- **Interpret strategy**: What does this mean for their direction?
+- **Decide response**: How should we react (if at all)?
+- **Communicate internally**: Brief the right teams
+
+## Common Competitor Research Mistakes
+
+### Mistake 1: Tracking Everything
+
+Not every competitor tweet matters. Focus on:
+- Changes that affect your customers
+- Moves that change competitive dynamics
+- Signals of strategic direction
+
+### Mistake 2: Reactive Roadmapping
+
+Don't let competitors drive your roadmap:
+- **Good**: "Competitor X shipped this; let's evaluate if our customers need it"
+- **Bad**: "Competitor X shipped this; we need to copy it immediately"
+
+### Mistake 3: Ignoring Emerging Competitors
+
+Today's startup is tomorrow's threat. Monitor:
+- Well-funded new entrants
+- Adjacent products expanding scope
+- Big tech experiments in your space
+
+### Mistake 4: Hoarding Intelligence
+
+Competitive intel loses value when siloed:
+- Share with sales (they face competitors daily)
+- Share with marketing (they need positioning context)
+- Share with product (they need roadmap input)
+
+### Mistake 5: Analysis Paralysis
+
+Don't over-analyze every change:
+- Most changes don't require response
+- Focus energy on high-impact moves
+- Default to "note and monitor"
+
+## How pmkit Handles Competitor Research
+
+pmkit's Competitor Research cadence job automates monitoring:
+
+1. **Tracks competitor changes** across websites, content, and mentions
+2. **Classifies by type** (feature, pricing, messaging, GTM)
+3. **Assesses significance** based on your competitive priorities
+4. **Generates digest** with strategic implications
+5. **Suggests actions** for sales, product, and marketing
+
+Each insight includes source links and confidence scores.
+
+## FAQ
+
+**Q: How many competitors should I actively track?**
+A: 3-5 primary competitors weekly, 5-10 secondary monthly. More than that dilutes focus.
+
+**Q: How do I track competitors with no public changelog?**
+A: Monitor their marketing site, customer reviews, job postings, and social mentions. Customer calls often reveal competitive intel.
+
+**Q: Should I share competitive intel with customers?**
+A: Carefully. Factual comparisons are fine; disparaging competitors backfires. Focus on your strengths, not their weaknesses.
+
+**Q: How do I handle competitive FUD (fear, uncertainty, doubt)?**
+A: Document it, prepare responses, and arm sales with facts. Don't engage in FUD yourself—it damages credibility.
+
+**Q: What if a competitor is clearly copying us?**
+A: Take it as validation. Focus on staying ahead through execution and customer relationships, not legal threats (usually).
+
+**Q: How do I get engineering to care about competitive intel?**
+A: Frame it as customer insight. "Customers are asking for X because Competitor Y has it" resonates more than "Competitor Y shipped X."
+
+---
+
+*See automated competitor research in action with the pmkit demo. Run the Competitor Research job to see how competitive changes are tracked and analyzed.*

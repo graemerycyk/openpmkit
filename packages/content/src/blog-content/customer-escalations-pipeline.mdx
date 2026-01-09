@@ -1,0 +1,430 @@
+# Customer escalations: building a repeatable escalation → fix pipeline
+
+Customer escalations are inevitable. What separates great product teams from struggling ones is how quickly and systematically they respond. A repeatable escalation-to-fix pipeline turns crisis moments into opportunities to build trust and improve your product.
+
+This guide shows you how to build a pipeline that transforms urgent customer issues into well-scoped fix specifications, with root cause analysis, impact assessment, and clear success criteria.
+
+## The Cost of Ad-Hoc Escalation Handling
+
+When escalations are handled ad-hoc, everyone suffers:
+
+### For Customers
+- Inconsistent response times
+- Repeated explanations to different people
+- Uncertainty about resolution timeline
+- Feeling unheard or deprioritized
+
+### For Product Teams
+- Context lost between handoffs
+- Engineering starts work without full understanding
+- Scope creep as new information emerges
+- No learning from patterns
+
+### For the Business
+- Churn from frustrated customers
+- Engineering time wasted on unclear specs
+- Reputation damage from slow responses
+- Missed opportunities to improve systematically
+
+## The Escalation-to-Fix Pipeline
+
+A systematic pipeline has five stages:
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Intake    │───▶│   Triage    │───▶│   Scope     │───▶│    Fix      │───▶│   Close     │
+│             │    │             │    │             │    │             │    │             │
+│ - Capture   │    │ - Severity  │    │ - Root cause│    │ - Implement │    │ - Verify    │
+│ - Context   │    │ - Impact    │    │ - Spec      │    │ - Test      │    │ - Communicate│
+│ - Urgency   │    │ - Owner     │    │ - Criteria  │    │ - Deploy    │    │ - Learn     │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+```
+
+### Stage 1: Intake
+
+Capture everything needed to understand the issue:
+
+```markdown
+## Escalation Intake Form
+
+**Customer**: [Company name]
+**Contact**: [Name, role, email]
+**Account tier**: [Enterprise/Mid-market/SMB]
+**ARR**: [$X]
+**Renewal date**: [Date]
+
+**Issue summary**: [One sentence]
+
+**Detailed description**:
+[Full description of the problem]
+
+**Steps to reproduce**:
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+**Expected behavior**: [What should happen]
+**Actual behavior**: [What actually happens]
+
+**Impact**:
+- Users affected: [Number/percentage]
+- Workflows blocked: [Which ones]
+- Business impact: [Revenue, productivity, etc.]
+
+**Workaround available**: [Yes/No - describe if yes]
+
+**First reported**: [Date/time]
+**Escalation source**: [Support ticket #, Slack, email, etc.]
+```
+
+### Stage 2: Triage
+
+Assess severity and assign ownership:
+
+```markdown
+## Triage Assessment
+
+**Severity**: [P0/P1/P2/P3]
+
+### Severity Criteria
+- P0: Service down, all users affected, no workaround
+- P1: Major feature broken, many users affected, workaround difficult
+- P2: Feature degraded, some users affected, workaround available
+- P3: Minor issue, few users affected, easy workaround
+
+**Impact score**: [1-10]
+- Users affected: [X] → [score]
+- Revenue at risk: [$X] → [score]
+- Reputational risk: [Low/Medium/High] → [score]
+
+**Owner**: [@engineer]
+**PM**: [@pm]
+**CSM**: [@csm]
+
+**SLA**: [Response time based on severity]
+- P0: 1 hour response, 4 hour resolution target
+- P1: 4 hour response, 24 hour resolution target
+- P2: 24 hour response, 1 week resolution target
+- P3: 48 hour response, 2 week resolution target
+
+**Communication plan**:
+- Customer update frequency: [Every X hours]
+- Internal update frequency: [Every X hours]
+- Stakeholders to notify: [List]
+```
+
+### Stage 3: Scope
+
+Define the fix with precision:
+
+```markdown
+## Fix Specification
+
+### Root Cause Analysis
+
+**Immediate cause**: [What directly caused the issue]
+**Contributing factors**: [What made it possible]
+**Systemic issues**: [Underlying problems to address]
+
+**Timeline**:
+- [Date]: [Event that may have triggered issue]
+- [Date]: [First customer report]
+- [Date]: [Issue confirmed]
+
+### Similar Past Issues
+
+| Issue | Date | Resolution | Recurrence |
+|-------|------|------------|------------|
+| [#123] | [Date] | [How fixed] | [Yes/No] |
+| [#456] | [Date] | [How fixed] | [Yes/No] |
+
+### Proposed Solution
+
+**Approach**: [Description of the fix]
+
+**Scope**:
+- [ ] [Component 1 to change]
+- [ ] [Component 2 to change]
+- [ ] [Tests to add]
+
+**Out of scope** (for this fix):
+- [Related improvement 1] → [Future ticket]
+- [Related improvement 2] → [Future ticket]
+
+**Risks**:
+| Risk | Likelihood | Mitigation |
+|------|------------|------------|
+| [Risk 1] | [H/M/L] | [Mitigation] |
+| [Risk 2] | [H/M/L] | [Mitigation] |
+
+### Success Criteria
+
+**Functional**:
+- [ ] [Specific behavior that must work]
+- [ ] [Another specific behavior]
+
+**Performance**:
+- [ ] [Performance requirement if applicable]
+
+**Verification**:
+- [ ] Customer confirms issue resolved
+- [ ] No regression in related functionality
+- [ ] Monitoring shows normal behavior
+
+### Estimate
+
+**Engineering effort**: [X hours/days]
+**Testing effort**: [X hours/days]
+**Deployment risk**: [Low/Medium/High]
+**Rollback plan**: [Description]
+```
+
+### Stage 4: Fix
+
+Execute the fix with proper process:
+
+```markdown
+## Fix Execution
+
+### Implementation
+
+**Branch**: [branch-name]
+**PR**: [#number]
+**Reviewers**: [@reviewer1, @reviewer2]
+
+**Changes**:
+- [File 1]: [Description of change]
+- [File 2]: [Description of change]
+
+### Testing
+
+**Unit tests**: [Added/Updated/N/A]
+**Integration tests**: [Added/Updated/N/A]
+**Manual testing**: [Completed by @person]
+
+**Test results**:
+- [ ] All existing tests pass
+- [ ] New tests pass
+- [ ] Manual verification complete
+- [ ] Customer scenario reproduced and fixed
+
+### Deployment
+
+**Environment progression**:
+- [ ] Staging: [Date/time]
+- [ ] Production: [Date/time]
+
+**Monitoring**:
+- [ ] Error rates normal
+- [ ] Performance metrics normal
+- [ ] No new alerts
+
+**Rollback trigger**: [Condition that would trigger rollback]
+```
+
+### Stage 5: Close
+
+Verify resolution and capture learnings:
+
+```markdown
+## Resolution
+
+### Customer Verification
+
+**Verified by**: [Customer contact]
+**Verification date**: [Date]
+**Customer feedback**: [Quote or summary]
+
+### Communication
+
+**Customer notified**: [Date/time]
+**Notification method**: [Email/call/Slack]
+**Message**: [Summary of what was communicated]
+
+### Metrics
+
+**Time to resolution**: [X hours/days]
+**SLA met**: [Yes/No]
+**Customer satisfaction**: [If measured]
+
+### Learnings
+
+**What went well**:
+- [Learning 1]
+- [Learning 2]
+
+**What could improve**:
+- [Improvement 1]
+- [Improvement 2]
+
+**Follow-up actions**:
+- [ ] [Action 1] - Owner: [@person] - Due: [Date]
+- [ ] [Action 2] - Owner: [@person] - Due: [Date]
+
+### Prevention
+
+**How to prevent recurrence**:
+- [Preventive measure 1]
+- [Preventive measure 2]
+
+**Monitoring added**: [Description of new monitoring]
+**Documentation updated**: [Links to updated docs]
+```
+
+## Automation with AI Agents
+
+The escalation pipeline benefits significantly from AI automation:
+
+### What Agents Can Do
+
+**Intake automation**:
+- Pull ticket history for the customer
+- Gather related past issues
+- Identify similar escalations from other customers
+- Pre-populate intake form with available data
+
+**Triage assistance**:
+- Suggest severity based on impact indicators
+- Calculate impact score from account data
+- Identify appropriate owners based on component
+- Draft initial communication
+
+**Scope generation**:
+- Search codebase for related issues
+- Find similar past fixes
+- Draft fix specification from intake data
+- Identify potential risks
+
+**Resolution tracking**:
+- Monitor fix progress
+- Draft customer updates
+- Compile resolution summary
+- Generate learnings report
+
+### What Humans Must Do
+
+- Validate severity assessment
+- Make prioritization decisions
+- Approve fix approach
+- Communicate with customers
+- Verify resolution quality
+
+### Sample Agent Workflow
+
+```typescript
+// Escalation Processing Job
+
+// Step 1: Gather context
+const ticket = await mcp.call('zendesk', 'get_ticket', { id: escalationId });
+const customer = await mcp.call('crm', 'get_account', { id: ticket.accountId });
+const history = await mcp.call('zendesk', 'get_tickets', {
+  accountId: ticket.accountId,
+  status: 'all',
+  limit: 20,
+});
+
+// Step 2: Find similar issues
+const similarIssues = await mcp.call('jira', 'search_issues', {
+  jql: `text ~ "${ticket.summary}" AND type = Bug`,
+});
+
+// Step 3: Generate fix spec draft
+const fixSpec = await generateFixSpec({
+  ticket,
+  customer,
+  history,
+  similarIssues,
+});
+
+// Step 4: Create proposal
+return {
+  type: 'escalation_spec',
+  content: fixSpec,
+  sources: [ticket.id, ...similarIssues.map(i => i.key)],
+};
+```
+
+## Escalation Metrics to Track
+
+Monitor these metrics to improve your pipeline:
+
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| Time to first response | <SLA | Customer feels heard |
+| Time to resolution | <SLA | Issue actually fixed |
+| SLA compliance | >95% | Consistent service |
+| Recurrence rate | <10% | Fixes are durable |
+| Customer satisfaction | >4/5 | Experience quality |
+| Escalation volume trend | Decreasing | Product improving |
+
+## Common Pipeline Mistakes
+
+### Mistake 1: Skipping Root Cause
+
+Fixing symptoms without understanding causes leads to recurrence:
+- **Bad**: "Fixed the null pointer exception"
+- **Good**: "Fixed the null pointer exception caused by race condition in async handler; added mutex"
+
+### Mistake 2: Scope Creep
+
+Escalations aren't feature requests:
+- Fix the immediate issue
+- Log related improvements as separate tickets
+- Don't hold the fix hostage to larger changes
+
+### Mistake 3: Poor Handoffs
+
+Information lost between stages wastes time:
+- Use structured templates
+- Keep all context in one place
+- Require explicit handoff acknowledgment
+
+### Mistake 4: No Learning Loop
+
+Each escalation is a learning opportunity:
+- Conduct brief retrospectives
+- Track patterns across escalations
+- Feed insights into product planning
+
+### Mistake 5: Inconsistent Communication
+
+Customers hate uncertainty:
+- Set expectations for update frequency
+- Proactively communicate, don't wait for asks
+- Be honest about timelines
+
+## How pmkit Handles Escalations
+
+pmkit's escalation workflow automates context gathering:
+
+1. **Aggregates ticket history** from Zendesk
+2. **Pulls account context** from CRM
+3. **Finds similar past issues** in Jira
+4. **Generates fix spec draft** with evidence
+5. **Tracks resolution** through completion
+
+The output includes full traceability and templates for each pipeline stage.
+
+## FAQ
+
+**Q: How do I handle escalations outside business hours?**
+A: Define on-call rotation for P0/P1 issues. Use automation to gather context so on-call can respond faster.
+
+**Q: What if the customer is wrong about severity?**
+A: Acknowledge their urgency, explain your assessment criteria, and commit to a timeline. Don't argue about severity labels.
+
+**Q: How do I prevent escalation fatigue?**
+A: Track escalation sources. If one customer escalates everything, have a relationship conversation. If many customers escalate the same thing, fix the underlying issue.
+
+**Q: Should engineering talk directly to customers?**
+A: For complex technical issues, yes—with PM or CSM present. Engineers get better context; customers feel heard.
+
+**Q: How do I balance escalations with planned work?**
+A: Reserve capacity for escalations (e.g., 20% of sprint). Track actual escalation load to calibrate.
+
+**Q: What if we can't fix it quickly?**
+A: Communicate honestly. Provide workarounds. Set realistic expectations. Customers respect honesty more than false promises.
+
+---
+
+*See escalation handling in action with the pmkit demo. The demo shows how customer context is aggregated and fix specifications are generated.*
