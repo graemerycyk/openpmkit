@@ -163,7 +163,7 @@ export class OpenAIClient implements LLMClient {
       body: JSON.stringify({
         model: model,
         messages: request.messages,
-        max_tokens: request.maxTokens || this.config.maxTokens,
+        max_completion_tokens: request.maxTokens || this.config.maxTokens,
         temperature: request.temperature ?? this.config.temperature,
       }),
     });
