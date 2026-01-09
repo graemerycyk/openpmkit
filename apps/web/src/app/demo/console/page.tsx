@@ -1201,15 +1201,7 @@ export default function ConsolePage() {
                                   </span>
                                   <span>•</span>
                                   <span>
-                                    {currentRun.llmMetadata.usage.totalTokens.toLocaleString()} tokens
-                                  </span>
-                                  <span>•</span>
-                                  <span>
                                     {(currentRun.llmMetadata.latencyMs / 1000).toFixed(1)}s
-                                  </span>
-                                  <span>•</span>
-                                  <span>
-                                    ${currentRun.llmMetadata.estimatedCostUsd.toFixed(4)}
                                   </span>
                                 </>
                               )}

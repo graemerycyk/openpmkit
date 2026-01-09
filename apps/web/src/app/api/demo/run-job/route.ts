@@ -414,10 +414,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Extract detailed error info
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    // Log detailed error for debugging
+    console.error('Detailed error:', {
+      message: errorMessage,
+      stack: errorStack,
+      hasOpenAIKey: !!process.env.OPENAI_API_KEY_DEMO || !!process.env.OPENAI_API_KEY,
+      useStubs: process.env.USE_STUB_LLM,
+    });
+
     return NextResponse.json(
       { 
         error: 'Failed to execute job', 
-        message: error instanceof Error ? error.message : 'Unknown error' 
+        message: errorMessage,
       },
       { status: 500 }
     );

@@ -383,9 +383,10 @@ export class LLMService {
       this.productionClient = this.stubClient;
       this.demoClient = this.stubClient;
     } else {
-      // Use separate API keys for demo and production
-      const demoApiKey = process.env.OPENAI_API_KEY_DEMO;
-      const prodApiKey = process.env.OPENAI_API_KEY_PROD;
+      // Use separate API keys for demo and production, with fallback to single key
+      const fallbackApiKey = process.env.OPENAI_API_KEY;
+      const demoApiKey = process.env.OPENAI_API_KEY_DEMO || fallbackApiKey;
+      const prodApiKey = process.env.OPENAI_API_KEY_PROD || fallbackApiKey;
 
       // Initialize demo client
       if (demoApiKey) {
@@ -394,7 +395,7 @@ export class LLMService {
           model: this.config.demoModel 
         });
       } else {
-        console.warn('OPENAI_API_KEY_DEMO not set, demo will use stub LLM');
+        console.warn('No OpenAI API key set for demo (OPENAI_API_KEY_DEMO or OPENAI_API_KEY), demo will use stub LLM');
         this.demoClient = this.stubClient;
       }
 
@@ -405,7 +406,7 @@ export class LLMService {
           model: this.config.defaultModel 
         });
       } else {
-        console.warn('OPENAI_API_KEY_PROD not set, production will use stub LLM');
+        console.warn('No OpenAI API key set for production (OPENAI_API_KEY_PROD or OPENAI_API_KEY), production will use stub LLM');
         this.productionClient = this.stubClient;
       }
     }
