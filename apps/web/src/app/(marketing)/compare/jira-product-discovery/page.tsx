@@ -42,7 +42,7 @@ const battlecardPoints: BattlecardPoint[] = [
       'Delivery board features built-in',
     ],
     counterpunch:
-      'pmkit proposes Jira epics and stories—you approve before they\'re created. Same Jira integration, but with AI doing the synthesis work.',
+      'pmkit proposes Jira epics and stories. You approve before they\'re created. Same Jira integration, but with AI doing the synthesis work.',
   },
   {
     title: 'Draft-Only Governance',
@@ -84,7 +84,7 @@ export default function JPDComparePage() {
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
               JPD helps prioritize ideas. pmkit synthesizes customer evidence, drafts artifacts,
-              and proposes Jira tickets—all with human approval before anything is created.
+              and proposes Jira tickets, all with human approval before anything is created.
             </p>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function JPDComparePage() {
             </p>
             <p className="mt-2 text-muted-foreground">
               <strong>Use pmkit</strong> if you need AI to synthesize evidence, draft artifacts,
-              and propose Jira tickets—with governance and approval workflows.
+              and propose Jira tickets, with governance and approval workflows.
             </p>
             <p className="mt-4 text-sm text-muted-foreground">
               They can work together: use JPD for prioritization, pmkit for synthesis and drafting.

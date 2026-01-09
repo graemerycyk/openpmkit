@@ -19,7 +19,7 @@ const battlecardPoints: BattlecardPoint[] = [
   {
     title: 'AI Agent vs Platform',
     wins: [
-      'pmkit runs workflows automatically—no manual data entry',
+      'pmkit runs workflows automatically, no manual data entry',
       'Daily briefs, VoC clustering, PRDs generated on schedule',
       'AI synthesizes across tools you already use',
     ],
@@ -28,7 +28,7 @@ const battlecardPoints: BattlecardPoint[] = [
       'Established market presence and ecosystem',
     ],
     counterpunch:
-      'Productboard requires you to centralize data in their platform. pmkit works with your existing tools—Jira, Slack, Gong—and synthesizes automatically.',
+      'Productboard requires you to centralize data in their platform. pmkit works with your existing tools (Jira, Slack, Gong) and synthesizes automatically.',
   },
   {
     title: 'Draft-Only Governance',
@@ -56,7 +56,7 @@ const battlecardPoints: BattlecardPoint[] = [
       'Established procurement patterns',
     ],
     counterpunch:
-      'Per-seat pricing punishes collaboration. pmkit charges for workflows run—add your whole team without multiplying costs.',
+      'Per-seat pricing punishes collaboration. pmkit charges for workflows run. Add your whole team without multiplying costs.',
   },
 ];
 
@@ -84,7 +84,7 @@ export default function ProductboardComparePage() {
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
               Productboard is a PM platform. pmkit is an AI agent that runs workflows,
-              synthesizes evidence, and proposes artifacts—working with your existing tools.
+              synthesizes evidence, and proposes artifacts. It works with your existing tools.
             </p>
           </div>
         </div>

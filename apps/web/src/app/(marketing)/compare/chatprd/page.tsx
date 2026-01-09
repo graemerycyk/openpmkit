@@ -33,12 +33,12 @@ const battlecardPoints: BattlecardPoint[] = [
   {
     title: 'Draft-Only Governance',
     wins: [
-      'PRDs are proposals—review and edit before publishing',
+      'PRDs are proposals. Review and edit before publishing',
       'Full audit trail of what was generated and why',
       'RBAC controls who can approve artifacts',
     ],
     risks: [
-      'ChatPRD is simpler—just generate and copy/paste',
+      'ChatPRD is simpler. Just generate and copy/paste',
       'Extra approval step adds friction',
     ],
     counterpunch:
@@ -52,11 +52,11 @@ const battlecardPoints: BattlecardPoint[] = [
       'Meeting prep references the same PRD context',
     ],
     risks: [
-      'ChatPRD is focused—does one thing well',
+      'ChatPRD is focused. Does one thing well',
       'Broader scope means more to learn',
     ],
     counterpunch:
-      'PRDs don\'t exist in isolation. pmkit connects the PRD to the roadmap, sprint, and release—so nothing falls through the cracks.',
+      'PRDs don\'t exist in isolation. pmkit connects the PRD to the roadmap, sprint, and release so nothing falls through the cracks.',
   },
 ];
 

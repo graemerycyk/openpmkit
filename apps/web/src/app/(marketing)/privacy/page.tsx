@@ -84,16 +84,16 @@ export default function PrivacyPage() {
               <strong>What we retain:</strong>
             </p>
             <ul>
-              <li>Artifacts (briefs, PRDs, reports) — 90 days default</li>
-              <li>Audit logs (tool calls, job runs) — subscription + 90 days</li>
-              <li>Account and user data — while account is active</li>
+              <li>Artifacts (briefs, PRDs, reports): 90 days default</li>
+              <li>Audit logs (tool calls, job runs): subscription + 90 days</li>
+              <li>Account and user data: while account is active</li>
             </ul>
             <p>
               <strong>What we don't retain:</strong>
             </p>
             <ul>
-              <li>Raw connector data (Slack messages, Jira issues) — cached temporarily during job execution only</li>
-              <li>LLM conversation context — not persisted after job completion</li>
+              <li>Raw connector data (Slack messages, Jira issues): cached temporarily during job execution only</li>
+              <li>LLM conversation context: not persisted after job completion</li>
             </ul>
 
             <h2>7. Your Rights</h2>

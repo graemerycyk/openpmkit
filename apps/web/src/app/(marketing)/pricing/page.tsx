@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'pmkit pricing: Teams plan at $75/seat/month (billed annually) for product teams, Enterprise for custom deployments with SAML/SCIM and advanced controls.',
   openGraph: {
-    title: 'pmkit Pricing — Teams & Enterprise',
+    title: 'pmkit Pricing: Teams & Enterprise',
     description: 'Annual pricing for product teams. Teams at $75/seat/month billed annually, Enterprise custom.',
   },
 };

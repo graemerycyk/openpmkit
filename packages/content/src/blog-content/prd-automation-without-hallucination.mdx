@@ -2,7 +2,7 @@
 
 AI can draft PRDs in minutes. The problem is trust. When an AI generates requirements, how do you know they're real? How do you distinguish genuine customer needs from plausible-sounding fabrications?
 
-The answer is evidence grounding—a systematic approach to PRD automation that links every requirement to its source, explicitly labels assumptions, and structures open questions for follow-up.
+The answer is evidence grounding: a systematic approach to PRD automation that links every requirement to its source, explicitly labels assumptions, and structures open questions for follow-up.
 
 ## The Hallucination Problem in PRD Generation
 
@@ -14,7 +14,7 @@ Large language models are excellent at generating plausible text. That's the pro
 **Hallucinated requirement** (sounds real, isn't):
 > "Users need advanced boolean search operators. Power users frequently request AND/OR/NOT syntax for complex queries."
 
-Both sound reasonable. But the first is backed by data you can verify. The second might be completely made up—or it might be real but from a different product's user base that the model was trained on.
+Both sound reasonable. But the first is backed by data you can verify. The second might be completely made up, or it might be real but from a different product's user base that the model was trained on.
 
 When engineering builds features based on hallucinated requirements, you get:
 - Features no one asked for
@@ -41,10 +41,10 @@ No requirement exists without traceable evidence:
 
 **Representative Quotes**:
 > "I spend more time searching than actually working. If I could just filter by last quarter..."
-> — Enterprise customer, Gong call, Dec 15, 2025
+> - Enterprise customer, Gong call, Dec 15, 2025
 
 > "Please add date range to search. This is table stakes for document management."
-> — Community post, Dec 18, 2025
+> - Community post, Dec 18, 2025
 ```
 
 ### Principle 2: Assumptions Are Explicit
@@ -190,10 +190,10 @@ AI generates the draft; humans verify and enhance:
 
 **Representative Quotes**:
 > "[Quote 1]"
-> — [Attribution]
+> - [Attribution]
 
 > "[Quote 2]"  
-> — [Attribution]
+> - [Attribution]
 
 **Acceptance Criteria**:
 - [ ] [Criterion 1]
@@ -338,7 +338,7 @@ Every requirement links to its source evidence. Nothing is fabricated.
 ## FAQ
 
 **Q: What if there isn't enough evidence for a feature I know we need?**
-A: Document what evidence exists, label the rest as assumptions, and plan validation. Sometimes product intuition is right—but it should be explicit, not hidden.
+A: Document what evidence exists, label the rest as assumptions, and plan validation. Sometimes product intuition is right, but it should be explicit, not hidden.
 
 **Q: How do I handle conflicting evidence?**
 A: Document both sides. "Enterprise customers want X, SMB customers want Y." Let the prioritization discussion resolve it.

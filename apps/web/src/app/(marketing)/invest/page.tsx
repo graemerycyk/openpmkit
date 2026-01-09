@@ -178,7 +178,7 @@ export default function InvestPage() {
       {/* Confidential Banner */}
       <div className="bg-amber-50 border-b border-amber-200 py-3 text-center text-sm text-amber-800">
         <div className="container">
-          <span className="font-semibold">Confidential</span> — For qualified investors only. Do not
+          <span className="font-semibold">Confidential</span>. For qualified investors only. Do not
           distribute.
           <span className="mx-2">·</span>
           <span className="text-amber-700">
@@ -203,8 +203,8 @@ export default function InvestPage() {
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 md:text-xl">
-              pmkit runs the daily workflows that consume PM time—briefs, meeting prep, VoC
-              clustering, and PRD drafts—so PMs can focus on strategy.
+              pmkit runs the daily workflows that consume PM time (briefs, meeting prep, VoC
+              clustering, and PRD drafts) so PMs can focus on strategy.
             </p>
 
             {/* Key Metrics */}
@@ -293,7 +293,7 @@ export default function InvestPage() {
                       "I spend the first two hours of every day just catching up on Slack and Jira"
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      — Repeated in PM interviews across B2B SaaS companies
+                      - Repeated in PM interviews across B2B SaaS companies
                     </p>
                   </div>
                 </div>
@@ -306,7 +306,7 @@ export default function InvestPage() {
                       "Meeting prep takes 30-45 minutes per customer call, and I have 4-5 a day"
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      — Common pattern in enterprise PM workflows
+                      - Common pattern in enterprise PM workflows
                     </p>
                   </div>
                 </div>
@@ -320,7 +320,7 @@ export default function InvestPage() {
                       it well"
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      — The synthesis tax on strategic output
+                      - The synthesis tax on strategic output
                     </p>
                   </div>
                 </div>
@@ -341,8 +341,8 @@ export default function InvestPage() {
               The cadence factory
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              pmkit runs scheduled workflows that produce artifact-first outputs—MD and JSON files
-              with evidence links—ready for review and approval.
+              pmkit runs scheduled workflows that produce artifact-first outputs (MD and JSON files
+              with evidence links) ready for review and approval.
             </p>
           </div>
 
@@ -523,7 +523,7 @@ export default function InvestPage() {
               SaaS pricing
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Annual subscriptions with per-seat pricing. No credits—fair use with enforceable caps.
+              Annual subscriptions with per-seat pricing. No credits, fair use with enforceable caps.
             </p>
           </div>
 
