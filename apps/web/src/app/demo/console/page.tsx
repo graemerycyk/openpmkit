@@ -1119,6 +1119,11 @@ export default function ConsolePage() {
                               </span>
                             )}
                           </div>
+                          {currentRun.error && (
+                            <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-800">
+                              <strong>Error:</strong> {currentRun.error}
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
 
