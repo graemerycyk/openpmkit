@@ -8,6 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   FileText,
   Users,
   BarChart3,
@@ -34,6 +40,7 @@ import {
   Wand2,
   Layers,
   Megaphone,
+  Expand,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -942,6 +949,7 @@ export default function ConsolePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'artifact' | 'connectors'>(
     'overview'
   );
+  const [artifactModalOpen, setArtifactModalOpen] = useState(false);
 
   // Get the current run for the selected job
   const currentRun = selectedJob ? jobRuns[selectedJob] : null;
@@ -1480,10 +1488,16 @@ export default function ConsolePage() {
                               )}
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" onClick={downloadArtifact}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setArtifactModalOpen(true)}>
+                              <Expand className="mr-2 h-4 w-4" />
+                              Expand
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={downloadArtifact}>
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </Button>
+                          </div>
                         </div>
                         {/* Provenance Banner */}
                         <div className="border-t bg-amber-50 px-4 py-3">
@@ -1616,6 +1630,35 @@ export default function ConsolePage() {
           )}
         </main>
       </div>
+
+      {/* Artifact Fullscreen Modal */}
+      <Dialog open={artifactModalOpen} onOpenChange={setArtifactModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="font-heading">
+              {currentRun?.artifact?.title || 'Artifact'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto min-h-0">
+            {currentRun?.artifact && (
+              selectedJob === 'prototype_generation' && currentRun.artifact.content.trim().startsWith('<!DOCTYPE') ? (
+                <iframe
+                  srcDoc={currentRun.artifact.content}
+                  className="w-full h-full min-h-[80vh] rounded-lg border bg-white"
+                  title="Prototype Preview"
+                  sandbox="allow-scripts"
+                />
+              ) : (
+                <div className="prose prose-sm max-w-none dark:prose-invert h-full">
+                  <pre className="whitespace-pre-wrap rounded-lg border bg-card p-6 font-sans text-sm text-foreground h-full overflow-auto">
+                    {currentRun.artifact.content}
+                  </pre>
+                </div>
+              )
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
