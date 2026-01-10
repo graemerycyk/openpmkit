@@ -8,7 +8,10 @@ import {
   mockAnalyticsServer,
   mockCompetitorServer,
   mockCommunityServer,
+  pmkitServer,
+  inMemoryPmkitDataStore,
 } from '@pmkit/mcp-servers';
+import type { Artifact } from '@pmkit/core';
 
 import { jiraData } from './data/jira';
 import { confluenceData } from './data/confluence';
@@ -18,6 +21,7 @@ import { zendeskData } from './data/zendesk';
 import { analyticsData } from './data/analytics';
 import { competitorData } from './data/competitor';
 import { communityData } from './data/community';
+import { pmkitData } from './data/pmkit';
 
 // ============================================================================
 // Demo Tenant Configuration
@@ -312,6 +316,20 @@ export function initializeMockData(): void {
     communityData.replies,
     communityData.featureRequests
   );
+
+  // Load pmkit artifacts data
+  const pmkitArtifacts: Artifact[] = pmkitData.artifacts.map((a) => ({
+    id: a.id,
+    tenantId: DEMO_TENANT.id,
+    jobId: a.jobId,
+    type: a.type as Artifact['type'],
+    title: a.title,
+    format: 'markdown' as const,
+    content: a.content,
+    metadata: a.metadata,
+    createdAt: new Date(a.createdAt),
+  }));
+  inMemoryPmkitDataStore.loadArtifacts(pmkitArtifacts);
 }
 
 // ============================================================================
@@ -332,6 +350,7 @@ export function createMockMCPClient() {
     analytics: mockAnalyticsServer,
     competitor: mockCompetitorServer,
     community: mockCommunityServer,
+    pmkit: pmkitServer,
 
     // Convenience method to call any tool
     async callTool(server: string, tool: string, input: Record<string, unknown>) {
@@ -361,6 +380,8 @@ export function createMockMCPClient() {
           return mockCompetitorServer.callTool(tool, input, context);
         case 'community':
           return mockCommunityServer.callTool(tool, input, context);
+        case 'pmkit':
+          return pmkitServer.callTool(tool, input, context);
         default:
           throw new Error(`Unknown server: ${server}`);
       }
@@ -377,4 +398,6 @@ export { zendeskData } from './data/zendesk';
 export { analyticsData } from './data/analytics';
 export { competitorData } from './data/competitor';
 export { communityData } from './data/community';
+export { pmkitData, getArtifactById, getArtifactsByType, getRecentArtifacts, searchArtifacts } from './data/pmkit';
+export type { PmkitArtifact } from './data/pmkit';
 

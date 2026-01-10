@@ -189,7 +189,7 @@ export default function HowItWorksPage() {
                 <ul className="mt-6 space-y-2">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-cobalt-600" />
-                    <span className="text-sm">Seven pre-built job types</span>
+                    <span className="text-sm">Eight pre-built job types</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-cobalt-600" />

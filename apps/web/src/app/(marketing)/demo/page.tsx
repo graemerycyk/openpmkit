@@ -19,7 +19,7 @@ import {
 export const metadata: Metadata = {
   title: 'Demo',
   description:
-    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 7 PM workflow jobs end-to-end.',
+    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 8 PM workflow jobs end-to-end.',
   openGraph: {
     title: 'pmkit Demo',
     description: 'Try the Agent Console with a complete demo enterprise dataset.',
@@ -122,7 +122,7 @@ export default function DemoPage() {
               Try the Agent Console
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Run all 7 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
+              Run all 8 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
               sources, and downloadable artifacts.
             </p>
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

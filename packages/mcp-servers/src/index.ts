@@ -7,6 +7,7 @@ export * from './zendesk';
 export * from './analytics';
 export * from './competitor';
 export * from './community';
+export * from './pmkit';
 
 // Import all mock servers
 import { mockJiraServer } from './jira';
@@ -17,6 +18,7 @@ import { mockZendeskServer } from './zendesk';
 import { mockAnalyticsServer } from './analytics';
 import { mockCompetitorServer } from './competitor';
 import { mockCommunityServer } from './community';
+import { pmkitServer } from './pmkit';
 import { MCPClient, ConnectorFactory, type ConnectorKey } from '@pmkit/mcp';
 
 // ============================================================================
@@ -34,6 +36,7 @@ export function createMockMCPClient(): MCPClient {
   client.registerServer(mockAnalyticsServer);
   client.registerServer(mockCompetitorServer);
   client.registerServer(mockCommunityServer);
+  client.registerServer(pmkitServer);
 
   return client;
 }
@@ -79,4 +82,5 @@ export {
   mockAnalyticsServer,
   mockCompetitorServer,
   mockCommunityServer,
+  pmkitServer,
 };

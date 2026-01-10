@@ -474,7 +474,7 @@ export default function HomePage() {
               Ready to try pmkit?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
-              Run all 7 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
+              Run all 8 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
               competitor research, roadmap alignment, PRD draft, and sprint review.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

@@ -164,7 +164,7 @@ enum JobStatus { Pending, Running, ... }
 
 ### Jobs
 
-- 7 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`
+- 8 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`
 - Job handlers implement `JobHandler` interface
 - All jobs produce artifacts in markdown format
 - Jobs run via `JobRunner.runJob()` which creates a `JobContext`
@@ -690,6 +690,7 @@ REDIS_URL=...             # Uses inline fallback if not set
 | Analytics | `MockAnalyticsMCPServer` | `analytics.ts` | `get_metrics`, `get_funnel`, `get_cohort` |
 | Community | `MockCommunityMCPServer` | `community.ts` | `get_posts`, `search_posts`, `get_feature_requests` |
 | Competitor | `MockCompetitorMCPServer` | `competitor.ts` | `get_competitor`, `get_feature_comparison`, `get_recent_changes` |
+| pmkit | `PmkitMCPServer` | `pmkit.ts` | `get_artifact`, `list_artifacts`, `search_artifacts`, `get_job`, `list_jobs`, `get_proposal`, `list_proposals`, `propose_artifact_update`, `propose_artifact_link` |
 
 ## User Roles
 

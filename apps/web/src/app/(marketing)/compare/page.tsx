@@ -115,7 +115,7 @@ export default function ComparePage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">Try It Yourself</h2>
             <p className="mt-4 text-cobalt-100">
-              The best comparison is hands-on. Run all seven PM workflows in the demo.
+              The best comparison is hands-on. Run all eight PM workflows in the demo.
             </p>
             <div className="mt-8">
               <Button size="lg" variant="secondary" asChild>

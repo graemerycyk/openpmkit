@@ -32,6 +32,7 @@ import {
   Newspaper,
   Hash,
   Wand2,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -67,6 +68,7 @@ const connectors: Connector[] = [
   { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_demo', type: 'mcp' },
   { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_demo', type: 'mcp' },
   { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_demo', type: 'mcp' },
+  { id: 'pmkit', name: 'pmkit Artifacts', icon: Layers, status: 'connected_demo', type: 'mcp', description: 'PRDs, briefs, reports from previous jobs' },
   // AI Crawlers
   { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_demo', type: 'crawler', description: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
   { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_demo', type: 'crawler', description: 'Google & Bing' },
@@ -230,10 +232,10 @@ const jobConfigs: Record<
     name: 'Prototype Generation',
     description: 'Generate UI prototype from PRD',
     icon: Wand2,
-    sources: ['confluence', 'jira'],
+    sources: ['pmkit', 'confluence', 'jira'],
     toolCalls: [
-      { name: 'get_prd_artifact', server: 'pmkit', input: { artifactId: 'prd-search-filters' } },
-      { name: 'extract_user_stories', server: 'pmkit', input: { prdId: 'prd-search-filters' } },
+      { name: 'get_prd_artifact', server: 'pmkit', input: { artifactId: 'artifact-prd-001' } },
+      { name: 'extract_user_stories', server: 'pmkit', input: { prdId: 'artifact-prd-001' } },
       { name: 'get_design_system', server: 'confluence', input: { spaceKey: 'DESIGN' } },
       { name: 'generate_ui_code', server: 'openai', input: { framework: 'react', styling: 'tailwind' } },
     ],

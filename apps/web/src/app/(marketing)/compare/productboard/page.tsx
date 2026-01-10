@@ -126,7 +126,7 @@ export default function ProductboardComparePage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See AI-Powered PM Workflows</h2>
             <p className="mt-4 text-cobalt-100">
-              Try all seven workflow jobs and see how pmkit automates PM work.
+              Try all eight workflow jobs and see how pmkit automates PM work.
             </p>
             <div className="mt-8">
               <Button size="lg" variant="secondary" asChild>
