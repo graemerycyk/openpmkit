@@ -32,7 +32,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Artifact Chaining: How AI Agents Build on Their Own Work',
     description:
       'Learn how AI agents can reference and build upon their previous outputs, creating compound value through artifact chaining—from VoC reports to PRDs to prototypes.',
-    publishedAt: '2026-01-10',
+    publishedAt: '2026-01-13',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'AI agent memory',
@@ -46,7 +46,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Sprint Review vs Release Notes: Internal vs External Communication',
     description:
       'Understand the key differences between sprint reviews and release notes—who reads them, what they contain, and how to automate both without losing quality.',
-    publishedAt: '2026-01-10',
+    publishedAt: '2026-01-12',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'sprint review vs release notes',
@@ -60,7 +60,7 @@ export const blogPosts: BlogPost[] = [
     title: 'MCP for Product Management: Connecting Your PM Stack',
     description:
       'A practical guide to MCP (Model Context Protocol) for product managers—how it connects Jira, Confluence, Slack, Gong, and more into unified AI workflows.',
-    publishedAt: '2026-01-10',
+    publishedAt: '2026-01-11',
     author: 'pmkit team',
     authorRole: 'Engineering',
     primaryKeyword: 'MCP product management',
@@ -88,7 +88,7 @@ export const blogPosts: BlogPost[] = [
     title: 'AI-Generated Release Notes: From Jira Tickets to Customer-Ready Updates',
     description:
       'Learn how to generate customer-facing release notes automatically from Jira tickets, saving hours per release while improving communication with customers and sales teams.',
-    publishedAt: '2026-01-10',
+    publishedAt: '2026-01-09',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'AI release notes',
@@ -102,7 +102,7 @@ export const blogPosts: BlogPost[] = [
     title: 'PRD to Prototype: AI-Generated UI from Product Requirements',
     description:
       'Learn how to generate functional UI prototypes directly from PRDs using AI, accelerating validation and reducing time to user feedback from weeks to minutes.',
-    publishedAt: '2026-01-10',
+    publishedAt: '2026-01-08',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'PRD to prototype',
@@ -312,7 +312,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Jira + Confluence + Slack: a practical operating system for product delivery',
     description:
       'How to configure Jira, Confluence, and Slack as an integrated operating system for product teams with AI automation.',
-    publishedAt: '2025-12-23',
+    publishedAt: '2025-12-22',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'Jira Confluence Slack',
@@ -326,7 +326,7 @@ export const blogPosts: BlogPost[] = [
     title: 'AI for search products: using analytics signals to prioritize what matters',
     description:
       'How product teams can use search analytics (no-results queries, CTR, trends) to inform roadmap priorities and content strategy.',
-    publishedAt: '2025-12-23',
+    publishedAt: '2025-12-21',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'search product analytics',
@@ -340,7 +340,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Agentic roadmaps: building strategy that updates with real customer evidence',
     description:
       'How to create living roadmaps that automatically incorporate customer evidence, competitive changes, and analytics signals.',
-    publishedAt: '2025-12-23',
+    publishedAt: '2025-12-20',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'agentic roadmaps',
@@ -354,7 +354,7 @@ export const blogPosts: BlogPost[] = [
     title: 'The enterprise PM toolkit: briefs, themes, PRDs, and sprint review packs',
     description:
       'A comprehensive guide to the essential PM artifacts for enterprise teams and how AI agents can automate their creation.',
-    publishedAt: '2025-12-23',
+    publishedAt: '2025-12-19',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'enterprise PM toolkit',
@@ -368,7 +368,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Why "AI PM copilot" is not enough: the case for multi-step PM jobs',
     description:
       'Why single-prompt copilots fall short for PM work and how multi-step agents that run complete workflows deliver better results.',
-    publishedAt: '2025-12-23',
+    publishedAt: '2025-12-18',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'AI PM copilot',
