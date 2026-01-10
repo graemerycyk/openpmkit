@@ -494,6 +494,17 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    // Debug: Log if content is empty
+    if (!result.content) {
+      console.error('[API] Empty content from executeJob:', {
+        jobType,
+        model: result.model,
+        isStub: result.isStub,
+        contentLength: result.content?.length,
+        usage: result.usage,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       content: result.content,
