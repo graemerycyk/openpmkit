@@ -11,7 +11,7 @@ import { AlertCircle } from 'lucide-react';
 
 // Error messages for different NextAuth error codes
 const errorMessages: Record<string, string> = {
-  Configuration: 'OAuth is not configured yet. Please use the demo mode below.',
+  Configuration: 'OAuth is not configured yet. Try the demo to explore pmkit.',
   AccessDenied: 'Access was denied. Please try again or contact support.',
   Verification: 'The verification link has expired or has already been used.',
   OAuthSignin: 'Error starting the sign-in process. Please try again.',
@@ -113,10 +113,13 @@ function LoginContent() {
               </div>
             </div>
 
-            {/* Demo Mode */}
-            <Button className="w-full" variant={isOAuthNotConfigured ? 'default' : 'secondary'} asChild>
-              <Link href="/demo/console">Continue as Demo Guest</Link>
-            </Button>
+            {/* Demo Mode - text link */}
+            <p className="text-center text-sm text-muted-foreground">
+              Just exploring?{' '}
+              <Link href="/demo/console" className="text-cobalt-600 hover:underline">
+                Try the demo without signing in →
+              </Link>
+            </p>
 
             <p className="text-center text-xs text-muted-foreground">
               By signing in, you agree to our{' '}
