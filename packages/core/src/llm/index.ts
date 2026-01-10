@@ -176,20 +176,8 @@ export class OpenAIClient implements LLMClient {
     const data = await response.json();
     const latencyMs = Date.now() - startTime;
 
-    // Debug logging for empty content
-    const messageContent = data.choices[0]?.message?.content;
-    if (!messageContent && data.usage?.completion_tokens > 0) {
-      console.error('[LLM] Empty content with tokens:', {
-        model: data.model,
-        finishReason: data.choices[0]?.finish_reason,
-        message: data.choices[0]?.message,
-        refusal: data.choices[0]?.message?.refusal,
-        completionTokens: data.usage?.completion_tokens,
-      });
-    }
-
     return {
-      content: messageContent || '',
+      content: data.choices[0]?.message?.content || '',
       model: data.model,
       usage: {
         inputTokens: data.usage?.prompt_tokens || 0,

@@ -1015,6 +1015,35 @@ export default function ConsolePage() {
         return;
       }
 
+      // Check if content is empty - fall back to static content if so
+      const generatedContent = data.content?.trim();
+      if (!generatedContent) {
+        console.warn('LLM returned empty content, falling back to static content');
+        const artifact = artifactContent[jobType];
+        setJobRuns((prev) => {
+          const currentJobRun = prev[jobType];
+          if (!currentJobRun) return prev;
+          return {
+            ...prev,
+            [jobType]: {
+              ...currentJobRun,
+              status: 'completed',
+              completedAt: new Date(),
+              artifact: {
+                ...artifact,
+                format: jobType === 'prototype_generation' ? 'html' : 'markdown',
+              },
+              llmMetadata: {
+                ...data.metadata,
+                isStub: true, // Mark as fallback
+              },
+            },
+          };
+        });
+        setActiveTab('artifact');
+        return;
+      }
+
       // Success - update with real LLM-generated content
       setJobRuns((prev) => {
         const currentJobRun = prev[jobType];
@@ -1027,8 +1056,8 @@ export default function ConsolePage() {
             completedAt: new Date(),
             artifact: {
               title: config.name,
-              content: data.content,
-              format: 'markdown',
+              content: generatedContent,
+              format: jobType === 'prototype_generation' ? 'html' : 'markdown',
             },
             llmMetadata: data.metadata,
           },
@@ -1052,7 +1081,7 @@ export default function ConsolePage() {
             completedAt: new Date(),
             artifact: {
               ...artifact,
-              format: 'markdown',
+              format: jobType === 'prototype_generation' ? 'html' : 'markdown',
             },
             llmMetadata: {
               model: 'fallback',
