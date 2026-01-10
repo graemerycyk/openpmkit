@@ -31,7 +31,7 @@ export const resources: ResourcePage[] = [
     slug: 'product-management-agent',
     title: 'Product Management Agent: AI That Runs PM Workflows',
     description:
-      'Learn how product management agents automate daily briefs, meeting prep, VoC clustering, and PRD drafts while keeping humans in control.',
+      'Learn how product management agents automate 9 PM workflows (daily briefs, meeting prep, VoC clustering, PRD drafts, and more) while keeping humans in control.',
     primaryKeyword: 'product management agent',
     secondaryKeywords: ['AI PM agent', 'PM automation', 'agentic product management'],
     category: 'agents',

@@ -60,6 +60,18 @@ const cadenceOutputs = [
     name: 'PRD Pack',
     description: 'Draft PRDs grounded in customer evidence with explicit assumptions',
   },
+  {
+    name: 'Sprint Review Pack',
+    description: 'Completed work, metrics, demos, and stakeholder updates',
+  },
+  {
+    name: 'Prototype Generation',
+    description: 'Interactive HTML prototypes from PRDs with working UI components',
+  },
+  {
+    name: 'Release Notes',
+    description: 'Customer-facing release notes from Jira and Confluence',
+  },
 ];
 
 const differentiators = [
@@ -203,8 +215,8 @@ export default function InvestPage() {
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 md:text-xl">
-              pmkit runs the daily workflows that consume PM time (briefs, meeting prep, VoC
-              clustering, and PRD drafts) so PMs can focus on strategy.
+              pmkit runs 9 PM workflows (briefs, meeting prep, VoC clustering, PRD drafts,
+              prototypes, and release notes) so PMs can focus on strategy.
             </p>
 
             {/* Key Metrics */}

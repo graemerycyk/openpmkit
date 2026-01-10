@@ -184,7 +184,7 @@ export default function HowItWorksPage() {
                   <h3 className="font-heading text-2xl font-bold">Configure Jobs</h3>
                 </div>
                 <p className="mt-4 text-muted-foreground">
-                  Set up the PM jobs you want to run; daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, or PRD drafts. Configure sources, schedules, and output destinations.
+                  Set up the PM jobs you want to run; daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, or release notes. Configure sources, schedules, and output destinations.
                 </p>
                 <ul className="mt-6 space-y-2">
                   <li className="flex items-center gap-2">

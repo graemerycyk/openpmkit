@@ -16,6 +16,8 @@ import {
   ClipboardCheck,
   MessageSquare,
   Mail,
+  Wand2,
+  Megaphone,
 } from 'lucide-react';
 
 const features = [
@@ -54,6 +56,24 @@ const features = [
     title: 'PRD Drafts',
     description:
       'Draft PRDs grounded in customer evidence, with explicit assumptions and open questions.',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Sprint Review Packs',
+    description:
+      'Generate sprint review packs with completed work, metrics, demos, and stakeholder updates.',
+  },
+  {
+    icon: Wand2,
+    title: 'Prototype Generation',
+    description:
+      'Turn PRDs into interactive HTML prototypes with working UI components and realistic data.',
+  },
+  {
+    icon: Megaphone,
+    title: 'Release Notes',
+    description:
+      'Generate customer-facing release notes from Jira and Confluence; clear, benefit-focused, and ready to publish.',
   },
 ];
 
@@ -127,7 +147,7 @@ export default function HomePage() {
             '@type': 'Product',
             name: 'pmkit',
             description:
-              'AI-powered product management agent that runs daily briefs, meeting prep, VoC clustering, and PRD drafts.',
+              'AI-powered product management agent that runs 9 PM workflows: daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, and release notes.',
             brand: {
               '@type': 'Brand',
               name: 'pmkit',
@@ -182,10 +202,10 @@ export default function HomePage() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              The kit every PM needs
+              9 workflows every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              AI briefs, themes, and draft PRDs; run end-to-end with traceability and governance.
+              AI briefs, VoC themes, PRD drafts, prototypes, and release notes; run end-to-end with traceability and governance.
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -244,8 +264,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-heading text-lg font-semibold">Run Jobs</h3>
               <p className="mt-2 text-muted-foreground">
-                Trigger daily briefs, meeting prep, VoC clustering, or PRD drafts; on demand or
-                scheduled.
+                Trigger any of the 9 PM workflows; on demand or scheduled.
               </p>
             </div>
             <div className="text-center">
@@ -475,7 +494,7 @@ export default function HomePage() {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
               Run all 9 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
-              competitor research, roadmap alignment, PRD draft, and sprint review.
+              competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, and release notes.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>
