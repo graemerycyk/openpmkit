@@ -176,15 +176,26 @@ export class OpenAIClient implements LLMClient {
     const data = await response.json();
     const latencyMs = Date.now() - startTime;
 
+    const messageContent = data.choices[0]?.message?.content || '';
+    const finishReason = data.choices[0]?.finish_reason;
+
+    // Log errors only - content filtering or truncation issues
+    if (data.choices[0]?.message?.refusal) {
+      console.error('[LLM] Content refused:', data.choices[0].message.refusal);
+    }
+    if (finishReason === 'length' && !messageContent) {
+      console.error('[LLM] Response truncated with no content - increase max_tokens');
+    }
+
     return {
-      content: data.choices[0]?.message?.content || '',
+      content: messageContent,
       model: data.model,
       usage: {
         inputTokens: data.usage?.prompt_tokens || 0,
         outputTokens: data.usage?.completion_tokens || 0,
         totalTokens: data.usage?.total_tokens || 0,
       },
-      finishReason: data.choices[0]?.finish_reason === 'stop' ? 'stop' : 'length',
+      finishReason: finishReason === 'stop' ? 'stop' : 'length',
       latencyMs,
     };
   }

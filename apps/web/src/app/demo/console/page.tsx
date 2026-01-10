@@ -1019,23 +1019,9 @@ export default function ConsolePage() {
       // Check if content is empty - show error in UI
       const generatedContent = data.content?.trim();
       
-      // Debug logging for LLM response
-      console.log('[LLM Response]', {
-        jobType,
-        hasContent: !!generatedContent,
-        contentLength: generatedContent?.length || 0,
-        contentPreview: generatedContent?.substring(0, 200) || '(empty)',
-        metadata: data.metadata,
-      });
-      
       if (!generatedContent) {
-        // Surface error in UI instead of silently falling back
-        const errorMessage = `LLM returned empty content for ${jobType}. This may be due to content filtering, token limits, or model issues. Check console for details.`;
-        console.error('[LLM Error] Empty content returned:', {
-          jobType,
-          metadata: data.metadata,
-          rawContent: data.content,
-        });
+        // Surface error in UI
+        const errorMessage = `LLM returned empty content for ${jobType}. This may be due to content filtering or model issues.`;
         
         setJobRuns((prev) => {
           const currentJobRun = prev[jobType];
@@ -1080,12 +1066,6 @@ export default function ConsolePage() {
       const errorMessage = error instanceof Error 
         ? `LLM API error: ${error.message}` 
         : 'LLM API error: Unknown error occurred';
-      
-      console.error('[LLM API Error]', {
-        jobType,
-        error,
-        errorMessage,
-      });
       
       setJobRuns((prev) => {
         const currentJobRun = prev[jobType];
@@ -1530,18 +1510,6 @@ export default function ConsolePage() {
                         </div>
                       </div>
                       <div className="flex-1 overflow-auto p-4">
-                        {/* Debug logging for artifact rendering */}
-                        {(() => {
-                          console.log('[Artifact Render]', {
-                            jobType: selectedJob,
-                            format: currentRun.artifact.format,
-                            contentLength: currentRun.artifact.content?.length,
-                            startsWithDoctype: currentRun.artifact.content?.trim().startsWith('<!DOCTYPE'),
-                            contentPreview: currentRun.artifact.content?.substring(0, 100),
-                            isStub: currentRun.llmMetadata?.isStub,
-                          });
-                          return null;
-                        })()}
                         {/* Render HTML prototypes in an iframe, markdown as text */}
                         {selectedJob === 'prototype_generation' && currentRun.artifact.content.trim().startsWith('<!DOCTYPE') ? (
                           <div className="h-full">

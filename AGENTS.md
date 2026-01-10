@@ -888,6 +888,61 @@ For end-to-end tests, use the demo console at `/demo/console`:
 | `NEXT_PUBLIC_GSC_VERIFICATION` | Google Search Console |
 | `NEXT_PUBLIC_BING_VERIFICATION` | Bing Webmaster Tools |
 
+### Demo Rate Limits
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `DEMO_LLM_CALLS_PER_HOUR` | 10 | Max LLM calls per hour for demo |
+| `DEMO_LLM_CALLS_PER_DAY` | 50 | Max LLM calls per day for demo |
+
+## LLM Configuration
+
+### Models
+
+| Model | Use Case | Context Window | Cost (per 1M tokens) |
+|-------|----------|----------------|---------------------|
+| `gpt-5.2` | Production | 400K | $1.75 in / $14.00 out |
+| `gpt-5-mini` | Demo | 128K | $0.25 in / $2.00 out |
+| `gpt-5-nano` | Testing | 64K | $0.10 in / $0.40 out |
+| `stub` | Development | N/A | Free (pre-generated) |
+
+### Token Limits by Job Type
+
+Demo jobs have per-job-type token limits to balance output quality and cost:
+
+| Job Type | Max Tokens | Rationale |
+|----------|------------|-----------|
+| `daily_brief` | 12,288 | Standard markdown output |
+| `meeting_prep` | 12,288 | Standard markdown output |
+| `voc_clustering` | 12,288 | Standard markdown output |
+| `competitor_research` | 12,288 | Standard markdown output |
+| `roadmap_alignment` | 12,288 | Standard markdown output |
+| `prd_draft` | 12,288 | Standard markdown output |
+| `sprint_review` | 12,288 | Standard markdown output |
+| `release_notes` | 12,288 | Standard markdown output |
+| `prototype_generation` | 24,000 | Full HTML with inline CSS/JS |
+
+Configuration is in `apps/web/src/app/api/demo/run-job/route.ts`:
+
+```typescript
+const JOB_MAX_TOKENS: Record<JobType, number> = {
+  daily_brief: 12288,
+  meeting_prep: 12288,
+  // ... etc
+  prototype_generation: 24000,
+};
+```
+
+### Cost Estimates (Demo)
+
+With default rate limits (50 calls/day) using GPT-5 mini:
+
+| Scenario | Per Call | Daily Max | Monthly Max |
+|----------|----------|-----------|-------------|
+| Standard jobs (12K tokens) | ~$0.025 | ~$1.25 | ~$37 |
+| Prototype (24K tokens) | ~$0.048 | ~$2.40 | ~$72 |
+| Mixed usage (realistic) | ~$0.030 | ~$1.50 | ~$45 |
+
 ## Related Files
 
 - `CLAUDE.md` - Quick reference for Claude Code

@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getLLMService, type JobType } from '@pmkit/core';
 import { executeJob, PROMPT_TEMPLATES, type PromptContext } from '@pmkit/prompts';
 
+// Max output tokens per job type
+// Standard jobs: 12,288 tokens (~9K words) - sufficient for detailed markdown
+// Prototype: 24,000 tokens - needed for complete HTML with inline CSS/JS
+const JOB_MAX_TOKENS: Record<JobType, number> = {
+  daily_brief: 12288,
+  meeting_prep: 12288,
+  voc_clustering: 12288,
+  competitor_research: 12288,
+  roadmap_alignment: 12288,
+  prd_draft: 12288,
+  sprint_review: 12288,
+  prototype_generation: 24000,
+  release_notes: 12288,
+};
+
 // Mock data for demo - simulates what real connectors would return
 const MOCK_CONNECTOR_DATA = {
   slack: {
@@ -483,27 +498,18 @@ export async function POST(request: NextRequest) {
     const context = buildJobContext(jobType);
 
     // Execute the job with real LLM
+    const maxTokens = JOB_MAX_TOKENS[jobType] || 12288;
+    
     const result = await executeJob(
       llmService,
       'demo', // Demo tenant - uses OPENAI_API_KEY_DEMO with rate limiting
       jobType,
       context,
       {
-        maxTokens: 4096,
+        maxTokens,
         temperature: 0.7,
       }
     );
-
-    // Debug: Log if content is empty
-    if (!result.content) {
-      console.error('[API] Empty content from executeJob:', {
-        jobType,
-        model: result.model,
-        isStub: result.isStub,
-        contentLength: result.content?.length,
-        usage: result.usage,
-      });
-    }
 
     return NextResponse.json({
       success: true,
