@@ -352,6 +352,112 @@ function buildJobContext(jobType: JobType): PromptContext {
         `.trim(),
       };
 
+    case 'prototype_generation':
+      return {
+        ...baseContext,
+        prdContent: `
+# PRD: Search Filters
+
+**Author**: Demo PM
+**Date**: ${new Date().toISOString().split('T')[0]}
+**Status**: Approved
+**Epic**: ACME-100
+
+## 1. Overview
+
+### Problem Statement
+Users cannot efficiently find content because search results lack filtering capabilities. 35% of support tickets mention search frustration.
+
+### Goals
+| Goal | Metric | Target |
+|------|--------|--------|
+| Reduce time to find content | Avg. search-to-click time | -30% |
+| Improve search satisfaction | User survey score | 3.2 → 4.0+ |
+
+## 2. User Stories
+
+1. **As a PM**, I want to filter search results by date range so I can find recent content quickly
+   - Acceptance: Date presets (7d, 30d, 90d) and custom range picker
+   
+2. **As a PM**, I want to filter by content type so I can narrow results to documents, projects, or comments
+   - Acceptance: Multi-select content type filter
+   
+3. **As a PM**, I want to combine multiple filters so I can find exactly what I need
+   - Acceptance: Filters combine with AND logic, clear all button
+
+## 3. Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1 | Date range filter with presets (7d, 30d, 90d, custom) | P0 |
+| F2 | Content type filter (documents, projects, comments) | P0 |
+| F3 | Filter combination with AND logic | P0 |
+| F4 | Clear all filters button | P0 |
+| F5 | Filter state shown in results count | P1 |
+        `.trim(),
+        designSystem: `
+**Design System Guidelines**
+- Use shadcn/ui components (Select, Button, Popover, Calendar)
+- Colors: cobalt-600 for primary actions, muted for secondary
+- Spacing: gap-3 between filter controls
+- Typography: text-sm for filter labels, text-muted-foreground for hints
+- Icons: Lucide React (CalendarIcon, X for clear)
+        `.trim(),
+        focusAreas: `
+**Focus Areas for Prototype**
+1. Filter bar layout and interaction
+2. Date range selection (presets + custom)
+3. Content type multi-select
+4. Clear filters functionality
+5. Results count with active filter state
+        `.trim(),
+      };
+
+    case 'release_notes':
+      return {
+        ...baseContext,
+        releaseVersion: 'v2.4.0',
+        releaseDate: new Date().toISOString().split('T')[0],
+        completedIssues: `
+**Completed Issues for v2.4.0**
+
+| Issue | Type | Title | Description |
+|-------|------|-------|-------------|
+| ACME-342 | Feature | Search date filters | Filter search results by date range (7d, 30d, 90d, custom) |
+| ACME-343 | Feature | Search content type filter | Filter by documents, projects, or comments |
+| ACME-346 | Improvement | Search filter UI polish | Improved filter bar layout and interactions |
+| ACME-347 | Improvement | Search analytics events | Track filter usage for product analytics |
+| ACME-350 | Bug | Search crash on special characters | Fixed crash when searching with special chars |
+| ACME-348 | Bug | Dashboard widget loading | Fixed widgets not loading for some users |
+| ACME-345 | Bug | Export button Safari fix | Fixed export not working on Safari |
+| ACME-341 | Bug | Notification preferences | Fixed preferences not saving correctly |
+| ACME-349 | Improvement | Search performance | Reduced p95 latency by 23% |
+        `.trim(),
+        epicSummaries: `
+**Epic: Search Improvements (ACME-100)**
+This release completes the first phase of search improvements, adding filtering capabilities that customers have requested for months. The search filters allow users to narrow results by date and content type, significantly reducing time to find content.
+
+Key outcomes:
+- 89 customer votes addressed
+- 3 enterprise expansion blockers removed
+- Foundation for future AI search features
+        `.trim(),
+        relatedPrds: `
+**Related PRD: Search Filters**
+- Goal: Reduce search-to-click time by 30%
+- User stories: Date filter, content type filter, combined filters
+- Success metrics: Filter adoption rate, search satisfaction score
+        `.trim(),
+        releaseNotesTemplate: `
+**Standard Release Notes Format**
+1. Highlights (2-3 key items)
+2. New Features (with benefit statements)
+3. Improvements (grouped by area)
+4. Bug Fixes (customer-facing only)
+5. Coming Soon (optional preview)
+        `.trim(),
+      };
+
     default:
       return baseContext;
   }
