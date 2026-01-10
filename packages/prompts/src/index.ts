@@ -11,7 +11,7 @@ export interface PromptTemplate {
   jobType: JobType;
   systemPrompt: string;
   userPromptTemplate: string;
-  outputFormat: 'markdown' | 'json' | 'structured';
+  outputFormat: 'markdown' | 'json' | 'structured' | 'html';
   requiredContext: string[];
 }
 
@@ -382,35 +382,46 @@ Create a sprint review pack with:
     name: 'Prototype Generation',
     description: 'Generate a UI prototype from a PRD',
     jobType: 'prototype_generation',
-    systemPrompt: `You are a UI/UX engineer who creates React prototypes from PRDs.
+    systemPrompt: `You are a UI/UX engineer who creates interactive HTML prototypes from PRDs.
+
+CRITICAL: Output ONLY a complete, standalone HTML file. No markdown, no explanations, no code fences.
 
 Guidelines:
-- Extract user stories and acceptance criteria from the PRD
-- Generate clean, functional React components using Tailwind CSS
-- Use shadcn/ui component patterns for consistency
+- Create a single HTML file with embedded CSS and JavaScript
+- Use modern CSS (flexbox, grid, CSS variables) for styling
+- Include interactive elements (dropdowns, buttons, filters) using vanilla JavaScript
+- Use a clean, professional design with good typography
 - Include realistic placeholder data
-- Make the UI interactive where appropriate
-- Focus on demonstrating core user flows
-- Output well-structured, readable code
+- Make all UI elements functional and interactive
+- The HTML must be self-contained and work when opened directly in a browser
 
-Output format: Markdown with embedded TSX code blocks for each component.`,
-    userPromptTemplate: `Generate a UI prototype based on this PRD:
+Design style:
+- Use a modern color palette (indigo/blue primary, gray neutrals)
+- Clean sans-serif fonts (system fonts)
+- Subtle shadows and rounded corners
+- Responsive layout that works on different screen sizes
+
+Output: A complete HTML document starting with <!DOCTYPE html> and ending with </html>. Nothing else.`,
+    userPromptTemplate: `Generate an interactive HTML prototype based on this PRD:
 
 ## PRD Content
 {{prdContent}}
 
-## Design System
+## Design Guidelines
 {{designSystem}}
 
 ## Focus Areas
 {{focusAreas}}
 
-Create a functional React prototype that demonstrates the core user experience described in the PRD. Include:
-1. Main component(s) implementing the user stories
-2. User flow coverage table showing which stories are implemented
-3. Validation checklist for testing
-4. Next steps for user testing and iteration`,
-    outputFormat: 'markdown',
+Create a complete, standalone HTML file that demonstrates the core user experience. The file must:
+1. Start with <!DOCTYPE html> and be valid HTML5
+2. Include all CSS in a <style> tag in the <head>
+3. Include all JavaScript in a <script> tag before </body>
+4. Be fully interactive (dropdowns work, buttons respond, filters apply)
+5. Look professional and polished
+
+Output ONLY the HTML file content. No markdown, no explanations, no code blocks.`,
+    outputFormat: 'html',
     requiredContext: ['prdContent'],
   },
 
@@ -1194,169 +1205,399 @@ Key talking points:
 **Committed Capacity**: 19 points`;
 }
 
-function generatePrototypeGenerationStub(context: PromptContext, date: string): string {
-  const featureName = (context.featureName as string) || 'Search Filters';
-  return `# UI Prototype: ${featureName}
-
-**Generated from**: PRD: ${featureName}
-**Framework**: React + Tailwind CSS
-**Date**: ${date}
-**Status**: Ready for Review
-
----
-
-## Generated Components
-
-### 1. ${featureName.replace(/\s+/g, '')}Component
-
-\`\`\`tsx
-import { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, X } from 'lucide-react';
-
-export function ${featureName.replace(/\s+/g, '')}({ onFilterChange }) {
-  const [dateRange, setDateRange] = useState('all');
-  const [contentType, setContentType] = useState('all');
-
-  const handleDateChange = (value) => {
-    setDateRange(value);
-    onFilterChange?.({ dateRange: value, contentType });
-  };
-
-  const handleContentTypeChange = (value) => {
-    setContentType(value);
-    onFilterChange?.({ dateRange, contentType: value });
-  };
-
-  const clearFilters = () => {
-    setDateRange('all');
-    setContentType('all');
-    onFilterChange?.({ dateRange: 'all', contentType: 'all' });
-  };
-
-  return (
-    <div className="flex items-center gap-3 p-4 border-b bg-muted/30">
-      <span className="text-sm text-muted-foreground">Filters:</span>
-      
-      <Select value={dateRange} onValueChange={handleDateChange}>
-        <SelectTrigger className="w-36">
-          <SelectValue placeholder="Date range" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All time</SelectItem>
-          <SelectItem value="7d">Last 7 days</SelectItem>
-          <SelectItem value="30d">Last 30 days</SelectItem>
-          <SelectItem value="90d">Last 90 days</SelectItem>
-          <SelectItem value="custom">Custom range</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select value={contentType} onValueChange={handleContentTypeChange}>
-        <SelectTrigger className="w-36">
-          <SelectValue placeholder="Content type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All types</SelectItem>
-          <SelectItem value="documents">Documents</SelectItem>
-          <SelectItem value="projects">Projects</SelectItem>
-          <SelectItem value="comments">Comments</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {(dateRange !== 'all' || contentType !== 'all') && (
-        <Button variant="ghost" size="sm" onClick={clearFilters}>
-          <X className="mr-1 h-3 w-3" />
-          Clear
-        </Button>
-      )}
-    </div>
-  );
-}
-\`\`\`
-
-### 2. SearchResultsComponent
-
-\`\`\`tsx
-import { FileText, Folder, MessageSquare } from 'lucide-react';
-
-const typeIcons = {
-  documents: FileText,
-  projects: Folder,
-  comments: MessageSquare,
-};
-
-export function SearchResults({ results, filters }) {
-  const filteredResults = results.filter(result => {
-    if (filters.contentType !== 'all' && result.type !== filters.contentType) {
-      return false;
+function generatePrototypeGenerationStub(_context: PromptContext, _date: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Filters Prototype</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    return true;
-  });
-
-  return (
-    <div className="divide-y">
-      <div className="px-4 py-2 text-sm text-muted-foreground">
-        {filteredResults.length} results
-        {filters.dateRange !== 'all' && \` • \${filters.dateRange}\`}
-        {filters.contentType !== 'all' && \` • \${filters.contentType}\`}
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .header {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .header p {
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    .search-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .search-input-container {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .search-input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+    
+    .filter-label {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .filter-select {
+      padding: 8px 32px 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      transition: border-color 0.2s;
+    }
+    
+    .filter-select:hover {
+      border-color: #cbd5e1;
+    }
+    
+    .filter-select:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .clear-btn {
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+    
+    .clear-btn:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    
+    .clear-btn.hidden {
+      display: none;
+    }
+    
+    .results-header {
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #64748b;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .active-filters {
+      display: inline-flex;
+      gap: 8px;
+      margin-left: 8px;
+    }
+    
+    .filter-tag {
+      background: #eef2ff;
+      color: #4f46e5;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .results-list {
+      list-style: none;
+    }
+    
+    .result-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .result-item:hover {
+      background: #f8fafc;
+    }
+    
+    .result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .result-icon {
+      width: 40px;
+      height: 40px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .result-icon svg {
+      width: 20px;
+      height: 20px;
+      color: #64748b;
+    }
+    
+    .result-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .result-title {
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+    
+    .result-excerpt {
+      font-size: 14px;
+      color: #64748b;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .result-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    
+    .no-results {
+      padding: 48px 16px;
+      text-align: center;
+      color: #64748b;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    
+    .badge.documents { background: #dbeafe; color: #1d4ed8; }
+    .badge.projects { background: #dcfce7; color: #15803d; }
+    .badge.comments { background: #fef3c7; color: #b45309; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Search Filters Prototype</h1>
+      <p>Interactive prototype generated from PRD • Filter by date and content type</p>
+    </div>
+    
+    <div class="search-box">
+      <div class="search-input-container">
+        <input type="text" class="search-input" placeholder="Search documents, projects, comments..." id="searchInput">
       </div>
       
-      {filteredResults.map(result => {
-        const Icon = typeIcons[result.type] || FileText;
-        return (
-          <div key={result.id} className="flex items-start gap-3 p-4 hover:bg-muted/50">
-            <Icon className="h-5 w-5 text-muted-foreground mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium truncate">{result.title}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-2">{result.excerpt}</p>
-            </div>
-          </div>
-        );
-      })}
+      <div class="filters-bar">
+        <span class="filter-label">Filters:</span>
+        
+        <select class="filter-select" id="dateFilter">
+          <option value="all">All time</option>
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+        </select>
+        
+        <select class="filter-select" id="typeFilter">
+          <option value="all">All types</option>
+          <option value="documents">Documents</option>
+          <option value="projects">Projects</option>
+          <option value="comments">Comments</option>
+        </select>
+        
+        <button class="clear-btn hidden" id="clearBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          Clear filters
+        </button>
+      </div>
+      
+      <div class="results-header" id="resultsHeader">
+        <span id="resultsCount">8 results</span>
+        <span class="active-filters" id="activeFilters"></span>
+      </div>
+      
+      <ul class="results-list" id="resultsList">
+      </ul>
     </div>
-  );
-}
-\`\`\`
+  </div>
 
-## User Flow Coverage
+  <script>
+    const mockData = [
+      { id: 1, type: 'documents', title: 'Q4 Product Roadmap', excerpt: 'Strategic roadmap for Q4 2025 including search improvements, enterprise features, and AI initiatives.', date: '2 days ago', author: 'Sarah Chen' },
+      { id: 2, type: 'projects', title: 'Search Improvements Epic', excerpt: 'Epic tracking all search-related improvements including filters, ranking, and performance.', date: '3 days ago', author: 'Alex Kim' },
+      { id: 3, type: 'comments', title: 'Comment on PRD: Search Filters', excerpt: 'Great progress on the filters! One suggestion: can we add a "custom date range" option for power users?', date: '5 days ago', author: 'Mike Johnson' },
+      { id: 4, type: 'documents', title: 'Search Architecture Doc', excerpt: 'Technical documentation for the search infrastructure including Elasticsearch configuration and indexing strategy.', date: '1 week ago', author: 'Dev Team' },
+      { id: 5, type: 'documents', title: 'Customer Feedback Summary', excerpt: 'Summary of customer feedback from Q3 including top feature requests and pain points.', date: '2 weeks ago', author: 'CS Team' },
+      { id: 6, type: 'projects', title: 'Enterprise SSO Implementation', excerpt: 'Project tracking SAML SSO implementation for enterprise customers.', date: '3 weeks ago', author: 'Security Team' },
+      { id: 7, type: 'comments', title: 'Comment on Sprint Review', excerpt: 'Sprint 42 was our best sprint yet! Great work on shipping the search filters ahead of schedule.', date: '1 month ago', author: 'Emily Davis' },
+      { id: 8, type: 'documents', title: 'Competitor Analysis Report', excerpt: 'Analysis of competitor features, pricing, and recent product announcements.', date: '2 months ago', author: 'Product Team' },
+    ];
 
-| User Story | Component | Status |
-|------------|-----------|--------|
-| Filter by date range | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
-| Filter by content type | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
-| Combine multiple filters | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
-| Clear all filters | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
-| See filter state in results | SearchResults | ✅ Implemented |
+    const dateFilter = document.getElementById('dateFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const clearBtn = document.getElementById('clearBtn');
+    const resultsList = document.getElementById('resultsList');
+    const resultsCount = document.getElementById('resultsCount');
+    const activeFilters = document.getElementById('activeFilters');
+    const searchInput = document.getElementById('searchInput');
 
-## Validation Checklist
+    function getIcon(type) {
+      const icons = {
+        documents: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>',
+        projects: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+        comments: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+      };
+      return icons[type] || icons.documents;
+    }
 
-- [ ] Date presets work correctly (7d, 30d, 90d)
-- [ ] Content type filter updates results
-- [ ] Combined filters apply AND logic
-- [ ] Clear button resets all filters
-- [ ] Filter state visible in results count
-- [ ] Mobile responsive layout
-- [ ] Keyboard navigation works
+    function filterResults() {
+      const dateValue = dateFilter.value;
+      const typeValue = typeFilter.value;
+      const searchValue = searchInput.value.toLowerCase();
+      
+      let filtered = mockData;
+      
+      if (typeValue !== 'all') {
+        filtered = filtered.filter(item => item.type === typeValue);
+      }
+      
+      if (searchValue) {
+        filtered = filtered.filter(item => 
+          item.title.toLowerCase().includes(searchValue) || 
+          item.excerpt.toLowerCase().includes(searchValue)
+        );
+      }
+      
+      // Update clear button visibility
+      clearBtn.classList.toggle('hidden', dateValue === 'all' && typeValue === 'all');
+      
+      // Update active filters display
+      let filterTags = '';
+      if (dateValue !== 'all') {
+        filterTags += '<span class="filter-tag">' + dateFilter.options[dateFilter.selectedIndex].text + '</span>';
+      }
+      if (typeValue !== 'all') {
+        filterTags += '<span class="filter-tag">' + typeValue + '</span>';
+      }
+      activeFilters.innerHTML = filterTags;
+      
+      // Update results count
+      resultsCount.textContent = filtered.length + ' result' + (filtered.length !== 1 ? 's' : '');
+      
+      // Render results
+      if (filtered.length === 0) {
+        resultsList.innerHTML = '<li class="no-results">No results found. Try adjusting your filters.</li>';
+      } else {
+        resultsList.innerHTML = filtered.map(item => 
+          '<li class="result-item">' +
+            '<div class="result-icon">' + getIcon(item.type) + '</div>' +
+            '<div class="result-content">' +
+              '<div class="result-title">' + item.title + '</div>' +
+              '<div class="result-excerpt">' + item.excerpt + '</div>' +
+              '<div class="result-meta">' +
+                '<span class="badge ' + item.type + '">' + item.type + '</span>' +
+                '<span>' + item.date + '</span>' +
+                '<span>' + item.author + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</li>'
+        ).join('');
+      }
+    }
 
-## Design System Alignment
+    function clearFilters() {
+      dateFilter.value = 'all';
+      typeFilter.value = 'all';
+      filterResults();
+    }
 
-- Uses shadcn/ui Select, Button, Popover components
-- Follows existing color scheme (muted backgrounds, foreground text)
-- Consistent spacing with existing UI patterns
-- Icons from Lucide React
+    dateFilter.addEventListener('change', filterResults);
+    typeFilter.addEventListener('change', filterResults);
+    clearBtn.addEventListener('click', clearFilters);
+    searchInput.addEventListener('input', filterResults);
 
-## Next Steps
-
-1. **User Testing**: Share prototype with 3-5 users for feedback
-2. **Feedback Collection**: Document UX issues and suggestions
-3. **PRD Update**: Refine requirements based on feedback
-4. **Design Handoff**: Pass validated prototype to design team for polish
-
----
-*Generated by pmkit • Prototype Generation v1*`;
+    // Initial render
+    filterResults();
+  </script>
+</body>
+</html>`;
 }
 
 function generateReleaseNotesStub(context: PromptContext, date: string): string {
