@@ -1762,8 +1762,18 @@ export async function executeJob(
     (response.usage.inputTokens / 1_000_000) * modelInfo.inputPricePerMillion +
     (response.usage.outputTokens / 1_000_000) * modelInfo.outputPricePerMillion;
 
+  // Post-process content for HTML outputs - strip markdown code fences if present
+  let content = response.content;
+  if (template.outputFormat === 'html' && content) {
+    // Strip markdown code fences like ```html ... ``` or ``` ... ```
+    content = content
+      .replace(/^```(?:html)?\s*\n?/i, '')
+      .replace(/\n?```\s*$/i, '')
+      .trim();
+  }
+
   return {
-    content: response.content,
+    content,
     model: response.model,
     usage: response.usage,
     latencyMs: response.latencyMs,
@@ -1804,6 +1814,10 @@ export function createStubGenerator(): (messages: LLMMessage[]) => string {
       return generateStubResponse('prd_draft', context);
     } else if (systemPrompt.includes('sprint review') || systemPrompt.includes('sprint data')) {
       return generateStubResponse('sprint_review', context);
+    } else if (systemPrompt.includes('HTML prototype') || systemPrompt.includes('UI prototype')) {
+      return generateStubResponse('prototype_generation', context);
+    } else if (systemPrompt.includes('release notes') || systemPrompt.includes('customer-facing')) {
+      return generateStubResponse('release_notes', context);
     }
 
     // Generic fallback
