@@ -151,8 +151,21 @@ This enables workflows where each job builds on previous outputs, reducing hallu
 
 | App | Purpose |
 |-----|---------|
-| `apps/web` | Next.js 15 marketing site + demo console |
+| `apps/web` | Next.js 15 marketing site + demo console + workbench |
 | `apps/worker` | BullMQ job worker (processes queued jobs) |
+
+### Workbench (Admin-Only)
+
+The Workbench (`/workbench`) is a copy/paste MVP that allows admin users to run jobs without connector setup:
+
+- **Purpose**: Dogfooding, demo validation, prompt iteration
+- **Access**: Admin-only (controlled via `ADMIN_EMAILS` env variable)
+- **How it works**: Users paste data (Slack messages, Jira updates, etc.) instead of pulling from connectors
+- **Key files**:
+  - `apps/web/src/app/workbench/page.tsx` - Main UI
+  - `apps/web/src/app/workbench/field-config.ts` - Field definitions per job type
+  - `apps/web/src/app/api/workbench/run-job/route.ts` - API endpoint
+  - `apps/web/src/lib/admin.ts` - Admin email check utility
 
 ## Code Conventions
 
@@ -879,6 +892,7 @@ For end-to-end tests, use the demo console at `/demo/console`:
 | `S3_*` | Artifact storage | Local filesystem |
 | `GOOGLE_CLIENT_ID/SECRET` | Google OAuth | Demo auth only |
 | `MICROSOFT_CLIENT_ID/SECRET` | Microsoft OAuth | Demo auth only |
+| `ADMIN_EMAILS` | Comma-separated admin emails for Workbench access | No workbench access |
 
 ### Analytics & SEO
 

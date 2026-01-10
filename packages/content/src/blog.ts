@@ -14,6 +14,7 @@ export interface BlogPost {
   readingTime: number; // minutes
   relatedResources: string[];
   relatedPosts: string[];
+  featured?: boolean; // Featured posts appear first on the blog page
 }
 
 export type BlogTag =
@@ -110,6 +111,7 @@ export const blogPosts: BlogPost[] = [
     readingTime: 14,
     relatedResources: ['prd-automation', 'product-management-agent', 'agentic-product-management'],
     relatedPosts: ['prd-automation-without-hallucination', 'from-slack-to-prd', 'enterprise-pm-toolkit'],
+    featured: true,
   },
   {
     slug: '2026-year-of-ai-agents-manus-meta',

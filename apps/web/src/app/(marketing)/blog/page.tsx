@@ -33,10 +33,14 @@ export default async function BlogPage({ searchParams }: PageProps) {
     ? blogPosts.filter((post) => post.tags.includes(selectedTag))
     : blogPosts;
 
-  // Sort by date descending
-  const sortedPosts = [...filteredPosts].sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
+  // Sort by featured first, then by date descending
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
+    // Featured posts come first
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    // Then sort by date
+    return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+  });
 
   return (
     <>
@@ -83,9 +87,15 @@ export default async function BlogPage({ searchParams }: PageProps) {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {sortedPosts.map((post) => (
               <Link key={post.slug} href={`/blog/${post.slug}`}>
-                <Card className="h-full transition-shadow hover:shadow-md">
+                <Card className={`h-full transition-shadow hover:shadow-md ${post.featured ? 'ring-2 ring-cobalt-200 bg-cobalt-50/30' : ''}`}>
                   <CardHeader>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {post.featured && (
+                        <>
+                          <Badge variant="cobalt" className="text-xs">Featured</Badge>
+                          <span>·</span>
+                        </>
+                      )}
                       <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
                       <span>·</span>
                       <span>{post.readingTime} min read</span>

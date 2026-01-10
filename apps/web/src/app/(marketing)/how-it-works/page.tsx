@@ -374,6 +374,17 @@ export default function HowItWorksPage() {
                 frequency: 'On-demand',
               },
               {
+                name: 'PRD to Prototype',
+                description: 'Turn PRDs into interactive HTML prototypes for rapid user validation.',
+                frequency: 'On-demand',
+                highlight: true,
+              },
+              {
+                name: 'PRD Draft',
+                description: 'Draft PRDs grounded in customer evidence and context.',
+                frequency: 'On-demand',
+              },
+              {
                 name: 'VoC Clustering',
                 description: 'Cluster feedback from support, calls, and community into themes.',
                 frequency: 'Weekly',
@@ -389,18 +400,8 @@ export default function HowItWorksPage() {
                 frequency: 'On-demand',
               },
               {
-                name: 'PRD Draft',
-                description: 'Draft PRDs grounded in customer evidence and context.',
-                frequency: 'On-demand',
-              },
-              {
                 name: 'Sprint Review',
                 description: 'Generate sprint summaries with completed work and release notes.',
-                frequency: 'On-demand',
-              },
-              {
-                name: 'Prototype Generation',
-                description: 'Generate UI prototypes from PRDs for rapid user validation.',
                 frequency: 'On-demand',
               },
               {
@@ -409,10 +410,15 @@ export default function HowItWorksPage() {
                 frequency: 'Per release',
               },
             ].map((job) => (
-              <Card key={job.name}>
+              <Card key={job.name} className={'highlight' in job && job.highlight ? 'ring-2 ring-cobalt-200 bg-cobalt-50/30' : ''}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{job.name}</CardTitle>
+                    <CardTitle className="text-lg">
+                      {job.name}
+                      {'highlight' in job && job.highlight && (
+                        <Badge variant="cobalt" className="ml-2 text-xs">Popular</Badge>
+                      )}
+                    </CardTitle>
                     <Badge variant="outline">{job.frequency}</Badge>
                   </div>
                 </CardHeader>

@@ -5,6 +5,7 @@ import { GeistMono } from 'geist/font/mono';
 import { Space_Grotesk } from 'next/font/google';
 import '@/styles/globals.css';
 import { siteConfig } from '@/lib/utils';
+import { SessionProvider } from '@/components/providers/session-provider';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -90,7 +91,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="min-h-screen bg-background font-sans antialiased">{children}</body>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
       <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );

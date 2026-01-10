@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import {
   FileText,
   Users,
@@ -34,6 +35,19 @@ const features = [
       'Walk into every customer meeting with context: recent calls, open tickets, and talking points.',
   },
   {
+    icon: Wand2,
+    title: 'PRD to Prototype',
+    description:
+      'Turn PRDs into interactive HTML prototypes with working UI—validate ideas in minutes, not weeks.',
+    highlight: true,
+  },
+  {
+    icon: FileText,
+    title: 'PRD Drafts',
+    description:
+      'Draft PRDs grounded in customer evidence, with explicit assumptions and open questions.',
+  },
+  {
     icon: BarChart3,
     title: 'VoC Clustering',
     description:
@@ -52,22 +66,10 @@ const features = [
       'Generate alignment memos with options, trade-offs, and recommendations for stakeholder decisions.',
   },
   {
-    icon: FileText,
-    title: 'PRD Drafts',
-    description:
-      'Draft PRDs grounded in customer evidence, with explicit assumptions and open questions.',
-  },
-  {
     icon: CheckCircle2,
     title: 'Sprint Review Packs',
     description:
       'Generate sprint review packs with completed work, metrics, demos, and stakeholder updates.',
-  },
-  {
-    icon: Wand2,
-    title: 'Prototype Generation',
-    description:
-      'Turn PRDs into interactive HTML prototypes with working UI components and realistic data.',
   },
   {
     icon: Megaphone,
@@ -175,8 +177,8 @@ export default function HomePage() {
               <span className="text-cobalt-600"> briefs, meetings, and PRDs</span> made simple.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Draft smarter. Decide faster. pmkit runs your PM workflows; daily briefs, meeting
-              prep, VoC themes, and PRD drafts; while you focus on strategy.
+              Draft smarter. Decide faster. pmkit runs your PM workflows—daily briefs, meeting
+              prep, PRD drafts, and interactive prototypes—while you focus on strategy.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
@@ -197,29 +199,140 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* PRD to Prototype Hero Section */}
       <section className="py-20 md:py-32">
+        <div className="container">
+          <div className="mx-auto max-w-4xl text-center">
+            <Badge variant="cobalt" className="mb-4">
+              See It In Action
+            </Badge>
+            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
+              From PRD to clickable prototype in minutes
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Watch pmkit transform a product requirements document into an interactive UI you can share with stakeholders—no design handoff required.
+            </p>
+          </div>
+          <div className="mt-12 mx-auto max-w-5xl">
+            <div className="rounded-xl border-2 border-cobalt-200 bg-white p-2 shadow-xl overflow-hidden">
+              <div className="rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 p-6">
+                {/* Browser chrome mockup */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="flex-1 mx-4">
+                    <div className="bg-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-300 font-mono">
+                      prototype-search-filters.html
+                    </div>
+                  </div>
+                </div>
+                {/* Prototype preview */}
+                <div className="bg-white rounded-lg overflow-hidden">
+                  <div className="bg-slate-50 border-b px-4 py-3">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 bg-white border rounded-lg px-3 py-2">
+                          <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          <span className="text-slate-400 text-sm">Search documents...</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="bg-white border rounded-lg px-3 py-2 text-sm text-slate-600">
+                          Last 30 days
+                        </div>
+                        <div className="bg-white border rounded-lg px-3 py-2 text-sm text-slate-600">
+                          All types
+                        </div>
+                        <div className="bg-cobalt-600 text-white rounded-lg px-4 py-2 text-sm font-medium">
+                          Search
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {[
+                      { title: 'Q4 Product Roadmap', type: 'Document', date: 'Dec 28' },
+                      { title: 'Search Filters PRD', type: 'PRD', date: 'Dec 27' },
+                      { title: 'Customer Feedback Analysis', type: 'Report', date: 'Dec 26' },
+                    ].map((item) => (
+                      <div key={item.title} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded bg-cobalt-100 flex items-center justify-center">
+                            <FileText className="w-4 h-4 text-cobalt-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-900 text-sm">{item.title}</p>
+                            <p className="text-xs text-slate-500">{item.type}</p>
+                          </div>
+                        </div>
+                        <span className="text-xs text-slate-400">{item.date}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button size="lg" asChild>
+                <Link href="/demo?job=prototype_generation">
+                  Try Prototype Generation
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/blog/prd-to-prototype-ai-ui-generation">
+                  Learn How It Works
+                </Link>
+              </Button>
+            </div>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              PRD → Prototype is part of pmkit&apos;s artifact chaining—each job builds on previous outputs.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="bg-muted/30 py-20 md:py-32">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
               9 workflows every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              AI briefs, VoC themes, PRD drafts, prototypes, and release notes; run end-to-end with traceability and governance.
+              AI briefs, VoC themes, PRD drafts, prototypes, and release notes—run end-to-end with traceability and governance.
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => (
               <Card
                 key={feature.title}
-                className="animate-fade-up border-0 bg-muted/30 shadow-none"
+                className={cn(
+                  "animate-fade-up border-0 shadow-none",
+                  'highlight' in feature && feature.highlight 
+                    ? "bg-cobalt-50 ring-2 ring-cobalt-200" 
+                    : "bg-background"
+                )}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardHeader>
-                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-100">
+                  <div className={cn(
+                    "mb-2 flex h-10 w-10 items-center justify-center rounded-lg",
+                    'highlight' in feature && feature.highlight ? "bg-cobalt-200" : "bg-cobalt-100"
+                  )}>
                     <feature.icon className="h-5 w-5 text-cobalt-600" />
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl">
+                    {feature.title}
+                    {'highlight' in feature && feature.highlight && (
+                      <Badge variant="cobalt" className="ml-2 text-xs">Popular</Badge>
+                    )}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-base">{feature.description}</CardDescription>
@@ -231,7 +344,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="bg-muted/30 py-20 md:py-32">
+      <section className="py-20 md:py-32">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">

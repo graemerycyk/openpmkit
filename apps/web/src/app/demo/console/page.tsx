@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,7 @@ import {
   AlertCircle,
   Download,
   ArrowLeft,
+  ArrowRight,
   User,
   Activity,
   Loader2,
@@ -41,8 +43,17 @@ import {
   Layers,
   Megaphone,
   Expand,
+  Lock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SignInModal } from '@/components/auth/sign-in-modal';
+import {
+  getDemoJobCount,
+  incrementDemoJobCount,
+  getMaxFreeJobs,
+  hasExceededFreeJobLimit,
+  storeDemoJobRun,
+} from '@/lib/demo-session';
 
 type JobType =
   | 'daily_brief'
@@ -151,8 +162,22 @@ const jobConfigs: Record<
     icon: typeof FileText;
     toolCalls: Omit<ToolCall, 'id' | 'status' | 'durationMs'>[];
     sources: string[];
+    highlight?: boolean;
   }
 > = {
+  prototype_generation: {
+    name: 'PRD to Prototype',
+    description: 'Generate interactive UI from PRD',
+    icon: Wand2,
+    sources: ['pmkit', 'confluence', 'jira'],
+    highlight: true,
+    toolCalls: [
+      { name: 'get_prd_artifact', server: 'pmkit', input: { artifactId: 'artifact-prd-001' } },
+      { name: 'extract_user_stories', server: 'pmkit', input: { prdId: 'artifact-prd-001' } },
+      { name: 'get_design_system', server: 'confluence', input: { spaceKey: 'DESIGN' } },
+      { name: 'generate_ui_code', server: 'openai', input: { framework: 'react', styling: 'tailwind' } },
+    ],
+  },
   daily_brief: {
     name: 'Daily Brief',
     description: 'Synthesize overnight activity',
@@ -174,6 +199,18 @@ const jobConfigs: Record<
       { name: 'get_calls', server: 'gong', input: { accountName: 'Globex Corp', limit: 5 } },
       { name: 'get_insights', server: 'gong', input: { type: 'pain_point' } },
       { name: 'get_tickets', server: 'zendesk', input: { tags: ['enterprise'], limit: 10 } },
+    ],
+  },
+  prd_draft: {
+    name: 'PRD Draft',
+    description: 'Draft PRD with evidence',
+    icon: FileText,
+    sources: ['discourse', 'gong', 'amplitude', 'confluence'],
+    toolCalls: [
+      { name: 'get_top_feature_requests', server: 'discourse', input: { limit: 10 } },
+      { name: 'get_pain_points', server: 'gong', input: { limit: 20 } },
+      { name: 'get_no_results_queries', server: 'amplitude', input: { minCount: 10 } },
+      { name: 'search_pages', server: 'confluence', input: { query: 'search', spaceKey: 'PROD' } },
     ],
   },
   voc_clustering: {
@@ -212,18 +249,6 @@ const jobConfigs: Record<
       { name: 'search_news', server: 'news_crawler', input: { query: 'competitor announcements', limit: 10 } },
     ],
   },
-  prd_draft: {
-    name: 'PRD Draft',
-    description: 'Draft PRD with evidence',
-    icon: FileText,
-    sources: ['discourse', 'gong', 'amplitude', 'confluence'],
-    toolCalls: [
-      { name: 'get_top_feature_requests', server: 'discourse', input: { limit: 10 } },
-      { name: 'get_pain_points', server: 'gong', input: { limit: 20 } },
-      { name: 'get_no_results_queries', server: 'amplitude', input: { minCount: 10 } },
-      { name: 'search_pages', server: 'confluence', input: { query: 'search', spaceKey: 'PROD' } },
-    ],
-  },
   sprint_review: {
     name: 'Sprint Review',
     description: 'Generate sprint review pack',
@@ -235,18 +260,6 @@ const jobConfigs: Record<
       { name: 'search_pages', server: 'confluence', input: { query: 'sprint-42 release notes', spaceKey: 'PROD' } },
       { name: 'get_channel_messages', server: 'slack', input: { channelId: 'C-product-updates', limit: 50 } },
       { name: 'get_feature_usage', server: 'amplitude', input: { features: ['search_filters', 'bulk_export'], period: 'sprint' } },
-    ],
-  },
-  prototype_generation: {
-    name: 'Prototype Generation',
-    description: 'Generate UI prototype from PRD',
-    icon: Wand2,
-    sources: ['pmkit', 'confluence', 'jira'],
-    toolCalls: [
-      { name: 'get_prd_artifact', server: 'pmkit', input: { artifactId: 'artifact-prd-001' } },
-      { name: 'extract_user_stories', server: 'pmkit', input: { prdId: 'artifact-prd-001' } },
-      { name: 'get_design_system', server: 'confluence', input: { spaceKey: 'DESIGN' } },
-      { name: 'generate_ui_code', server: 'openai', input: { framework: 'react', styling: 'tailwind' } },
     ],
   },
   release_notes: {
@@ -934,7 +947,8 @@ None in this release.
 };
 
 export default function ConsolePage() {
-  const [selectedJob, setSelectedJob] = useState<JobType | null>(null);
+  const { data: session } = useSession();
+  const [selectedJob, setSelectedJob] = useState<JobType | null>('prototype_generation');
   const [jobRuns, setJobRuns] = useState<Record<JobType, JobRun | null>>({
     daily_brief: null,
     meeting_prep: null,
@@ -950,11 +964,28 @@ export default function ConsolePage() {
     'overview'
   );
   const [artifactModalOpen, setArtifactModalOpen] = useState(false);
+  
+  // Demo job counter state
+  const [signInModalOpen, setSignInModalOpen] = useState(false);
+  const [demoJobCount, setDemoJobCount] = useState(0);
+  const maxFreeJobs = getMaxFreeJobs();
+  const isAuthenticated = !!session?.user;
+
+  // Load demo job count from localStorage on mount
+  useEffect(() => {
+    setDemoJobCount(getDemoJobCount());
+  }, []);
 
   // Get the current run for the selected job
   const currentRun = selectedJob ? jobRuns[selectedJob] : null;
 
   const runJob = async (jobType: JobType) => {
+    // Check if user has exceeded free job limit (only for unauthenticated users)
+    if (!isAuthenticated && hasExceededFreeJobLimit()) {
+      setSignInModalOpen(true);
+      return;
+    }
+
     const config = jobConfigs[jobType];
     const runId = `run-${Date.now()}`;
 
@@ -973,6 +1004,12 @@ export default function ConsolePage() {
 
     setJobRuns((prev) => ({ ...prev, [jobType]: run }));
     setActiveTab('timeline');
+    
+    // Increment job count for unauthenticated users
+    if (!isAuthenticated) {
+      const newCount = incrementDemoJobCount();
+      setDemoJobCount(newCount);
+    }
 
     // Simulate tool calls (gathering data from mock connectors)
     for (let i = 0; i < run.toolCalls.length; i++) {
@@ -1049,6 +1086,7 @@ export default function ConsolePage() {
       }
 
       // Success - update with real LLM-generated content
+      const completedAt = new Date();
       setJobRuns((prev) => {
         const currentJobRun = prev[jobType];
         if (!currentJobRun) return prev;
@@ -1057,7 +1095,7 @@ export default function ConsolePage() {
           [jobType]: {
             ...currentJobRun,
             status: 'completed',
-            completedAt: new Date(),
+            completedAt,
             artifact: {
               title: config.name,
               content: generatedContent,
@@ -1067,6 +1105,18 @@ export default function ConsolePage() {
           },
         };
       });
+
+      // Store job run for anonymous users (for later migration)
+      if (!isAuthenticated && run.startedAt) {
+        storeDemoJobRun({
+          id: runId,
+          type: jobType,
+          status: 'completed',
+          startedAt: run.startedAt.toISOString(),
+          completedAt: completedAt.toISOString(),
+          artifactTitle: config.name,
+        });
+      }
 
       setActiveTab('artifact');
     } catch (error) {
@@ -1138,9 +1188,29 @@ export default function ConsolePage() {
           </Badge>
         </div>
         <div className="flex items-center gap-4">
+          {/* Job counter for unauthenticated users */}
+          {!isAuthenticated && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">
+                {demoJobCount}/{maxFreeJobs} free jobs used
+              </span>
+              {demoJobCount >= maxFreeJobs && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="h-7 gap-1 text-xs"
+                  onClick={() => setSignInModalOpen(true)}
+                >
+                  <Lock className="h-3 w-3" />
+                  Sign in for more
+                </Button>
+              )}
+            </div>
+          )}
+          <Separator orientation="vertical" className="h-6" />
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <User className="h-4 w-4" />
-            <span>Demo Guest</span>
+            <span>{isAuthenticated ? session.user?.name || 'User' : 'Demo Guest'}</span>
             <Badge variant="secondary">PM</Badge>
           </div>
         </div>
@@ -1184,11 +1254,16 @@ export default function ConsolePage() {
                     'flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors',
                     isSelected
                       ? 'bg-cobalt-100 text-cobalt-700'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      : config.highlight
+                        ? 'bg-cobalt-50/50 text-cobalt-600 hover:bg-cobalt-100/50'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
                   <config.icon className="h-4 w-4" />
                   <span className="flex-1">{config.name}</span>
+                  {config.highlight && !isRunning && !isCompleted && (
+                    <Badge variant="cobalt" className="text-[10px] px-1.5 py-0">Try</Badge>
+                  )}
                   {isRunning && <Loader2 className="h-4 w-4 animate-spin text-cobalt-600" />}
                   {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-600" />}
                 </button>
@@ -1308,6 +1383,54 @@ export default function ConsolePage() {
                 </div>
 
                 <TabsContent value="overview" className="h-full flex-1 overflow-auto p-4">
+                  {/* Artifact Chaining Callout for Prototype Generation */}
+                  {selectedJob === 'prototype_generation' && (
+                    <div className="mb-6 rounded-lg bg-gradient-to-r from-cobalt-50 to-indigo-50 border border-cobalt-200 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-100">
+                          <Layers className="h-4 w-4 text-cobalt-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-cobalt-900">Artifact Chaining</p>
+                          <p className="mt-1 text-sm text-cobalt-700">
+                            This job uses your PRD artifact as input. Run <strong>PRD Draft</strong> first to create evidence-grounded requirements, then generate a prototype from it—no copy-paste needed.
+                          </p>
+                          <div className="mt-3 flex items-center gap-2 text-xs text-cobalt-600">
+                            <Badge variant="outline" className="border-cobalt-200 bg-white">VoC Report</Badge>
+                            <ArrowRight className="h-3 w-3" />
+                            <Badge variant="outline" className="border-cobalt-200 bg-white">PRD Draft</Badge>
+                            <ArrowRight className="h-3 w-3" />
+                            <Badge variant="cobalt">Prototype</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Artifact Chaining Callout for PRD Draft */}
+                  {selectedJob === 'prd_draft' && (
+                    <div className="mb-6 rounded-lg bg-gradient-to-r from-cobalt-50 to-indigo-50 border border-cobalt-200 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-100">
+                          <Layers className="h-4 w-4 text-cobalt-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-cobalt-900">Artifact Chaining</p>
+                          <p className="mt-1 text-sm text-cobalt-700">
+                            After running this job, use the PRD artifact as input for <strong>PRD to Prototype</strong> to generate an interactive UI mockup.
+                          </p>
+                          <div className="mt-3 flex items-center gap-2 text-xs text-cobalt-600">
+                            <Badge variant="cobalt">PRD Draft</Badge>
+                            <ArrowRight className="h-3 w-3" />
+                            <Badge variant="outline" className="border-cobalt-200 bg-white">Prototype</Badge>
+                            <ArrowRight className="h-3 w-3" />
+                            <Badge variant="outline" className="border-cobalt-200 bg-white">User Testing</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid gap-6 md:grid-cols-2">
                     <Card>
                       <CardHeader>
@@ -1659,6 +1782,14 @@ export default function ConsolePage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Sign In Modal - shown when user exceeds free job limit */}
+      <SignInModal
+        open={signInModalOpen}
+        onOpenChange={setSignInModalOpen}
+        jobsUsed={demoJobCount}
+        maxFreeJobs={maxFreeJobs}
+      />
     </div>
   );
 }

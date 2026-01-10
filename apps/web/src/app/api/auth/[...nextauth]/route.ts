@@ -31,6 +31,12 @@ const handler = NextAuth({
       }
       return token;
     },
+    async redirect({ url, baseUrl }) {
+      // After sign in, redirect to dashboard
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`;
+    },
   },
   session: {
     strategy: 'jwt',

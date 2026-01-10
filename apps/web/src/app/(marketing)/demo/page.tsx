@@ -46,6 +46,23 @@ const jobs = [
     sources: ['Gong', 'Zendesk', 'Jira'],
   },
   {
+    id: 'prototype_generation',
+    name: 'PRD to Prototype',
+    description: 'Turn PRDs into interactive HTML prototypes—validate ideas in minutes, not weeks.',
+    icon: Wand2,
+    duration: '~50s',
+    sources: ['pmkit', 'Confluence', 'Jira'],
+    highlight: true,
+  },
+  {
+    id: 'prd_draft',
+    name: 'PRD Draft',
+    description: 'Draft PRDs grounded in customer evidence and context.',
+    icon: FileText,
+    duration: '~40s',
+    sources: ['Discourse', 'Gong', 'Amplitude', 'Confluence'],
+  },
+  {
     id: 'voc_clustering',
     name: 'VoC Clustering',
     description: 'Cluster customer feedback into actionable themes with evidence.',
@@ -70,28 +87,12 @@ const jobs = [
     sources: ['Jira', 'Amplitude', 'Discourse', 'News Crawler'],
   },
   {
-    id: 'prd_draft',
-    name: 'PRD Draft',
-    description: 'Draft PRDs grounded in customer evidence and context.',
-    icon: FileText,
-    duration: '~40s',
-    sources: ['Discourse', 'Gong', 'Amplitude', 'Confluence'],
-  },
-  {
     id: 'sprint_review',
     name: 'Sprint Review',
     description: 'Generate sprint review packs with shipped work, metrics, and follow-ups.',
     icon: CheckCircle2,
     duration: '~35s',
     sources: ['Jira', 'Confluence', 'Slack', 'Amplitude'],
-  },
-  {
-    id: 'prototype_generation',
-    name: 'Prototype Generation',
-    description: 'Generate interactive UI prototypes directly from PRDs.',
-    icon: Wand2,
-    duration: '~50s',
-    sources: ['pmkit', 'Confluence'],
   },
   {
     id: 'release_notes',
@@ -172,15 +173,23 @@ export default function DemoPage() {
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {jobs.map((job) => (
-              <Card key={job.id}>
+              <Card 
+                key={job.id}
+                className={'highlight' in job && job.highlight ? 'ring-2 ring-cobalt-200 bg-cobalt-50/30' : ''}
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-100">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${'highlight' in job && job.highlight ? 'bg-cobalt-200' : 'bg-cobalt-100'}`}>
                       <job.icon className="h-5 w-5 text-cobalt-600" />
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {job.duration}
+                    <div className="flex items-center gap-2">
+                      {'highlight' in job && job.highlight && (
+                        <Badge variant="cobalt" className="text-xs">Try This</Badge>
+                      )}
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {job.duration}
+                      </div>
                     </div>
                   </div>
                   <CardTitle className="mt-4 text-lg">{job.name}</CardTitle>
