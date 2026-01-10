@@ -1,0 +1,336 @@
+# PRD to Prototype: AI-Generated UI from Product Requirements
+
+The gap between PRD and prototype is where momentum dies. You've written a detailed product requirements document, stakeholders have approved it, and now... you wait. Days or weeks for design to produce mockups. More time for engineering to build a clickable prototype. By the time you have something to show users, the market has moved.
+
+What if you could generate a functional UI prototype directly from your PRD in minutes?
+
+## The PRD-to-Prototype Gap
+
+Traditional product development follows a linear path:
+
+```
+PRD → Design Mockups → Engineering Prototype → User Testing → Iteration
+      (1-2 weeks)      (2-4 weeks)            (1 week)       (repeat)
+```
+
+Each handoff introduces delay:
+- **PRD to Design**: Designers interpret requirements, ask clarifying questions, iterate on concepts
+- **Design to Engineering**: Engineers translate mockups into code, discover edge cases, request design changes
+- **Prototype to Testing**: Users finally see something tangible, provide feedback that invalidates assumptions
+
+The total cycle from PRD to user feedback? Often 4-8 weeks. In fast-moving markets, that's an eternity.
+
+## AI-Generated Prototypes: A New Workflow
+
+Modern AI can generate functional UI code from natural language descriptions. Combined with evidence-grounded PRDs, this creates a new workflow:
+
+```
+PRD → AI Prototype Generation → User Testing → Refined PRD → Design Polish
+      (5 minutes)              (same day)     (informed)    (focused)
+```
+
+The key insight: **you don't need pixel-perfect designs to validate product direction**. A functional prototype that demonstrates the core user experience is often enough to:
+
+- Test whether the solution addresses the pain point
+- Gather feedback on information architecture
+- Validate user flows before investing in polish
+- Align stakeholders on what "done" looks like
+
+## How PRD-to-Prototype Works
+
+### Step 1: Extract UI Requirements from PRD
+
+A well-structured PRD contains the raw material for UI generation:
+
+| PRD Section | UI Implication |
+|-------------|----------------|
+| User Stories | Core screens and flows |
+| Acceptance Criteria | Interactive behaviors |
+| Requirements | Component specifications |
+| Success Metrics | Key actions to highlight |
+
+For example, from a search filters PRD:
+
+**User Story**: "As a PM, I want to filter search by date range so I can find recent content quickly."
+
+**Extracted UI Requirements**:
+- Search results page with filter panel
+- Date range selector with presets (7 days, 30 days, 90 days)
+- Custom date picker option
+- Filter state visible in URL
+- Real-time result updates
+
+### Step 2: Generate Functional Prototype
+
+AI transforms these requirements into working React/Tailwind code:
+
+```tsx
+// Generated from PRD user stories
+export function SearchFilters() {
+  const [dateRange, setDateRange] = useState('all');
+  const [contentType, setContentType] = useState('all');
+  
+  return (
+    <div className="flex gap-4 p-4 border-b">
+      <Select value={dateRange} onValueChange={setDateRange}>
+        <SelectTrigger className="w-40">
+          <SelectValue placeholder="Date range" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All time</SelectItem>
+          <SelectItem value="7d">Last 7 days</SelectItem>
+          <SelectItem value="30d">Last 30 days</SelectItem>
+          <SelectItem value="90d">Last 90 days</SelectItem>
+          <SelectItem value="custom">Custom range</SelectItem>
+        </SelectContent>
+      </Select>
+      
+      <Select value={contentType} onValueChange={setContentType}>
+        <SelectTrigger className="w-40">
+          <SelectValue placeholder="Content type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All types</SelectItem>
+          <SelectItem value="docs">Documents</SelectItem>
+          <SelectItem value="projects">Projects</SelectItem>
+          <SelectItem value="comments">Comments</SelectItem>
+        </SelectContent>
+      </Select>
+      
+      <Button variant="ghost" size="sm">
+        Clear filters
+      </Button>
+    </div>
+  );
+}
+```
+
+### Step 3: Interactive Preview
+
+The generated code renders as an interactive prototype:
+
+- Users can click through the interface
+- Form elements respond to input
+- Navigation flows work end-to-end
+- Realistic placeholder data shows context
+
+### Step 4: Iterate Based on Feedback
+
+User feedback on the prototype informs PRD refinements:
+
+> "I expected the date filter to show a calendar, not just presets."
+
+This feedback goes back into the PRD as a refined requirement, and a new prototype generates in minutes.
+
+## Benefits of AI-Generated Prototypes
+
+### Speed to Validation
+
+| Traditional | AI-Generated |
+|-------------|--------------|
+| 4-8 weeks to user feedback | Same-day user feedback |
+| Multiple handoffs | Direct PRD → prototype |
+| High cost to iterate | Low cost to iterate |
+
+### Reduced Miscommunication
+
+When stakeholders see a working prototype instead of a written spec:
+- Fewer "that's not what I meant" moments
+- Concrete discussions replace abstract debates
+- Edge cases surface earlier
+
+### Design Resource Efficiency
+
+Designers focus on what matters:
+- Polish and brand consistency (not exploration)
+- Complex interactions (not basic layouts)
+- Visual design (not information architecture)
+
+### Engineering Alignment
+
+Engineers see the target before writing code:
+- Clearer understanding of requirements
+- Earlier identification of technical constraints
+- Reference implementation for component structure
+
+## When to Use PRD-to-Prototype
+
+### Good Fit
+
+- **New features**: Validate direction before heavy investment
+- **User flow changes**: Test navigation and information architecture
+- **Internal tools**: Speed over polish
+- **Stakeholder alignment**: Show, don't tell
+- **User research**: Tangible stimulus for feedback sessions
+
+### Less Ideal
+
+- **Brand-critical interfaces**: Need designer involvement from start
+- **Complex animations**: AI-generated motion is basic
+- **Accessibility-first**: Requires human expertise
+- **Highly regulated**: May need compliance review of generated code
+
+## Integration with Product Workflows
+
+### As a PRD Follow-On
+
+After generating an evidence-grounded PRD, trigger prototype generation:
+
+1. PRD Draft job completes → artifact saved
+2. PM reviews PRD, approves for prototyping
+3. Prototype Generation job runs → extracts UI requirements
+4. Interactive prototype available for review
+5. Feedback informs PRD iteration
+
+### As a Stakeholder Communication Tool
+
+Before the roadmap review:
+
+1. Generate prototypes for top 3 proposed features
+2. Present working demos instead of slide decks
+3. Stakeholders interact with the concepts
+4. Prioritization based on tangible understanding
+
+### As a User Research Stimulus
+
+For customer interviews:
+
+1. Generate prototype from proposed solution
+2. Share interactive link with research participants
+3. Observe how they navigate and what confuses them
+4. Capture feedback directly tied to specific UI elements
+
+## Technical Approaches
+
+### Option 1: Direct LLM Generation
+
+Use GPT-5 or similar to generate React/Tailwind code:
+
+**Pros**:
+- Full control over output
+- Customizable to your design system
+- No external dependencies
+
+**Cons**:
+- Requires prompt engineering
+- Output quality varies
+- Need rendering infrastructure
+
+### Option 2: Specialized Tools (Figma AI, v0)
+
+Use purpose-built UI generation tools:
+
+**Pros**:
+- Optimized for UI generation
+- Built-in preview and iteration
+- Higher baseline quality
+
+**Cons**:
+- External dependency
+- May not match your design system
+- Additional tool in the workflow
+
+### Option 3: Hybrid Approach
+
+Generate with LLM, refine with specialized tools:
+
+1. LLM extracts UI requirements from PRD
+2. Specialized tool generates initial prototype
+3. LLM-assisted iteration based on feedback
+4. Design team polishes final version
+
+## Best Practices
+
+### 1. Start with Clear User Stories
+
+Vague PRDs produce vague prototypes. Ensure your PRD includes:
+- Specific user personas
+- Concrete actions and outcomes
+- Acceptance criteria with testable conditions
+
+### 2. Include Visual Context
+
+Help the AI understand your design language:
+- Reference existing screens
+- Specify component library (shadcn, Material, etc.)
+- Describe the overall aesthetic
+
+### 3. Iterate Rapidly
+
+Don't try to get it perfect on the first generation:
+- Generate → Review → Refine prompt → Regenerate
+- Each iteration takes minutes, not days
+- Capture learnings for future generations
+
+### 4. Set Expectations
+
+Communicate that prototypes are for validation, not production:
+- "This is a concept exploration"
+- "We're testing the approach, not the pixels"
+- "Design will refine before engineering builds"
+
+### 5. Capture Feedback Systematically
+
+Structure feedback collection:
+- What worked well?
+- What was confusing?
+- What's missing?
+- What would you change?
+
+## Measuring Success
+
+Track these metrics to evaluate PRD-to-prototype effectiveness:
+
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| Time to first user feedback | <1 day | Speed of validation |
+| PRD revision rate | ↓ 30% | Better initial requirements |
+| Design iteration cycles | ↓ 50% | Clearer starting point |
+| Stakeholder alignment time | ↓ 40% | Tangible communication |
+| Feature success rate | ↑ 20% | Better validated concepts |
+
+## The Future of Product Development
+
+PRD-to-prototype is part of a broader shift in how products are built:
+
+1. **Evidence-grounded PRDs** ensure we're solving real problems
+2. **AI-generated prototypes** accelerate validation
+3. **Rapid iteration** based on user feedback
+4. **Design polish** applied to validated concepts
+5. **Engineering builds** with clear, tested specifications
+
+The result: faster time to market, higher confidence in what we're building, and better allocation of design and engineering resources.
+
+## Future: Figma AI Integration
+
+While direct LLM generation provides full control, specialized tools like Figma AI offer additional capabilities:
+
+- **Design system integration**: Generate prototypes that match your Figma components
+- **Collaborative iteration**: Designers can refine AI-generated starting points
+- **Production handoff**: Seamless transition from prototype to design specs
+
+pmkit is building toward a hybrid approach where you can choose your generation target based on the use case.
+
+## FAQ
+
+**Q: Will this replace designers?**
+A: No. It shifts design work from exploration to refinement. Designers focus on polish, brand consistency, and complex interactions rather than basic layout iteration.
+
+**Q: How good are AI-generated prototypes?**
+A: Good enough for validation, not production. Expect 70-80% of the way there; the remaining 20-30% requires human refinement.
+
+**Q: What about accessibility?**
+A: AI-generated code includes basic accessibility, but human review is essential for WCAG compliance. Treat prototypes as starting points.
+
+**Q: Can I use the generated code in production?**
+A: Sometimes. Simple components may be production-ready. Complex features need engineering review and refinement.
+
+**Q: How do I handle feedback that contradicts the PRD?**
+A: Great! That's the point. Update the PRD based on what you learned, then regenerate the prototype.
+
+**Q: What if stakeholders fall in love with the prototype design?**
+A: Set expectations upfront. Prototypes demonstrate functionality, not final visual design. Design will refine the aesthetic.
+
+---
+
+*Generate prototypes directly from your PRDs with pmkit. Run the PRD Draft job, then trigger Prototype Generation to see your requirements come to life as interactive UI.*

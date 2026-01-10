@@ -324,6 +324,7 @@ export class UsageTracker {
         roadmap_alignment: 0,
         prd_draft: 0,
         sprint_review: 0,
+        prototype_generation: 0,
       },
       toolCalls: 0,
       llmTokens: { input: 0, output: 0 },

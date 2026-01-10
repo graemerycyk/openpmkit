@@ -356,12 +356,12 @@ export default function HowItWorksPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">Seven Workflow Jobs</h2>
+            <h2 className="font-heading text-3xl font-bold">Eight Workflow Jobs</h2>
             <p className="mt-4 text-muted-foreground">
               Pre-built workflows for the most common PM tasks. Run on-demand or on a schedule.
             </p>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 name: 'Daily Brief',
@@ -398,6 +398,11 @@ export default function HowItWorksPage() {
                 description: 'Generate sprint summaries with completed work and release notes.',
                 frequency: 'On-demand',
               },
+              {
+                name: 'Prototype Generation',
+                description: 'Generate UI prototypes from PRDs for rapid user validation.',
+                frequency: 'On-demand',
+              },
             ].map((job) => (
               <Card key={job.name}>
                 <CardHeader>
@@ -421,7 +426,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See It In Action</h2>
             <p className="mt-4 text-cobalt-100">
-              Try all seven jobs in the interactive demo with a complete demo enterprise dataset.
+              Try all eight jobs in the interactive demo with a complete demo enterprise dataset.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

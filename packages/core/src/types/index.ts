@@ -44,6 +44,7 @@ export const JobTypeSchema = z.enum([
   'roadmap_alignment',
   'prd_draft',
   'sprint_review',
+  'prototype_generation',
 ]);
 export type JobType = z.infer<typeof JobTypeSchema>;
 
@@ -152,6 +153,7 @@ export const ArtifactTypeSchema = z.enum([
   'prd',
   'sprint_review',
   'release_notes',
+  'prototype',
 ]);
 export type ArtifactType = z.infer<typeof ArtifactTypeSchema>;
 

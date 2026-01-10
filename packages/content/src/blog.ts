@@ -28,6 +28,20 @@ export type BlogTag =
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'prd-to-prototype-ai-ui-generation',
+    title: 'PRD to Prototype: AI-Generated UI from Product Requirements',
+    description:
+      'Learn how to generate functional UI prototypes directly from PRDs using AI, accelerating validation and reducing time to user feedback from weeks to minutes.',
+    publishedAt: '2026-01-10',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'PRD to prototype',
+    tags: ['agents', 'product-management'],
+    readingTime: 14,
+    relatedResources: ['prd-automation', 'product-management-agent', 'agentic-product-management'],
+    relatedPosts: ['prd-automation-without-hallucination', 'from-slack-to-prd', 'enterprise-pm-toolkit'],
+  },
+  {
     slug: '2026-year-of-ai-agents-manus-meta',
     title: "Why 2026 Will Be the Year of AI Agents (and What Meta's Manus Deal Signals)",
     description:

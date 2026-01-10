@@ -179,6 +179,64 @@ export const keywords: KeywordEntry[] = [
     intent: 'informational',
     relatedPages: ['/resources/customer-escalation-to-fix-spec', '/demo'],
   },
+
+  // PRD to Prototype Keywords
+  {
+    keyword: 'PRD to prototype',
+    category: 'primary',
+    searchVolume: 'medium',
+    difficulty: 'low',
+    intent: 'commercial',
+    relatedPages: ['/demo', '/resources/prd-automation', '/blog/prd-to-prototype-ai-ui-generation'],
+  },
+  {
+    keyword: 'AI UI generation from PRD',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'informational',
+    relatedPages: ['/demo', '/blog/prd-to-prototype-ai-ui-generation'],
+  },
+  {
+    keyword: 'generate prototype from requirements',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'commercial',
+    relatedPages: ['/demo', '/resources/prd-automation'],
+  },
+  {
+    keyword: 'AI prototype generator',
+    category: 'adjacent',
+    searchVolume: 'medium',
+    difficulty: 'medium',
+    intent: 'commercial',
+    relatedPages: ['/demo', '/blog/prd-to-prototype-ai-ui-generation'],
+  },
+  {
+    keyword: 'PRD to UI mockup',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'informational',
+    relatedPages: ['/demo', '/resources/prd-automation'],
+  },
+  {
+    keyword: 'automated UI prototyping',
+    category: 'adjacent',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'commercial',
+    relatedPages: ['/demo', '/blog/prd-to-prototype-ai-ui-generation'],
+  },
+  {
+    keyword: 'AI mockup generator from requirements',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'commercial',
+    relatedPages: ['/demo', '/resources/prd-to-prototype-generation'],
+  },
 ];
 
 export function getKeywordsByCategory(category: KeywordEntry['category']): KeywordEntry[] {

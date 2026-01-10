@@ -1178,6 +1178,75 @@ export const resources: ResourcePage[] = [
       },
     ],
   },
+  {
+    slug: 'prd-to-prototype-generation',
+    title: 'PRD to Prototype: AI-Generated UI from Requirements',
+    description:
+      'Generate functional UI prototypes directly from PRDs using AI. Validate product direction in minutes instead of weeks.',
+    primaryKeyword: 'PRD to prototype',
+    secondaryKeywords: ['AI UI generation', 'prototype from PRD', 'automated prototyping', 'AI mockup generator'],
+    category: 'workflows',
+    relatedPages: ['/demo', '/resources/prd-automation', '/blog/prd-to-prototype-ai-ui-generation'],
+    workedExample: {
+      title: 'From Search Filters PRD to Interactive Prototype',
+      scenario: 'After generating a PRD for search filters, the PM wants to validate the UX with users before investing in design. They run the Prototype Generation job.',
+      steps: [
+        'Agent extracts user stories and acceptance criteria from the PRD',
+        'Identifies key UI components: filter panel, date picker, content type selector',
+        'Generates React/Tailwind code for the search interface',
+        'Renders interactive prototype with realistic placeholder data',
+        'PM shares prototype link with 3 users for same-day feedback',
+      ],
+      outcome: 'Users provide feedback within hours. One insight: they expected a calendar picker, not just presets. The PRD is updated before design begins, saving a week of iteration.',
+    },
+    checklist: [
+      'Do you wait weeks between PRD approval and user feedback?',
+      'Are stakeholders struggling to visualize written requirements?',
+      'Do design iterations reveal PRD gaps that could have been caught earlier?',
+      'Is your team building features that don\'t match user expectations?',
+      'Do you wish you could test product direction before investing in design?',
+    ],
+    keyBenefits: [
+      'Validate product direction in minutes, not weeks',
+      'Reduce miscommunication between PM and design',
+      'Catch PRD gaps before engineering investment',
+      'Align stakeholders with tangible prototypes',
+    ],
+    useCases: [
+      'New feature validation before design investment',
+      'Stakeholder alignment with interactive demos',
+      'User research with tangible prototypes',
+      'Internal tool rapid development',
+      'Concept testing for roadmap prioritization',
+    ],
+    faqItems: [
+      {
+        question: 'How does PRD to prototype generation work?',
+        answer:
+          'pmkit extracts user stories, acceptance criteria, and requirements from your PRD, then generates functional React/Tailwind code that renders as an interactive prototype. The prototype demonstrates core user flows with realistic placeholder data.',
+      },
+      {
+        question: 'Will AI-generated prototypes replace designers?',
+        answer:
+          'No. AI prototypes are for validation, not production. Designers focus on polish, brand consistency, and complex interactions rather than basic layout exploration. The prototype gives them a validated starting point.',
+      },
+      {
+        question: 'How good are the generated prototypes?',
+        answer:
+          'Good enough for validation. Expect 70-80% of the way to a polished design. The goal is to test product direction quickly, not produce pixel-perfect mockups.',
+      },
+      {
+        question: 'Can I use the generated code in production?',
+        answer:
+          'Sometimes. Simple components may be production-ready. Complex features need engineering review. Treat generated code as a reference implementation, not final code.',
+      },
+      {
+        question: 'What if user feedback contradicts the PRD?',
+        answer:
+          'That\'s the point! Update the PRD based on what you learned, then regenerate the prototype. Each iteration takes minutes, not weeks.',
+      },
+    ],
+  },
 ];
 
 export function getResourceBySlug(slug: string): ResourcePage | undefined {

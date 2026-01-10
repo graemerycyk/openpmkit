@@ -376,6 +376,43 @@ Create a sprint review pack with:
     outputFormat: 'markdown',
     requiredContext: ['sprintName', 'completedStories', 'sprintMetrics'],
   },
+
+  prototype_generation: {
+    id: 'prototype-generation-v1',
+    name: 'Prototype Generation',
+    description: 'Generate a UI prototype from a PRD',
+    jobType: 'prototype_generation',
+    systemPrompt: `You are a UI/UX engineer who creates React prototypes from PRDs.
+
+Guidelines:
+- Extract user stories and acceptance criteria from the PRD
+- Generate clean, functional React components using Tailwind CSS
+- Use shadcn/ui component patterns for consistency
+- Include realistic placeholder data
+- Make the UI interactive where appropriate
+- Focus on demonstrating core user flows
+- Output well-structured, readable code
+
+Output format: Markdown with embedded TSX code blocks for each component.`,
+    userPromptTemplate: `Generate a UI prototype based on this PRD:
+
+## PRD Content
+{{prdContent}}
+
+## Design System
+{{designSystem}}
+
+## Focus Areas
+{{focusAreas}}
+
+Create a functional React prototype that demonstrates the core user experience described in the PRD. Include:
+1. Main component(s) implementing the user stories
+2. User flow coverage table showing which stories are implemented
+3. Validation checklist for testing
+4. Next steps for user testing and iteration`,
+    outputFormat: 'markdown',
+    requiredContext: ['prdContent'],
+  },
 };
 
 // ============================================================================
@@ -438,6 +475,8 @@ export function generateStubResponse(
       return generatePrdDraftStub(context, date);
     case 'sprint_review':
       return generateSprintReviewStub(context, date);
+    case 'prototype_generation':
+      return generatePrototypeGenerationStub(context, date);
     default:
       return `# ${template.name}\n\nGenerated on ${date}\n\nStub response for ${jobType}`;
   }
@@ -1096,6 +1135,171 @@ Key talking points:
 | P1 | Search performance optimization | 5 |
 
 **Committed Capacity**: 19 points`;
+}
+
+function generatePrototypeGenerationStub(context: PromptContext, date: string): string {
+  const featureName = (context.featureName as string) || 'Search Filters';
+  return `# UI Prototype: ${featureName}
+
+**Generated from**: PRD: ${featureName}
+**Framework**: React + Tailwind CSS
+**Date**: ${date}
+**Status**: Ready for Review
+
+---
+
+## Generated Components
+
+### 1. ${featureName.replace(/\s+/g, '')}Component
+
+\`\`\`tsx
+import { useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, X } from 'lucide-react';
+
+export function ${featureName.replace(/\s+/g, '')}({ onFilterChange }) {
+  const [dateRange, setDateRange] = useState('all');
+  const [contentType, setContentType] = useState('all');
+
+  const handleDateChange = (value) => {
+    setDateRange(value);
+    onFilterChange?.({ dateRange: value, contentType });
+  };
+
+  const handleContentTypeChange = (value) => {
+    setContentType(value);
+    onFilterChange?.({ dateRange, contentType: value });
+  };
+
+  const clearFilters = () => {
+    setDateRange('all');
+    setContentType('all');
+    onFilterChange?.({ dateRange: 'all', contentType: 'all' });
+  };
+
+  return (
+    <div className="flex items-center gap-3 p-4 border-b bg-muted/30">
+      <span className="text-sm text-muted-foreground">Filters:</span>
+      
+      <Select value={dateRange} onValueChange={handleDateChange}>
+        <SelectTrigger className="w-36">
+          <SelectValue placeholder="Date range" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All time</SelectItem>
+          <SelectItem value="7d">Last 7 days</SelectItem>
+          <SelectItem value="30d">Last 30 days</SelectItem>
+          <SelectItem value="90d">Last 90 days</SelectItem>
+          <SelectItem value="custom">Custom range</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={contentType} onValueChange={handleContentTypeChange}>
+        <SelectTrigger className="w-36">
+          <SelectValue placeholder="Content type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All types</SelectItem>
+          <SelectItem value="documents">Documents</SelectItem>
+          <SelectItem value="projects">Projects</SelectItem>
+          <SelectItem value="comments">Comments</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {(dateRange !== 'all' || contentType !== 'all') && (
+        <Button variant="ghost" size="sm" onClick={clearFilters}>
+          <X className="mr-1 h-3 w-3" />
+          Clear
+        </Button>
+      )}
+    </div>
+  );
+}
+\`\`\`
+
+### 2. SearchResultsComponent
+
+\`\`\`tsx
+import { FileText, Folder, MessageSquare } from 'lucide-react';
+
+const typeIcons = {
+  documents: FileText,
+  projects: Folder,
+  comments: MessageSquare,
+};
+
+export function SearchResults({ results, filters }) {
+  const filteredResults = results.filter(result => {
+    if (filters.contentType !== 'all' && result.type !== filters.contentType) {
+      return false;
+    }
+    return true;
+  });
+
+  return (
+    <div className="divide-y">
+      <div className="px-4 py-2 text-sm text-muted-foreground">
+        {filteredResults.length} results
+        {filters.dateRange !== 'all' && \` • \${filters.dateRange}\`}
+        {filters.contentType !== 'all' && \` • \${filters.contentType}\`}
+      </div>
+      
+      {filteredResults.map(result => {
+        const Icon = typeIcons[result.type] || FileText;
+        return (
+          <div key={result.id} className="flex items-start gap-3 p-4 hover:bg-muted/50">
+            <Icon className="h-5 w-5 text-muted-foreground mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium truncate">{result.title}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-2">{result.excerpt}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+\`\`\`
+
+## User Flow Coverage
+
+| User Story | Component | Status |
+|------------|-----------|--------|
+| Filter by date range | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
+| Filter by content type | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
+| Combine multiple filters | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
+| Clear all filters | ${featureName.replace(/\s+/g, '')} | ✅ Implemented |
+| See filter state in results | SearchResults | ✅ Implemented |
+
+## Validation Checklist
+
+- [ ] Date presets work correctly (7d, 30d, 90d)
+- [ ] Content type filter updates results
+- [ ] Combined filters apply AND logic
+- [ ] Clear button resets all filters
+- [ ] Filter state visible in results count
+- [ ] Mobile responsive layout
+- [ ] Keyboard navigation works
+
+## Design System Alignment
+
+- Uses shadcn/ui Select, Button, Popover components
+- Follows existing color scheme (muted backgrounds, foreground text)
+- Consistent spacing with existing UI patterns
+- Icons from Lucide React
+
+## Next Steps
+
+1. **User Testing**: Share prototype with 3-5 users for feedback
+2. **Feedback Collection**: Document UX issues and suggestions
+3. **PRD Update**: Refine requirements based on feedback
+4. **Design Handoff**: Pass validated prototype to design team for polish
+
+---
+*Generated by pmkit • Prototype Generation v1*`;
 }
 
 // ============================================================================
