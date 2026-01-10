@@ -14,6 +14,8 @@ import {
   Clock,
   Database,
   CheckCircle2,
+  Wand2,
+  Megaphone,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -83,6 +85,22 @@ const jobs = [
     duration: '~35s',
     sources: ['Jira', 'Confluence', 'Slack', 'Amplitude'],
   },
+  {
+    id: 'prototype_generation',
+    name: 'Prototype Generation',
+    description: 'Generate interactive UI prototypes directly from PRDs.',
+    icon: Wand2,
+    duration: '~50s',
+    sources: ['pmkit', 'Confluence'],
+  },
+  {
+    id: 'release_notes',
+    name: 'Release Notes',
+    description: 'Generate customer-facing release notes from completed work.',
+    icon: Megaphone,
+    duration: '~30s',
+    sources: ['Jira', 'Confluence', 'pmkit'],
+  },
 ];
 
 const demoFeatures = [
@@ -147,7 +165,7 @@ export default function DemoPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">7 Product Manager Workflows</h2>
+            <h2 className="font-heading text-3xl font-bold">9 Product Manager Workflows</h2>
             <p className="mt-4 text-muted-foreground">
               Run any job to see the complete workflow; tool calls, sources, and artifacts.
             </p>
@@ -228,6 +246,7 @@ export default function DemoPage() {
               { name: 'Analytics', items: '13 search queries, 11 features' },
               { name: 'Competitor', items: '5 competitors, 7 changes' },
               { name: 'Community', items: '5 posts, 8 feature requests' },
+              { name: 'pmkit', items: '5 artifacts, 3 PRDs' },
             ].map((source) => (
               <Card key={source.name}>
                 <CardHeader className="pb-2">
