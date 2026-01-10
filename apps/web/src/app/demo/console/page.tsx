@@ -256,7 +256,8 @@ const jobConfigs: Record<
   },
 };
 
-// Simulated artifact content
+// Simulated artifact content - kept for reference but not used (errors are surfaced instead of fallback)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const artifactContent: Record<JobType, { title: string; content: string }> = {
   daily_brief: {
     title: 'Daily Brief - Dec 29, 2025',
@@ -1015,11 +1016,27 @@ export default function ConsolePage() {
         return;
       }
 
-      // Check if content is empty - fall back to static content if so
+      // Check if content is empty - show error in UI
       const generatedContent = data.content?.trim();
+      
+      // Debug logging for LLM response
+      console.log('[LLM Response]', {
+        jobType,
+        hasContent: !!generatedContent,
+        contentLength: generatedContent?.length || 0,
+        contentPreview: generatedContent?.substring(0, 200) || '(empty)',
+        metadata: data.metadata,
+      });
+      
       if (!generatedContent) {
-        console.warn('LLM returned empty content, falling back to static content');
-        const artifact = artifactContent[jobType];
+        // Surface error in UI instead of silently falling back
+        const errorMessage = `LLM returned empty content for ${jobType}. This may be due to content filtering, token limits, or model issues. Check console for details.`;
+        console.error('[LLM Error] Empty content returned:', {
+          jobType,
+          metadata: data.metadata,
+          rawContent: data.content,
+        });
+        
         setJobRuns((prev) => {
           const currentJobRun = prev[jobType];
           if (!currentJobRun) return prev;
@@ -1027,20 +1044,13 @@ export default function ConsolePage() {
             ...prev,
             [jobType]: {
               ...currentJobRun,
-              status: 'completed',
+              status: 'error',
               completedAt: new Date(),
-              artifact: {
-                ...artifact,
-                format: jobType === 'prototype_generation' ? 'html' : 'markdown',
-              },
-              llmMetadata: {
-                ...data.metadata,
-                isStub: true, // Mark as fallback
-              },
+              error: errorMessage,
+              llmMetadata: data.metadata,
             },
           };
         });
-        setActiveTab('artifact');
         return;
       }
 
@@ -1066,10 +1076,17 @@ export default function ConsolePage() {
 
       setActiveTab('artifact');
     } catch (error) {
-      // Network or other error - fall back to static content
-      console.error('LLM API error, falling back to static content:', error);
+      // Network or other error - show error in UI
+      const errorMessage = error instanceof Error 
+        ? `LLM API error: ${error.message}` 
+        : 'LLM API error: Unknown error occurred';
       
-      const artifact = artifactContent[jobType];
+      console.error('[LLM API Error]', {
+        jobType,
+        error,
+        errorMessage,
+      });
+      
       setJobRuns((prev) => {
         const currentJobRun = prev[jobType];
         if (!currentJobRun) return prev;
@@ -1077,24 +1094,12 @@ export default function ConsolePage() {
           ...prev,
           [jobType]: {
             ...currentJobRun,
-            status: 'completed',
+            status: 'error',
             completedAt: new Date(),
-            artifact: {
-              ...artifact,
-              format: jobType === 'prototype_generation' ? 'html' : 'markdown',
-            },
-            llmMetadata: {
-              model: 'fallback',
-              usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
-              latencyMs: 0,
-              estimatedCostUsd: 0,
-              isStub: true,
-            },
+            error: errorMessage,
           },
         };
       });
-
-      setActiveTab('artifact');
     }
   };
 
@@ -1525,6 +1530,18 @@ export default function ConsolePage() {
                         </div>
                       </div>
                       <div className="flex-1 overflow-auto p-4">
+                        {/* Debug logging for artifact rendering */}
+                        {(() => {
+                          console.log('[Artifact Render]', {
+                            jobType: selectedJob,
+                            format: currentRun.artifact.format,
+                            contentLength: currentRun.artifact.content?.length,
+                            startsWithDoctype: currentRun.artifact.content?.trim().startsWith('<!DOCTYPE'),
+                            contentPreview: currentRun.artifact.content?.substring(0, 100),
+                            isStub: currentRun.llmMetadata?.isStub,
+                          });
+                          return null;
+                        })()}
                         {/* Render HTML prototypes in an iframe, markdown as text */}
                         {selectedJob === 'prototype_generation' && currentRun.artifact.content.trim().startsWith('<!DOCTYPE') ? (
                           <div className="h-full">
