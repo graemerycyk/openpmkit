@@ -119,6 +119,23 @@ this.registerTool({ name: 'create_jira_epic', ... });
 - Users belong to tenants with role-based permissions
 - Jobs, artifacts, proposals all reference their tenant
 
+### Artifact Chaining
+
+pmkit artifacts can be used as data sources for subsequent jobs, enabling compound workflows:
+
+- **VoC Report** → PRD Draft (customer evidence)
+- **PRD** → Prototype Generation (requirements)
+- **PRD + Jira** → Release Notes (feature context)
+- **Competitor Report** → Roadmap Alignment (competitive context)
+
+The `pmkit` MCP server exposes tools for querying artifacts:
+- `get_artifact` - Retrieve by ID
+- `list_artifacts` - List by type
+- `search_artifacts` - Semantic search
+- `get_recent_artifacts` - Get most recent by type
+
+This enables workflows where each job builds on previous outputs, reducing hallucination through evidence grounding.
+
 ## Package Responsibilities
 
 | Package | Purpose | Key Exports |
@@ -164,7 +181,7 @@ enum JobStatus { Pending, Running, ... }
 
 ### Jobs
 
-- 8 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`
+- 9 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`, `release_notes`
 - Job handlers implement `JobHandler` interface
 - All jobs produce artifacts in markdown format
 - Jobs run via `JobRunner.runJob()` which creates a `JobContext`

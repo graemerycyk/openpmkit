@@ -19,7 +19,7 @@ const battlecardPoints: BattlecardPoint[] = [
   {
     title: 'Structured Workflows vs Chat',
     wins: [
-      'Eight pre-built PM workflows that run end-to-end',
+      'Nine pre-built PM workflows that run end-to-end',
       'Consistent, repeatable outputs every time',
       'Scheduled jobs run without prompting',
     ],
@@ -122,7 +122,7 @@ export default function NalinComparePage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See Structured Workflows</h2>
             <p className="mt-4 text-cobalt-100">
-              Run all eight PM jobs in the demo and experience consistent, repeatable outputs.
+              Run all nine PM jobs in the demo and experience consistent, repeatable outputs.
             </p>
             <div className="mt-8">
               <Button size="lg" variant="secondary" asChild>

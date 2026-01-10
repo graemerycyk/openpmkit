@@ -484,7 +484,7 @@ export default function AutomationToolsComparePage() {
               See the Difference
             </h2>
             <p className="mt-4 text-cobalt-100">
-              Try all eight PM workflow jobs in the interactive demo. Experience draft-only
+              Try all nine PM workflow jobs in the interactive demo. Experience draft-only
               proposals, traceable insights, and chained workflows firsthand.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

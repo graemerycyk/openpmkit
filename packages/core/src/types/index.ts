@@ -45,6 +45,7 @@ export const JobTypeSchema = z.enum([
   'prd_draft',
   'sprint_review',
   'prototype_generation',
+  'release_notes',
 ]);
 export type JobType = z.infer<typeof JobTypeSchema>;
 

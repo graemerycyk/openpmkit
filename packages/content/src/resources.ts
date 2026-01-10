@@ -954,11 +954,11 @@ export const resources: ResourcePage[] = [
     slug: 'ai-release-notes-and-sprint-review-packs',
     title: 'AI Release Notes & Sprint Review Packs',
     description:
-      'Generate release notes and sprint review packs automatically from Jira tickets and git commits.',
+      'Generate customer-facing release notes and internal sprint review packs automatically from Jira tickets. Save hours per release while improving communication.',
     primaryKeyword: 'AI release notes',
-    secondaryKeywords: ['sprint review automation', 'release notes generator', 'sprint summary AI'],
+    secondaryKeywords: ['sprint review automation', 'release notes generator', 'sprint summary AI', 'changelog automation'],
     category: 'workflows',
-    relatedPages: ['/demo', '/resources/product-ops-automation', '/blog'],
+    relatedPages: ['/demo', '/resources/product-ops-automation', '/blog/ai-release-notes-from-jira'],
     workedExample: {
       title: 'Release Notes in 5 Minutes Instead of 2 Hours',
       scenario: 'It\'s release day. The PM needs customer-facing release notes. Instead of reading 47 Jira tickets, they run the release notes job.',
@@ -966,44 +966,60 @@ export const resources: ResourcePage[] = [
         'Agent retrieves all tickets in the release (47 completed)',
         'Categorizes by type: 12 features, 28 fixes, 7 improvements',
         'Writes customer-friendly descriptions (no Jira jargon)',
-        'Highlights top 3 features with benefits',
+        'Highlights top 3 features with benefit statements',
         'Drafts release notes in the team\'s standard format',
+        'Creates sales enablement talking points for CSM/Sales',
       ],
-      outcome: 'The PM reviews and publishes release notes in 5 minutes. Customers see a polished update. Marketing has content for the announcement.',
+      outcome: 'The PM reviews and publishes release notes in 5 minutes. Customers see a polished update. Sales has talking points for customer calls. Marketing has content for the announcement.',
     },
     checklist: [
       'Do release notes take hours to write?',
       'Is there inconsistency in release note quality?',
       'Do you struggle to translate Jira tickets to customer language?',
-      'Are sprint reviews missing important context?',
+      'Does sales lack visibility into what shipped?',
+      'Do CSMs miss opportunities to proactively share updates?',
       'Do you wish release notes wrote themselves?',
     ],
     keyBenefits: [
-      'Release notes in minutes',
-      'Customer-friendly language',
+      'Release notes in minutes, not hours',
+      'Customer-friendly language automatically',
       'Consistent quality every release',
-      'Sprint reviews with full context',
+      'Sales enablement same-day',
+      'Multiple audience versions from one source',
+    ],
+    useCases: [
+      'Customer-facing changelog updates',
+      'In-app "What\'s New" notifications',
+      'Release announcement emails',
+      'Sales enablement talking points',
+      'CSM proactive outreach',
+      'Support team briefings',
     ],
     faqItems: [
       {
         question: 'How are release notes generated?',
         answer:
-          'pmkit pulls completed Jira tickets, categorizes them by type (feature, fix, improvement), and generates customer-facing release notes with appropriate language.',
+          'pmkit pulls completed Jira tickets for the release version, retrieves epic context for the bigger picture, references related PRDs to connect features to customer problems, and generates customer-facing notes in your team\'s format.',
       },
       {
-        question: "What's in a sprint review pack?",
+        question: 'How is this different from Sprint Review?',
         answer:
-          'Sprint review packs include velocity metrics, completed vs. planned work, blockers encountered, key learnings, and recommendations for the next sprint.',
+          'Sprint Review is internal-focused (velocity, blockers, team metrics). Release Notes is customer-focused (benefits, features, fixes). Sprint Review includes what didn\'t ship; Release Notes only includes what shipped.',
       },
       {
         question: 'Can I customize the release notes format?',
         answer:
-          'Yes. Configure templates for different audiences (customers, internal, executives) with appropriate detail levels and formatting.',
+          'Yes. Configure templates for different audiences (customers, sales, internal) with appropriate detail levels, tone, and formatting.',
       },
       {
-        question: 'Does it include git commit information?',
+        question: 'Can it generate multiple versions?',
         answer:
-          'Yes. pmkit can correlate Jira tickets with git commits for technical audiences who want to see what code changed.',
+          'Yes. From the same source data, pmkit can generate customer-facing notes, sales talking points, and technical changelogs with appropriate detail for each audience.',
+      },
+      {
+        question: 'Does it connect features to customer requests?',
+        answer:
+          'Yes. pmkit can reference VoC data and PRDs to include statements like "This addresses feedback from 89 customers who requested better search capabilities."',
       },
     ],
   },

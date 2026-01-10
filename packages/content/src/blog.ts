@@ -28,6 +28,76 @@ export type BlogTag =
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'artifact-chaining-ai-agents-build-on-work',
+    title: 'Artifact Chaining: How AI Agents Build on Their Own Work',
+    description:
+      'Learn how AI agents can reference and build upon their previous outputs, creating compound value through artifact chaining—from VoC reports to PRDs to prototypes.',
+    publishedAt: '2026-01-10',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'AI agent memory',
+    tags: ['agents', 'product-management'],
+    readingTime: 11,
+    relatedResources: ['product-management-agent', 'agentic-product-management', 'prd-automation'],
+    relatedPosts: ['what-is-a-product-management-agent', 'prd-to-prototype-ai-ui-generation', 'draft-only-ai-agents'],
+  },
+  {
+    slug: 'sprint-review-vs-release-notes',
+    title: 'Sprint Review vs Release Notes: Internal vs External Communication',
+    description:
+      'Understand the key differences between sprint reviews and release notes—who reads them, what they contain, and how to automate both without losing quality.',
+    publishedAt: '2026-01-10',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'sprint review vs release notes',
+    tags: ['product-management', 'agents'],
+    readingTime: 13,
+    relatedResources: ['ai-release-notes-and-sprint-review-packs', 'product-ops-automation'],
+    relatedPosts: ['ai-release-notes-from-jira', 'product-ops-automation', 'enterprise-pm-toolkit'],
+  },
+  {
+    slug: 'mcp-for-product-management',
+    title: 'MCP for Product Management: Connecting Your PM Stack',
+    description:
+      'A practical guide to MCP (Model Context Protocol) for product managers—how it connects Jira, Confluence, Slack, Gong, and more into unified AI workflows.',
+    publishedAt: '2026-01-10',
+    author: 'pmkit team',
+    authorRole: 'Engineering',
+    primaryKeyword: 'MCP product management',
+    tags: ['integrations', 'agents'],
+    readingTime: 14,
+    relatedResources: ['mcp-connectors-for-enterprise-tools', 'jira-and-confluence-ai-workflows'],
+    relatedPosts: ['agent-workflows-with-mcp', 'jira-confluence-slack-operating-system', 'what-is-a-product-management-agent'],
+  },
+  {
+    slug: '9-pm-workflows-automate-today',
+    title: '9 PM Workflows You Can Automate Today',
+    description:
+      'A comprehensive guide to the nine product management workflows you can automate with AI agents—from daily briefs to release notes, with time savings for each.',
+    publishedAt: '2026-01-10',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'PM workflow automation',
+    tags: ['agents', 'product-management'],
+    readingTime: 15,
+    relatedResources: ['product-management-agent', 'product-ops-automation', 'agentic-product-management'],
+    relatedPosts: ['what-is-a-product-management-agent', 'enterprise-pm-toolkit', 'product-ops-automation'],
+  },
+  {
+    slug: 'ai-release-notes-from-jira',
+    title: 'AI-Generated Release Notes: From Jira Tickets to Customer-Ready Updates',
+    description:
+      'Learn how to generate customer-facing release notes automatically from Jira tickets, saving hours per release while improving communication with customers and sales teams.',
+    publishedAt: '2026-01-10',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'AI release notes',
+    tags: ['agents', 'product-management', 'integrations'],
+    readingTime: 12,
+    relatedResources: ['ai-release-notes-sprint-review', 'jira-confluence-integration', 'product-ops-automation'],
+    relatedPosts: ['product-ops-automation', 'jira-confluence-slack-operating-system', 'prd-automation-without-hallucination'],
+  },
+  {
     slug: 'prd-to-prototype-ai-ui-generation',
     title: 'PRD to Prototype: AI-Generated UI from Product Requirements',
     description:

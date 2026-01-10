@@ -6,7 +6,7 @@ pmkit is an AI-powered product management agent that runs daily briefs, meeting 
 
 ## Features
 
-- **8 Workflow Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft, sprint review, prototype generation
+- **9 Workflow Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, release notes
 - **Draft-Only**: Agents propose changes but never write directly to external systems
 - **Full Traceability**: Every tool call, source, and artifact is logged
 - **Enterprise Governance**: RBAC, permission simulation, audit logging

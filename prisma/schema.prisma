@@ -377,6 +377,7 @@ enum JobType {
   prd_draft
   sprint_review
   prototype_generation
+  release_notes
 }
 
 enum JobStatus {
