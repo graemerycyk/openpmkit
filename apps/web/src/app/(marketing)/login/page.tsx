@@ -33,10 +33,6 @@ function LoginContent() {
     signIn('google', { callbackUrl: '/dashboard' });
   };
 
-  const handleMicrosoftSignIn = () => {
-    signIn('azure-ad', { callbackUrl: '/dashboard' });
-  };
-
   // Check if OAuth is not configured (Configuration error)
   const isOAuthNotConfigured = error === 'Configuration';
 
@@ -94,8 +90,7 @@ function LoginContent() {
             <Button
               variant="outline"
               className="w-full justify-center gap-2"
-              onClick={handleMicrosoftSignIn}
-              disabled={isOAuthNotConfigured}
+              disabled
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                 <path fill="#F25022" d="M1 1h10v10H1z" />
@@ -104,6 +99,9 @@ function LoginContent() {
                 <path fill="#FFB900" d="M13 13h10v10H13z" />
               </svg>
               Continue with Microsoft
+              <span className="ml-1 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                Coming soon
+              </span>
             </Button>
 
             <div className="relative">
