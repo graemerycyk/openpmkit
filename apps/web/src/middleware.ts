@@ -1,81 +1,73 @@
-import { withAuth } from 'next-auth/middleware';
+import { getToken } from 'next-auth/jwt';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default withAuth(
-  function middleware(req) {
-    // If user is authenticated and trying to access login, redirect to dashboard
-    if (req.nextUrl.pathname === '/login' && req.nextauth.token) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+// Protected routes that require authentication
+const protectedRoutes = [
+  '/dashboard',
+  '/settings',
+  '/workbench',
+  '/api/workbench',
+];
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Check if this is a protected route
+  const isProtectedRoute = protectedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // Only check auth for protected routes
+  if (isProtectedRoute) {
+    try {
+      const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+
+      // If no token, redirect to login
+      if (!token) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('callbackUrl', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+    } catch {
+      // If token check fails (e.g., no secret configured), redirect to login
+      const loginUrl = new URL('/login', request.url);
+      return NextResponse.redirect(loginUrl);
     }
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const { pathname } = req.nextUrl;
-        
-        // Public routes - always allow
-        if (
-          pathname.startsWith('/api/auth') ||
-          pathname.startsWith('/api/demo') ||
-          pathname === '/login' ||
-          pathname === '/' ||
-          pathname.startsWith('/demo') ||
-          pathname.startsWith('/blog') ||
-          pathname.startsWith('/resources') ||
-          pathname.startsWith('/how-it-works') ||
-          pathname.startsWith('/pricing') ||
-          pathname.startsWith('/contact') ||
-          pathname.startsWith('/privacy') ||
-          pathname.startsWith('/terms') ||
-          pathname.startsWith('/security') ||
-          pathname.startsWith('/trust') ||
-          pathname.startsWith('/compare') ||
-          pathname.startsWith('/invest') ||
-          pathname.startsWith('/why-pmkit') ||
-          pathname.startsWith('/_next') ||
-          pathname.startsWith('/favicon') ||
-          pathname.startsWith('/icon') ||
-          pathname.startsWith('/apple') ||
-          pathname.startsWith('/manifest') ||
-          pathname.startsWith('/robots') ||
-          pathname.startsWith('/sitemap') ||
-          pathname.startsWith('/rss') ||
-          pathname.startsWith('/opengraph') ||
-          pathname.startsWith('/twitter')
-        ) {
-          return true;
-        }
-        
-        // Protected routes - require authentication
-        if (
-          pathname.startsWith('/dashboard') ||
-          pathname.startsWith('/settings') ||
-          pathname.startsWith('/workbench') ||
-          pathname.startsWith('/api/workbench')
-        ) {
-          return !!token;
-        }
-        
-        // Default: allow
-        return true;
-      },
-    },
-    pages: {
-      signIn: '/login',
-    },
   }
-);
+
+  // If user is authenticated and trying to access login, redirect to dashboard
+  if (pathname === '/login') {
+    try {
+      const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+
+      if (token) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+    } catch {
+      // Ignore errors for login page - just show the login page
+    }
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
+     * Only match protected routes and login page
+     * This avoids running middleware on public pages entirely
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/dashboard/:path*',
+    '/settings/:path*',
+    '/workbench/:path*',
+    '/api/workbench/:path*',
+    '/login',
   ],
 };

@@ -50,3 +50,4 @@ docker/data/
 # OS
 Thumbs.db
 
+apps/web/env.local

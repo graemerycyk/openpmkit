@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLLMService, type JobType } from '@pmkit/core';
 import { executeJob, PROMPT_TEMPLATES, type PromptContext } from '@pmkit/prompts';
+import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 
 // Max output tokens per job type
 // Standard jobs: 12,288 tokens (~9K words) - sufficient for detailed markdown
@@ -480,6 +481,29 @@ Key outcomes:
 
 export async function POST(request: NextRequest) {
   try {
+    // IP-based rate limiting to prevent abuse
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(`demo:${clientIP}`, RATE_LIMITS.demo);
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many requests',
+          message: `Rate limit exceeded. Please try again in ${Math.ceil((rateLimitResult.retryAfterMs || 0) / 1000)} seconds.`,
+          isRateLimited: true,
+          retryAfterMs: rateLimitResult.retryAfterMs,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil((rateLimitResult.retryAfterMs || 0) / 1000)),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Reset': String(rateLimitResult.resetAt),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { jobType } = body as { jobType: JobType };
 

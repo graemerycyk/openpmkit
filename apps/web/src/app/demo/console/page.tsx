@@ -938,7 +938,7 @@ None in this release.
 ## Questions?
 
 - 📖 [Full documentation](https://docs.example.com)
-- 💬 [Contact support](mailto:support@example.com)
+- 💬 [Contact support](mailto:support@getpmkit.com)
 - 🐦 [Follow us for updates](https://twitter.com/example)
 
 ---
