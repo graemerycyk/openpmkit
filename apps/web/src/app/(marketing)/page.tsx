@@ -174,7 +174,7 @@ export default function HomePage() {
             </Badge>
             <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
               Your daily PM toolkit;
-              <span className="text-cobalt-600"> briefs, PRDs, and prototypes</span>—made simple.
+              <span className="text-cobalt-600"> briefs, PRDs, and prototypes</span> - made simple.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
               Draft smarter. Decide faster. pmkit runs your PM workflows—daily briefs, meeting
