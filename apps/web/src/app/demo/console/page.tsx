@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
@@ -535,7 +535,7 @@ pmkit Agent`;
 // Main Component
 // ============================================================================
 
-export default function ConsolePage() {
+function ConsolePageContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   
@@ -1734,5 +1734,26 @@ export default function ConsolePage() {
         maxFreeJobs={maxFreeJobs}
       />
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function ConsolePageLoading() {
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="text-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-cobalt-600 border-t-transparent mx-auto" />
+        <p className="mt-4 text-sm text-muted-foreground">Loading demo console...</p>
+      </div>
+    </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function ConsolePage() {
+  return (
+    <Suspense fallback={<ConsolePageLoading />}>
+      <ConsolePageContent />
+    </Suspense>
   );
 }
