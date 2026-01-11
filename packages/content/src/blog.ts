@@ -28,6 +28,49 @@ export type BlogTag =
   | 'founders-notes';
 
 export const blogPosts: BlogPost[] = [
+  // AI Crawler blog posts
+  {
+    slug: 'reddit-to-roadmap-mining-social-platforms',
+    title: 'From Reddit Thread to Roadmap: Mining Social Platforms for Product Signal',
+    description:
+      'How to systematically extract product insights from Reddit, Hacker News, and other communities—turning user discussions into roadmap priorities.',
+    publishedAt: '2026-01-16',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'reddit product feedback',
+    tags: ['voc', 'product-management', 'agents'],
+    readingTime: 11,
+    relatedResources: ['social-crawler-integration', 'community-to-roadmap', 'voice-of-customer-clustering'],
+    relatedPosts: ['voice-of-customer-at-scale', 'social-listening-for-product-managers', 'from-slack-to-prd'],
+  },
+  {
+    slug: 'competitive-intelligence-system-ai-crawlers',
+    title: 'Building a Competitive Intelligence System with AI Crawlers',
+    description:
+      'A practical guide to building an automated competitive intelligence system using social, web, and news crawlers—from setup to daily briefs.',
+    publishedAt: '2026-01-15',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'competitive intelligence automation',
+    tags: ['competitor-research', 'agents', 'integrations'],
+    readingTime: 14,
+    relatedResources: ['web-search-integration', 'news-crawler-integration', 'competitor-research'],
+    relatedPosts: ['competitor-research', '9-pm-workflows-automate-today', 'enterprise-pm-toolkit'],
+  },
+  {
+    slug: 'social-listening-for-product-managers',
+    title: 'Social Listening for Product Managers: Finding Product Signal in the Noise',
+    description:
+      'Learn how PMs can use social listening differently than marketing—finding feature requests, competitive mentions, and early warning signals on Reddit, X, and Hacker News.',
+    publishedAt: '2026-01-14',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'social listening product management',
+    tags: ['voc', 'competitor-research', 'agents'],
+    readingTime: 12,
+    relatedResources: ['social-crawler-integration', 'voice-of-customer-clustering', 'competitor-research'],
+    relatedPosts: ['voice-of-customer-at-scale', 'competitor-research', 'from-slack-to-prd'],
+  },
   {
     slug: 'artifact-chaining-ai-agents-build-on-work',
     title: 'Artifact Chaining: How AI Agents Build on Their Own Work',

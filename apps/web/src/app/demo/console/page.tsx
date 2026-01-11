@@ -767,6 +767,12 @@ function ConsolePageContent() {
 
   // Command demo handlers
   const handleCommandRun = async () => {
+    // Check free job limit for unauthenticated users
+    if (!isAuthenticated && hasExceededFreeJobLimit()) {
+      setSignInModalOpen(true);
+      return;
+    }
+
     const intent = parseCommand(command, selectedChannel);
     if (!intent) {
       setParsedIntent(null);
@@ -778,12 +784,52 @@ function ConsolePageContent() {
     setDraftResponse(null);
     setCommandRunId(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Increment job count for unauthenticated users
+    if (!isAuthenticated) {
+      const newCount = incrementDemoJobCount();
+      setDemoJobCount(newCount);
+    }
 
-    const newRunId = `run_${Date.now()}`;
-    setCommandRunId(newRunId);
-    setDraftResponse(generateDraftResponse(intent, selectedChannel));
-    setIsCommandRunning(false);
+    try {
+      // Call the actual API to run the job (counts against rate limits)
+      const response = await fetch('/api/demo/run-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobType: intent.jobType }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle rate limit or other errors
+        if (data.isRateLimited) {
+          setIsCommandRunning(false);
+          setParsedIntent(null);
+          // Show error in the UI
+          return;
+        }
+      }
+
+      const newRunId = `run_${Date.now()}`;
+      setCommandRunId(newRunId);
+      setDraftResponse(generateDraftResponse(intent, selectedChannel));
+    } catch (error) {
+      console.error('Command run error:', error);
+    } finally {
+      setIsCommandRunning(false);
+    }
+  };
+
+  // Handler for crawler demo buttons
+  const handleCrawlerDemo = (jobType: JobType) => {
+    // Check free job limit for unauthenticated users
+    if (!isAuthenticated && hasExceededFreeJobLimit()) {
+      setSignInModalOpen(true);
+      return;
+    }
+    
+    setDemoView('workflows');
+    setSelectedJob(jobType);
   };
 
   const handleExampleClick = (example: string) => {
@@ -1762,7 +1808,11 @@ function ConsolePageContent() {
                       <Badge variant="cobalt" className="text-xs">monday.com</Badge>
                     </div>
                   </div>
-                  <Button className="w-full" variant="outline" disabled>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => handleCrawlerDemo('competitor_research')}
+                  >
                     <Play className="mr-2 h-4 w-4" />
                     Run Demo Crawl
                   </Button>
@@ -1801,7 +1851,11 @@ function ConsolePageContent() {
                       <Badge variant="cobalt" className="text-xs">coda vs notion</Badge>
                     </div>
                   </div>
-                  <Button className="w-full" variant="outline" disabled>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => handleCrawlerDemo('competitor_research')}
+                  >
                     <Play className="mr-2 h-4 w-4" />
                     Run Demo Search
                   </Button>
@@ -1841,7 +1895,11 @@ function ConsolePageContent() {
                       <Badge variant="cobalt" className="text-xs">SaaS funding</Badge>
                     </div>
                   </div>
-                  <Button className="w-full" variant="outline" disabled>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => handleCrawlerDemo('competitor_research')}
+                  >
                     <Play className="mr-2 h-4 w-4" />
                     Run Demo Crawl
                   </Button>
@@ -1899,19 +1957,23 @@ function ConsolePageContent() {
               </CardContent>
             </Card>
 
-            {/* CTA */}
-            <div className="mt-8 rounded-lg bg-gradient-to-r from-cobalt-50 to-indigo-50 border border-cobalt-200 p-6 text-center">
-              <h3 className="font-heading text-lg font-semibold">Try Real Crawlers in the Workbench</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Admin users can run real crawlers with live data in the Workbench.
-              </p>
-              <Button className="mt-4" asChild>
-                <Link href="/workbench">
-                  Open Workbench
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+            {/* Integration CTA */}
+            <Card className="mt-8 border-cobalt-200 bg-gradient-to-r from-cobalt-50 to-indigo-50">
+              <CardContent className="flex items-center justify-between pt-6">
+                <div>
+                  <h3 className="font-heading text-lg font-semibold">Ready to Connect Real Data Sources?</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Contact our team to set up live crawlers with your own keywords and competitors.
+                  </p>
+                </div>
+                <Button asChild>
+                  <Link href="/contact">
+                    Contact Sales
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </main>
       ) : null}

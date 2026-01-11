@@ -815,7 +815,7 @@ export default function WorkbenchPage() {
                   </div>
                 )}
               </ScrollArea>
-            </div>
+        </div>
           </div>
 
           {/* Main Crawler Content */}

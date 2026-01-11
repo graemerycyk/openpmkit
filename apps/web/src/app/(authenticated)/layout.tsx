@@ -3,6 +3,7 @@
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -26,6 +27,7 @@ import {
   ChevronDown,
   Sparkles,
   Settings,
+  Wrench,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -75,8 +77,31 @@ interface AuthenticatedLayoutProps {
 }
 
 export default function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      if (status !== 'authenticated') {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, [status]);
 
   return (
     <div className="flex h-screen flex-col">
@@ -85,7 +110,7 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
       {/* Top Header */}
       <header className="flex h-14 items-center justify-between border-b bg-background px-4">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="font-heading text-xl font-bold text-cobalt-600">pmkit</span>
           </Link>
         </div>
@@ -131,6 +156,18 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                   Run Jobs
                 </Link>
               </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/workbench" className="flex items-center gap-2 cursor-pointer">
+                      <Wrench className="h-4 w-4" />
+                      Workbench
+                      <span className="ml-auto text-xs text-cobalt-600">Admin</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/settings/profile" className="flex items-center gap-2 cursor-pointer">
