@@ -219,6 +219,12 @@ export default function InvestPage() {
               prototypes, and release notes) so PMs can focus on strategy.
             </p>
 
+            {/* Founder Credibility */}
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Second-time founder · Previous exit to Gainsight</span>
+            </div>
+
             {/* Key Metrics */}
             <div className="mt-12 grid grid-cols-3 gap-6">
               {metrics.map((metric) => (
@@ -825,8 +831,11 @@ export default function InvestPage() {
               Team
             </Badge>
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              Solo founder, strong founder-market fit
+              Second-time founder with exit
             </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Solo founder who previously built and exited ModerateKit to Gainsight.
+            </p>
           </div>
 
           <div className="mt-12 mx-auto max-w-2xl">
@@ -837,15 +846,21 @@ export default function InvestPage() {
                 </div>
                 <div className="text-center sm:text-left">
                   <h3 className="font-heading text-xl font-semibold">Founder</h3>
-                  <p className="mt-2 text-muted-foreground">
-                    Exited ModerateKit (April 2025). Background in enterprise PM tooling and
-                    B2B SaaS operations. Deep understanding of the PM workflow pain points from
+                  <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                    <p className="text-sm font-medium text-emerald-800">
+                      🎯 Previous Exit: ModerateKit → Gainsight (April 2025)
+                    </p>
+                  </div>
+                  <p className="mt-3 text-muted-foreground">
+                    Built and sold ModerateKit as a solo founder. Background in enterprise PM tooling and
+                    B2B SaaS operations. Deep understanding of PM workflow pain points from
                     years of building and operating product teams.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
+                    <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">Exited Founder</Badge>
                     <Badge variant="outline">Enterprise SaaS</Badge>
                     <Badge variant="outline">Product Management</Badge>
-                    <Badge variant="outline">Previous Exit</Badge>
+                    <Badge variant="outline">Solo Builder</Badge>
                   </div>
                 </div>
               </div>

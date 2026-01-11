@@ -16,6 +16,10 @@ import {
   CheckCircle2,
   Wand2,
   Megaphone,
+  MessageSquare,
+  Globe,
+  Newspaper,
+  Hash,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -144,16 +148,22 @@ export default function DemoPage() {
               Run all 9 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
               sources, and downloadable artifacts.
             </p>
-            <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
                 <Link href="/demo/console">
-                  Launch Dashboard
+                  Workflow Demo
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href="/demo/console?view=commands">
-                  Try Slack/Email Launcher
+                  Slack/Teams Demo
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/demo/console?view=crawlers">
+                  AI Crawlers Demo
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -235,6 +245,124 @@ export default function DemoPage() {
         </div>
       </section>
 
+      {/* Slack/Teams Launcher */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="cobalt" className="mb-4">
+              Slack/Teams Launcher
+            </Badge>
+            <h2 className="font-heading text-3xl font-bold">Launch Jobs from Anywhere</h2>
+            <p className="mt-4 text-muted-foreground">
+              Trigger pmkit jobs directly from Slack, Microsoft Teams, or Email. No dashboard required—get
+              results delivered right where you work.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-cobalt-100">
+                <Hash className="h-7 w-7 text-cobalt-600" />
+              </div>
+              <h3 className="mt-4 font-heading font-semibold">Slack Commands</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Use <code className="rounded bg-muted px-1 py-0.5 text-xs">/pmkit</code> slash commands to run any workflow.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-cobalt-100">
+                <Users className="h-7 w-7 text-cobalt-600" />
+              </div>
+              <h3 className="mt-4 font-heading font-semibold">Teams Integration</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Mention <code className="rounded bg-muted px-1 py-0.5 text-xs">@pmkit</code> in any channel to trigger jobs.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-cobalt-100">
+                <MessageSquare className="h-7 w-7 text-cobalt-600" />
+              </div>
+              <h3 className="mt-4 font-heading font-semibold">Draft-Only Responses</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                All responses are proposals—review and approve before posting.
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 text-center">
+            <Button variant="outline" asChild>
+              <Link href="/demo/console?view=commands">
+                Try Slack/Teams Demo
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Crawlers */}
+      <section className="bg-muted/30 py-16 md:py-24">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="cobalt" className="mb-4">
+              AI Crawlers
+            </Badge>
+            <h2 className="font-heading text-3xl font-bold">Real-Time Competitive Intelligence</h2>
+            <p className="mt-4 text-muted-foreground">
+              Monitor social media, web, and news sources for competitor updates, customer sentiment,
+              and market trends—automatically fed into your PM workflows.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100">
+                  <Hash className="h-6 w-6 text-pink-600" />
+                </div>
+                <CardTitle className="mt-4">Social Crawler</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Monitor Reddit, Hacker News, and more for brand mentions, competitor discussions, and customer sentiment.
+                </CardDescription>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                  <Globe className="h-6 w-6 text-blue-600" />
+                </div>
+                <CardTitle className="mt-4">Web Search</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Search Google and DuckDuckGo for competitor pages, pricing changes, and market research.
+                </CardDescription>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100">
+                  <Newspaper className="h-6 w-6 text-amber-600" />
+                </div>
+                <CardTitle className="mt-4">News Crawler</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Track industry news, press releases, and analyst reports for competitive intelligence.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="mt-8 text-center">
+            <Button variant="outline" asChild>
+              <Link href="/demo/console?view=crawlers">
+                Try AI Crawlers Demo
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Mock Data Preview */}
       <section className="py-16 md:py-24">
         <div className="container">
@@ -285,7 +413,7 @@ export default function DemoPage() {
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/demo/console">
                   <Play className="mr-2 h-4 w-4" />
-                  Launch Dashboard
+                  Workflow Demo
                 </Link>
               </Button>
               <Button
