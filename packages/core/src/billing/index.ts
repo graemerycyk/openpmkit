@@ -63,6 +63,7 @@ export interface PlanFeatures {
   scheduledCompetitorResearch: boolean;
 
   // Jobs - On-demand limits per seat per month
+  maxOnDemandDailyBriefPerSeatPerMonth: number;
   maxOnDemandMeetingPrepPerSeatPerMonth: number;
   maxOnDemandPrdPackPerSeatPerMonth: number;
   maxOnDemandRoadmapMemoPerSeatPerMonth: number;
@@ -120,6 +121,7 @@ export const TEAMS_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // On-demand limits per seat per month (generous fair use)
+    maxOnDemandDailyBriefPerSeatPerMonth: 4,
     maxOnDemandMeetingPrepPerSeatPerMonth: 30,
     maxOnDemandPrdPackPerSeatPerMonth: 12,
     maxOnDemandRoadmapMemoPerSeatPerMonth: 12,
@@ -174,6 +176,7 @@ export const ENTERPRISE_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // 5× higher on-demand limits (can be overridden per customer via entitlements)
+    maxOnDemandDailyBriefPerSeatPerMonth: 20,
     maxOnDemandMeetingPrepPerSeatPerMonth: 150,
     maxOnDemandPrdPackPerSeatPerMonth: 60,
     maxOnDemandRoadmapMemoPerSeatPerMonth: 60,
@@ -254,6 +257,7 @@ export const EntitlementKeySchema = z.enum([
   'connectors.customEnabled',
   
   // Job run limits (on-demand per seat per month)
+  'jobs.maxOnDemandDailyBriefPerSeatPerMonth',
   'jobs.maxOnDemandMeetingPrepPerSeatPerMonth',
   'jobs.maxOnDemandPrdPackPerSeatPerMonth',
   'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth',
@@ -374,6 +378,7 @@ export class EntitlementService {
 
     await this.store.upsert(tenantId, 'connectors.allowed', features.allowedConnectors);
     await this.store.upsert(tenantId, 'connectors.customEnabled', features.customConnectorsEnabled);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandDailyBriefPerSeatPerMonth', features.maxOnDemandDailyBriefPerSeatPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandMeetingPrepPerSeatPerMonth', features.maxOnDemandMeetingPrepPerSeatPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandPrdPackPerSeatPerMonth', features.maxOnDemandPrdPackPerSeatPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth', features.maxOnDemandRoadmapMemoPerSeatPerMonth);
@@ -406,6 +411,8 @@ export class EntitlementService {
         return features.allowedConnectors;
       case 'connectors.customEnabled':
         return features.customConnectorsEnabled;
+      case 'jobs.maxOnDemandDailyBriefPerSeatPerMonth':
+        return features.maxOnDemandDailyBriefPerSeatPerMonth;
       case 'jobs.maxOnDemandMeetingPrepPerSeatPerMonth':
         return features.maxOnDemandMeetingPrepPerSeatPerMonth;
       case 'jobs.maxOnDemandPrdPackPerSeatPerMonth':

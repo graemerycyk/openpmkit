@@ -463,9 +463,9 @@ export class LimitsEnforcer {
       };
     }
 
-    // Check on-demand limits for specific job types
-    // daily_brief is scheduled-only, all others have on-demand limits
+    // Check on-demand limits for all job types
     const onDemandJobs: JobType[] = [
+      'daily_brief',
       'meeting_prep',
       'prd_draft',
       'roadmap_alignment',
@@ -511,6 +511,7 @@ export class LimitsEnforcer {
     ctx: LimitsContext,
     jobType: JobType,
     features: { 
+      maxOnDemandDailyBriefPerSeatPerMonth: number;
       maxOnDemandMeetingPrepPerSeatPerMonth: number;
       maxOnDemandPrdPackPerSeatPerMonth: number;
       maxOnDemandRoadmapMemoPerSeatPerMonth: number;
@@ -534,6 +535,9 @@ export class LimitsEnforcer {
 
     let limit: number;
     switch (jobType) {
+      case 'daily_brief':
+        limit = features.maxOnDemandDailyBriefPerSeatPerMonth;
+        break;
       case 'meeting_prep':
         limit = features.maxOnDemandMeetingPrepPerSeatPerMonth;
         break;

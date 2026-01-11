@@ -91,9 +91,9 @@ const plans: Plan[] = [
 ];
 
 const jobTypes = [
-  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: 'Included' },
-  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: '+ 4/month/seat' },
-  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: '+ 4/month/seat' },
+  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: '4/month/seat' },
+  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: '4/month/seat' },
+  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: '4/month/seat' },
   { name: 'Meeting Prep Pack', schedule: 'On-demand', onDemand: '30/month/seat' },
   { name: 'PRD Pack', schedule: 'On-demand', onDemand: '12/month/seat' },
   { name: 'Roadmap Alignment Memo', schedule: 'On-demand', onDemand: '12/month/seat' },
