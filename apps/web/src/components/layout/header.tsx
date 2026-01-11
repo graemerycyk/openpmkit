@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import { useState } from 'react';
 
 const navigation = [
@@ -17,7 +18,11 @@ const navigation = [
 
 export function Header() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isAuthenticated = status === 'authenticated' && !!session?.user;
+  const isLoading = status === 'loading';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -45,14 +50,43 @@ export function Header() {
           ))}
         </div>
 
-        {/* Desktop CTA */}
+        {/* Desktop CTA - Session Aware */}
         <div className="hidden md:flex md:items-center md:space-x-4">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Log in</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/demo">Try Demo</Link>
-          </Button>
+          {isLoading ? (
+            // Loading state - show placeholder
+            <div className="h-9 w-20 animate-pulse rounded-md bg-muted" />
+          ) : isAuthenticated ? (
+            // Authenticated - show dashboard link and user info
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/dashboard" className="flex items-center gap-2">
+                  {session.user?.image ? (
+                    <img
+                      src={session.user.image}
+                      alt={session.user.name || 'User'}
+                      className="h-6 w-6 rounded-full"
+                    />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
+                  <span>{session.user?.name?.split(' ')[0] || 'Dashboard'}</span>
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href="/demo/console">Run Jobs</Link>
+              </Button>
+            </>
+          ) : (
+            // Not authenticated - show login and demo buttons
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/demo">Try Demo</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -90,12 +124,33 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-4 flex flex-col space-y-2">
-              <Button variant="outline" asChild>
-                <Link href="/login">Log in</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/demo">Try Demo</Link>
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <Button variant="outline" asChild>
+                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/demo/console" onClick={() => setMobileMenuOpen(false)}>
+                      Run Jobs
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" asChild>
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                      Log in
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/demo" onClick={() => setMobileMenuOpen(false)}>
+                      Try Demo
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -103,4 +158,3 @@ export function Header() {
     </header>
   );
 }
-
