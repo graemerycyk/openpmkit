@@ -1416,7 +1416,8 @@ function ConsolePageContent() {
       ) : (
         // Slack & Teams Commands View
         <main className="flex-1 overflow-auto p-8">
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto max-w-6xl">
+            {/* Header */}
             <div className="text-center">
               <h1 className="font-heading text-3xl font-bold">Launch Jobs from Anywhere</h1>
               <p className="mt-2 text-muted-foreground">
@@ -1424,8 +1425,104 @@ function ConsolePageContent() {
               </p>
             </div>
 
-            <div className="mt-8 grid gap-8 lg:grid-cols-2">
-              {/* Input Panel */}
+            {/* Status Steps Row */}
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {/* Step 1: Parsed Intent */}
+              <Card className={cn('transition-opacity', !parsedIntent && 'opacity-50')}>
+                <CardContent className="pt-4">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cobalt-100 text-xs font-bold text-cobalt-700">
+                      1
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm">Parsed Intent</p>
+                      {parsedIntent ? (
+                        <div className="mt-1 space-y-1">
+                          <Badge variant="outline" className="text-xs">{parsedIntent.jobName}</Badge>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'ml-1 text-xs',
+                              parsedIntent.confidence === 'high' && 'border-green-200 bg-green-50 text-green-700',
+                              parsedIntent.confidence === 'medium' && 'border-amber-200 bg-amber-50 text-amber-700',
+                              parsedIntent.confidence === 'low' && 'border-red-200 bg-red-50 text-red-700'
+                            )}
+                          >
+                            {parsedIntent.confidence}
+                          </Badge>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Enter a command to see the parsed intent
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Step 2: Job Status */}
+              <Card className={cn('transition-opacity', !commandRunId && !isCommandRunning && 'opacity-50')}>
+                <CardContent className="pt-4">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cobalt-100 text-xs font-bold text-cobalt-700">
+                      2
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm">Job Status</p>
+                      {isCommandRunning ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Loader2 className="h-3 w-3 animate-spin text-cobalt-600" />
+                          <span className="text-xs text-muted-foreground">Running...</span>
+                        </div>
+                      ) : commandRunId ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          <span className="text-xs text-green-600 font-medium">Complete</span>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Run a command to see job status
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Step 3: Draft Response */}
+              <Card className={cn('transition-opacity', !draftResponse && 'opacity-50')}>
+                <CardContent className="pt-4">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cobalt-100 text-xs font-bold text-cobalt-700">
+                      3
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm">Draft Response</p>
+                        <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700 text-[10px] px-1.5 py-0">
+                          Proposal Only
+                        </Badge>
+                      </div>
+                      {draftResponse ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          <span className="text-xs text-green-600 font-medium">Ready to review</span>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Complete a job to see the draft response
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Main Content: Input + Examples | Draft Response */}
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              {/* Left Column: Channel Selection + Command Input */}
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -1502,161 +1599,19 @@ function ConsolePageContent() {
                         </>
                       )}
                     </Button>
-
                   </CardContent>
                 </Card>
 
-                {/* Workflow Examples */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Workflow Examples</CardTitle>
-                    <CardDescription>
-                      Click any example to copy it to the command input
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-                      {workflowExamples.map((workflow) => {
-                        const Icon = workflow.icon;
-                        const exampleCommand = workflow.commands[selectedChannel];
-                        return (
-                          <div
-                            key={workflow.jobType}
-                            className="flex items-center justify-between rounded-md border p-2 hover:bg-muted/50 transition-colors group"
-                          >
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted">
-                                <Icon className="h-4 w-4 text-muted-foreground" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium truncate">{workflow.jobName}</p>
-                                <p className="text-xs text-muted-foreground font-mono truncate">
-                                  {exampleCommand}
-                                </p>
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="shrink-0 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => handleExampleClick(exampleCommand)}
-                            >
-                              <Copy className="h-4 w-4" />
-                              <span className="sr-only">Copy to input</span>
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Output Panel */}
-              <div className="space-y-6">
-                {/* Parsed Intent */}
-                <Card className={cn(!parsedIntent && 'opacity-50')}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-100 text-xs font-bold text-cobalt-700">
-                        1
-                      </span>
-                      Parsed Intent
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {parsedIntent ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Job Type:</span>
-                          <Badge variant="outline">{parsedIntent.jobName}</Badge>
-                        </div>
-                        {Object.keys(parsedIntent.params).length > 0 && (
-                          <div className="space-y-1">
-                            <span className="text-sm text-muted-foreground">Parameters:</span>
-                            <div className="rounded-md bg-muted p-2 text-xs font-mono">
-                              {JSON.stringify(parsedIntent.params, null, 2)}
-                            </div>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Confidence:</span>
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              parsedIntent.confidence === 'high' && 'border-green-200 bg-green-50 text-green-700',
-                              parsedIntent.confidence === 'medium' && 'border-amber-200 bg-amber-50 text-amber-700',
-                              parsedIntent.confidence === 'low' && 'border-red-200 bg-red-50 text-red-700'
-                            )}
-                          >
-                            {parsedIntent.confidence}
-                          </Badge>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Enter a command to see the parsed intent
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Job Status */}
-                <Card className={cn(!commandRunId && !isCommandRunning && 'opacity-50')}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-100 text-xs font-bold text-cobalt-700">
-                        2
-                      </span>
-                      Job Status
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isCommandRunning ? (
-                      <div className="flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin text-cobalt-600" />
-                        <div>
-                          <p className="font-medium">Running {parsedIntent?.jobName}...</p>
-                          <p className="text-sm text-muted-foreground">Collecting data from sources</p>
-                        </div>
-                      </div>
-                    ) : commandRunId ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 className="h-5 w-5 text-green-600" />
-                          <div>
-                            <p className="font-medium">Job Complete</p>
-                            <p className="text-xs text-muted-foreground">Run ID: {commandRunId}</p>
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm" onClick={() => setDemoView('workflows')}>
-                          View in Console
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Run a command to see job status
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Draft Response */}
-                <Card className={cn(!draftResponse && 'opacity-50')}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-100 text-xs font-bold text-cobalt-700">
-                        3
-                      </span>
-                      Draft Response
-                      <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
-                        Proposal Only
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {draftResponse ? (
+                {/* Draft Response Preview (shown when available) */}
+                {draftResponse && (
+                  <Card className="border-green-200 bg-green-50/30">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        Draft Response Ready
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="space-y-3">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           {(() => {
@@ -1677,21 +1632,72 @@ function ConsolePageContent() {
                             <span>{draftResponse.recipient}</span>
                           </div>
                         )}
-                        <div className="rounded-md border bg-muted/30 p-4">
+                        <div className="rounded-md border bg-white p-4">
                           <pre className="whitespace-pre-wrap text-sm">{draftResponse.content}</pre>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          This is a draft proposal. In production, you would review and approve before posting.
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-muted-foreground">
+                            This is a draft proposal. Review and approve before posting.
+                          </p>
+                          <Button variant="outline" size="sm" onClick={() => setDemoView('workflows')}>
+                            View in Console
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Complete a job to see the draft response
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
+
+              {/* Right Column: Workflow Examples */}
+              <Card className="h-fit">
+                <CardHeader>
+                  <CardTitle>Workflow Examples</CardTitle>
+                  <CardDescription>
+                    Click any example to copy it to the command input
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {workflowExamples.map((workflow) => {
+                      const Icon = workflow.icon;
+                      const exampleCommand = workflow.commands[selectedChannel];
+                      return (
+                        <div
+                          key={workflow.jobType}
+                          className="flex items-center justify-between rounded-md border p-2 hover:bg-muted/50 transition-colors group cursor-pointer"
+                          onClick={() => handleExampleClick(exampleCommand)}
+                        >
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted">
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium truncate">{workflow.jobName}</p>
+                              <p className="text-xs text-muted-foreground font-mono truncate">
+                                {exampleCommand}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="shrink-0 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleExampleClick(exampleCommand);
+                            }}
+                          >
+                            <Copy className="h-4 w-4" />
+                            <span className="sr-only">Copy to input</span>
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </main>

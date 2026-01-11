@@ -116,33 +116,43 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to check workbench status
+// Returns isAdmin: false for unauthenticated or non-admin users (no 401)
 export async function GET() {
   try {
     const session = await getServerSession();
     
+    // Return isAdmin: false for unauthenticated users (don't throw 401)
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({
+        isAdmin: false,
+      });
     }
 
     const isAdmin = isAdminEmail(session.user.email);
-    const llmService = getLLMService();
-    const modelInfo = llmService.getModelForTenant('workbench');
+    
+    // Only include model info for admin users
+    if (isAdmin) {
+      const llmService = getLLMService();
+      const modelInfo = llmService.getModelForTenant('workbench');
+      
+      return NextResponse.json({
+        isAdmin: true,
+        model: {
+          id: modelInfo.id,
+          name: modelInfo.name,
+          description: modelInfo.description,
+        },
+        isUsingStubs: llmService.isUsingStubs(),
+      });
+    }
 
+    // Non-admin authenticated user
     return NextResponse.json({
-      isAdmin,
-      model: {
-        id: modelInfo.id,
-        name: modelInfo.name,
-        description: modelInfo.description,
-      },
-      isUsingStubs: llmService.isUsingStubs(),
+      isAdmin: false,
     });
   } catch {
     return NextResponse.json(
-      { error: 'Failed to get status' },
+      { isAdmin: false, error: 'Failed to get status' },
       { status: 500 }
     );
   }

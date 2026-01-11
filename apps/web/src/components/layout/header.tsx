@@ -41,8 +41,13 @@ export function Header() {
       }
       try {
         const res = await fetch('/api/workbench/run-job');
-        const data = await res.json();
-        setIsAdmin(data.isAdmin === true);
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        } else {
+          // Non-200 response (e.g., 401, 403) - user is not admin
+          setIsAdmin(false);
+        }
       } catch {
         setIsAdmin(false);
       }

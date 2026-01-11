@@ -80,9 +80,6 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="font-heading text-xl font-bold text-cobalt-600">pmkit</span>
           </Link>
-          <Badge variant="cobalt" className="text-xs">
-            Beta
-          </Badge>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" asChild>

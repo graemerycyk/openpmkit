@@ -169,9 +169,6 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-cobalt-50/50 to-background py-20 md:py-32">
         <div className="container relative z-10">
           <div className="mx-auto max-w-4xl text-center">
-            <Badge variant="cobalt" className="mb-6">
-              Now in Beta
-            </Badge>
             <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
               Your daily PM toolkit;
               <span className="text-cobalt-600"> briefs, PRDs, and prototypes</span> - made simple.
