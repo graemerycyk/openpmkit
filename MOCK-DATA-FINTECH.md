@@ -29,7 +29,159 @@
 
 ---
 
+## Design System Guidelines
+
+Use these guidelines when generating prototypes or designing new features for FinTech/payments applications.
+
+### Color Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--primary` | `#059669` (emerald-600) | Primary buttons, success states |
+| `--primary-hover` | `#047857` (emerald-700) | Hover states |
+| `--background` | `#ffffff` | Page backgrounds |
+| `--foreground` | `#1e293b` | Primary text |
+| `--muted` | `#f8fafc` | Secondary backgrounds, cards |
+| `--muted-foreground` | `#64748b` | Secondary text, placeholders |
+| `--border` | `#e2e8f0` | Borders, dividers |
+| `--pending` | `#f59e0b` (amber-500) | Pending transactions |
+| `--processing` | `#3b82f6` (blue-500) | Processing states |
+| `--completed` | `#10b981` (emerald-500) | Completed transactions |
+| `--failed` | `#ef4444` (red-500) | Failed transactions, errors |
+
+### Typography
+
+| Element | Font | Size | Weight |
+|---------|------|------|--------|
+| Headings (h1-h6) | Space Grotesk | 24-36px | 600-700 |
+| Body text | Geist Sans | 14-16px | 400 |
+| Code/mono | Geist Mono | 13-14px | 400 |
+| Amounts | Geist Sans | 18-24px | 700, tabular-nums |
+| Currency codes | Geist Mono | 12-14px | 500 |
+| Timestamps | Geist Sans | 12px | 400 |
+
+### Component Library
+
+Use shadcn/ui components:
+
+| Component | Usage |
+|-----------|-------|
+| `Card` | Settlement cards, transaction summaries |
+| `Badge` | Status indicators (pending, completed, failed) |
+| `Button` | Primary actions (`default`), secondary (`outline`) |
+| `Tabs` | Transaction type filters |
+| `ScrollArea` | Transaction lists |
+| `Popover` | Settlement details, notifications |
+| `Select` | Currency selectors, date filters |
+
+### Spacing System
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `gap-1` | 4px | Tight spacing (status dots, currency codes) |
+| `gap-2` | 8px | Compact spacing (card elements) |
+| `gap-3` | 12px | Standard spacing (list items) |
+| `gap-4` | 16px | Section spacing |
+| `gap-6` | 24px | Large section spacing |
+| `gap-8` | 32px | Page section spacing |
+
+### Icons
+
+Use Lucide React icons:
+
+| Icon | Usage |
+|------|-------|
+| `ArrowUpRight` | Outgoing settlements |
+| `ArrowDownLeft` | Incoming settlements |
+| `Clock` | Pending/processing states |
+| `CheckCircle` | Completed transactions |
+| `AlertCircle` | Failed transactions, warnings |
+| `Bell` | Notifications |
+| `DollarSign` | Amount displays |
+| `RefreshCw` | Refresh/sync actions |
+
+### Interactive States
+
+```css
+/* Hover */
+background: var(--muted);
+border-color: var(--border);
+
+/* Focus */
+border-color: var(--primary);
+box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+
+/* Active/Selected */
+background: var(--primary);
+color: white;
+
+/* Processing */
+animation: pulse 2s infinite;
+
+/* Disabled */
+opacity: 0.5;
+cursor: not-allowed;
+```
+
+---
+
+## Focus Areas for Prototypes
+
+Use these focus areas when generating UI prototypes for FinTech/payments applications.
+
+### Settlement Dashboard Prototype
+
+```
+**Focus Areas for Prototype**
+1. Real-time settlement feed with live updates
+2. Status cards (Pending, Processing, Completed, Failed)
+3. Amount totals by status with currency breakdown
+4. Time-based filtering (Today, This Week, Custom)
+5. Settlement card design with status indicators
+6. WebSocket connection status indicator
+```
+
+### Notification Center Prototype
+
+```
+**Focus Areas for Prototype**
+1. Bell icon with unread count badge
+2. Slide-out notification panel
+3. Notification grouping (Today, Yesterday, Earlier)
+4. Mark as read / Mark all as read
+5. Click-to-navigate to settlement
+6. Notification preferences modal
+```
+
+### Multi-Currency Dashboard Prototype
+
+```
+**Focus Areas for Prototype**
+1. Currency selector dropdown
+2. Exchange rate display with timestamp
+3. Multi-currency totals with conversions
+4. Currency-specific transaction lists
+5. FX rate trend indicators
+6. Currency conversion calculator
+```
+
+### Compliance Reporting Prototype
+
+```
+**Focus Areas for Prototype**
+1. Report type selector
+2. Date range picker
+3. Export format options (PDF, CSV, Excel)
+4. Preview pane with sample data
+5. Scheduled report configuration
+6. Audit trail viewer
+```
+
+---
+
 ## Workbench Copy/Paste Data
+
+Ready-to-use data samples for the Workbench admin demo mode. Copy and paste these into the appropriate fields.
 
 ### Daily Brief Data
 
@@ -573,6 +725,151 @@ This release delivers real-time settlement visibility that treasury teams have b
 **What's Next:**
 - Phase 2: Predictive settlement timing (Q2 2026)
 - Phase 3: AI-powered treasury insights (Q3 2026)
+```
+
+---
+
+### Prototype Generation Data
+
+#### PRD Content (Sample)
+```
+# PRD: Real-Time Settlement Notifications
+
+## 1. Overview
+
+### Problem Statement
+Treasury teams cannot efficiently manage cash flow because settlement status updates are delayed and require manual checking.
+
+### Goals
+| Goal | Metric | Target |
+|------|--------|--------|
+| Reduce manual status checks | Dashboard refreshes/user/day | 12 → 2 |
+| Improve treasury planning | Settlement prediction accuracy | 0% → 80% |
+
+## 2. User Stories
+
+1. **As a Treasury Manager**, I want real-time settlement notifications
+   - Acceptance: Push notifications within 5 seconds of settlement completion
+   
+2. **As a Controller**, I want to customize notification preferences
+   - Acceptance: Choose channels (email, SMS, webhook) and thresholds
+
+3. **As an Operations Lead**, I want settlement ETA predictions
+   - Acceptance: ML-based predictions with 80%+ accuracy
+
+4. **As a Finance Admin**, I want notification audit trails
+   - Acceptance: Complete log of all notifications sent
+
+## 3. Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1 | Real-time settlement status updates | P0 |
+| F2 | Push notifications (email, SMS, webhook) | P0 |
+| F3 | Notification preferences per user | P1 |
+| F4 | Settlement ETA predictions | P1 |
+| F5 | Notification audit trail | P0 |
+| F6 | Batch settlement summaries | P2 |
+
+## 4. Key Flows
+
+1. Settlement initiated in banking system
+2. Event captured by Kafka consumer
+3. Status update pushed via WebSocket
+4. User receives notification (based on preferences)
+5. Dashboard updates in real-time
+6. Audit log entry created
+7. ETA prediction updated for pending settlements
+```
+
+#### Design System Guidelines (for Prototype)
+```
+**Design System Guidelines**
+
+**Components:**
+- Use shadcn/ui components (Card, Badge, Button, Tabs, ScrollArea)
+- Settlement cards: vertical layout with status indicator
+- Notification center: slide-out panel from right
+- Status badges: color-coded by settlement state
+
+**Colors:**
+- Primary actions: emerald-600 (#059669) - financial/success theme
+- Pending: amber-500 (#f59e0b)
+- Processing: blue-500 (#3b82f6)
+- Completed: emerald-500 (#10b981)
+- Failed: red-500 (#ef4444)
+- Borders: slate-200 (#e2e8f0)
+- Muted text: slate-500 (#64748b)
+
+**Typography:**
+- Settlement amounts: text-2xl (24px), font-bold, tabular-nums
+- Status labels: text-sm (14px), font-medium, uppercase
+- Timestamps: text-xs (12px), text-muted-foreground
+- Currency codes: text-sm, font-mono
+
+**Icons:**
+- Use Lucide React icons
+- ArrowUpRight for outgoing settlements
+- ArrowDownLeft for incoming settlements
+- Clock for pending/processing
+- CheckCircle for completed
+- AlertCircle for failed
+- Bell for notifications
+
+**Spacing:**
+- Settlement card padding: 16px 20px
+- Gap between cards: 12px
+- Status indicator: 8px dot with 4px margin-right
+- Amount/currency gap: 4px
+
+**States:**
+- Hover: bg-muted/50, subtle shadow
+- Selected: ring-2 ring-emerald-500/20, border-emerald-500
+- Processing: pulse animation on status dot
+- New notification: slide-in from right with fade
+```
+
+#### Focus Areas (for Prototype)
+```
+**Focus Areas for Prototype**
+
+1. **Settlement Dashboard**
+   - Real-time settlement feed with live updates
+   - Status cards: Pending, Processing, Completed, Failed
+   - Total amounts by status with currency breakdown
+   - Time-based filtering (Today, This Week, Custom)
+
+2. **Settlement Card Design**
+   - Status indicator (colored dot + label)
+   - Amount with currency code (e.g., $45,000.00 USD)
+   - Counterparty name and account
+   - Timestamp with relative time
+   - ETA for pending settlements
+
+3. **Notification Center**
+   - Bell icon with unread count badge
+   - Slide-out panel with notification list
+   - Group by: Today, Yesterday, Earlier
+   - Mark as read / Mark all as read
+   - Click to navigate to settlement
+
+4. **Real-Time Updates**
+   - WebSocket connection indicator
+   - New settlements animate in at top
+   - Status changes highlight briefly
+   - Sound/vibration option for mobile
+
+5. **Notification Preferences**
+   - Channel toggles: Email, SMS, Webhook
+   - Threshold settings: Notify above $X
+   - Quiet hours configuration
+   - Per-currency preferences
+
+6. **Settlement Details Modal**
+   - Full settlement information
+   - Timeline of status changes
+   - Related notifications sent
+   - Audit trail with timestamps
 ```
 
 ---

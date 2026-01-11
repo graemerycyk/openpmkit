@@ -29,7 +29,198 @@
 
 ---
 
+## Design System Guidelines
+
+Use these guidelines when generating prototypes or designing new features for HealthTech/patient engagement applications.
+
+### Color Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--primary` | `#0d9488` (teal-600) | Primary buttons, healthcare trust theme |
+| `--primary-hover` | `#0f766e` (teal-700) | Hover states |
+| `--background` | `#ffffff` | Page backgrounds |
+| `--foreground` | `#1e293b` | Primary text |
+| `--muted` | `#f8fafc` | Secondary backgrounds, cards |
+| `--muted-foreground` | `#64748b` | Secondary text, placeholders |
+| `--border` | `#e2e8f0` | Borders, dividers |
+| `--urgent` | `#ef4444` (red-500) | Urgent alerts, critical status |
+| `--scheduled` | `#3b82f6` (blue-500) | Scheduled appointments |
+| `--success` | `#10b981` (emerald-500) | Completed, confirmed |
+| `--pending` | `#f59e0b` (amber-500) | Pending actions |
+
+### Typography
+
+| Element | Font | Size | Weight |
+|---------|------|------|--------|
+| Headings (h1-h6) | Space Grotesk | 24-36px | 600-700 |
+| Body text | Geist Sans | 16px min | 400 |
+| Code/mono | Geist Mono | 14px | 400 |
+| Patient names | Geist Sans | 18px | 600 |
+| Appointment times | Geist Sans | 16px | 500 |
+| Helper text | Geist Sans | 14px | 400 |
+
+**Accessibility Note:** Minimum font size of 16px for all body text to ensure readability.
+
+### Component Library
+
+Use shadcn/ui components:
+
+| Component | Usage |
+|-----------|-------|
+| `Card` | Patient cards, appointment cards |
+| `Badge` | Status indicators, appointment types |
+| `Button` | Primary actions, minimum 44px touch target |
+| `Avatar` | Patient/provider photos |
+| `Tabs` | Content organization |
+| `Calendar` | Appointment scheduling |
+| `ScrollArea` | Message threads, records lists |
+
+### Spacing System
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `gap-2` | 8px | Compact spacing |
+| `gap-3` | 12px | Standard spacing |
+| `gap-4` | 16px | Section spacing |
+| `gap-6` | 24px | Large section spacing |
+| `gap-8` | 32px | Page section spacing |
+| Touch target | 44px min | All interactive elements |
+
+### Icons
+
+Use Lucide React icons:
+
+| Icon | Usage |
+|------|-------|
+| `Calendar` | Appointments, scheduling |
+| `MessageSquare` | Secure messaging |
+| `FileText` | Health records |
+| `User` | Patient profile |
+| `Bell` | Notifications |
+| `Heart` | Health metrics |
+| `Video` | Telehealth |
+| `Phone` | Contact/call |
+
+### Accessibility Requirements
+
+```css
+/* Focus indicators - high visibility */
+outline: 2px solid var(--primary);
+outline-offset: 2px;
+
+/* Color contrast - WCAG AA minimum */
+/* Text on background: 4.5:1 ratio */
+/* Large text: 3:1 ratio */
+
+/* Touch targets */
+min-height: 44px;
+min-width: 44px;
+
+/* Skip navigation */
+.skip-link:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+```
+
+### Interactive States
+
+```css
+/* Hover */
+background: var(--muted);
+border-color: var(--primary);
+
+/* Focus */
+outline: 2px solid var(--primary);
+outline-offset: 2px;
+
+/* Active/Selected */
+background: var(--primary);
+color: white;
+
+/* Error */
+border-color: var(--urgent);
+color: var(--urgent);
+
+/* Disabled */
+opacity: 0.5;
+cursor: not-allowed;
+```
+
+---
+
+## Focus Areas for Prototypes
+
+Use these focus areas when generating UI prototypes for HealthTech/patient engagement applications.
+
+### Patient Portal Dashboard Prototype
+
+```
+**Focus Areas for Prototype**
+1. Welcome message with patient name
+2. Upcoming appointments (next 7 days)
+3. Unread messages count with badge
+4. Quick actions: Schedule, Message, Records
+5. Health reminders and alerts
+6. Accessibility: skip links, keyboard nav
+```
+
+### Appointment Scheduling Prototype
+
+```
+**Focus Areas for Prototype**
+1. Provider selection with photos and specialties
+2. Calendar view with available time slots
+3. Appointment type selector (in-person, telehealth)
+4. Confirmation screen with add-to-calendar
+5. Large touch targets for mobile
+6. Screen reader announcements for selections
+```
+
+### Secure Messaging Prototype
+
+```
+**Focus Areas for Prototype**
+1. Inbox with message threads
+2. Compose new message to provider
+3. Attachment support (images, documents)
+4. Read receipts and timestamps
+5. Search messages functionality
+6. High contrast mode support
+```
+
+### Health Records Viewer Prototype
+
+```
+**Focus Areas for Prototype**
+1. Lab results with trend charts
+2. Medication list with refill status
+3. Visit summaries with provider notes
+4. Immunization records
+5. Download/share/print options
+6. Data visualization accessibility
+```
+
+### Telehealth Waiting Room Prototype
+
+```
+**Focus Areas for Prototype**
+1. Connection status indicator
+2. Audio/video test controls
+3. Waiting time estimate
+4. Provider information display
+5. Technical support access
+6. Bandwidth quality indicator
+```
+
+---
+
 ## Workbench Copy/Paste Data
+
+Ready-to-use data samples for the Workbench admin demo mode. Copy and paste these into the appropriate fields.
 
 ### Daily Brief Data
 
@@ -575,6 +766,164 @@ This release transforms the patient experience with a redesigned portal, improve
 **What's Next:**
 - Phase 2: FHIR R4 full support (Q1 2026)
 - Phase 3: Patient outcome tracking (Q2 2026)
+```
+
+---
+
+### Prototype Generation Data
+
+#### PRD Content (Sample)
+```
+# PRD: Patient Portal Redesign
+
+## 1. Overview
+
+### Problem Statement
+Patients struggle to engage with their healthcare providers because the current portal is difficult to navigate and not accessible to users with disabilities.
+
+### Goals
+| Goal | Metric | Target |
+|------|--------|--------|
+| Increase portal adoption | Active patient users | 67% → 85% |
+| Improve accessibility | WCAG compliance level | Partial → AA |
+
+## 2. User Stories
+
+1. **As a Patient**, I want an intuitive portal interface
+   - Acceptance: Task completion rate >90% for common actions
+   
+2. **As a Patient with disabilities**, I want full accessibility support
+   - Acceptance: WCAG 2.1 AA compliance certified
+
+3. **As a Care Coordinator**, I want to see patient engagement metrics
+   - Acceptance: Dashboard with adoption and usage analytics
+
+4. **As a Clinic Admin**, I want to customize portal branding
+   - Acceptance: Logo, colors, and messaging customization
+
+## 3. Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1 | Responsive mobile-first design | P0 |
+| F2 | WCAG 2.1 AA compliance | P0 |
+| F3 | Appointment scheduling widget | P0 |
+| F4 | Secure messaging center | P0 |
+| F5 | Health records viewer | P1 |
+| F6 | Custom branding options | P2 |
+
+## 4. Key Flows
+
+1. Patient logs in via SSO or credentials
+2. Dashboard shows upcoming appointments and messages
+3. Patient schedules new appointment
+4. Confirmation sent via email/SMS
+5. Patient views health records
+6. Patient sends secure message to provider
+7. Provider responds within portal
+```
+
+#### Design System Guidelines (for Prototype)
+```
+**Design System Guidelines**
+
+**Components:**
+- Use shadcn/ui components (Card, Badge, Button, Tabs, Avatar)
+- Patient cards: clean, accessible design with large touch targets
+- Appointment widgets: calendar-style with time slots
+- Message threads: chat-style with read receipts
+
+**Colors:**
+- Primary actions: teal-600 (#0d9488) - healthcare/trust theme
+- Urgent/Alert: red-500 (#ef4444)
+- Success: emerald-500 (#10b981)
+- Scheduled: blue-500 (#3b82f6)
+- Pending: amber-500 (#f59e0b)
+- Borders: slate-200 (#e2e8f0)
+- Muted text: slate-500 (#64748b)
+
+**Typography:**
+- Patient names: text-lg (18px), font-semibold
+- Appointment times: text-base (16px), font-medium
+- Status labels: text-sm (14px), font-medium
+- Helper text: text-sm, text-muted-foreground
+- Minimum font size: 16px for accessibility
+
+**Icons:**
+- Use Lucide React icons
+- Calendar for appointments
+- MessageSquare for messages
+- FileText for health records
+- User for profile
+- Bell for notifications
+- Heart for health metrics
+
+**Spacing:**
+- Card padding: 20px 24px
+- Touch target minimum: 44px × 44px
+- Gap between sections: 24px
+- Form field spacing: 16px
+
+**Accessibility:**
+- Focus indicators: ring-2 ring-teal-500, 2px offset
+- Color contrast: minimum 4.5:1 for text
+- Skip navigation links
+- ARIA labels on all interactive elements
+- Keyboard navigation support
+
+**States:**
+- Hover: bg-teal-50, border-teal-200
+- Focus: ring-2 ring-teal-500/20, border-teal-500
+- Active: bg-teal-100
+- Disabled: opacity-50, cursor-not-allowed
+- Error: border-red-500, text-red-600
+```
+
+#### Focus Areas (for Prototype)
+```
+**Focus Areas for Prototype**
+
+1. **Patient Dashboard**
+   - Welcome message with patient name
+   - Upcoming appointments (next 7 days)
+   - Unread messages count
+   - Quick actions: Schedule, Message, Records
+   - Health reminders and alerts
+
+2. **Appointment Scheduling**
+   - Provider selection with photos and specialties
+   - Calendar view with available slots
+   - Time slot selection with duration
+   - Appointment type (in-person, telehealth)
+   - Confirmation with add-to-calendar option
+
+3. **Secure Messaging**
+   - Inbox with message threads
+   - Compose new message to provider
+   - Attachment support (images, documents)
+   - Read receipts and timestamps
+   - Search messages
+
+4. **Health Records Viewer**
+   - Lab results with trends
+   - Medication list with refill status
+   - Visit summaries
+   - Immunization records
+   - Download/share options
+
+5. **Accessibility Features**
+   - High contrast mode toggle
+   - Font size adjustment
+   - Screen reader optimized
+   - Keyboard shortcuts help
+   - Skip to main content link
+
+6. **Mobile Experience**
+   - Bottom navigation bar
+   - Swipe gestures for common actions
+   - Pull to refresh
+   - Offline appointment viewing
+   - Push notification preferences
 ```
 
 ---
