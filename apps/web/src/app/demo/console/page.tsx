@@ -25,7 +25,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Download,
-  ArrowLeft,
   ArrowRight,
   User,
   Activity,
@@ -1175,14 +1174,11 @@ export default function ConsolePage() {
       <header className="flex h-14 items-center justify-between border-b px-4">
         <div className="flex items-center gap-4">
           <Link
-            href="/demo"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            href="/"
+            className="font-heading text-xl font-bold text-cobalt-600"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm">Back to Demo</span>
+            pmkit
           </Link>
-          <Separator orientation="vertical" className="h-6" />
-          <span className="font-heading font-semibold text-cobalt-600">pmkit</span>
           <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
             Demo Mode
           </Badge>
@@ -1213,6 +1209,12 @@ export default function ConsolePage() {
             <span>{isAuthenticated ? session.user?.name || 'User' : 'Demo Guest'}</span>
             <Badge variant="secondary">PM</Badge>
           </div>
+          <Separator orientation="vertical" className="h-6" />
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/">
+              Exit Demo
+            </Link>
+          </Button>
         </div>
       </header>
 

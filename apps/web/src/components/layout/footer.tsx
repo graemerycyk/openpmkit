@@ -69,7 +69,7 @@ export function Footer() {
               pmkit
             </Link>
             <p className="mt-2 text-sm text-muted-foreground">
-              Your daily PM toolkit - briefs, meetings, and PRDs made simple.
+              Your daily PM toolkit - briefs, PRDs, and prototypes made simple.
             </p>
           </div>
 

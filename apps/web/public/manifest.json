@@ -1,7 +1,7 @@
 {
   "name": "pmkit",
   "short_name": "pmkit",
-  "description": "Your daily PM toolkit - briefs, meetings, and PRDs made simple.",
+  "description": "Your daily PM toolkit - briefs, PRDs, and prototypes made simple.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

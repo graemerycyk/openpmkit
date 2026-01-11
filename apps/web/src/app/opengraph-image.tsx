@@ -83,7 +83,7 @@ export default async function Image() {
             lineHeight: 1.4,
           }}
         >
-          Your daily PM toolkit - briefs, meetings, and PRDs made simple.
+          Your daily PM toolkit - briefs, PRDs, and prototypes made simple.
         </p>
 
         {/* Features */}
