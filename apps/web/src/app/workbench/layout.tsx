@@ -112,6 +112,12 @@ export default function WorkbenchLayout({
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white">
+            <Link href="/demo/console">
+              Try Demo
+            </Link>
+          </Button>
+          <Separator orientation="vertical" className="h-6" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">

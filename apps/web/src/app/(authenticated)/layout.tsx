@@ -38,7 +38,7 @@ const sidebarNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Run Jobs',
+    title: 'Try Demo',
     href: '/demo/console',
     icon: Play,
     badge: 'Demo',
@@ -115,10 +115,9 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" asChild>
+          <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white">
             <Link href="/demo/console">
-              <Play className="mr-2 h-4 w-4" />
-              Run Jobs
+              Try Demo
             </Link>
           </Button>
           <Separator orientation="vertical" className="h-6" />

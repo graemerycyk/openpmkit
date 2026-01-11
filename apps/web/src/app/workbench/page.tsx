@@ -48,6 +48,7 @@ import {
   Trash2,
   History,
   ChevronRight,
+  ChevronDown,
   AlertCircle,
   Expand,
   Globe,
@@ -56,6 +57,9 @@ import {
   RefreshCw,
   ExternalLink,
   Zap,
+  Link2,
+  Calendar,
+  User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JOB_CONTEXT_FIELDS, JOB_TYPE_INFO, type ContextField } from './field-config';
@@ -187,6 +191,7 @@ export default function WorkbenchPage() {
   const [selectedCrawlerJob, setSelectedCrawlerJob] = useState<CrawlerJob | null>(null);
   const [isCrawlerRunning, setIsCrawlerRunning] = useState(false);
   const [crawlerError, setCrawlerError] = useState<string | null>(null);
+  const [expandedResults, setExpandedResults] = useState<Set<string>>(new Set());
 
   // Load history on mount
   useEffect(() => {
@@ -419,6 +424,18 @@ export default function WorkbenchPage() {
         : [...prev, platform]
     );
   };
+  
+  const toggleResultExpanded = (resultId: string) => {
+    setExpandedResults(prev => {
+      const next = new Set(prev);
+      if (next.has(resultId)) {
+        next.delete(resultId);
+      } else {
+        next.add(resultId);
+      }
+      return next;
+    });
+  };
 
   return (
     <TooltipProvider>
@@ -439,7 +456,12 @@ export default function WorkbenchPage() {
               PM Jobs
             </button>
             <button
-              onClick={() => setMode('crawlers')}
+              onClick={() => {
+                setMode('crawlers');
+                // Clear selected crawler job when switching to crawlers tab
+                // so user sees fresh state for new crawls
+                setSelectedCrawlerJob(null);
+              }}
               className={cn(
                 'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
                 mode === 'crawlers'
@@ -762,7 +784,7 @@ export default function WorkbenchPage() {
               <div className="flex items-center justify-between border-b p-4">
                 <div className="flex items-center gap-2">
                   <Globe className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Crawler Jobs</span>
+                  <span className="font-medium">Crawler Results</span>
                 </div>
                 {crawlerJobs.length > 0 && (
                   <Badge variant="secondary">{crawlerJobs.length}</Badge>
@@ -998,42 +1020,125 @@ export default function WorkbenchPage() {
                   {selectedCrawlerJob.results && selectedCrawlerJob.results.length > 0 && (
                     <div className="space-y-3">
                       <h3 className="font-medium">Results ({selectedCrawlerJob.results.length})</h3>
-                      {selectedCrawlerJob.results.map((result) => (
-                        <Card key={result.id} className="overflow-hidden">
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-xs shrink-0">
-                                    {result.source}
-                                  </Badge>
-                                  {result.author && (
-                                    <span className="text-xs text-muted-foreground">
-                                      by {result.author}
-                                    </span>
-                                  )}
-                                  {result.publishedAt && (
-                                    <span className="text-xs text-muted-foreground">
-                                      • {new Date(result.publishedAt).toLocaleDateString()}
-                                    </span>
-                                  )}
+                      {selectedCrawlerJob.results.map((result) => {
+                        const isExpanded = expandedResults.has(result.id);
+                        return (
+                          <Card key={result.id} className="overflow-hidden transition-all">
+                            <button
+                              onClick={() => toggleResultExpanded(result.id)}
+                              className="w-full text-left"
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <Badge variant="outline" className="text-xs shrink-0">
+                                        {result.source}
+                                      </Badge>
+                                      {result.author && (
+                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                          <User className="h-3 w-3" />
+                                          {result.author}
+                                        </span>
+                                      )}
+                                      {result.publishedAt && (
+                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                          <Calendar className="h-3 w-3" />
+                                          {new Date(result.publishedAt).toLocaleDateString()}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <h4 className={cn(
+                                      "mt-2 font-medium",
+                                      !isExpanded && "line-clamp-2"
+                                    )}>
+                                      {result.title}
+                                    </h4>
+                                    {!isExpanded && (
+                                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                        {result.content}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {isExpanded ? (
+                                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                                    ) : (
+                                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                                    )}
+                                  </div>
                                 </div>
-                                <h4 className="mt-1 font-medium line-clamp-2">{result.title}</h4>
-                                <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
-                                  {result.content}
-                                </p>
+                              </CardContent>
+                            </button>
+                            
+                            {/* Expanded Content */}
+                            {isExpanded && (
+                              <div className="border-t bg-muted/30">
+                                <CardContent className="p-4 space-y-4">
+                                  {/* Full Content */}
+                                  <div>
+                                    <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                                      Content
+                                    </h5>
+                                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                                      {result.content}
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Citation / Source Link */}
+                                  {result.url && (
+                                    <div>
+                                      <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                                        Citation
+                                      </h5>
+                                      <div className="flex items-center gap-2 p-3 rounded-lg bg-background border">
+                                        <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
+                                        <a
+                                          href={result.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-sm text-cobalt-600 hover:underline truncate flex-1"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {result.url}
+                                        </a>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          asChild
+                                          className="shrink-0"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <a href={result.url} target="_blank" rel="noopener noreferrer">
+                                            <ExternalLink className="h-4 w-4" />
+                                          </a>
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Metadata */}
+                                  {result.metadata && Object.keys(result.metadata).length > 0 && (
+                                    <div>
+                                      <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                                        Additional Info
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-2 text-sm">
+                                        {Object.entries(result.metadata).map(([key, value]) => (
+                                          <div key={key} className="flex items-center gap-2">
+                                            <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
+                                            <span className="font-medium">{String(value)}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </CardContent>
                               </div>
-                              {result.url && (
-                                <Button variant="ghost" size="sm" asChild className="shrink-0">
-                                  <a href={result.url} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="h-4 w-4" />
-                                  </a>
-                                </Button>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                            )}
+                          </Card>
+                        );
+                      })}
                     </div>
                   )}
 

@@ -11,7 +11,6 @@ import {
   BarChart3,
   Target,
   GitBranch,
-  Play,
   ArrowRight,
   Sparkles,
   Clock,
@@ -108,7 +107,6 @@ export default function DashboardPage() {
           <h2 className="font-heading text-xl font-semibold">All PM Workflows</h2>
           <Button variant="outline" size="sm" asChild>
             <Link href="/demo/console">
-              <Play className="mr-2 h-4 w-4" />
               Open Console
             </Link>
           </Button>
@@ -168,7 +166,6 @@ export default function DashboardPage() {
             </p>
             <Button className="mt-4" asChild>
               <Link href="/demo/console">
-                <Play className="mr-2 h-4 w-4" />
                 Run Your First Job
               </Link>
             </Button>
