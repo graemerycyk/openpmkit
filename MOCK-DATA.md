@@ -542,4 +542,985 @@ const result = await client.callTool('jira', 'search_issues', {
 
 ---
 
+## Design System Guidelines
+
+Use these guidelines when generating prototypes or designing new features.
+
+### Color Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--primary` | `#6366f1` (cobalt-600) | Primary buttons, links, focus states |
+| `--primary-hover` | `#4f46e5` (cobalt-700) | Hover states |
+| `--background` | `#ffffff` | Page backgrounds |
+| `--foreground` | `#1e293b` | Primary text |
+| `--muted` | `#f8fafc` | Secondary backgrounds, cards |
+| `--muted-foreground` | `#64748b` | Secondary text, placeholders |
+| `--border` | `#e2e8f0` | Borders, dividers |
+| `--destructive` | `#ef4444` | Error states, delete actions |
+| `--success` | `#22c55e` | Success states, confirmations |
+| `--warning` | `#f59e0b` | Warning states, cautions |
+
+### Typography
+
+| Element | Font | Size | Weight |
+|---------|------|------|--------|
+| Headings (h1-h6) | Space Grotesk | 24-36px | 600-700 |
+| Body text | Geist Sans | 14-16px | 400 |
+| Code/mono | Geist Mono | 13-14px | 400 |
+| Labels | Geist Sans | 12-14px | 500 |
+| Captions | Geist Sans | 12px | 400 |
+
+### Component Library
+
+Use shadcn/ui components:
+
+| Component | Usage |
+|-----------|-------|
+| `Button` | Primary actions (`default`), secondary (`outline`), danger (`destructive`) |
+| `Select` | Dropdowns, filter selectors |
+| `Input` | Text inputs, search fields |
+| `Textarea` | Multi-line text input |
+| `Card` | Content containers |
+| `Badge` | Status indicators, tags |
+| `Tabs` | Content organization |
+| `Popover` | Contextual menus, date pickers |
+| `Calendar` | Date selection |
+| `ScrollArea` | Scrollable containers |
+
+### Spacing System
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `gap-1` | 4px | Tight spacing (icons, badges) |
+| `gap-2` | 8px | Compact spacing (form elements) |
+| `gap-3` | 12px | Standard spacing (filter controls) |
+| `gap-4` | 16px | Section spacing |
+| `gap-6` | 24px | Large section spacing |
+| `gap-8` | 32px | Page section spacing |
+
+### Icons
+
+Use Lucide React icons:
+
+| Icon | Usage |
+|------|-------|
+| `CalendarIcon` | Date pickers, date filters |
+| `X` | Close buttons, clear filters |
+| `Search` | Search inputs |
+| `Filter` | Filter toggles |
+| `ChevronDown` | Dropdown indicators |
+| `Check` | Selected states |
+| `FileText` | Documents |
+| `Folder` | Projects |
+| `MessageSquare` | Comments |
+
+### Interactive States
+
+```css
+/* Hover */
+background: var(--muted);
+border-color: var(--border);
+
+/* Focus */
+border-color: var(--primary);
+box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+
+/* Active/Selected */
+background: var(--primary);
+color: white;
+
+/* Disabled */
+opacity: 0.5;
+cursor: not-allowed;
+```
+
+---
+
+## Focus Areas for Prototypes
+
+Use these focus areas when generating UI prototypes from PRDs.
+
+### Search Filters Prototype
+
+```
+**Focus Areas for Prototype**
+1. Filter bar layout and interaction
+2. Date range selection (presets + custom picker)
+3. Content type multi-select dropdown
+4. Clear filters functionality
+5. Results count with active filter state
+6. Real-time filter application
+7. Filter persistence across searches
+```
+
+### Dashboard Prototype
+
+```
+**Focus Areas for Prototype**
+1. Widget grid layout (responsive)
+2. Widget types: metrics, charts, lists
+3. Widget configuration/settings
+4. Drag-and-drop reordering
+5. Add/remove widgets
+6. Loading states for async data
+7. Empty states for new users
+```
+
+### Onboarding Flow Prototype
+
+```
+**Focus Areas for Prototype**
+1. Step indicator/progress bar
+2. Form validation and error states
+3. Skip/back navigation
+4. Contextual help tooltips
+5. Success celebration on completion
+6. Smooth transitions between steps
+```
+
+### Settings Page Prototype
+
+```
+**Focus Areas for Prototype**
+1. Navigation sidebar with sections
+2. Form layouts for different setting types
+3. Toggle switches for boolean settings
+4. Save/cancel actions
+5. Unsaved changes warning
+6. Success/error feedback
+```
+
+---
+
+## Workbench Copy/Paste Data
+
+Ready-to-use data samples for the Workbench admin demo mode. Copy and paste these into the appropriate fields.
+
+### Daily Brief Data
+
+#### Slack Messages
+```
+#product-updates: "Search filters shipping next week! 🎉" - Sarah Chen (👀 12, 🚀 8)
+#product-updates: "Sprint 42 velocity looking good - 16/19 points complete" - Marcus Johnson
+#customer-success: "Globex Corp escalation resolved - dashboard widgets fixed" - Mike Johnson (✅ 5)
+#engineering: "ACME-350 fix deployed - search special characters bug resolved" - Alex Kim (🎉 15)
+#customer-feedback: "NPS response from Initech: Score 8 - 'Love the product, search needs work'" - Support Bot
+DM from CEO: "Great progress on search. Let's discuss AI roadmap in our 1:1"
+#support-escalations: "🔴 P1 resolved: Globex Corp dashboard issue - root cause was Redis connection pool" - Dev Team
+```
+
+#### Jira Updates
+```
+**Sprint 42 Status (Dec 16-29)**
+
+| Issue | Title | Status | Points |
+|-------|-------|--------|--------|
+| ACME-342 | Search date filters | In Progress (70%) | 5 |
+| ACME-343 | Search ranking improvements | In Review | 8 |
+| ACME-344 | No results UX | To Do | 3 |
+| ACME-350 | P1: Search crash on special chars | Done | - |
+
+**Sprint Velocity**: 16/19 points (84%)
+
+**Blockers:**
+- ACME-343 waiting on performance review from platform team
+- ACME-344 deprioritized for escalation work
+
+**Recent Activity:**
+- ACME-350 resolved (P1 bug) - Dec 23
+- ACME-342 70% complete - filters UI done, backend in progress
+- 3 new bugs triaged, 2 added to backlog
+```
+
+#### Support Tickets
+```
+**Open Tickets (Last 7 Days)**
+
+| Ticket | Customer | Priority | Subject | Age |
+|--------|----------|----------|---------|-----|
+| ZD-4521 | Globex Corp | Urgent | Dashboard widgets not loading | 3d |
+| ZD-4518 | Initech | High | Search relevance issues | 5d |
+| ZD-4515 | Umbrella Corp | Normal | Need date filters in search | 7d |
+| ZD-4512 | Weyland Ind | High | Slack integration not syncing | 8d |
+
+**Resolved This Week:**
+- ZD-4520: Search crashes with special characters (P1) - Resolved
+- ZD-4519: Dashboard performance for large accounts - Resolved
+
+**Themes:**
+- Search-related: 47 tickets (35%)
+- Performance: 22 tickets (16%)
+- Integration: 18 tickets (13%)
+```
+
+#### Community Activity
+```
+**Top Discussions:**
+1. "Search improvements coming soon?" - 45 replies, 89 upvotes
+   > "Finally! Date filters will save us hours" - power_user_jane
+2. "Workaround for finding old content" - 23 replies, 67 upvotes
+   > Staff reply: "Search improvements shipping next week!"
+3. "Slack integration reliability issues" - 18 replies, 34 upvotes
+
+**Feature Requests:**
+| Request | Votes | Status |
+|---------|-------|--------|
+| Date filters for search | 89 | In Progress |
+| Saved searches | 56 | Planned |
+| Better Jira integration | 72 | Planned |
+| Dark mode | 145 | In Progress |
+
+**New Posts Today:** 12
+**Active Users This Week:** 234
+```
+
+---
+
+### Meeting Prep Data
+
+#### Recent Calls / Meeting Notes
+```
+**Globex Corp QBR** (Dec 20, 45 min)
+- Attendees: John Smith (VP Product), Emily Davis (PM), Sarah Chen (CSM)
+- Topics: Search frustrations, expansion plans, roadmap review
+- Key Quotes:
+  > "Search is our biggest pain point - team spends 20-30 min/day searching"
+  > "We're ready to expand from 50 to 200 seats once search is fixed"
+  > "Date filters would be huge for us"
+- Sentiment: Mixed (frustrated but optimistic)
+- Next Steps: Follow up on search improvements timeline
+
+**Globex Corp Support Call** (Dec 15, 20 min)
+- Attendees: John Smith, Support Team
+- Issue: Dashboard widgets not loading
+- Resolution: Escalated to engineering, temporary workaround provided
+- Customer satisfaction: Neutral
+
+**Globex Corp Feature Request** (Nov 28, email)
+- Request: Date filters for search
+- Priority: High (blocking expansion)
+- Added to Q4 roadmap
+```
+
+#### Support Tickets
+```
+**Open Tickets for Globex Corp**
+
+| Ticket | Priority | Subject | Age | Status |
+|--------|----------|---------|-----|--------|
+| ZD-4521 | Urgent | Dashboard widgets not loading | 3d | In Progress |
+| ZD-4518 | High | Search relevance issues | 5d | Pending |
+| ZD-4502 | Normal | Feature request: date filters | 12d | Planned |
+
+**Resolved (Last 30 Days):**
+- ZD-4495: Export timeout for large datasets - Resolved
+- ZD-4488: SSO configuration help - Resolved
+- ZD-4475: API rate limiting questions - Resolved
+
+**Ticket Trend:** 8 tickets in last 30 days (up from 5 previous month)
+```
+
+#### Account Health
+```
+**Account Health: Globex Corp**
+
+| Metric | Value | Trend |
+|--------|-------|-------|
+| Health Score | 72/100 | ⚠️ At Risk (was 78) |
+| Contract Value | $48,000 ARR | - |
+| Seats | 50 (of 50 licensed) | At capacity |
+| Renewal Date | March 15, 2026 | 75 days |
+| NPS Score | 7 (Passive) | Down from 8 |
+
+**Expansion Potential:**
+- Requested: 200 seats (4x expansion)
+- Blocker: Search improvements
+- Potential ARR: $192,000
+
+**Key Contacts:**
+- John Smith (VP Product) - Executive sponsor, decision maker
+- Emily Davis (PM) - Day-to-day contact, power user
+- IT Admin (unknown) - Technical contact for SSO
+
+**Risk Factors:**
+- Search frustration mentioned in 3 recent calls
+- Competitor (Notion) mentioned in last QBR
+- Dashboard issues affecting 12 users
+
+**Opportunities:**
+- 4x expansion if search ships
+- API integration interest for internal tools
+- Potential case study candidate
+```
+
+---
+
+### VoC Clustering Data
+
+#### Support Tickets
+```
+**Support Ticket Themes (Last 30 Days)**
+
+| Theme | Count | % of Total | Trend |
+|-------|-------|------------|-------|
+| Search issues | 47 | 35% | ↑ 15% |
+| Performance | 22 | 16% | ↑ 25% |
+| Onboarding | 15 | 11% | → Stable |
+| Integrations | 18 | 13% | ↓ 8% |
+| Feature requests | 12 | 9% | → Stable |
+| Billing/account | 8 | 6% | → Stable |
+| Other | 13 | 10% | - |
+
+**Sample Tickets by Theme:**
+
+Search Issues:
+- "Search not finding recently created documents" - Globex Corp
+- "Search returns too many irrelevant results" - Initech
+- "Need date filters in search" - Umbrella Corp
+- "Search crashes with special characters" - Multiple customers
+
+Performance:
+- "Dashboard widgets not loading" - Globex Corp (P1)
+- "Slow page loads during peak hours" - Weyland Industries
+- "API timeouts on large exports" - Umbrella Corp
+
+Integrations:
+- "Slack integration stopped syncing" - Weyland Industries
+- "Jira two-way sync not working" - Initech
+- "Calendar integration missing events" - Multiple customers
+```
+
+#### Call Insights
+```
+**Pain Points (from 32 calls)**
+
+1. Search frustration (mentioned in 12 calls, 38%)
+   > "I spend more time searching than working" - Globex Corp
+   > "Search never finds what I'm looking for" - Initech
+   > "We've created workarounds using tags" - Umbrella Corp
+
+2. Onboarding complexity (8 calls, 25%)
+   > "It took our team 3 weeks to get productive" - Weyland Industries
+   > "The learning curve is steep" - New customer
+   > "New hires keep getting stuck on project creation" - Globex Corp
+
+3. Integration reliability (6 calls, 19%)
+   > "Slack sync is unreliable" - Multiple customers
+   > "We need better Jira integration" - Initech
+   > "Calendar events don't always sync" - Umbrella Corp
+
+**Feature Requests from Calls:**
+1. Date filters for search (89 votes equivalent)
+2. Saved searches (45 votes equivalent)
+3. Better Slack integration (38 votes equivalent)
+4. AI-powered search (34 votes equivalent)
+
+**Competitive Mentions:**
+- Notion: 8 mentions (positive sentiment toward their search)
+- Coda: 3 mentions (pricing comparison)
+- Monday.com: 2 mentions (Slack integration)
+```
+
+#### Community Feedback
+```
+**Feature Requests (Community Forum)**
+
+1. **Date filters for search** (89 votes) - Status: In Progress
+   > "I need to find content from last week, not 2 years ago"
+   > "This is table stakes - every competitor has this"
+
+2. **Better Jira integration** (72 votes) - Status: Planned
+   > "Two-way sync would be a game changer"
+   > "Currently using Zapier as a workaround"
+
+3. **Saved searches** (56 votes) - Status: Under Review
+   > "Let me save my common searches"
+   > "I search for the same things every day"
+
+4. **AI-powered search** (34 votes) - Status: Open
+   > "Notion has this, why don't you?"
+   > "Semantic search would be amazing"
+
+**Discussion Themes:**
+- Search workarounds: 23 posts, 1,450 views
+- Integration tips: 18 posts, 890 views
+- Feature request discussions: 45 posts, 2,100 views
+```
+
+#### NPS Verbatims
+```
+**NPS Verbatims (Last 30 Days)**
+
+Score 9-10 (Promoters):
+- "Love the product, just need better search" - Enterprise customer
+- "Best tool for our PM workflow" - Mid-market customer
+- "Great support team, always helpful" - SMB customer
+
+Score 7-8 (Passives):
+- "Good but Notion's search is better" - Enterprise customer
+- "Great for our team, onboarding was rough" - Mid-market customer
+- "Would recommend once search improves" - Enterprise customer
+
+Score 0-6 (Detractors):
+- "Can't find anything, considering alternatives" - Enterprise customer
+- "Slack integration keeps breaking" - Mid-market customer
+- "Too expensive for what we get" - SMB customer
+
+**NPS Summary:**
+- Overall NPS: 32 (down from 38 last quarter)
+- Enterprise NPS: 28 (search is main detractor)
+- Mid-market NPS: 35
+- SMB NPS: 42
+```
+
+---
+
+### Competitor Research Data
+
+#### Competitor Updates
+```
+**Competitor Updates (Last 14 Days)**
+
+### Notion
+- **AI-powered search launched** (Dec 22) 🔴 HIGH IMPACT
+  - Semantic search using embeddings
+  - Available to all paid plans
+  - Early reviews: "Game changer for finding content"
+  - Source: Product Hunt, TechCrunch
+
+- **Repositioned as "AI-first workspace"** (Dec 15)
+  - New homepage messaging emphasizes AI
+  - Tagline: "The AI-powered workspace for modern teams"
+
+### Coda
+- **20% enterprise price reduction** (Dec 18) 🔴 HIGH IMPACT
+  - Enterprise now $20/user/month (was $25)
+  - Targeting enterprise market share
+  - Source: Company blog, pricing page
+
+### Monday.com
+- **Native Slack integration** (Dec 15) 🟡 MEDIUM IMPACT
+  - Two-way sync with channels
+  - Slash commands for task creation
+  - Interactive messages for updates
+  - Source: Press release
+
+### Asana
+- **AI Goals feature launched** (Dec 12) 🟡 MEDIUM IMPACT
+  - AI-powered goal setting and tracking
+  - Progress predictions and risk alerts
+  - Source: TechCrunch
+
+### ClickUp
+- **$400M Series D at $4B valuation** (Dec 10) 🔴 HIGH IMPACT
+  - Plans to double engineering team in 2026
+  - Focus on AI and enterprise features
+  - Source: Crunchbase, company announcement
+```
+
+#### Feature Comparison
+```
+**Feature Comparison Matrix**
+
+| Feature | Us | Notion | Coda | Monday | Asana |
+|---------|-----|--------|------|--------|-------|
+| AI Search | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Search Filters | 🔜 | ✅ | ✅ | ✅ | ✅ |
+| Saved Searches | ❌ | ✅ | ✅ | ✅ | ✅ |
+| SAML SSO | 🔜 | ✅ | ✅ | ✅ | ✅ |
+| SCIM Provisioning | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Audit Logs | 🔜 | ✅ | ❌ | ✅ | ✅ |
+| Slack Integration | ⚠️ | ✅ | ✅ | ✅ | ✅ |
+| Jira Integration | ✅ | ✅ | ✅ | ✅ | ✅ |
+| API Webhooks | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Custom Fields | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Templates | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Mobile App | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+Legend: ✅ Available | 🔜 Coming Soon | ⚠️ Partial/Issues | ❌ Not Available
+
+**Pricing Comparison (per user/month, annual):**
+| Tier | Us | Notion | Coda | Monday | Asana |
+|------|-----|--------|------|--------|-------|
+| Free | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Pro | $12 | $10 | $10 | $12 | $11 |
+| Business | $18 | $18 | $15 | $19 | $25 |
+| Enterprise | $22 | $25 | $20 | $24 | Custom |
+```
+
+---
+
+### PRD Draft Data
+
+#### Customer Evidence
+```
+**Customer Evidence for Search Filters**
+
+| Source | Count | Key Quote |
+|--------|-------|-----------|
+| Support tickets | 47 | "I spend more time searching than working" |
+| Gong calls | 12 | "Date filters would be huge" |
+| Community | 89 votes | "Filter by content type please" |
+| NPS verbatims | 8 | "Search is my biggest frustration" |
+
+**Enterprise Expansion Blocked:**
+- Globex Corp: 50 → 200 seats ($144K ARR increase)
+- Initech: 30 → 100 seats ($84K ARR increase)
+- Umbrella Corp: New deal, 150 seats ($180K ARR)
+- **Total blocked ARR: $408K**
+
+**Competitive Pressure:**
+- Notion launched AI search (Dec 22)
+- All competitors have search filters
+- 3 lost deals cited search as factor
+
+**Customer Quotes:**
+> "We're ready to expand once search is fixed" - Globex Corp VP
+> "I've created a tagging workaround but it's not sustainable" - Power user
+> "Our team spends 20-30 minutes per day just searching" - Enterprise PM
+> "Date filters are table stakes - every competitor has this" - Community
+```
+
+#### Analytics Signals
+```
+**Search Analytics (Last 30 Days)**
+
+| Metric | Value | Change | Target |
+|--------|-------|--------|--------|
+| Search queries/day | 45,000 | +12% | - |
+| Avg. search-to-click | 8.2s | -5% | <5s |
+| No-results rate | 23% | -2% | <10% |
+| Search abandonment | 18% | +3% | <10% |
+| Filter usage (current) | 0% | - | >40% |
+
+**Top Search Queries (No Results):**
+1. "meeting notes" - 980 queries, 22% no results
+2. "Q4 report" - 750 queries, 8% no results
+3. "onboarding guide" - 540 queries, 35% no results
+4. "export data" - 420 queries, 42% no results
+
+**User Behavior:**
+- 89% of users use search at least once per session
+- Average 3.2 searches per session
+- 45% refine their search query at least once
+- Power users search 8+ times per session
+
+**Funnel: Search → Result Click**
+1. Search initiated: 100%
+2. Results viewed: 92%
+3. Result clicked: 68%
+4. Correct result found: 52%
+```
+
+#### Technical Context
+```
+**Technical Context**
+
+**Current Search Infrastructure:**
+- Elasticsearch 7.x cluster (3 nodes)
+- Index size: 2.3M documents
+- Avg query time: 120ms (p50), 450ms (p95)
+- Current filter support: Project only
+
+**Proposed Changes:**
+- Add date range filter (created_at, updated_at)
+- Add content type filter (documents, projects, comments)
+- Add combined filter support (AND logic)
+- Implement filter state in URL for sharing
+
+**Performance Considerations:**
+- Filter queries add ~20ms latency
+- Date range filters require index optimization
+- Content type filters use existing type field
+- Combined filters may need query restructuring
+
+**Dependencies:**
+- Elasticsearch upgrade to 8.x (recommended)
+- Redis cache for filter presets
+- Frontend filter component library
+
+**Estimated Effort:**
+- Backend: 2 weeks (filter API, index optimization)
+- Frontend: 2 weeks (filter UI, state management)
+- Testing: 1 week (performance, edge cases)
+- Total: 5-6 weeks
+```
+
+---
+
+### Sprint Review Data
+
+#### Completed Stories
+```
+**Sprint 42 Completed Work (Dec 16-29)**
+
+| Issue | Type | Title | Points | Status |
+|-------|------|-------|--------|--------|
+| ACME-342 | Story | Search date filters | 5 | ✅ Done |
+| ACME-343 | Story | Search ranking improvements | 8 | ✅ Done |
+| ACME-350 | Bug | P1: Search crash on special chars | - | ✅ Done |
+| ACME-348 | Bug | Dashboard widget loading fix | - | ✅ Done |
+| ACME-346 | Story | Filter UI components | 3 | ✅ Done |
+| ACME-345 | Bug | Export button Safari fix | - | ✅ Done |
+
+**Carried Over:**
+| Issue | Type | Title | Points | Reason |
+|-------|------|-------|--------|--------|
+| ACME-344 | Story | No results UX | 3 | Deprioritized for P1 |
+
+**Unplanned Work:**
+- ACME-350: P1 bug discovered mid-sprint (2 days)
+- Globex Corp escalation support (1 day)
+```
+
+#### Sprint Metrics
+```
+**Sprint 42 Metrics**
+
+| Metric | Committed | Completed | % |
+|--------|-----------|-----------|---|
+| Story Points | 19 | 16 | 84% |
+| Stories | 8 | 7 | 87% |
+| Bugs Resolved | 4 | 5 | 125% |
+| P1 Issues | 1 | 1 | 100% |
+
+**Velocity Trend:**
+- Sprint 40: 14 pts
+- Sprint 41: 17 pts
+- Sprint 42: 16 pts
+- 3-Sprint Average: 15.7 pts
+
+**Work Distribution:**
+- Customer-facing features: 75%
+- Bug fixes: 15%
+- Tech debt: 10%
+
+**Quality Metrics:**
+- Bugs found in sprint: 2
+- Bugs escaped to production: 0
+- Code review turnaround: 4 hours avg
+- Test coverage: 78% (up from 75%)
+
+**Team Capacity:**
+- Available: 40 person-days
+- Used: 38 person-days
+- PTO/Sick: 2 person-days
+```
+
+#### Blockers & Issues
+```
+**Blockers & Issues Encountered**
+
+1. **P1 Bug: Search Crash (ACME-350)**
+   - Discovered: Dec 22
+   - Resolved: Dec 23
+   - Impact: 2 days of unplanned work
+   - Root cause: Missing input sanitization
+   - Learning: Add fuzz testing to search
+
+2. **Globex Corp Escalation**
+   - Issue: Dashboard widgets not loading
+   - Duration: 1 day investigation
+   - Root cause: Redis connection pool exhaustion
+   - Resolution: Increased pool size, added monitoring
+
+3. **Search Ranking Complexity**
+   - Original estimate: 5 points
+   - Actual effort: 8 points
+   - Reason: Algorithm complexity underestimated
+   - Learning: Add spike stories for algorithm work
+
+**Process Improvements Identified:**
+- Add connection pool monitoring to all services
+- Include fuzz testing in QA checklist
+- Better estimation for algorithm work
+```
+
+#### Customer Feedback
+```
+**Customer Feedback This Sprint**
+
+**On Search Filters (Preview Users):**
+> "The search filters are exactly what we needed. This changes everything for our team." - Globex Corp
+
+> "Finally! Date filters will save us hours every week." - Community power user
+
+> "Can we also get a 'custom date range' option?" - Beta tester
+
+**On Bug Fixes:**
+> "Thanks for the quick fix on the special characters bug!" - Umbrella Corp
+
+> "Dashboard is working great now. Appreciate the fast response." - Globex Corp
+
+**Feature Requests from Feedback:**
+1. Custom date range picker (5 mentions)
+2. Save filter preferences (3 mentions)
+3. Keyboard shortcuts for filters (2 mentions)
+
+**NPS Impact:**
+- Pre-sprint NPS: 32
+- Post-sprint NPS (preview): 38 (projected)
+- Search satisfaction: 3.2 → 3.8 (preview users)
+```
+
+---
+
+### Release Notes Data
+
+#### Completed Issues
+```
+**Completed Issues for v2.4.0**
+
+| Issue | Type | Title | Description |
+|-------|------|-------|-------------|
+| ACME-342 | Feature | Search date filters | Filter search results by date range (7d, 30d, 90d, custom) |
+| ACME-343 | Feature | Search ranking improvements | Improved relevance with recency and engagement signals |
+| ACME-346 | Feature | Content type filters | Filter by documents, projects, or comments |
+| ACME-350 | Bug | Search crash fix | Fixed crash when using special characters in search |
+| ACME-348 | Bug | Dashboard widget fix | Fixed widgets not loading for some users |
+| ACME-345 | Bug | Safari export fix | Fixed export button not working on Safari |
+| ACME-341 | Bug | Notification preferences | Fixed preferences not saving correctly |
+
+**Performance Improvements:**
+- Search latency reduced by 23% (p95: 450ms → 350ms)
+- Dashboard load time improved by 40% for large accounts
+- Memory usage reduced by 15% for complex dashboards
+```
+
+#### Epic Summaries
+```
+**Epic: Search Improvements (ACME-100)**
+
+This release completes Phase 1 of our search improvements initiative, adding filtering capabilities that customers have requested for months.
+
+**Key Outcomes:**
+- 89 customer votes addressed (date/content type filters)
+- 3 enterprise expansion blockers removed
+- Foundation laid for future AI search features
+
+**What's Included:**
+- Date range filters (presets + custom)
+- Content type filters (documents, projects, comments)
+- Combined filter support
+- Improved relevance ranking
+
+**Customer Impact:**
+- Expected 30% reduction in search-to-click time
+- Filter adoption target: >40% of searches
+- Search satisfaction target: 3.2 → 4.0+
+
+**What's Next:**
+- Phase 2: Saved searches (Q1 2026)
+- Phase 3: AI-powered semantic search (Q2 2026)
+```
+
+#### Related PRDs
+```
+**Related PRD: Search Filters**
+
+**Goals:**
+| Goal | Metric | Target |
+|------|--------|--------|
+| Reduce time to find content | Avg. search-to-click | -30% |
+| Improve satisfaction | Survey score | 3.2 → 4.0+ |
+| Drive filter adoption | Filter usage rate | >40% |
+
+**User Stories Delivered:**
+1. As a PM, I can filter search by date range
+2. As a PM, I can filter by content type
+3. As a PM, I can combine multiple filters
+4. As a PM, I can clear all filters with one click
+
+**Success Criteria:**
+- [x] All P0 requirements complete
+- [x] <1% error rate in filter queries
+- [x] Performance within targets (<200ms)
+- [x] Documentation updated
+
+**Evidence Base:**
+- 47 support tickets about search
+- 89-vote community feature request
+- 3 enterprise deals blocked by search
+- 12 Gong call mentions
+```
+
+---
+
+### Prototype Generation Data
+
+#### PRD Content (Sample)
+```
+# PRD: Search Filters
+
+## 1. Overview
+
+### Problem Statement
+Users cannot efficiently find content because search results lack filtering capabilities.
+
+### Goals
+| Goal | Metric | Target |
+|------|--------|--------|
+| Reduce time to find content | Avg. search-to-click time | -30% |
+| Improve search satisfaction | User survey score | 3.2 → 4.0+ |
+
+## 2. User Stories
+
+1. **As a PM**, I want to filter search results by date range
+   - Acceptance: Date presets (7d, 30d, 90d) and custom range picker
+   
+2. **As a PM**, I want to filter by content type
+   - Acceptance: Multi-select for documents, projects, comments
+
+3. **As a PM**, I want to combine multiple filters
+   - Acceptance: Filters work together with AND logic
+
+4. **As a PM**, I want to clear all filters
+   - Acceptance: Single "Clear filters" button resets all
+
+## 3. Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1 | Date range filter with presets | P0 |
+| F2 | Custom date range picker | P1 |
+| F3 | Content type filter | P0 |
+| F4 | Clear all filters button | P0 |
+| F5 | Filter state in URL | P2 |
+| F6 | Results count with active filters | P0 |
+
+## 4. Key Flows
+
+1. User enters search query
+2. Results display with filter bar above
+3. User selects date filter (e.g., "Last 7 days")
+4. Results update in real-time
+5. User adds content type filter
+6. Results narrow further
+7. Active filters shown as tags
+8. User clicks "Clear filters" to reset
+```
+
+#### Design System Guidelines (for Prototype)
+```
+**Design System Guidelines**
+
+**Components:**
+- Use shadcn/ui components (Select, Button, Popover, Calendar)
+- Filter bar: horizontal layout with gap-3 spacing
+- Dropdowns: 200px min-width, 8px border-radius
+
+**Colors:**
+- Primary actions: cobalt-600 (#6366f1)
+- Filter tags: cobalt-100 bg, cobalt-700 text
+- Borders: slate-200 (#e2e8f0)
+- Muted text: slate-500 (#64748b)
+
+**Typography:**
+- Filter labels: text-sm (14px), font-medium
+- Results count: text-sm, text-muted-foreground
+- Result titles: text-base (16px), font-medium
+
+**Icons:**
+- Use Lucide React icons
+- CalendarIcon for date picker
+- X for clear/close
+- ChevronDown for dropdowns
+- Filter for filter toggle
+
+**Spacing:**
+- Filter bar padding: 12px 16px
+- Gap between filters: 12px
+- Results list item padding: 16px
+
+**States:**
+- Hover: bg-muted, border-slate-300
+- Focus: ring-2 ring-cobalt-500/20, border-cobalt-500
+- Active filter: bg-cobalt-100, text-cobalt-700
+```
+
+#### Focus Areas (for Prototype)
+```
+**Focus Areas for Prototype**
+
+1. **Filter Bar Layout**
+   - Horizontal bar below search input
+   - Filters: Date range, Content type
+   - Clear button appears when filters active
+   - Results count updates in real-time
+
+2. **Date Range Selection**
+   - Dropdown with presets: All time, Last 7 days, Last 30 days, Last 90 days
+   - Custom range option opens date picker
+   - Selected value shown in dropdown trigger
+
+3. **Content Type Filter**
+   - Dropdown with options: All types, Documents, Projects, Comments
+   - Single select (not multi-select for MVP)
+   - Icon + label for each option
+
+4. **Active Filter State**
+   - Show filter tags when active
+   - "2 filters active" indicator
+   - Clear all button visible
+
+5. **Results Display**
+   - Show result count: "8 results"
+   - List with icon, title, excerpt, metadata
+   - Content type badge on each result
+   - Date shown in relative format
+
+6. **Interactions**
+   - Filters apply immediately (no "Apply" button)
+   - Smooth transitions on filter change
+   - Loading state while filtering
+   - Empty state for no results
+```
+
+---
+
+## Data Files Location
+
+All mock data is located in `packages/mock-tenant/src/data/`:
+
+| File | Contents |
+|------|----------|
+| `jira.ts` | Sprints, issues (epics, stories, bugs, tasks) |
+| `confluence.ts` | Spaces, pages |
+| `slack.ts` | Channels, messages |
+| `gong.ts` | Calls, transcripts, insights |
+| `zendesk.ts` | Tickets, comments |
+| `analytics.ts` | Events, search queries, feature usage, user journeys |
+| `competitor.ts` | Competitors, changes, feature comparisons |
+| `community.ts` | Posts, replies, feature requests |
+| `pmkit.ts` | Generated artifacts (PRDs, briefs, reports) |
+
+## Usage
+
+```typescript
+import { 
+  initializeMockData, 
+  createMockMCPClient,
+  DEMO_TENANT,
+  DEMO_USERS,
+  DEMO_ARCS,
+  jiraData,
+  slackData,
+  // ... other data exports
+} from '@pmkit/mock-tenant';
+
+// Initialize all mock data
+initializeMockData();
+
+// Create a mock MCP client for testing
+const client = createMockMCPClient();
+
+// Call tools
+const result = await client.callTool('jira', 'search_issues', { 
+  jql: 'project = ACME' 
+});
+```
+
+---
+
 *Generated from pmkit mock-tenant package • Last updated: January 2026*
