@@ -279,7 +279,7 @@ export default function HomePage() {
             </div>
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" asChild>
-                <Link href="/demo?job=prototype_generation">
+                <Link href="/demo/console?job=prototype_generation">
                   Try Prototype Generation
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -549,8 +549,8 @@ export default function HomePage() {
 
           <div className="mt-8 text-center">
             <Button asChild>
-              <Link href="/demo/launcher">
-                Try the Launcher Demo
+              <Link href="/demo/console?view=commands">
+                Try the Slack & Teams Demo
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

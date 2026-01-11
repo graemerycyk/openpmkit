@@ -239,7 +239,7 @@ enum JobStatus { Pending, Running, ... }
 ### Web App
 - `apps/web/src/app/(marketing)/` - Marketing pages (uses shared layout with header/footer)
 - `apps/web/src/app/demo/console/` - Demo console UI
-- `apps/web/src/app/demo/launcher/` - Slack/Teams/Email launcher demo
+- `apps/web/src/app/demo/console/` - Demo console with PM Workflows and Slack/Teams command demo
 - `apps/web/src/components/layout/` - Header and Footer components
 - `apps/web/src/components/ui/` - Shared UI components (shadcn/ui)
 - `apps/web/src/lib/utils.ts` - Utilities including `cn()` and `siteConfig`
