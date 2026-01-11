@@ -31,7 +31,6 @@ interface Integration {
   status: ConnectionStatus;
   category: 'tools' | 'crawlers';
   docsUrl?: string;
-  isPro?: boolean;
 }
 
 const integrations: Integration[] = [
@@ -74,7 +73,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-green-100 text-green-600',
     status: 'not_connected',
     category: 'tools',
-    isPro: true,
+    docsUrl: '/resources/gong-integration',
   },
   {
     id: 'zendesk',
@@ -84,7 +83,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-emerald-100 text-emerald-600',
     status: 'not_connected',
     category: 'tools',
-    isPro: true,
+    docsUrl: '/resources/zendesk-integration',
   },
   {
     id: 'amplitude',
@@ -94,7 +93,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-indigo-100 text-indigo-600',
     status: 'not_connected',
     category: 'tools',
-    isPro: true,
+    docsUrl: '/resources/amplitude-integration',
   },
   {
     id: 'discourse',
@@ -104,6 +103,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-amber-100 text-amber-600',
     status: 'not_connected',
     category: 'tools',
+    docsUrl: '/resources/discourse-integration',
   },
   {
     id: 'linear',
@@ -132,7 +132,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-pink-100 text-pink-600',
     status: 'not_connected',
     category: 'crawlers',
-    isPro: true,
+    docsUrl: '/resources/social-crawler-integration',
   },
   {
     id: 'web_search',
@@ -142,6 +142,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-cyan-100 text-cyan-600',
     status: 'not_connected',
     category: 'crawlers',
+    docsUrl: '/resources/web-search-integration',
   },
   {
     id: 'news_crawler',
@@ -151,7 +152,7 @@ const integrations: Integration[] = [
     iconBg: 'bg-orange-100 text-orange-600',
     status: 'not_connected',
     category: 'crawlers',
-    isPro: true,
+    docsUrl: '/resources/news-crawler-integration',
   },
 ];
 
@@ -191,11 +192,6 @@ function IntegrationCard({ integration }: { integration: Integration }) {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold">{integration.name}</h3>
-                {integration.isPro && (
-                  <Badge variant="cobalt" className="text-xs">
-                    Pro
-                  </Badge>
-                )}
               </div>
               <p className="text-sm text-muted-foreground">{integration.description}</p>
               <StatusBadge status={integration.status} />
@@ -261,7 +257,7 @@ export default function IntegrationsPage() {
             <div>
               <h3 className="font-semibold">Upgrade to Paid Plan for all integrations</h3>
               <p className="text-sm text-muted-foreground">
-                Get access to Gong, Zendesk, Amplitude, and AI crawlers with a Pro plan.
+                Get access to all tool integrations and AI crawlers with a paid plan.
               </p>
             </div>
           </div>
@@ -309,8 +305,8 @@ export default function IntegrationsPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>MCP Clients</CardTitle>
-            <Badge variant="cobalt" className="text-xs">
-              Pro
+            <Badge variant="secondary" className="text-xs">
+              Coming Soon
             </Badge>
           </div>
           <CardDescription>
@@ -320,13 +316,13 @@ export default function IntegrationsPage() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
-            <div className="flex-1 rounded-lg border bg-muted/50 px-4 py-2 font-mono text-sm">
+            <div className="flex-1 rounded-lg border bg-muted/50 px-4 py-2 font-mono text-sm text-muted-foreground">
               https://app.getpmkit.com/mcp
             </div>
-            <Button variant="outline">
-              Copy Config
+            <Button variant="outline" disabled>
+              Coming Soon
             </Button>
-            <Button>
+            <Button disabled>
               Open in Cursor
             </Button>
           </div>

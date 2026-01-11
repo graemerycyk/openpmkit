@@ -78,7 +78,7 @@ type JobStatus = 'idle' | 'running' | 'completed' | 'error';
 
 type ConnectorStatus = 'not_connected' | 'connected_demo' | 'connected_real';
 
-type DemoView = 'workflows' | 'commands';
+type DemoView = 'workflows' | 'commands' | 'crawlers';
 
 type Channel = 'slack' | 'teams' | 'email';
 
@@ -894,6 +894,18 @@ function ConsolePageContent() {
             <MessageSquare className="h-4 w-4" />
             Slack & Teams
           </button>
+          <button
+            onClick={() => setDemoView('crawlers')}
+            className={cn(
+              'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+              demoView === 'crawlers'
+                ? 'bg-background text-foreground shadow-sm border'
+                : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+            )}
+          >
+            <Globe className="h-4 w-4" />
+            AI Crawlers
+          </button>
         </div>
       </div>
 
@@ -1413,7 +1425,7 @@ function ConsolePageContent() {
             )}
           </main>
         </div>
-      ) : (
+      ) : demoView === 'commands' ? (
         // Slack & Teams Commands View
         <main className="flex-1 overflow-auto p-8">
           <div className="mx-auto max-w-6xl">
@@ -1701,7 +1713,208 @@ function ConsolePageContent() {
             </div>
           </div>
         </main>
-      )}
+      ) : demoView === 'crawlers' ? (
+        // AI Crawlers View
+        <main className="flex-1 overflow-auto p-8">
+          <div className="mx-auto max-w-6xl">
+            {/* Header */}
+            <div className="text-center">
+              <h1 className="font-heading text-3xl font-bold">AI Crawlers</h1>
+              <p className="mt-2 text-muted-foreground">
+                Monitor social media, web, and news for competitive intelligence and customer insights.
+              </p>
+            </div>
+
+            {/* Crawler Cards */}
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {/* Social Crawler */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-purple-50 opacity-50" />
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100">
+                      <Hash className="h-6 w-6 text-pink-600" />
+                    </div>
+                    <div>
+                      <CardTitle>Social Crawler</CardTitle>
+                      <CardDescription>Reddit, Hacker News</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Monitor social platforms for brand mentions, competitor discussions, and customer sentiment.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">PLATFORMS</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline">Reddit</Badge>
+                      <Badge variant="outline">Hacker News</Badge>
+                      <Badge variant="secondary" className="opacity-50">X (Coming)</Badge>
+                      <Badge variant="secondary" className="opacity-50">LinkedIn (Coming)</Badge>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">EXAMPLE KEYWORDS</p>
+                    <div className="flex flex-wrap gap-1">
+                      <Badge variant="cobalt" className="text-xs">notion</Badge>
+                      <Badge variant="cobalt" className="text-xs">coda</Badge>
+                      <Badge variant="cobalt" className="text-xs">monday.com</Badge>
+                    </div>
+                  </div>
+                  <Button className="w-full" variant="outline" disabled>
+                    <Play className="mr-2 h-4 w-4" />
+                    Run Demo Crawl
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Web Search Crawler */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50 opacity-50" />
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                      <Globe className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <CardTitle>Web Search</CardTitle>
+                      <CardDescription>Google, DuckDuckGo</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Search the web for competitor pages, pricing changes, and market research.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">SEARCH ENGINES</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline">Google</Badge>
+                      <Badge variant="outline">DuckDuckGo</Badge>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">EXAMPLE QUERIES</p>
+                    <div className="flex flex-wrap gap-1">
+                      <Badge variant="cobalt" className="text-xs">notion pricing 2026</Badge>
+                      <Badge variant="cobalt" className="text-xs">coda vs notion</Badge>
+                    </div>
+                  </div>
+                  <Button className="w-full" variant="outline" disabled>
+                    <Play className="mr-2 h-4 w-4" />
+                    Run Demo Search
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* News Crawler */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 opacity-50" />
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100">
+                      <Newspaper className="h-6 w-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <CardTitle>News Crawler</CardTitle>
+                      <CardDescription>Industry news & press</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Track industry news, press releases, and analyst reports for competitive intelligence.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">SOURCES</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline">Google News</Badge>
+                      <Badge variant="outline">NewsAPI</Badge>
+                      <Badge variant="secondary" className="opacity-50">TechCrunch (Coming)</Badge>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">EXAMPLE TOPICS</p>
+                    <div className="flex flex-wrap gap-1">
+                      <Badge variant="cobalt" className="text-xs">AI product management</Badge>
+                      <Badge variant="cobalt" className="text-xs">SaaS funding</Badge>
+                    </div>
+                  </div>
+                  <Button className="w-full" variant="outline" disabled>
+                    <Play className="mr-2 h-4 w-4" />
+                    Run Demo Crawl
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* How It Works */}
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle>How AI Crawlers Work</CardTitle>
+                <CardDescription>
+                  Crawlers run asynchronously and return results within minutes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-4">
+                  <div className="text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                      <span className="text-lg font-bold text-cobalt-600">1</span>
+                    </div>
+                    <p className="mt-2 font-medium">Configure Keywords</p>
+                    <p className="text-sm text-muted-foreground">
+                      Set up keywords, competitors, or topics to monitor
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                      <span className="text-lg font-bold text-cobalt-600">2</span>
+                    </div>
+                    <p className="mt-2 font-medium">Start Crawl</p>
+                    <p className="text-sm text-muted-foreground">
+                      Crawler fetches data from multiple sources
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                      <span className="text-lg font-bold text-cobalt-600">3</span>
+                    </div>
+                    <p className="mt-2 font-medium">Process Results</p>
+                    <p className="text-sm text-muted-foreground">
+                      AI analyzes and categorizes findings
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                      <span className="text-lg font-bold text-cobalt-600">4</span>
+                    </div>
+                    <p className="mt-2 font-medium">Use in Jobs</p>
+                    <p className="text-sm text-muted-foreground">
+                      Feed results into VoC, Competitor Research, etc.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* CTA */}
+            <div className="mt-8 rounded-lg bg-gradient-to-r from-cobalt-50 to-indigo-50 border border-cobalt-200 p-6 text-center">
+              <h3 className="font-heading text-lg font-semibold">Try Real Crawlers in the Workbench</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Admin users can run real crawlers with live data in the Workbench.
+              </p>
+              <Button className="mt-4" asChild>
+                <Link href="/workbench">
+                  Open Workbench
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </main>
+      ) : null}
 
       {/* Artifact Fullscreen Modal */}
       <Dialog open={artifactModalOpen} onOpenChange={setArtifactModalOpen}>

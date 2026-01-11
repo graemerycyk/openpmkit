@@ -1263,6 +1263,582 @@ export const resources: ResourcePage[] = [
       },
     ],
   },
+
+  // ============================================================================
+  // Integration Documentation Pages
+  // ============================================================================
+
+  // Jira Integration
+  {
+    slug: 'jira-integration',
+    title: 'Jira Integration: Connect Your Project Tracking',
+    description:
+      'Connect Jira to pmkit to sync issues, epics, and sprint data for automated PRDs, daily briefs, and sprint reviews.',
+    primaryKeyword: 'Jira integration',
+    secondaryKeywords: ['Jira AI', 'Jira automation', 'Jira MCP connector'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/jira-and-confluence-ai-workflows', '/resources/slack-to-jira-draft-epics'],
+    workedExample: {
+      title: 'Syncing Sprint Data for Daily Briefs',
+      scenario: 'A PM connects Jira to pmkit to automate their daily brief generation with real-time sprint data.',
+      steps: [
+        'Connect Jira via OAuth in pmkit settings',
+        'Select the projects and boards to sync',
+        'Configure which issue types to include (epics, stories, bugs)',
+        'Daily Brief job now pulls sprint progress, blockers, and velocity automatically',
+        'PRD Draft job references existing epics and stories for context',
+      ],
+      outcome: 'Daily briefs include real-time sprint status. PRDs reference existing Jira context. Sprint reviews generate automatically from completed tickets.',
+    },
+    keyBenefits: [
+      'Real-time sprint data in daily briefs',
+      'PRDs linked to existing Jira epics',
+      'Automated sprint review generation',
+      'Draft epics and stories from Slack conversations',
+    ],
+    faqItems: [
+      {
+        question: 'What Jira data does pmkit access?',
+        answer:
+          'pmkit reads issues, epics, sprints, projects, and comments. It can propose new epics and stories but never writes directly—all changes require your approval.',
+      },
+      {
+        question: 'Does pmkit support Jira Cloud and Data Center?',
+        answer:
+          'Yes. The Jira MCP connector supports both Jira Cloud and Jira Data Center deployments.',
+      },
+      {
+        question: 'How do I connect Jira?',
+        answer:
+          'Go to Settings → Integrations → Jira and click "Connect". You\'ll be redirected to Atlassian to authorize pmkit. Select the sites and projects to sync.',
+      },
+      {
+        question: 'What permissions does pmkit need?',
+        answer:
+          'pmkit requests read access to issues, projects, and sprints. Write access is only used for creating draft proposals that you approve.',
+      },
+    ],
+  },
+
+  // Confluence Integration
+  {
+    slug: 'confluence-integration',
+    title: 'Confluence Integration: Publish PRDs and Documentation',
+    description:
+      'Connect Confluence to pmkit to access existing documentation and publish PRDs, meeting notes, and artifacts directly.',
+    primaryKeyword: 'Confluence integration',
+    secondaryKeywords: ['Confluence AI', 'Confluence automation', 'Confluence MCP connector'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/jira-and-confluence-ai-workflows', '/resources/prd-automation'],
+    workedExample: {
+      title: 'Publishing PRDs to Confluence',
+      scenario: 'After generating a PRD in pmkit, the PM publishes it directly to their team\'s Confluence space.',
+      steps: [
+        'Connect Confluence via OAuth in pmkit settings',
+        'Generate a PRD using the PRD Draft job',
+        'Review and edit the PRD in pmkit',
+        'Click "Publish to Confluence" and select the target space',
+        'PRD is created as a new Confluence page with proper formatting',
+      ],
+      outcome: 'PRDs flow seamlessly from pmkit to Confluence. Team members access documentation in their familiar workspace. Version history is maintained.',
+    },
+    keyBenefits: [
+      'Publish PRDs directly to Confluence',
+      'Access existing documentation for context',
+      'Maintain consistent formatting',
+      'Link artifacts to Confluence pages',
+    ],
+    faqItems: [
+      {
+        question: 'What Confluence data does pmkit access?',
+        answer:
+          'pmkit reads pages, spaces, and page hierarchies. It can propose new pages but requires your approval before publishing.',
+      },
+      {
+        question: 'Can pmkit update existing Confluence pages?',
+        answer:
+          'Yes. pmkit can propose updates to existing pages. You review the changes before they\'re applied.',
+      },
+      {
+        question: 'How does formatting work?',
+        answer:
+          'pmkit converts markdown artifacts to Confluence\'s storage format, preserving headers, lists, tables, and code blocks.',
+      },
+      {
+        question: 'Can I choose which space to publish to?',
+        answer:
+          'Yes. When publishing, you select the target space and parent page. pmkit respects your Confluence permissions.',
+      },
+    ],
+  },
+
+  // Slack Integration
+  {
+    slug: 'slack-integration',
+    title: 'Slack Integration: Notifications and Job Triggers',
+    description:
+      'Connect Slack to pmkit for notifications, job triggers, and extracting product discussions from channels.',
+    primaryKeyword: 'Slack integration',
+    secondaryKeywords: ['Slack AI', 'Slack automation', 'Slack MCP connector'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/slack-to-jira-draft-epics', '/resources/product-management-agent'],
+    workedExample: {
+      title: 'Turning Slack Threads into Jira Epics',
+      scenario: 'A product discussion in Slack needs to become a Jira epic. The PM triggers the Slack-to-Jira job.',
+      steps: [
+        'Connect Slack via OAuth in pmkit settings',
+        'Configure which channels to monitor for product discussions',
+        'React to a thread with the pmkit emoji or use /pmkit command',
+        'pmkit extracts requirements from the conversation',
+        'Review and approve the draft epic before it\'s created in Jira',
+      ],
+      outcome: 'Slack discussions become structured Jira epics without manual summarization. Context is preserved. Nothing falls through the cracks.',
+    },
+    keyBenefits: [
+      'Extract requirements from Slack threads',
+      'Receive job completion notifications',
+      'Trigger jobs with slash commands',
+      'Monitor channels for product signals',
+    ],
+    faqItems: [
+      {
+        question: 'What Slack data does pmkit access?',
+        answer:
+          'pmkit reads messages from channels you configure. It can post notifications to channels but never sends messages without your approval.',
+      },
+      {
+        question: 'Can I trigger jobs from Slack?',
+        answer:
+          'Yes. Use /pmkit commands to trigger jobs directly from Slack. Results are delivered to the channel or as a DM.',
+      },
+      {
+        question: 'Which channels should I connect?',
+        answer:
+          'Connect channels where product discussions happen: #product-feedback, #customer-success, #feature-requests, etc.',
+      },
+      {
+        question: 'Does pmkit read private channels?',
+        answer:
+          'Only if you explicitly add pmkit to the private channel. pmkit respects Slack\'s permission model.',
+      },
+    ],
+  },
+
+  // MCP Integration
+  {
+    slug: 'mcp-integration',
+    title: 'MCP Integration: Connect pmkit to Your AI Client',
+    description:
+      'Use Model Context Protocol (MCP) to connect pmkit tools to Cursor, Claude Desktop, or other AI clients.',
+    primaryKeyword: 'MCP integration',
+    secondaryKeywords: ['Model Context Protocol', 'MCP connector', 'AI client integration'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/mcp-connectors-for-enterprise-tools', '/how-it-works'],
+    workedExample: {
+      title: 'Adding pmkit to Cursor IDE',
+      scenario: 'A developer wants to access pmkit tools directly from their Cursor IDE.',
+      steps: [
+        'Copy the pmkit MCP configuration from Settings → Integrations',
+        'Open Cursor settings and navigate to MCP configuration',
+        'Paste the pmkit config into your mcp.json file',
+        'Restart Cursor to load the new MCP server',
+        'pmkit tools are now available in Cursor\'s AI assistant',
+      ],
+      outcome: 'Developers can query pmkit data, run jobs, and access artifacts directly from their IDE without context switching.',
+    },
+    keyBenefits: [
+      'Access pmkit from your IDE',
+      'Query artifacts and proposals',
+      'Run jobs without leaving your workflow',
+      'Standardized MCP protocol',
+    ],
+    faqItems: [
+      {
+        question: 'What is MCP (Model Context Protocol)?',
+        answer:
+          'MCP is a standardized protocol for connecting AI agents to external tools. It defines how AI clients discover and interact with tool APIs.',
+      },
+      {
+        question: 'Which AI clients support MCP?',
+        answer:
+          'Cursor, Claude Desktop, and other MCP-compatible clients. Check your client\'s documentation for MCP support.',
+      },
+      {
+        question: 'What pmkit tools are available via MCP?',
+        answer:
+          'Query artifacts, list jobs, search proposals, and access connector data. All read operations are available; writes create proposals for review.',
+      },
+      {
+        question: 'Is MCP secure?',
+        answer:
+          'Yes. MCP connections use your pmkit API key for authentication. All requests are logged in the audit trail.',
+      },
+    ],
+  },
+
+  // Gong Integration
+  {
+    slug: 'gong-integration',
+    title: 'Gong Integration: Extract Customer Insights from Calls',
+    description:
+      'Connect Gong to pmkit to automatically extract pain points, feature requests, and competitive mentions from sales and CS calls.',
+    primaryKeyword: 'Gong integration',
+    secondaryKeywords: ['Gong AI', 'call transcript analysis', 'Gong MCP connector'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/gong-transcripts-to-product-insights', '/resources/voice-of-customer-clustering'],
+    workedExample: {
+      title: 'Mining Customer Calls for Product Signal',
+      scenario: 'A PM wants to understand what customers are really saying in sales calls. They run Gong analysis.',
+      steps: [
+        'Connect Gong via OAuth in pmkit settings',
+        'Configure which call types to analyze (sales, CS, onboarding)',
+        'Run the VoC Clustering job with Gong as a source',
+        'pmkit extracts pain points, feature requests, and competitor mentions',
+        'Review clustered themes with supporting call excerpts',
+      ],
+      outcome: 'Product decisions are grounded in actual customer conversations. Competitor mentions are tracked automatically. Nothing is lost in translation from sales.',
+    },
+    keyBenefits: [
+      'Extract insights from every call',
+      'Track competitor mentions automatically',
+      'Hear directly from customers',
+      'Search across all transcripts',
+    ],
+    faqItems: [
+      {
+        question: 'What Gong data does pmkit access?',
+        answer:
+          'pmkit reads call transcripts, metadata (participants, duration, date), and Gong\'s extracted insights. It never accesses call recordings directly.',
+      },
+      {
+        question: 'How are insights attributed?',
+        answer:
+          'Each insight includes the speaker, timestamp, and surrounding context. You can trace any insight back to the exact moment in the call.',
+      },
+      {
+        question: 'Can I filter by account or segment?',
+        answer:
+          'Yes. Filter Gong analysis by account, deal stage, customer segment, or date range.',
+      },
+      {
+        question: 'Does this work with Chorus or other tools?',
+        answer:
+          'Currently pmkit supports Gong natively. Chorus integration is on the roadmap.',
+      },
+    ],
+  },
+
+  // Zendesk Integration
+  {
+    slug: 'zendesk-integration',
+    title: 'Zendesk Integration: Analyze Support Tickets',
+    description:
+      'Connect Zendesk to pmkit to analyze support tickets for VoC clustering, escalation tracking, and trend analysis.',
+    primaryKeyword: 'Zendesk integration',
+    secondaryKeywords: ['Zendesk AI', 'support ticket analysis', 'Zendesk MCP connector'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/voice-of-customer-clustering', '/resources/customer-escalation-to-fix-spec'],
+    workedExample: {
+      title: 'Tracking Support Trends for Product',
+      scenario: 'A PM wants to understand which product issues are driving the most support tickets.',
+      steps: [
+        'Connect Zendesk via OAuth in pmkit settings',
+        'Configure which ticket views or tags to analyze',
+        'Run VoC Clustering with Zendesk as a source',
+        'pmkit clusters tickets by theme and tracks trends over time',
+        'Daily briefs highlight escalations and trending issues',
+      ],
+      outcome: 'Product is never surprised by support trends. Escalations surface in daily briefs. VoC reports include quantified support data.',
+    },
+    keyBenefits: [
+      'Cluster support tickets by theme',
+      'Track escalations automatically',
+      'Quantify issue impact',
+      'Identify trends over time',
+    ],
+    faqItems: [
+      {
+        question: 'What Zendesk data does pmkit access?',
+        answer:
+          'pmkit reads tickets, comments, tags, and custom fields. It respects your Zendesk views and permissions.',
+      },
+      {
+        question: 'Can pmkit create or update tickets?',
+        answer:
+          'pmkit can propose ticket updates (like adding tags) but never writes directly. All changes require your approval.',
+      },
+      {
+        question: 'How do I filter which tickets to analyze?',
+        answer:
+          'Configure ticket views, tags, or custom field filters in the integration settings.',
+      },
+      {
+        question: 'Does pmkit support Zendesk Suite and Support?',
+        answer:
+          'Yes. pmkit works with both Zendesk Suite and standalone Zendesk Support.',
+      },
+    ],
+  },
+
+  // Amplitude Integration
+  {
+    slug: 'amplitude-integration',
+    title: 'Amplitude Integration: Product Analytics for PRDs',
+    description:
+      'Connect Amplitude to pmkit to pull product analytics, feature usage data, and user journeys into PRDs and reports.',
+    primaryKeyword: 'Amplitude integration',
+    secondaryKeywords: ['product analytics AI', 'Amplitude MCP connector', 'usage data'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/search-product-analytics-insights', '/resources/prd-automation'],
+    workedExample: {
+      title: 'Grounding PRDs in Usage Data',
+      scenario: 'A PM is drafting a PRD for a feature improvement. They want to include current usage metrics.',
+      steps: [
+        'Connect Amplitude via OAuth in pmkit settings',
+        'Configure which events and properties to sync',
+        'Run PRD Draft job with Amplitude as a data source',
+        'PRD includes current feature adoption, user segments, and drop-off points',
+        'Stakeholders see evidence-based requirements',
+      ],
+      outcome: 'PRDs include quantitative evidence. Feature decisions are grounded in actual usage. Success metrics are based on current baselines.',
+    },
+    keyBenefits: [
+      'Include usage data in PRDs',
+      'Track feature adoption automatically',
+      'Identify user segments and behaviors',
+      'Set evidence-based success metrics',
+    ],
+    faqItems: [
+      {
+        question: 'What Amplitude data does pmkit access?',
+        answer:
+          'pmkit reads events, user properties, cohorts, and charts. It can query specific metrics but never modifies your Amplitude configuration.',
+      },
+      {
+        question: 'Can I include charts in PRDs?',
+        answer:
+          'pmkit can reference Amplitude metrics and trends. For visual charts, link to Amplitude dashboards.',
+      },
+      {
+        question: 'How do I configure which events to sync?',
+        answer:
+          'Select specific events, properties, and cohorts in the integration settings. pmkit only accesses what you configure.',
+      },
+      {
+        question: 'Does pmkit support other analytics tools?',
+        answer:
+          'Mixpanel and Segment integrations are on the roadmap. Contact us for specific requests.',
+      },
+    ],
+  },
+
+  // Discourse Integration
+  {
+    slug: 'discourse-integration',
+    title: 'Discourse Integration: Monitor Community Discussions',
+    description:
+      'Connect Discourse to pmkit to monitor community discussions, feature requests, and user feedback.',
+    primaryKeyword: 'Discourse integration',
+    secondaryKeywords: ['community monitoring', 'Discourse MCP connector', 'feature request tracking'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/community-ideas-to-roadmap', '/resources/voice-of-customer-clustering'],
+    workedExample: {
+      title: 'Prioritizing Community Feature Requests',
+      scenario: 'The community has hundreds of feature requests. The PM needs to identify which ones to prioritize.',
+      steps: [
+        'Connect Discourse via API key in pmkit settings',
+        'Configure which categories to monitor (Feature Requests, Feedback)',
+        'Run VoC Clustering with Discourse as a source',
+        'pmkit clusters requests by theme and ranks by engagement',
+        'Roadmap alignment memo includes community evidence',
+      ],
+      outcome: 'Community voice is heard in roadmap decisions. Feature requests are quantified. Users see their feedback matters.',
+    },
+    keyBenefits: [
+      'Track feature requests automatically',
+      'Quantify community sentiment',
+      'Include community evidence in PRDs',
+      'Close the loop with users',
+    ],
+    faqItems: [
+      {
+        question: 'What Discourse data does pmkit access?',
+        answer:
+          'pmkit reads topics, posts, likes, and user activity from configured categories. It respects your Discourse permissions.',
+      },
+      {
+        question: 'Can pmkit post to Discourse?',
+        answer:
+          'pmkit can propose posts (like feature shipped announcements) but requires your approval before posting.',
+      },
+      {
+        question: 'How do I filter which categories to monitor?',
+        answer:
+          'Select specific categories in the integration settings. Common choices: Feature Requests, Feedback, Bug Reports.',
+      },
+      {
+        question: 'Does pmkit support other community platforms?',
+        answer:
+          'GitHub Discussions is supported. Circle and custom platforms are available for enterprise customers.',
+      },
+    ],
+  },
+
+  // Social Crawler Integration
+  {
+    slug: 'social-crawler-integration',
+    title: 'Social Crawler: Monitor Social Media for Product Signal',
+    description:
+      'Monitor X, Reddit, LinkedIn, Discord, Bluesky, and Threads for mentions, sentiment, and competitive intelligence.',
+    primaryKeyword: 'social media monitoring',
+    secondaryKeywords: ['social crawler', 'social listening AI', 'brand monitoring'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/competitor-research', '/resources/voice-of-customer-clustering'],
+    workedExample: {
+      title: 'Catching a Viral Complaint Before It Escalates',
+      scenario: 'A customer posts a complaint on X that starts gaining traction. The Social Crawler surfaces it in the daily brief.',
+      steps: [
+        'Configure Social Crawler with your brand keywords and competitors',
+        'Crawler monitors X, Reddit, and other platforms continuously',
+        'High-engagement posts are flagged and included in daily briefs',
+        'PM sees the complaint before it goes viral',
+        'Team responds proactively, turning a detractor into an advocate',
+      ],
+      outcome: 'Social issues are caught early. Competitive launches are tracked in real-time. Community sentiment is quantified.',
+    },
+    keyBenefits: [
+      'Monitor multiple platforms from one place',
+      'Catch issues before they escalate',
+      'Track competitor social presence',
+      'Quantify community sentiment',
+    ],
+    faqItems: [
+      {
+        question: 'Which platforms does Social Crawler monitor?',
+        answer:
+          'X (Twitter), Reddit, LinkedIn, Discord (public servers), Bluesky, and Threads. Additional platforms can be added for enterprise customers.',
+      },
+      {
+        question: 'How does keyword monitoring work?',
+        answer:
+          'Configure brand keywords, competitor names, and product terms. The crawler searches for mentions and tracks engagement metrics.',
+      },
+      {
+        question: 'Can I filter by sentiment?',
+        answer:
+          'Yes. Social Crawler classifies posts by sentiment (positive, negative, neutral) and can filter alerts by sentiment threshold.',
+      },
+      {
+        question: 'How often is data refreshed?',
+        answer:
+          'Continuous monitoring with alerts for high-engagement posts. Daily summaries are included in daily briefs.',
+      },
+    ],
+  },
+
+  // Web Search Integration
+  {
+    slug: 'web-search-integration',
+    title: 'Web Search: Competitive Intelligence from the Web',
+    description:
+      'Search Google and Bing for competitor intelligence, industry news, and market research.',
+    primaryKeyword: 'web search integration',
+    secondaryKeywords: ['competitive intelligence', 'market research AI', 'web crawler'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/competitor-research', '/resources/agentic-product-management'],
+    workedExample: {
+      title: 'Discovering a Competitor Price Change',
+      scenario: 'The weekly Competitor Research job uses Web Search to discover a competitor has changed their pricing.',
+      steps: [
+        'Configure Web Search with competitor domains and keywords',
+        'Crawler searches for pricing pages, press releases, and announcements',
+        'Competitor Research job synthesizes findings into a report',
+        'PM sees the price change before sales encounters it in deals',
+        'Sales is briefed with competitive positioning',
+      ],
+      outcome: 'Competitive changes are discovered proactively. Sales has current intelligence. Product roadmap considers competitive context.',
+    },
+    keyBenefits: [
+      'Discover competitor changes automatically',
+      'Track industry news and trends',
+      'Research market context for PRDs',
+      'Stay ahead of competitive moves',
+    ],
+    faqItems: [
+      {
+        question: 'What does Web Search crawl?',
+        answer:
+          'Web Search queries Google and Bing for configured keywords, then crawls result pages for relevant content. It respects robots.txt and rate limits.',
+      },
+      {
+        question: 'How do I configure search terms?',
+        answer:
+          'Set up competitor names, product keywords, and industry terms. Web Search combines these into targeted queries.',
+      },
+      {
+        question: 'Can Web Search access paywalled content?',
+        answer:
+          'No. Web Search only accesses publicly available content. For paywalled sources, use direct integrations.',
+      },
+      {
+        question: 'How is this different from manual Google searches?',
+        answer:
+          'Web Search runs automatically on schedule, tracks changes over time, and synthesizes findings into structured reports.',
+      },
+    ],
+  },
+
+  // News Crawler Integration
+  {
+    slug: 'news-crawler-integration',
+    title: 'News Crawler: Track Industry News and Press Releases',
+    description:
+      'Monitor industry news, press releases, and analyst reports for competitive intelligence and market context.',
+    primaryKeyword: 'news monitoring',
+    secondaryKeywords: ['news crawler', 'press release tracking', 'industry news AI'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/competitor-research', '/resources/roadmap-alignment-memos'],
+    workedExample: {
+      title: 'Catching a Competitor Funding Announcement',
+      scenario: 'A competitor announces a $50M funding round. News Crawler surfaces it in the daily brief.',
+      steps: [
+        'Configure News Crawler with competitor names and industry keywords',
+        'Crawler monitors news sources, press releases, and tech publications',
+        'Funding announcement is detected and classified as high-priority',
+        'Daily brief includes the announcement with strategic implications',
+        'Leadership is informed before the news spreads internally',
+      ],
+      outcome: 'Strategic news is surfaced proactively. Competitive context informs roadmap discussions. No one is caught off-guard.',
+    },
+    keyBenefits: [
+      'Track competitor announcements',
+      'Monitor industry trends',
+      'Surface strategic news automatically',
+      'Inform roadmap with market context',
+    ],
+    faqItems: [
+      {
+        question: 'What news sources does News Crawler monitor?',
+        answer:
+          'Major tech publications, industry-specific news sites, press release wires, and company newsrooms. Enterprise customers can add custom sources.',
+      },
+      {
+        question: 'How are news items prioritized?',
+        answer:
+          'News Crawler classifies items by relevance (competitor mention, industry trend, direct impact) and source authority.',
+      },
+      {
+        question: 'Can I get alerts for specific topics?',
+        answer:
+          'Yes. Configure alert rules for specific competitors, topics, or news types. Alerts can be delivered via Slack or email.',
+      },
+      {
+        question: 'How far back does News Crawler search?',
+        answer:
+          'Continuous monitoring for new content. Historical search available for the past 30 days.',
+      },
+    ],
+  },
 ];
 
 export function getResourceBySlug(slug: string): ResourcePage | undefined {

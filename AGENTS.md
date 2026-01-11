@@ -706,7 +706,35 @@ NEXTAUTH_SECRET=...
 # Optional (demo works without these)
 OPENAI_API_KEY=...        # Uses stubs if not set
 REDIS_URL=...             # Uses inline fallback if not set
+
+# AI Crawlers (optional - free fallbacks available)
+SERPER_API_KEY=...        # Serper.dev for Google search (2,500 free/month)
+NEWSAPI_KEY=...           # NewsAPI.org for news (100 free/day)
+GNEWS_API_KEY=...         # GNews.io alternative (600 free/day)
 ```
+
+## AI Crawlers
+
+Real-time web crawlers for competitive intelligence. Available in the Workbench for admin users.
+
+| Crawler | Free API | Fallback | Rate Limit |
+|---------|----------|----------|------------|
+| Social | Reddit API (official) | Hacker News API | 100 req/min |
+| Web Search | Serper.dev | DuckDuckGo | 2,500/month |
+| News | NewsAPI.org | Google News RSS | 100/day |
+
+### Crawler Types
+
+- **Social Crawler**: Searches Reddit and Hacker News for discussions, mentions, and sentiment
+- **Web Search Crawler**: Searches Google/DuckDuckGo for competitor pages and market research
+- **News Crawler**: Searches news sources for industry updates and press releases
+
+### Usage
+
+1. Go to `/workbench` (admin only)
+2. Switch to "AI Crawlers" tab
+3. Select crawler type and enter keywords
+4. Click "Start Crawl" - results appear in 1-2 minutes
 
 ## Connectors Reference
 

@@ -8,6 +8,9 @@ export * from './analytics';
 export * from './competitor';
 export * from './community';
 export * from './pmkit';
+export * from './social-crawler';
+export * from './web-search';
+export * from './news-crawler';
 
 // Import all mock servers
 import { mockJiraServer } from './jira';
@@ -19,6 +22,9 @@ import { mockAnalyticsServer } from './analytics';
 import { mockCompetitorServer } from './competitor';
 import { mockCommunityServer } from './community';
 import { pmkitServer } from './pmkit';
+import { mockSocialCrawlerServer } from './social-crawler';
+import { mockWebSearchServer } from './web-search';
+import { mockNewsCrawlerServer } from './news-crawler';
 import { MCPClient, ConnectorFactory, type ConnectorKey } from '@pmkit/mcp';
 
 // ============================================================================
@@ -37,6 +43,9 @@ export function createMockMCPClient(): MCPClient {
   client.registerServer(mockCompetitorServer);
   client.registerServer(mockCommunityServer);
   client.registerServer(pmkitServer);
+  client.registerServer(mockSocialCrawlerServer);
+  client.registerServer(mockWebSearchServer);
+  client.registerServer(mockNewsCrawlerServer);
 
   return client;
 }
@@ -83,4 +92,7 @@ export {
   mockCompetitorServer,
   mockCommunityServer,
   pmkitServer,
+  mockSocialCrawlerServer,
+  mockWebSearchServer,
+  mockNewsCrawlerServer,
 };

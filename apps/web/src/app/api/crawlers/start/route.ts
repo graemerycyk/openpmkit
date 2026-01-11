@@ -1,0 +1,149 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { isAdminEmail } from '@/lib/admin';
+import { crawlerJobs, cleanupOldJobs, type CrawlerJobState } from '@/lib/crawler-store';
+import {
+  runSocialCrawler,
+  runWebSearchCrawler,
+  runNewsCrawler,
+  type SocialCrawlerInput,
+  type WebSearchCrawlerInput,
+  type NewsCrawlerInput,
+  type CrawlerType,
+} from '@pmkit/core';
+
+export async function POST(request: NextRequest) {
+  try {
+    // Check authentication
+    const session = await getServerSession();
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Check admin access for workbench
+    if (!isAdminEmail(session.user.email)) {
+      return NextResponse.json(
+        { error: 'Admin access required for crawlers' },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+    const { type, keywords, platforms, config } = body as {
+      type: CrawlerType;
+      keywords: string[];
+      platforms?: string[];
+      config?: Record<string, unknown>;
+    };
+
+    // Validate input
+    if (!type || !['social', 'web_search', 'news'].includes(type)) {
+      return NextResponse.json(
+        { error: 'Invalid crawler type' },
+        { status: 400 }
+      );
+    }
+
+    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+      return NextResponse.json(
+        { error: 'Keywords are required' },
+        { status: 400 }
+      );
+    }
+
+    // Create job
+    const jobId = `crawl-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const job: CrawlerJobState = {
+      id: jobId,
+      type,
+      status: 'pending',
+      keywords,
+      platforms: platforms || [],
+      config: config || {},
+      createdAt: new Date(),
+      results: [],
+    };
+
+    crawlerJobs.set(jobId, job);
+    cleanupOldJobs();
+
+    // Start crawler asynchronously
+    runCrawlerAsync(jobId, job);
+
+    return NextResponse.json({
+      success: true,
+      jobId,
+      status: 'pending',
+      message: 'Crawler job started',
+    });
+  } catch (error) {
+    console.error('Crawler start error:', error);
+    return NextResponse.json(
+      { error: 'Failed to start crawler' },
+      { status: 500 }
+    );
+  }
+}
+
+async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
+  const jobState = crawlerJobs.get(jobId);
+  if (!jobState) return;
+
+  jobState.status = 'running';
+  jobState.startedAt = new Date();
+
+  try {
+    let response;
+
+    switch (job.type) {
+      case 'social': {
+        const input: SocialCrawlerInput = {
+          keywords: job.keywords,
+          platforms: (job.platforms.length > 0 ? job.platforms : ['reddit']) as ('reddit' | 'hackernews')[],
+          limit: (job.config.limit as number) || 25,
+          timeRange: (job.config.timeRange as 'day' | 'week' | 'month' | 'year' | 'all') || 'week',
+        };
+        response = await runSocialCrawler(input);
+        break;
+      }
+
+      case 'web_search': {
+        const input: WebSearchCrawlerInput = {
+          keywords: job.keywords,
+          limit: (job.config.limit as number) || 20,
+          searchType: (job.config.searchType as 'web' | 'news' | 'images') || 'web',
+        };
+        response = await runWebSearchCrawler(input);
+        break;
+      }
+
+      case 'news': {
+        const input: NewsCrawlerInput = {
+          keywords: job.keywords,
+          limit: (job.config.limit as number) || 25,
+          language: (job.config.language as string) || 'en',
+          sortBy: (job.config.sortBy as 'relevancy' | 'popularity' | 'publishedAt') || 'publishedAt',
+        };
+        response = await runNewsCrawler(input);
+        break;
+      }
+
+      default:
+        throw new Error(`Unknown crawler type: ${job.type}`);
+    }
+
+    // Update job with results
+    jobState.status = response.success ? 'completed' : 'failed';
+    jobState.completedAt = new Date();
+    jobState.results = response.results.map(r => ({ ...r, jobId }));
+    jobState.error = response.error;
+
+  } catch (error) {
+    jobState.status = 'failed';
+    jobState.completedAt = new Date();
+    jobState.error = error instanceof Error ? error.message : 'Unknown error';
+  }
+}

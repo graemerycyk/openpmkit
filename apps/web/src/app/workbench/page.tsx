@@ -50,10 +50,46 @@ import {
   ChevronRight,
   AlertCircle,
   Expand,
+  Globe,
+  Newspaper,
+  Hash,
+  RefreshCw,
+  ExternalLink,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JOB_CONTEXT_FIELDS, JOB_TYPE_INFO, type ContextField } from './field-config';
-import type { JobType } from '@pmkit/core';
+import type { JobType, CrawlerType } from '@pmkit/core';
+import { CardDescription } from '@/components/ui/card';
+
+// Workbench mode
+type WorkbenchMode = 'jobs' | 'crawlers';
+
+// Crawler job state
+interface CrawlerJob {
+  id: string;
+  type: CrawlerType;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  keywords: string[];
+  platforms: string[];
+  createdAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  error?: string;
+  resultCount: number;
+  results?: CrawlerResult[];
+}
+
+interface CrawlerResult {
+  id: string;
+  source: string;
+  title: string;
+  url?: string;
+  content: string;
+  author?: string;
+  publishedAt?: string;
+  metadata?: Record<string, unknown>;
+}
 
 // Icon mapping
 const ICONS: Record<string, typeof FileText> = {
@@ -126,6 +162,11 @@ function saveHistory(history: WorkbenchRun[]) {
 
 export default function WorkbenchPage() {
   useSession(); // Used for auth check in layout
+  
+  // Workbench mode
+  const [mode, setMode] = useState<WorkbenchMode>('jobs');
+  
+  // Jobs state
   const [selectedJobType, setSelectedJobType] = useState<JobType>('daily_brief');
   const [contextValues, setContextValues] = useState<Record<string, string>>({});
   const [tenantName, setTenantName] = useState('');
@@ -137,11 +178,45 @@ export default function WorkbenchPage() {
   const [activeTab, setActiveTab] = useState<'input' | 'output'>('input');
   const [copied, setCopied] = useState(false);
   const [expandModalOpen, setExpandModalOpen] = useState(false);
+  
+  // Crawler state
+  const [crawlerType, setCrawlerType] = useState<CrawlerType>('social');
+  const [crawlerKeywords, setCrawlerKeywords] = useState('');
+  const [crawlerPlatforms, setCrawlerPlatforms] = useState<string[]>(['reddit']);
+  const [crawlerJobs, setCrawlerJobs] = useState<CrawlerJob[]>([]);
+  const [selectedCrawlerJob, setSelectedCrawlerJob] = useState<CrawlerJob | null>(null);
+  const [isCrawlerRunning, setIsCrawlerRunning] = useState(false);
+  const [crawlerError, setCrawlerError] = useState<string | null>(null);
 
   // Load history on mount
   useEffect(() => {
     setHistory(loadHistory());
   }, []);
+  
+  // Poll for crawler job updates
+  useEffect(() => {
+    const runningJobs = crawlerJobs.filter(j => j.status === 'pending' || j.status === 'running');
+    if (runningJobs.length === 0) return;
+    
+    const interval = setInterval(async () => {
+      for (const job of runningJobs) {
+        try {
+          const response = await fetch(`/api/crawlers/${job.id}`);
+          if (response.ok) {
+            const updatedJob = await response.json();
+            setCrawlerJobs(prev => prev.map(j => j.id === job.id ? updatedJob : j));
+            if (selectedCrawlerJob?.id === job.id) {
+              setSelectedCrawlerJob(updatedJob);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to poll crawler job:', err);
+        }
+      }
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [crawlerJobs, selectedCrawlerJob]);
 
   // Get fields for current job type
   const fields = JOB_CONTEXT_FIELDS[selectedJobType] || [];
@@ -252,10 +327,135 @@ export default function WorkbenchPage() {
     setHistory([]);
     localStorage.removeItem(HISTORY_KEY);
   };
+  
+  // ============================================================================
+  // Crawler Functions
+  // ============================================================================
+  
+  const startCrawler = async () => {
+    if (!crawlerKeywords.trim()) {
+      setCrawlerError('Please enter at least one keyword');
+      return;
+    }
+    
+    setIsCrawlerRunning(true);
+    setCrawlerError(null);
+    
+    try {
+      const keywords = crawlerKeywords.split(',').map(k => k.trim()).filter(Boolean);
+      
+      const response = await fetch('/api/crawlers/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: crawlerType,
+          keywords,
+          platforms: crawlerType === 'social' ? crawlerPlatforms : undefined,
+          config: {
+            limit: 25,
+            timeRange: 'week',
+          },
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to start crawler');
+      }
+      
+      // Add new job to list
+      const newJob: CrawlerJob = {
+        id: data.jobId,
+        type: crawlerType,
+        status: 'pending',
+        keywords,
+        platforms: crawlerPlatforms,
+        createdAt: new Date().toISOString(),
+        resultCount: 0,
+      };
+      
+      setCrawlerJobs(prev => [newJob, ...prev]);
+      setSelectedCrawlerJob(newJob);
+      setCrawlerKeywords('');
+    } catch (err) {
+      setCrawlerError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsCrawlerRunning(false);
+    }
+  };
+  
+  const refreshCrawlerJob = async (jobId: string) => {
+    try {
+      const response = await fetch(`/api/crawlers/${jobId}`);
+      if (response.ok) {
+        const updatedJob = await response.json();
+        setCrawlerJobs(prev => prev.map(j => j.id === jobId ? updatedJob : j));
+        if (selectedCrawlerJob?.id === jobId) {
+          setSelectedCrawlerJob(updatedJob);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh crawler job:', err);
+    }
+  };
+  
+  const deleteCrawlerJob = async (jobId: string) => {
+    try {
+      await fetch(`/api/crawlers/${jobId}`, { method: 'DELETE' });
+      setCrawlerJobs(prev => prev.filter(j => j.id !== jobId));
+      if (selectedCrawlerJob?.id === jobId) {
+        setSelectedCrawlerJob(null);
+      }
+    } catch (err) {
+      console.error('Failed to delete crawler job:', err);
+    }
+  };
+  
+  const togglePlatform = (platform: string) => {
+    setCrawlerPlatforms(prev => 
+      prev.includes(platform) 
+        ? prev.filter(p => p !== platform)
+        : [...prev, platform]
+    );
+  };
 
   return (
     <TooltipProvider>
-      <div className="flex h-full">
+      <div className="flex h-full flex-col">
+        {/* Mode Selector */}
+        <div className="border-b bg-muted/30 px-4 py-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMode('jobs')}
+              className={cn(
+                'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+                mode === 'jobs'
+                  ? 'bg-background text-foreground shadow-sm border'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+              )}
+            >
+              <Zap className="h-4 w-4" />
+              PM Jobs
+            </button>
+            <button
+              onClick={() => setMode('crawlers')}
+              className={cn(
+                'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+                mode === 'crawlers'
+                  ? 'bg-background text-foreground shadow-sm border'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+              )}
+            >
+              <Globe className="h-4 w-4" />
+              AI Crawlers
+              <Badge variant="cobalt" className="text-[10px] px-1.5 py-0">Live</Badge>
+            </button>
+          </div>
+        </div>
+        
+        {mode === 'jobs' ? (
+        <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - History */}
         <div className="hidden w-64 shrink-0 border-r bg-muted/30 lg:block">
           <div className="flex h-full flex-col">
@@ -552,6 +752,314 @@ export default function WorkbenchPage() {
             </TabsContent>
           </Tabs>
         </div>
+        </div>
+        ) : (
+        // AI Crawlers View
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar - Crawler Jobs */}
+          <div className="hidden w-72 shrink-0 border-r bg-muted/30 lg:block">
+            <div className="flex h-full flex-col">
+              <div className="flex items-center justify-between border-b p-4">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Crawler Jobs</span>
+                </div>
+                {crawlerJobs.length > 0 && (
+                  <Badge variant="secondary">{crawlerJobs.length}</Badge>
+                )}
+              </div>
+              <ScrollArea className="flex-1">
+                {crawlerJobs.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    No crawler jobs yet. Start a crawl to see results.
+                  </div>
+                ) : (
+                  <div className="space-y-1 p-2">
+                    {crawlerJobs.map((job) => {
+                      const CrawlerIcon = job.type === 'social' ? Hash : job.type === 'news' ? Newspaper : Globe;
+                      return (
+                        <button
+                          key={job.id}
+                          onClick={() => setSelectedCrawlerJob(job)}
+                          className={cn(
+                            'flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted',
+                            selectedCrawlerJob?.id === job.id && 'bg-muted'
+                          )}
+                        >
+                          <CrawlerIcon className="h-4 w-4 shrink-0 text-cobalt-600" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium capitalize">
+                              {job.type.replace('_', ' ')}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              {job.keywords.slice(0, 2).join(', ')}
+                              {job.keywords.length > 2 && ` +${job.keywords.length - 2}`}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            {job.status === 'running' || job.status === 'pending' ? (
+                              <Loader2 className="h-4 w-4 animate-spin text-cobalt-600" />
+                            ) : job.status === 'completed' ? (
+                              <Badge variant="outline" className="text-xs border-green-200 bg-green-50 text-green-700">
+                                {job.resultCount}
+                              </Badge>
+                            ) : (
+                              <Badge variant="destructive" className="text-xs">
+                                Failed
+                              </Badge>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          </div>
+
+          {/* Main Crawler Content */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {/* Crawler Type Selector */}
+            <div className="border-b bg-background p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Label className="shrink-0">Crawler:</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={crawlerType === 'social' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCrawlerType('social')}
+                      className="gap-2"
+                    >
+                      <Hash className="h-4 w-4" />
+                      Social
+                    </Button>
+                    <Button
+                      variant={crawlerType === 'web_search' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCrawlerType('web_search')}
+                      className="gap-2"
+                    >
+                      <Globe className="h-4 w-4" />
+                      Web Search
+                    </Button>
+                    <Button
+                      variant={crawlerType === 'news' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCrawlerType('news')}
+                      className="gap-2"
+                    >
+                      <Newspaper className="h-4 w-4" />
+                      News
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {crawlerType === 'social' && 'Search Reddit and Hacker News for discussions and mentions.'}
+                {crawlerType === 'web_search' && 'Search Google/DuckDuckGo for competitor pages and market research.'}
+                {crawlerType === 'news' && 'Search news sources for industry updates and press releases.'}
+              </p>
+            </div>
+
+            {/* Crawler Input */}
+            <div className="border-b bg-muted/30 p-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="crawler-keywords">Keywords (comma-separated)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="crawler-keywords"
+                      value={crawlerKeywords}
+                      onChange={(e) => setCrawlerKeywords(e.target.value)}
+                      placeholder="notion, coda, monday.com, project management"
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={startCrawler}
+                      disabled={isCrawlerRunning || !crawlerKeywords.trim()}
+                      className="gap-2"
+                    >
+                      {isCrawlerRunning ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Starting...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          Start Crawl
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {crawlerType === 'social' && (
+                  <div className="space-y-2">
+                    <Label>Platforms</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={crawlerPlatforms.includes('reddit') ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => togglePlatform('reddit')}
+                      >
+                        Reddit
+                      </Button>
+                      <Button
+                        variant={crawlerPlatforms.includes('hackernews') ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => togglePlatform('hackernews')}
+                      >
+                        Hacker News
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {crawlerError && (
+                  <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <p className="text-sm">{crawlerError}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Crawler Results */}
+            <ScrollArea className="flex-1">
+              {selectedCrawlerJob ? (
+                <div className="p-4 space-y-4">
+                  {/* Job Header */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base capitalize flex items-center gap-2">
+                          {selectedCrawlerJob.type === 'social' && <Hash className="h-5 w-5 text-pink-600" />}
+                          {selectedCrawlerJob.type === 'web_search' && <Globe className="h-5 w-5 text-blue-600" />}
+                          {selectedCrawlerJob.type === 'news' && <Newspaper className="h-5 w-5 text-amber-600" />}
+                          {selectedCrawlerJob.type.replace('_', ' ')} Crawler
+                        </CardTitle>
+                        <div className="flex items-center gap-2">
+                          {selectedCrawlerJob.status === 'running' || selectedCrawlerJob.status === 'pending' ? (
+                            <Badge variant="secondary" className="gap-1">
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              {selectedCrawlerJob.status}
+                            </Badge>
+                          ) : selectedCrawlerJob.status === 'completed' ? (
+                            <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
+                              Completed
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive">Failed</Badge>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => refreshCrawlerJob(selectedCrawlerJob.id)}
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteCrawlerJob(selectedCrawlerJob.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardDescription>
+                        Keywords: {selectedCrawlerJob.keywords.join(', ')}
+                        {selectedCrawlerJob.platforms.length > 0 && (
+                          <> • Platforms: {selectedCrawlerJob.platforms.join(', ')}</>
+                        )}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>Started: {new Date(selectedCrawlerJob.createdAt).toLocaleString()}</span>
+                        {selectedCrawlerJob.completedAt && (
+                          <span>Completed: {new Date(selectedCrawlerJob.completedAt).toLocaleString()}</span>
+                        )}
+                        <span>Results: {selectedCrawlerJob.resultCount}</span>
+                      </div>
+                      {selectedCrawlerJob.error && (
+                        <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-800">
+                          <strong>Error:</strong> {selectedCrawlerJob.error}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Results List */}
+                  {selectedCrawlerJob.results && selectedCrawlerJob.results.length > 0 && (
+                    <div className="space-y-3">
+                      <h3 className="font-medium">Results ({selectedCrawlerJob.results.length})</h3>
+                      {selectedCrawlerJob.results.map((result) => (
+                        <Card key={result.id} className="overflow-hidden">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs shrink-0">
+                                    {result.source}
+                                  </Badge>
+                                  {result.author && (
+                                    <span className="text-xs text-muted-foreground">
+                                      by {result.author}
+                                    </span>
+                                  )}
+                                  {result.publishedAt && (
+                                    <span className="text-xs text-muted-foreground">
+                                      • {new Date(result.publishedAt).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                                <h4 className="mt-1 font-medium line-clamp-2">{result.title}</h4>
+                                <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
+                                  {result.content}
+                                </p>
+                              </div>
+                              {result.url && (
+                                <Button variant="ghost" size="sm" asChild className="shrink-0">
+                                  <a href={result.url} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="h-4 w-4" />
+                                  </a>
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedCrawlerJob.status === 'completed' && selectedCrawlerJob.resultCount === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Globe className="mx-auto h-12 w-12 opacity-50" />
+                      <p className="mt-2">No results found for these keywords.</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <div className="text-center">
+                    <Globe className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <h2 className="mt-4 font-heading text-lg font-semibold">Start a Crawl</h2>
+                    <p className="mt-2 text-sm text-muted-foreground max-w-md">
+                      Enter keywords above and click &quot;Start Crawl&quot; to fetch real data from the web.
+                      Results will appear here within 1-2 minutes.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </ScrollArea>
+          </div>
+        </div>
+        )}
       </div>
 
       {/* Fullscreen Expand Modal */}

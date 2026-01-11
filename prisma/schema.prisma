@@ -598,6 +598,64 @@ enum AuditAction {
 }
 
 // ============================================================================
+// Crawler Job Models
+// ============================================================================
+
+model CrawlerJob {
+  id          String        @id @default(cuid())
+  tenantId    String?
+  userId      String?
+  type        CrawlerType
+  status      CrawlerStatus @default(pending)
+  keywords    String[]
+  platforms   String[]      @default([])
+  config      Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+
+  results CrawlerResult[]
+
+  @@index([tenantId, status])
+  @@index([userId, createdAt])
+  @@map("crawler_jobs")
+}
+
+enum CrawlerType {
+  social
+  web_search
+  news
+}
+
+enum CrawlerStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+model CrawlerResult {
+  id        String   @id @default(cuid())
+  jobId     String
+  source    String
+  title     String
+  url       String?
+  content   String   @db.Text
+  author    String?
+  publishedAt DateTime?
+  sentiment String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  job CrawlerJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@map("crawler_results")
+}
+
+// ============================================================================
 // NextAuth Models
 // ============================================================================
 

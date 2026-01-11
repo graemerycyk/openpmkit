@@ -100,22 +100,22 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
-                {session?.user?.image ? (
-                  <img
-                    src={session.user.image}
-                    alt={session.user.name || 'User'}
-                    className="h-8 w-8 rounded-full"
-                  />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-100 text-cobalt-600">
-                    <User className="h-4 w-4" />
-                  </div>
-                )}
+            {session?.user?.image ? (
+              <img
+                src={session.user.image}
+                alt={session.user.name || 'User'}
+                className="h-8 w-8 rounded-full"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-100 text-cobalt-600">
+                <User className="h-4 w-4" />
+              </div>
+            )}
                 <div className="hidden text-left sm:block">
-                  <p className="text-sm font-medium">{session?.user?.name || 'User'}</p>
-                  <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              <p className="text-sm font-medium">{session?.user?.name || 'User'}</p>
+              <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
