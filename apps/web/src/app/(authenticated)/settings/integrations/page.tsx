@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -183,14 +180,6 @@ function StatusBadge({ status }: { status: ConnectionStatus }) {
 }
 
 function IntegrationCard({ integration }: { integration: Integration }) {
-  const [isConnecting, setIsConnecting] = useState(false);
-
-  const handleConnect = () => {
-    setIsConnecting(true);
-    // In real implementation, this would trigger OAuth flow
-    setTimeout(() => setIsConnecting(false), 1000);
-  };
-
   return (
     <Card className="transition-all hover:shadow-md">
       <CardContent className="p-6">
@@ -222,11 +211,8 @@ function IntegrationCard({ integration }: { integration: Integration }) {
                 Manage
               </Button>
             ) : (
-              <Button
-                onClick={handleConnect}
-                disabled={isConnecting}
-              >
-                {isConnecting ? 'Connecting...' : 'Connect'}
+              <Button asChild>
+                <Link href="/pricing">Upgrade to Paid Plan</Link>
               </Button>
             )}
             {integration.docsUrl && (
@@ -273,7 +259,7 @@ export default function IntegrationsPage() {
               <Sparkles className="h-6 w-6 text-cobalt-600" />
             </div>
             <div>
-              <h3 className="font-semibold">Upgrade to Pro for all integrations</h3>
+              <h3 className="font-semibold">Upgrade to Paid Plan for all integrations</h3>
               <p className="text-sm text-muted-foreground">
                 Get access to Gong, Zendesk, Amplitude, and AI crawlers with a Pro plan.
               </p>

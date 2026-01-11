@@ -8,10 +8,10 @@ import { CheckCircle2, Building2, Users, Zap, Shield, HelpCircle } from 'lucide-
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'pmkit pricing: Teams plan at $75/seat/month (billed annually) for product teams, Enterprise for custom deployments with SAML/SCIM and advanced controls.',
+    'pmkit pricing: Teams plan at $49/seat/month (billed annually) for product teams, Enterprise for custom deployments with SAML/SCIM and advanced controls.',
   openGraph: {
     title: 'pmkit Pricing: Teams & Enterprise',
-    description: 'Annual pricing for product teams. Teams at $75/seat/month billed annually, Enterprise custom.',
+    description: 'Annual pricing for product teams. Teams at $49/seat/month billed annually, Enterprise custom.',
   },
 };
 
@@ -41,9 +41,9 @@ const plans: Plan[] = [
   {
     name: 'Teams',
     description: 'For product teams with SSO, core connectors, and governance',
-    price: '$75',
+    price: '$49',
     priceDetail: 'per seat / month',
-    billingNote: 'Billed annually ($900/seat/year)',
+    billingNote: 'Billed annually ($588/seat/year)',
     minSeats: 5,
     badge: null,
     features: [
@@ -81,7 +81,7 @@ const plans: Plan[] = [
       { name: 'Customer-managed keys (KMS)', included: true, detail: 'Coming soon' },
       { name: 'Private networking / on-prem', included: true, detail: 'Coming soon' },
       { name: 'SLAs + dedicated support', included: true },
-      { name: 'Higher concurrency & run limits', included: true },
+      { name: '5× higher workflow limits', included: true },
     ],
     cta: 'Contact Sales',
     ctaHref: '/contact?plan=enterprise',
@@ -91,13 +91,15 @@ const plans: Plan[] = [
 ];
 
 const jobTypes = [
-  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: 'Included in schedule' },
-  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: 'Included in schedule' },
-  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: 'Included in schedule' },
-  { name: 'Meeting Prep Pack', schedule: 'On-demand only', onDemand: '10/month/seat' },
-  { name: 'PRD Pack', schedule: 'On-demand only', onDemand: '4/month/seat' },
-  { name: 'Roadmap Alignment Memo', schedule: 'On-demand only', onDemand: '4/month/seat' },
-  { name: 'Sprint Review Pack', schedule: 'On-demand only', onDemand: '2/month/seat' },
+  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: 'Included' },
+  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: '+ 4/month/seat' },
+  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: '+ 4/month/seat' },
+  { name: 'Meeting Prep Pack', schedule: 'On-demand', onDemand: '30/month/seat' },
+  { name: 'PRD Pack', schedule: 'On-demand', onDemand: '12/month/seat' },
+  { name: 'Roadmap Alignment Memo', schedule: 'On-demand', onDemand: '12/month/seat' },
+  { name: 'Sprint Review Pack', schedule: 'On-demand', onDemand: '8/month/seat' },
+  { name: 'Release Notes', schedule: 'On-demand', onDemand: '16/month/seat' },
+  { name: 'Prototype Generation', schedule: 'On-demand', onDemand: '8/month/seat' },
 ];
 
 const faqs = [
@@ -114,7 +116,7 @@ const faqs = [
   {
     question: 'Are there usage limits?',
     answer:
-      'Yes. Scheduled jobs (Daily Brief, Weekly Themes, Competitor Research) run at fixed cadences per workspace. On-demand jobs (Meeting Prep, PRD Pack, Roadmap Memo) have per-seat monthly limits. Enterprise customers can purchase additional capacity.',
+      'Yes. Scheduled jobs (Daily Brief, Weekly Themes, Competitor Research) run at fixed cadences per workspace. On-demand jobs have generous per-seat monthly limits. Enterprise customers get 5× higher limits and can purchase additional capacity.',
   },
   {
     question: 'What about concurrency?',
@@ -202,7 +204,7 @@ export default function PricingPage() {
                       Minimum {plan.minSeats} seats
                       {plan.name === 'Teams' && (
                         <span className="ml-1">
-                          · Starting at ${(900 * plan.minSeats).toLocaleString()}/year
+                          · Starting at ${(588 * plan.minSeats).toLocaleString()}/year
                         </span>
                       )}
                     </p>

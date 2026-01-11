@@ -57,13 +57,20 @@ export interface PlanFeatures {
   allowedConnectors: ConnectorKey[];
   customConnectorsEnabled: boolean; // Enterprise only
 
-  // Jobs
+  // Jobs - Scheduled
   scheduledDailyBrief: boolean;
   scheduledWeeklyThemes: boolean;
   scheduledCompetitorResearch: boolean;
+
+  // Jobs - On-demand limits per seat per month
   maxOnDemandMeetingPrepPerSeatPerMonth: number;
   maxOnDemandPrdPackPerSeatPerMonth: number;
   maxOnDemandRoadmapMemoPerSeatPerMonth: number;
+  maxOnDemandSprintReviewPerSeatPerMonth: number;
+  maxOnDemandReleaseNotesPerSeatPerMonth: number;
+  maxOnDemandPrototypeGenPerSeatPerMonth: number;
+  maxOnDemandVocClusteringPerSeatPerMonth: number;
+  maxOnDemandCompetitorResearchPerSeatPerMonth: number;
 
   // Concurrency
   maxConcurrentRunsPer10Seats: number;
@@ -94,8 +101,8 @@ export const TEAMS_PLAN: PlanConfig = {
   key: 'TEAMS',
   name: 'Teams',
   description: 'For product teams with SSO, all connectors, and governance',
-  pricePerSeatPerMonth: 75, // $75/seat/month
-  pricePerSeatPerYear: 900, // $900/seat/year (billed annually)
+  pricePerSeatPerMonth: 49, // $49/seat/month
+  pricePerSeatPerYear: 588, // $588/seat/year (billed annually)
   minSeats: 5,
   features: {
     // SSO: OIDC only (Google Workspace + Microsoft Entra ID)
@@ -112,10 +119,15 @@ export const TEAMS_PLAN: PlanConfig = {
     scheduledWeeklyThemes: true,
     scheduledCompetitorResearch: true,
 
-    // On-demand limits per seat per month
-    maxOnDemandMeetingPrepPerSeatPerMonth: 10,
-    maxOnDemandPrdPackPerSeatPerMonth: 4,
-    maxOnDemandRoadmapMemoPerSeatPerMonth: 4,
+    // On-demand limits per seat per month (generous fair use)
+    maxOnDemandMeetingPrepPerSeatPerMonth: 30,
+    maxOnDemandPrdPackPerSeatPerMonth: 12,
+    maxOnDemandRoadmapMemoPerSeatPerMonth: 12,
+    maxOnDemandSprintReviewPerSeatPerMonth: 8,
+    maxOnDemandReleaseNotesPerSeatPerMonth: 16,
+    maxOnDemandPrototypeGenPerSeatPerMonth: 8,
+    maxOnDemandVocClusteringPerSeatPerMonth: 4,
+    maxOnDemandCompetitorResearchPerSeatPerMonth: 4,
 
     // Concurrency: 2 concurrent runs per 10 seats
     maxConcurrentRunsPer10Seats: 2,
@@ -161,10 +173,15 @@ export const ENTERPRISE_PLAN: PlanConfig = {
     scheduledWeeklyThemes: true,
     scheduledCompetitorResearch: true,
 
-    // Higher on-demand limits
-    maxOnDemandMeetingPrepPerSeatPerMonth: 50,
-    maxOnDemandPrdPackPerSeatPerMonth: 20,
-    maxOnDemandRoadmapMemoPerSeatPerMonth: 20,
+    // 5× higher on-demand limits (can be overridden per customer via entitlements)
+    maxOnDemandMeetingPrepPerSeatPerMonth: 150,
+    maxOnDemandPrdPackPerSeatPerMonth: 60,
+    maxOnDemandRoadmapMemoPerSeatPerMonth: 60,
+    maxOnDemandSprintReviewPerSeatPerMonth: 40,
+    maxOnDemandReleaseNotesPerSeatPerMonth: 80,
+    maxOnDemandPrototypeGenPerSeatPerMonth: 40,
+    maxOnDemandVocClusteringPerSeatPerMonth: 20,
+    maxOnDemandCompetitorResearchPerSeatPerMonth: 20,
 
     // Higher concurrency
     maxConcurrentRunsPer10Seats: 5,
@@ -236,10 +253,15 @@ export const EntitlementKeySchema = z.enum([
   'connectors.allowed',
   'connectors.customEnabled',
   
-  // Job run limits
+  // Job run limits (on-demand per seat per month)
   'jobs.maxOnDemandMeetingPrepPerSeatPerMonth',
   'jobs.maxOnDemandPrdPackPerSeatPerMonth',
   'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth',
+  'jobs.maxOnDemandSprintReviewPerSeatPerMonth',
+  'jobs.maxOnDemandReleaseNotesPerSeatPerMonth',
+  'jobs.maxOnDemandPrototypeGenPerSeatPerMonth',
+  'jobs.maxOnDemandVocClusteringPerSeatPerMonth',
+  'jobs.maxOnDemandCompetitorResearchPerSeatPerMonth',
   'jobs.maxConcurrentRunsPer10Seats',
   
   // Scheduled job toggles
@@ -355,6 +377,11 @@ export class EntitlementService {
     await this.store.upsert(tenantId, 'jobs.maxOnDemandMeetingPrepPerSeatPerMonth', features.maxOnDemandMeetingPrepPerSeatPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandPrdPackPerSeatPerMonth', features.maxOnDemandPrdPackPerSeatPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth', features.maxOnDemandRoadmapMemoPerSeatPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandSprintReviewPerSeatPerMonth', features.maxOnDemandSprintReviewPerSeatPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandReleaseNotesPerSeatPerMonth', features.maxOnDemandReleaseNotesPerSeatPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandPrototypeGenPerSeatPerMonth', features.maxOnDemandPrototypeGenPerSeatPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandVocClusteringPerSeatPerMonth', features.maxOnDemandVocClusteringPerSeatPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandCompetitorResearchPerSeatPerMonth', features.maxOnDemandCompetitorResearchPerSeatPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxConcurrentRunsPer10Seats', features.maxConcurrentRunsPer10Seats);
     await this.store.upsert(tenantId, 'jobs.scheduledDailyBrief', features.scheduledDailyBrief);
     await this.store.upsert(tenantId, 'jobs.scheduledWeeklyThemes', features.scheduledWeeklyThemes);
@@ -385,6 +412,16 @@ export class EntitlementService {
         return features.maxOnDemandPrdPackPerSeatPerMonth;
       case 'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth':
         return features.maxOnDemandRoadmapMemoPerSeatPerMonth;
+      case 'jobs.maxOnDemandSprintReviewPerSeatPerMonth':
+        return features.maxOnDemandSprintReviewPerSeatPerMonth;
+      case 'jobs.maxOnDemandReleaseNotesPerSeatPerMonth':
+        return features.maxOnDemandReleaseNotesPerSeatPerMonth;
+      case 'jobs.maxOnDemandPrototypeGenPerSeatPerMonth':
+        return features.maxOnDemandPrototypeGenPerSeatPerMonth;
+      case 'jobs.maxOnDemandVocClusteringPerSeatPerMonth':
+        return features.maxOnDemandVocClusteringPerSeatPerMonth;
+      case 'jobs.maxOnDemandCompetitorResearchPerSeatPerMonth':
+        return features.maxOnDemandCompetitorResearchPerSeatPerMonth;
       case 'jobs.maxConcurrentRunsPer10Seats':
         return features.maxConcurrentRunsPer10Seats;
       case 'jobs.scheduledDailyBrief':

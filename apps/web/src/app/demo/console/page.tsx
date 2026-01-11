@@ -847,7 +847,7 @@ function ConsolePageContent() {
           </div>
           <Separator orientation="vertical" className="h-6" />
           <Button variant="outline" size="sm" asChild>
-            <Link href="/">
+            <Link href={isAuthenticated ? '/dashboard' : '/'}>
               Exit Demo
             </Link>
           </Button>

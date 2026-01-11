@@ -184,7 +184,7 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
               <div className="rounded-lg border bg-gradient-to-br from-cobalt-50 to-background p-4">
                 <div className="flex items-center gap-2 text-cobalt-600">
                   <Sparkles className="h-4 w-4" />
-                  <span className="text-sm font-medium">Upgrade to Pro</span>
+                  <span className="text-sm font-medium">Upgrade to Paid Plan</span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Connect your real tools and unlock unlimited jobs.

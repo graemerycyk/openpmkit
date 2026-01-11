@@ -10,13 +10,16 @@ import type { ConnectorKey } from '../connectors';
 // ============================================================================
 
 export const UsageEventTypeSchema = z.enum([
-  // Job runs
+  // Job runs (all 9 job types)
   'job.run.daily_brief',
   'job.run.meeting_prep',
   'job.run.voc_clustering',
   'job.run.competitor_research',
   'job.run.roadmap_alignment',
   'job.run.prd_draft',
+  'job.run.sprint_review',
+  'job.run.prototype_generation',
+  'job.run.release_notes',
   
   // Tool calls
   'tool.call',
@@ -461,7 +464,17 @@ export class LimitsEnforcer {
     }
 
     // Check on-demand limits for specific job types
-    const onDemandJobs: JobType[] = ['meeting_prep', 'prd_draft', 'roadmap_alignment'];
+    // daily_brief is scheduled-only, all others have on-demand limits
+    const onDemandJobs: JobType[] = [
+      'meeting_prep',
+      'prd_draft',
+      'roadmap_alignment',
+      'sprint_review',
+      'release_notes',
+      'prototype_generation',
+      'voc_clustering',
+      'competitor_research',
+    ];
     
     if (onDemandJobs.includes(jobType)) {
       const result = await this.checkOnDemandLimit(ctx, jobType, features);
@@ -501,6 +514,11 @@ export class LimitsEnforcer {
       maxOnDemandMeetingPrepPerSeatPerMonth: number;
       maxOnDemandPrdPackPerSeatPerMonth: number;
       maxOnDemandRoadmapMemoPerSeatPerMonth: number;
+      maxOnDemandSprintReviewPerSeatPerMonth: number;
+      maxOnDemandReleaseNotesPerSeatPerMonth: number;
+      maxOnDemandPrototypeGenPerSeatPerMonth: number;
+      maxOnDemandVocClusteringPerSeatPerMonth: number;
+      maxOnDemandCompetitorResearchPerSeatPerMonth: number;
     }
   ): Promise<LimitCheckResult> {
     const now = new Date();
@@ -524,6 +542,21 @@ export class LimitsEnforcer {
         break;
       case 'roadmap_alignment':
         limit = features.maxOnDemandRoadmapMemoPerSeatPerMonth;
+        break;
+      case 'sprint_review':
+        limit = features.maxOnDemandSprintReviewPerSeatPerMonth;
+        break;
+      case 'release_notes':
+        limit = features.maxOnDemandReleaseNotesPerSeatPerMonth;
+        break;
+      case 'prototype_generation':
+        limit = features.maxOnDemandPrototypeGenPerSeatPerMonth;
+        break;
+      case 'voc_clustering':
+        limit = features.maxOnDemandVocClusteringPerSeatPerMonth;
+        break;
+      case 'competitor_research':
+        limit = features.maxOnDemandCompetitorResearchPerSeatPerMonth;
         break;
       default:
         return { allowed: true };

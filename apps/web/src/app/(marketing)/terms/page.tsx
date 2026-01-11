@@ -12,7 +12,7 @@ export default function TermsPage() {
       <div className="container">
         <div className="mx-auto max-w-3xl">
           <h1 className="font-heading text-4xl font-bold">Terms of Service</h1>
-          <p className="mt-4 text-muted-foreground">Last updated: December 29, 2025</p>
+          <p className="mt-4 text-muted-foreground">Last updated: January 11, 2026</p>
 
           <div className="prose mt-12">
             <h2>1. Acceptance of Terms</h2>
@@ -43,50 +43,65 @@ export default function TermsPage() {
               <li>Interfere with or disrupt the service</li>
               <li>Use the service to transmit harmful code</li>
               <li>Reverse engineer or attempt to extract source code</li>
+              <li>Use automated systems to exceed fair use limits</li>
+              <li>Share account credentials or circumvent seat-based licensing</li>
+              <li>Resell or redistribute service outputs without authorization</li>
             </ul>
 
-            <h2>5. Draft-Only Operations</h2>
+            <h2>5. Fair Use Policy</h2>
+            <p>
+              pmkit subscriptions include generous usage allowances designed for normal business
+              use. We reserve the right to limit or suspend accounts that significantly exceed
+              typical usage patterns or that we reasonably believe are being used in ways that
+              negatively impact service quality for other customers.
+            </p>
+            <p>
+              Usage limits are applied per seat and reset monthly. If you consistently need
+              higher limits, please contact us about our Enterprise plan with custom capacity.
+            </p>
+
+            <h2>6. Draft-Only Operations</h2>
             <p>
               pmkit operates on a draft-only basis. All outputs are proposals that require your
               review and approval before any action is taken in connected systems. pmkit does not
               directly write to external systems without explicit user action.
             </p>
 
-            <h2>6. Intellectual Property</h2>
+            <h2>7. Intellectual Property</h2>
             <p>
               The pmkit service, including all content, features, and functionality, is owned by
               pmkit and protected by intellectual property laws. You retain ownership of your data
               and content processed through the service.
             </p>
 
-            <h2>7. Third-Party Integrations</h2>
+            <h2>8. Third-Party Integrations</h2>
             <p>
               pmkit integrates with third-party services (Jira, Slack, Gong, etc.). Your use of
               these integrations is subject to the terms of service of those third parties. pmkit
               is not responsible for the availability or functionality of third-party services.
             </p>
 
-            <h2>8. Disclaimer of Warranties</h2>
+            <h2>9. Disclaimer of Warranties</h2>
             <p>
               The service is provided "as is" without warranties of any kind. We do not guarantee
               that the service will be uninterrupted, error-free, or meet your specific
               requirements.
             </p>
 
-            <h2>9. Limitation of Liability</h2>
+            <h2>10. Limitation of Liability</h2>
             <p>
               To the maximum extent permitted by law, pmkit shall not be liable for any indirect,
               incidental, special, consequential, or punitive damages arising from your use of the
               service.
             </p>
 
-            <h2>10. Changes to Terms</h2>
+            <h2>11. Changes to Terms</h2>
             <p>
               We may update these terms from time to time. We will notify you of any material
               changes by posting the new terms on this page.
             </p>
 
-            <h2>11. Contact</h2>
+            <h2>12. Contact</h2>
             <p>
               If you have questions about these Terms of Service, please{' '}
               <Link href="/contact" className="text-cobalt-600 hover:underline">
