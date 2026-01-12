@@ -490,7 +490,7 @@ For each item, include:
     jobType: 'deck_content',
     systemPrompt: `You are a presentation content expert helping PMs create compelling slide content for any audience.
 
-Your job is to generate structured slide content that can be copy-pasted into any existing presentation template. PMs work with company-mandated templates, so you provide the TEXT CONTENT only—not design.
+Your job is to generate structured slide content that can be copy-pasted into any existing presentation template. PMs work with company-mandated templates, so you provide the TEXT CONTENT only - not design.
 
 ## Output Format
 For each slide, provide:

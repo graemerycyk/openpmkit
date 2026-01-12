@@ -1251,7 +1251,7 @@ function ConsolePageContent() {
                           <div className="flex-1">
                             <p className="font-medium text-cobalt-900">Artifact Chaining</p>
                             <p className="mt-1 text-sm text-cobalt-700">
-                              This job uses your PRD artifact as input. Run <strong>PRD Draft</strong> first to create evidence-grounded requirements, then generate a prototype from it—no copy-paste needed.
+                              This job uses your PRD artifact as input. Run <strong>PRD Draft</strong> first to create evidence-grounded requirements, then generate a prototype from it - no copy-paste needed.
                             </p>
                             <div className="mt-3 flex items-center gap-2 text-xs text-cobalt-600">
                               <Badge variant="outline" className="border-cobalt-200 bg-white">VoC Report</Badge>

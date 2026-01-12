@@ -215,7 +215,7 @@ export default function HomePage() {
               From PRD to clickable prototype in minutes
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Watch pmkit transform a product requirements document into an interactive UI you can share with stakeholders—no design handoff required.
+              Watch pmkit transform a product requirements document into an interactive UI you can share with stakeholders - no design handoff required.
             </p>
           </div>
           <div className="mt-12 mx-auto max-w-5xl">
