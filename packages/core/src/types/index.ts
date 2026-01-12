@@ -227,6 +227,17 @@ export const AuditActionSchema = z.enum([
   'user.logout',
   'permission.checked',
   'permission.denied',
+  // Guardrail and safety events
+  'guardrail.triggered',
+  'guardrail.passed',
+  'llm.refusal',
+  'content.filtered',
+  // Policy events
+  'policy.checked',
+  'policy.denied',
+  // Cache events
+  'cache.hit',
+  'cache.miss',
 ]);
 export type AuditAction = z.infer<typeof AuditActionSchema>;
 

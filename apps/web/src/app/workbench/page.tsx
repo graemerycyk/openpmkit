@@ -65,6 +65,11 @@ import { cn } from '@/lib/utils';
 import { JOB_CONTEXT_FIELDS, JOB_TYPE_INFO, type ContextField } from './field-config';
 import type { JobType, CrawlerType } from '@pmkit/core';
 import { CardDescription } from '@/components/ui/card';
+import { 
+  SIEMExportPreview, 
+  generateTelemetryEvents,
+  type JobRunData,
+} from '@/components/ui/siem-export-preview';
 
 // Workbench mode
 type WorkbenchMode = 'jobs' | 'crawlers';
@@ -824,6 +829,45 @@ export default function WorkbenchPage() {
                         </div>
                       </div>
                     )}
+                    
+                    {/* SIEM Export Preview */}
+                    <div className="p-6 pt-0">
+                      <Separator className="mb-6" />
+                      <SIEMExportPreview 
+                        events={generateTelemetryEvents({
+                          runId: result.id,
+                          jobType: result.jobType,
+                          tenantId: 'workbench-tenant',
+                          userId: 'workbench-admin',
+                          startedAt: new Date(result.timestamp.getTime() - result.metadata.latencyMs),
+                          completedAt: result.timestamp,
+                          success: true,
+                          // Workbench uses pasted data, so tool calls are simulated
+                          toolCalls: Object.keys(result.context).map((key, idx) => ({
+                            id: `tc-${idx}`,
+                            toolName: `get_${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`,
+                            connectorKey: key.includes('slack') ? 'slack' 
+                              : key.includes('jira') ? 'jira' 
+                              : key.includes('gong') ? 'gong'
+                              : key.includes('zendesk') ? 'zendesk'
+                              : key.includes('confluence') ? 'confluence'
+                              : 'pmkit',
+                            latencyMs: Math.floor(Math.random() * 200) + 50,
+                            success: true,
+                            isSimulated: true, // Workbench uses pasted data
+                          })),
+                          // LLM metrics are real
+                          llmMetrics: {
+                            model: result.metadata.model,
+                            inputTokens: result.metadata.usage.inputTokens,
+                            outputTokens: result.metadata.usage.outputTokens,
+                            totalTokens: result.metadata.usage.totalTokens,
+                            latencyMs: result.metadata.latencyMs,
+                            estimatedCostUsd: result.metadata.estimatedCostUsd,
+                          },
+                        } as JobRunData)}
+                      />
+                    </div>
                   </ScrollArea>
                 </div>
               )}
@@ -1013,7 +1057,7 @@ export default function WorkbenchPage() {
             {/* Crawler Results */}
             <ScrollArea className="flex-1">
               {selectedCrawlerJob ? (
-                <div className="p-4 space-y-4">
+                <div className="p-4 space-y-4 overflow-hidden">
                   {/* Job Header */}
                   <Card>
                     <CardHeader className="pb-2">
@@ -1084,27 +1128,27 @@ export default function WorkbenchPage() {
 
                   {/* AI Analysis Section */}
                   {selectedCrawlerJob.analysis && (
-                    <Card className="border-cobalt-200 bg-gradient-to-br from-cobalt-50/50 to-background">
+                    <Card className="border-cobalt-200 bg-gradient-to-br from-cobalt-50/50 to-background overflow-hidden">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-2">
-                          <Wand2 className="h-5 w-5 text-cobalt-600" />
+                          <Wand2 className="h-5 w-5 text-cobalt-600 shrink-0" />
                           <CardTitle className="text-base">AI Analysis</CardTitle>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCrawlerAnalysisModalOpen(true)}
-                            className="ml-auto gap-2"
+                            className="ml-auto gap-2 shrink-0"
                           >
                             <Expand className="h-4 w-4" />
                             Expand
                           </Button>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-6">
+                      <CardContent className="space-y-6 overflow-hidden">
                         {/* Executive Summary */}
-                        <div>
+                        <div className="overflow-hidden">
                           <h4 className="text-sm font-semibold mb-2">Executive Summary</h4>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
+                          <p className="text-sm text-muted-foreground leading-relaxed break-words">
                             {selectedCrawlerJob.analysis.summary}
                           </p>
                         </div>
@@ -1169,10 +1213,10 @@ export default function WorkbenchPage() {
                                       </Badge>
                                     </div>
                                   </div>
-                                  <p className="text-xs text-muted-foreground">{theme.description}</p>
+                                  <p className="text-xs text-muted-foreground break-words">{theme.description}</p>
                                   {theme.keyQuotes.length > 0 && (
-                                    <div className="mt-2 pl-3 border-l-2 border-cobalt-200">
-                                      <p className="text-xs italic text-muted-foreground">
+                                    <div className="mt-2 pl-3 border-l-2 border-cobalt-200 overflow-hidden">
+                                      <p className="text-xs italic text-muted-foreground break-words">
                                         "{theme.keyQuotes[0]}"
                                       </p>
                                     </div>
@@ -1214,8 +1258,8 @@ export default function WorkbenchPage() {
                                       {insight.priority} priority
                                     </Badge>
                                   </div>
-                                  <h5 className="font-medium text-sm">{insight.title}</h5>
-                                  <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                                  <h5 className="font-medium text-sm break-words">{insight.title}</h5>
+                                  <p className="text-xs text-muted-foreground mt-1 break-words">{insight.description}</p>
                                 </div>
                               ))}
                             </div>
@@ -1224,13 +1268,13 @@ export default function WorkbenchPage() {
 
                         {/* Competitor Mentions */}
                         {selectedCrawlerJob.analysis.competitorMentions.length > 0 && (
-                          <div>
+                          <div className="overflow-hidden">
                             <h4 className="text-sm font-semibold mb-2">Competitor Mentions</h4>
                             <div className="flex flex-wrap gap-2">
                               {selectedCrawlerJob.analysis.competitorMentions.map((mention, i) => (
-                                <div key={i} className="p-2 rounded-lg border bg-background text-xs">
-                                  <span className="font-medium">{mention.competitor}</span>
-                                  <span className="text-muted-foreground"> • {mention.source}</span>
+                                <div key={i} className="p-2 rounded-lg border bg-background text-xs max-w-full overflow-hidden">
+                                  <span className="font-medium break-words">{mention.competitor}</span>
+                                  <span className="text-muted-foreground break-words"> • {mention.source}</span>
                                   <Badge 
                                     variant="outline"
                                     className={cn(
@@ -1249,12 +1293,12 @@ export default function WorkbenchPage() {
 
                         {/* Top Quotes */}
                         {selectedCrawlerJob.analysis.topQuotes.length > 0 && (
-                          <div>
+                          <div className="overflow-hidden">
                             <h4 className="text-sm font-semibold mb-2">Notable Quotes</h4>
                             <div className="space-y-2">
                               {selectedCrawlerJob.analysis.topQuotes.slice(0, 3).map((quote, i) => (
-                                <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30">
-                                  <p className="text-sm italic">"{quote.quote}"</p>
+                                <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30 overflow-hidden">
+                                  <p className="text-sm italic break-words">"{quote.quote}"</p>
                                   <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                                     <span>- {quote.source}</span>
                                     {quote.url && (
@@ -1268,7 +1312,7 @@ export default function WorkbenchPage() {
                                       </a>
                                     )}
                                   </div>
-                                  <p className="text-xs text-muted-foreground mt-1">{quote.relevance}</p>
+                                  <p className="text-xs text-muted-foreground mt-1 break-words">{quote.relevance}</p>
                                 </div>
                               ))}
                             </div>
@@ -1277,13 +1321,13 @@ export default function WorkbenchPage() {
 
                         {/* Recommendations */}
                         {selectedCrawlerJob.analysis.recommendations.length > 0 && (
-                          <div>
+                          <div className="overflow-hidden">
                             <h4 className="text-sm font-semibold mb-2">Recommendations</h4>
                             <ul className="space-y-1">
                               {selectedCrawlerJob.analysis.recommendations.map((rec, i) => (
                                 <li key={i} className="flex items-start gap-2 text-sm">
                                   <CheckCircle2 className="h-4 w-4 text-cobalt-600 mt-0.5 shrink-0" />
-                                  <span>{rec}</span>
+                                  <span className="break-words min-w-0">{rec}</span>
                                 </li>
                               ))}
                             </ul>
@@ -1356,13 +1400,13 @@ export default function WorkbenchPage() {
                                       )}
                                     </div>
                                     <h4 className={cn(
-                                      "mt-2 font-medium",
+                                      "mt-2 font-medium break-words",
                                       !isExpanded && "line-clamp-2"
                                     )}>
                                       {result.title}
                                     </h4>
                                     {!isExpanded && (
-                                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2 break-words">
                                         {result.content}
                                       </p>
                                     )}
@@ -1383,28 +1427,28 @@ export default function WorkbenchPage() {
                               <div className="border-t bg-muted/30">
                                 <CardContent className="p-4 space-y-4">
                                   {/* Full Content */}
-                                  <div>
+                                  <div className="overflow-hidden">
                                     <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                                       Content
                                     </h5>
-                                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                                       {result.content}
                                     </p>
                                   </div>
                                   
                                   {/* Citation / Source Link */}
                                   {result.url && (
-                                    <div>
+                                    <div className="overflow-hidden">
                                       <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                                         Citation
                                       </h5>
-                                      <div className="flex items-center gap-2 p-3 rounded-lg bg-background border">
+                                      <div className="flex items-center gap-2 p-3 rounded-lg bg-background border overflow-hidden">
                                         <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
                                         <a
                                           href={result.url}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-sm text-cobalt-600 hover:underline truncate flex-1"
+                                          className="text-sm text-cobalt-600 hover:underline truncate flex-1 min-w-0"
                                           onClick={(e) => e.stopPropagation()}
                                         >
                                           {result.url}
@@ -1514,11 +1558,11 @@ export default function WorkbenchPage() {
           </DialogHeader>
           <ScrollArea className="flex-1 min-h-0">
             {selectedCrawlerJob?.analysis && (
-              <div className="space-y-6 p-4">
+              <div className="space-y-6 p-4 overflow-hidden">
                 {/* Executive Summary */}
-                <div>
+                <div className="overflow-hidden">
                   <h4 className="text-sm font-semibold mb-2">Executive Summary</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed break-words">
                     {selectedCrawlerJob.analysis.summary}
                   </p>
                 </div>
@@ -1583,10 +1627,10 @@ export default function WorkbenchPage() {
                               </Badge>
                             </div>
                           </div>
-                          <p className="text-xs text-muted-foreground">{theme.description}</p>
+                          <p className="text-xs text-muted-foreground break-words">{theme.description}</p>
                           {theme.keyQuotes.length > 0 && (
-                            <div className="mt-2 pl-3 border-l-2 border-cobalt-200">
-                              <p className="text-xs italic text-muted-foreground">
+                            <div className="mt-2 pl-3 border-l-2 border-cobalt-200 overflow-hidden">
+                              <p className="text-xs italic text-muted-foreground break-words">
                                 &quot;{theme.keyQuotes[0]}&quot;
                               </p>
                             </div>
@@ -1599,12 +1643,12 @@ export default function WorkbenchPage() {
 
                 {/* Insights */}
                 {selectedCrawlerJob.analysis.insights.length > 0 && (
-                  <div>
+                  <div className="overflow-hidden">
                     <h4 className="text-sm font-semibold mb-2">Key Insights</h4>
                     <div className="space-y-2">
                       {selectedCrawlerJob.analysis.insights.map((insight, i) => (
-                        <div key={i} className="p-3 rounded-lg border bg-background">
-                          <div className="flex items-center gap-2 mb-1">
+                        <div key={i} className="p-3 rounded-lg border bg-background overflow-hidden">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <Badge 
                               variant={
                                 insight.type === 'opportunity' ? 'default' :
@@ -1628,8 +1672,8 @@ export default function WorkbenchPage() {
                               {insight.priority} priority
                             </Badge>
                           </div>
-                          <h5 className="font-medium text-sm">{insight.title}</h5>
-                          <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                          <h5 className="font-medium text-sm break-words">{insight.title}</h5>
+                          <p className="text-xs text-muted-foreground mt-1 break-words">{insight.description}</p>
                         </div>
                       ))}
                     </div>
@@ -1638,13 +1682,13 @@ export default function WorkbenchPage() {
 
                 {/* Competitor Mentions */}
                 {selectedCrawlerJob.analysis.competitorMentions.length > 0 && (
-                  <div>
+                  <div className="overflow-hidden">
                     <h4 className="text-sm font-semibold mb-2">Competitor Mentions</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedCrawlerJob.analysis.competitorMentions.map((mention, i) => (
-                        <div key={i} className="p-2 rounded-lg border bg-background text-xs">
-                          <span className="font-medium">{mention.competitor}</span>
-                          <span className="text-muted-foreground"> • {mention.source}</span>
+                        <div key={i} className="p-2 rounded-lg border bg-background text-xs max-w-full overflow-hidden">
+                          <span className="font-medium break-words">{mention.competitor}</span>
+                          <span className="text-muted-foreground break-words"> • {mention.source}</span>
                           <Badge 
                             variant="outline"
                             className={cn(
@@ -1663,13 +1707,13 @@ export default function WorkbenchPage() {
 
                 {/* Top Quotes */}
                 {selectedCrawlerJob.analysis.topQuotes.length > 0 && (
-                  <div>
+                  <div className="overflow-hidden">
                     <h4 className="text-sm font-semibold mb-2">Notable Quotes</h4>
                     <div className="space-y-2">
                       {selectedCrawlerJob.analysis.topQuotes.map((quote, i) => (
-                        <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30">
-                          <p className="text-sm italic">&quot;{quote.quote}&quot;</p>
-                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30 overflow-hidden">
+                          <p className="text-sm italic break-words">&quot;{quote.quote}&quot;</p>
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground flex-wrap">
                             <span>- {quote.source}</span>
                             {quote.url && (
                               <a 
@@ -1682,7 +1726,7 @@ export default function WorkbenchPage() {
                               </a>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{quote.relevance}</p>
+                          <p className="text-xs text-muted-foreground mt-1 break-words">{quote.relevance}</p>
                         </div>
                       ))}
                     </div>
@@ -1691,13 +1735,13 @@ export default function WorkbenchPage() {
 
                 {/* Recommendations */}
                 {selectedCrawlerJob.analysis.recommendations.length > 0 && (
-                  <div>
+                  <div className="overflow-hidden">
                     <h4 className="text-sm font-semibold mb-2">Recommendations</h4>
                     <ul className="space-y-1">
                       {selectedCrawlerJob.analysis.recommendations.map((rec, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm">
                           <CheckCircle2 className="h-4 w-4 text-cobalt-600 mt-0.5 shrink-0" />
-                          <span>{rec}</span>
+                          <span className="break-words min-w-0">{rec}</span>
                         </li>
                       ))}
                     </ul>
@@ -1730,12 +1774,12 @@ export default function WorkbenchPage() {
           </DialogHeader>
           <ScrollArea className="flex-1 min-h-0">
             {selectedCrawlerJob?.results && selectedCrawlerJob.results.length > 0 && (
-              <div className="space-y-3 p-4">
+              <div className="space-y-3 p-4 overflow-hidden">
                 {selectedCrawlerJob.results.map((result) => (
                   <Card key={result.id} className="overflow-hidden">
-                    <CardContent className="p-4">
+                    <CardContent className="p-4 overflow-hidden">
                       <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex-1 overflow-hidden">
                           <div className="flex items-center gap-2 flex-wrap">
                             <Badge variant="outline" className="text-xs shrink-0">
                               {result.source}
@@ -1753,18 +1797,18 @@ export default function WorkbenchPage() {
                               </span>
                             )}
                           </div>
-                          <h4 className="mt-2 font-medium">{result.title}</h4>
-                          <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">
+                          <h4 className="mt-2 font-medium break-words">{result.title}</h4>
+                          <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap break-words">
                             {result.content}
                           </p>
                           {result.url && (
-                            <div className="mt-3 flex items-center gap-2 p-2 rounded-lg bg-muted/50 border">
+                            <div className="mt-3 flex items-center gap-2 p-2 rounded-lg bg-muted/50 border overflow-hidden">
                               <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
                               <a
                                 href={result.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm text-cobalt-600 hover:underline truncate flex-1"
+                                className="text-sm text-cobalt-600 hover:underline truncate flex-1 min-w-0"
                               >
                                 {result.url}
                               </a>

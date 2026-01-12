@@ -408,12 +408,15 @@ export default function TrustPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    System status and incident communication. Status page coming soon.
+                    System status and incident communication.
                   </p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-sm text-muted-foreground">
-                    status.getpmkit.com
-                    <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
-                  </span>
+                  <Link
+                    href="/status"
+                    className="mt-3 inline-flex items-center gap-1 text-sm text-cobalt-600 hover:underline"
+                  >
+                    getpmkit.com/status
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
                 </CardContent>
               </Card>
 

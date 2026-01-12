@@ -50,6 +50,7 @@ import {
   Zap,
   Copy,
   Presentation,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SignInModal } from '@/components/auth/sign-in-modal';
@@ -60,6 +61,13 @@ import {
   hasExceededFreeJobLimit,
   storeDemoJobRun,
 } from '@/lib/demo-session';
+import { AuditLog } from './components/audit-log';
+import { generateMockAuditEntries } from './lib/demo-data';
+import { 
+  SIEMExportPreview, 
+  generateTelemetryEvents,
+  type JobRunData,
+} from '@/components/ui/siem-export-preview';
 
 // ============================================================================
 // Types
@@ -631,9 +639,10 @@ function ConsolePageContent() {
     release_notes: null,
     deck_content: null,
   });
-  const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'artifact' | 'connectors'>(
+  const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'artifact' | 'audit' | 'connectors'>(
     'overview'
   );
+  const [auditEntries, setAuditEntries] = useState<ReturnType<typeof generateMockAuditEntries>>([]);
   const [artifactModalOpen, setArtifactModalOpen] = useState(false);
   
   // Command demo state
@@ -698,6 +707,11 @@ function ConsolePageContent() {
 
     setJobRuns((prev) => ({ ...prev, [jobType]: run }));
     setActiveTab('timeline');
+    
+    // Generate audit entries for this job run
+    const jobIdForAudit = jobType.replace('_', '-');
+    const newAuditEntries = generateMockAuditEntries(jobIdForAudit);
+    setAuditEntries(newAuditEntries);
     
     if (!isAuthenticated) {
       const newCount = incrementDemoJobCount();
@@ -1238,6 +1252,14 @@ function ConsolePageContent() {
                       <TabsTrigger value="artifact" disabled={!currentRun?.artifact}>
                         Artifact
                       </TabsTrigger>
+                      <TabsTrigger value="audit" disabled={auditEntries.length === 0}>
+                        Audit Log
+                        {auditEntries.length > 0 && (
+                          <Badge variant="secondary" className="ml-2">
+                            {auditEntries.length}
+                          </Badge>
+                        )}
+                      </TabsTrigger>
                       <TabsTrigger value="connectors">Connectors</TabsTrigger>
                     </TabsList>
                   </div>
@@ -1529,6 +1551,65 @@ function ConsolePageContent() {
                             No artifact generated yet.
                           </p>
                         </div>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="audit" className="h-full flex-1 overflow-auto p-4">
+                    {auditEntries.length > 0 && currentRun ? (
+                      <div className="space-y-6">
+                        <div className="rounded-lg border border-cobalt-200 bg-cobalt-50/50 p-4">
+                          <div className="flex items-start gap-3">
+                            <Shield className="mt-0.5 h-5 w-5 text-cobalt-600" />
+                            <div>
+                              <h3 className="font-semibold text-cobalt-900">Full Audit Trail</h3>
+                              <p className="mt-1 text-sm text-cobalt-700">
+                                Every action is logged with actor, timestamp, and resource details. 
+                                Enterprise customers can export audit logs to SIEM solutions.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <AuditLog entries={auditEntries} />
+                        
+                        {/* SIEM Export Preview */}
+                        <SIEMExportPreview 
+                          events={generateTelemetryEvents({
+                            runId: currentRun.id,
+                            jobType: currentRun.type,
+                            tenantId: 'demo-tenant-1',
+                            userId: 'demo-user-1',
+                            startedAt: currentRun.startedAt || new Date(),
+                            completedAt: currentRun.completedAt,
+                            success: currentRun.status === 'completed',
+                            errorMessage: currentRun.error,
+                            toolCalls: currentRun.toolCalls.map(tc => ({
+                              id: tc.id,
+                              toolName: tc.name,
+                              connectorKey: tc.server,
+                              latencyMs: tc.durationMs,
+                              success: tc.status === 'success',
+                              isSimulated: true, // Demo console uses mocked data
+                            })),
+                            llmMetrics: currentRun.llmMetadata ? {
+                              model: currentRun.llmMetadata.model,
+                              inputTokens: currentRun.llmMetadata.usage.inputTokens,
+                              outputTokens: currentRun.llmMetadata.usage.outputTokens,
+                              totalTokens: currentRun.llmMetadata.usage.totalTokens,
+                              latencyMs: currentRun.llmMetadata.latencyMs,
+                              estimatedCostUsd: currentRun.llmMetadata.estimatedCostUsd,
+                            } : undefined,
+                          } as JobRunData)}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center text-center">
+                        <Shield className="h-12 w-12 text-muted-foreground/50" />
+                        <h3 className="mt-4 font-medium">No Audit Entries Yet</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          Run a job to see the full audit trail with all tool calls, 
+                          permission checks, and artifact creation events.
+                        </p>
                       </div>
                     )}
                   </TabsContent>

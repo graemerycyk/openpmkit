@@ -19,7 +19,9 @@
 
 | What | Where |
 |------|-------|
+| **TODO tracking** | `TODO.md` ⚠️ **Check this first!** |
 | Domain types | `packages/core/src/types/index.ts` |
+| Telemetry & SIEM | `packages/core/src/telemetry/index.ts` |
 | MCP framework | `packages/mcp/src/index.ts` |
 | Job runner | `packages/core/src/jobs/index.ts` |
 | Prompt templates | `packages/prompts/src/index.ts` |
@@ -29,6 +31,26 @@
 | Demo data | `packages/mock-tenant/src/data/` |
 | Web app | `apps/web/src/app/` |
 | UI components | `apps/web/src/components/ui/` |
+
+### TODO.md - Incomplete Features Tracking
+
+**Always check `TODO.md` before and after making changes.**
+
+This file tracks:
+- 🔴 Critical items blocking security reviews
+- 🟠 High priority items backing up marketing claims
+- 🟡 "Coming soon" features claimed on marketing pages
+- 🟢 Nice-to-have improvements
+- 📝 Documentation gaps where claims exceed implementation
+- 💡 Ideas for future consideration
+
+**When building:**
+1. Check TODO.md for related incomplete work
+2. Update status when completing items
+3. Add new items when you discover incomplete features
+4. Add items when making claims that aren't fully implemented
+
+**Keep TODO.md as the single source of truth for what's done, half-done, and still to do.**
 
 ---
 
@@ -1020,6 +1042,7 @@ With default rate limits (50 calls/day) using GPT-5 mini:
 
 ## Related Files
 
+- `TODO.md` - **Incomplete features tracking** (check before/after changes)
 - `CLAUDE.md` - Quick reference for Claude Code
 - `.cursorrules` - Cursor IDE configuration
 - `CONTRIBUTING.md` - Human contributor guide

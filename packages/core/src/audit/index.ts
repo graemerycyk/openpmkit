@@ -282,6 +282,128 @@ export class AuditLogger {
     });
   }
 
+  // Guardrail and safety logging
+  async logGuardrailTriggered(
+    tenantId: string,
+    jobId: string,
+    guardrailType: string,
+    reason: string,
+    modelId?: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'guardrail.triggered',
+      resourceType: 'job',
+      resourceId: jobId,
+      details: { guardrailType, reason, modelId },
+    });
+  }
+
+  async logGuardrailPassed(
+    tenantId: string,
+    jobId: string,
+    guardrailType: string,
+    modelId?: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'guardrail.passed',
+      resourceType: 'job',
+      resourceId: jobId,
+      details: { guardrailType, modelId },
+    });
+  }
+
+  async logLLMRefusal(
+    tenantId: string,
+    jobId: string,
+    refusalReason: string,
+    modelId?: string,
+    promptVersion?: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'llm.refusal',
+      resourceType: 'job',
+      resourceId: jobId,
+      details: { refusalReason, modelId, promptVersion },
+    });
+  }
+
+  async logContentFiltered(
+    tenantId: string,
+    jobId: string,
+    filterCategory: string,
+    modelId?: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'content.filtered',
+      resourceType: 'job',
+      resourceId: jobId,
+      details: { filterCategory, modelId },
+    });
+  }
+
+  // Policy logging
+  async logPolicyChecked(
+    tenantId: string,
+    connectorKey: string,
+    toolName: string,
+    decision: 'allow' | 'deny',
+    ruleMatched?: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'policy.checked',
+      resourceType: 'connector',
+      resourceId: connectorKey,
+      details: { toolName, decision, ruleMatched },
+    });
+  }
+
+  async logPolicyDenied(
+    tenantId: string,
+    connectorKey: string,
+    toolName: string,
+    reason: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'policy.denied',
+      resourceType: 'connector',
+      resourceId: connectorKey,
+      details: { toolName, reason },
+    });
+  }
+
+  // Cache logging
+  async logCacheHit(
+    tenantId: string,
+    cacheKey: string,
+    resourceType: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'cache.hit',
+      resourceType,
+      resourceId: cacheKey,
+    });
+  }
+
+  async logCacheMiss(
+    tenantId: string,
+    cacheKey: string,
+    resourceType: string
+  ): Promise<AuditLog> {
+    return this.log({
+      tenantId,
+      action: 'cache.miss',
+      resourceType,
+      resourceId: cacheKey,
+    });
+  }
+
   // Query methods
   async getByTenant(
     tenantId: string,

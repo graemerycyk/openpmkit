@@ -7,6 +7,9 @@ export * from './rbac';
 // Audit
 export * from './audit';
 
+// Telemetry (extended audit with SIEM export)
+export * from './telemetry';
+
 // Jobs
 export * from './jobs';
 

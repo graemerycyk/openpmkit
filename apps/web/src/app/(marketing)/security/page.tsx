@@ -45,7 +45,7 @@ const securityFeatures = [
     icon: Server,
     title: 'Infrastructure Security',
     description:
-      'Hosted on managed cloud infrastructure (Vercel, Neon) with encryption, access controls, and monitoring. SOC 2 certification in progress.',
+      'Hosted on DigitalOcean managed cloud infrastructure with encryption, access controls, and monitoring. SOC 2 certification in progress.',
   },
 ];
 

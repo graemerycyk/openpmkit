@@ -13,6 +13,16 @@
 - Database and testing information
 - Frontend design system
 
+## ⚠️ TODO.md - Check Before/After Changes
+
+**Always check `TODO.md`** for incomplete features and "coming soon" claims.
+
+When building, bug fixing, or reviewing:
+1. Check TODO.md for related incomplete work
+2. Update status when completing items
+3. Add new items when you discover incomplete features or make claims that aren't fully implemented
+4. Keep TODO.md as the single source of truth
+
 ## Quick Start for Claude Code
 
 ```bash
@@ -43,7 +53,9 @@ npm run typecheck
 
 | Purpose | Location |
 |---------|----------|
+| **TODO Tracking** | `TODO.md` ⚠️ |
 | Domain Types | `packages/core/src/types/index.ts` |
+| Telemetry & SIEM | `packages/core/src/telemetry/index.ts` |
 | MCP Framework | `packages/mcp/src/index.ts` |
 | Job Runner | `packages/core/src/jobs/index.ts` |
 | Prompt Templates | `packages/prompts/src/index.ts` |
