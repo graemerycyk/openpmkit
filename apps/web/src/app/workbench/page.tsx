@@ -268,7 +268,8 @@ export default function WorkbenchPage() {
   
   // Crawler expand modal state
   const [crawlerAnalysisModalOpen, setCrawlerAnalysisModalOpen] = useState(false);
-  const [crawlerRawResultsModalOpen, setCrawlerRawResultsModalOpen] = useState(false);
+  const [selectedRawResult, setSelectedRawResult] = useState<CrawlerResult | null>(null);
+  const [rawResultModalOpen, setRawResultModalOpen] = useState(false);
   
   // Share dialog state
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -283,7 +284,6 @@ export default function WorkbenchPage() {
   const [selectedCrawlerJob, setSelectedCrawlerJob] = useState<CrawlerJob | null>(null);
   const [isCrawlerRunning, setIsCrawlerRunning] = useState(false);
   const [crawlerError, setCrawlerError] = useState<string | null>(null);
-  const [expandedResults, setExpandedResults] = useState<Set<string>>(new Set());
 
   // Load history on mount
   useEffect(() => {
@@ -593,17 +593,6 @@ export default function WorkbenchPage() {
     );
   };
   
-  const toggleResultExpanded = (resultId: string) => {
-    setExpandedResults(prev => {
-      const next = new Set(prev);
-      if (next.has(resultId)) {
-        next.delete(resultId);
-      } else {
-        next.add(resultId);
-      }
-      return next;
-    });
-  };
 
   return (
     <TooltipProvider>
@@ -1558,185 +1547,49 @@ export default function WorkbenchPage() {
                   {/* Results List */}
                   {selectedCrawlerJob.results && selectedCrawlerJob.results.length > 0 && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium">Raw Results ({selectedCrawlerJob.results.length})</h3>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCrawlerRawResultsModalOpen(true)}
-                          className="gap-2"
-                        >
-                          <Expand className="h-4 w-4" />
-                          Expand All
-                        </Button>
-                      </div>
-                      {selectedCrawlerJob.results.map((result) => {
-                        const isExpanded = expandedResults.has(result.id);
-                        // Parse URL for metadata display
-                        let urlParts: { domain?: string; path?: string } = {};
-                        if (result.url) {
-                          try {
-                            const parsed = new URL(result.url);
-                            urlParts = { domain: parsed.hostname, path: parsed.pathname + parsed.search };
-                          } catch { /* ignore */ }
-                        }
-                        
-                        return (
-                          <Card key={result.id} className="overflow-hidden">
-                            <CardContent className="p-4">
-                              {/* Header with source badge and expand button */}
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <Badge variant="outline" className="text-xs shrink-0">
-                                      {result.source}
-                                    </Badge>
-                                    {result.publishedAt && (
-                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" />
-                                        {new Date(result.publishedAt).toLocaleDateString()}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <h4 className="mt-2 font-medium break-words">
-                                    {result.title}
-                                  </h4>
+                      <h3 className="font-medium">Raw Results ({selectedCrawlerJob.results.length})</h3>
+                      {selectedCrawlerJob.results.map((result) => (
+                        <Card key={result.id} className="overflow-hidden">
+                          <CardContent className="p-4">
+                            {/* Header with source badge and expand button */}
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <Badge variant="outline" className="text-xs shrink-0">
+                                    {result.source}
+                                  </Badge>
+                                  {result.publishedAt && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <Calendar className="h-3 w-3" />
+                                      {new Date(result.publishedAt).toLocaleDateString()}
+                                    </span>
+                                  )}
                                 </div>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => toggleResultExpanded(result.id)}
-                                  className="gap-1 shrink-0"
-                                >
-                                  <Expand className="h-3 w-3" />
-                                  {isExpanded ? 'Collapse' : 'Expand'}
-                                </Button>
+                                <h4 className="mt-2 font-medium break-words">
+                                  {result.title}
+                                </h4>
                               </div>
-                              
-                              {/* Preview (when collapsed) */}
-                              {!isExpanded && (
-                                <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words">
-                                  {result.content}
-                                </p>
-                              )}
-                            </CardContent>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedRawResult(result);
+                                  setRawResultModalOpen(true);
+                                }}
+                                className="gap-1 shrink-0"
+                              >
+                                <Expand className="h-3 w-3" />
+                                Expand
+                              </Button>
+                            </div>
                             
-                            {/* Expanded Content */}
-                            {isExpanded && (
-                              <div className="border-t bg-muted/30">
-                                <CardContent className="p-4 space-y-4">
-                                  {/* Full Content */}
-                                  <div className="overflow-hidden">
-                                    <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                                      Content
-                                    </h5>
-                                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                      {result.content}
-                                    </p>
-                                  </div>
-                                  
-                                  {/* URL Details */}
-                                  {result.url && (
-                                    <div className="overflow-hidden">
-                                      <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                                        Source URL
-                                      </h5>
-                                      <div className="space-y-2 text-sm">
-                                        <div className="flex items-center gap-2 p-3 rounded-lg bg-background border overflow-hidden">
-                                          <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
-                                          <a
-                                            href={result.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-cobalt-600 hover:underline truncate flex-1 min-w-0"
-                                          >
-                                            {result.url}
-                                          </a>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            asChild
-                                            className="shrink-0"
-                                          >
-                                            <a href={result.url} target="_blank" rel="noopener noreferrer">
-                                              <ExternalLink className="h-4 w-4" />
-                                            </a>
-                                          </Button>
-                                        </div>
-                                        {urlParts.domain && (
-                                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                            <div className="flex items-start gap-2">
-                                              <span className="text-muted-foreground font-medium min-w-[60px]">Domain:</span>
-                                              <span className="break-all">{urlParts.domain}</span>
-                                            </div>
-                                            {urlParts.path && urlParts.path !== '/' && (
-                                              <div className="flex items-start gap-2">
-                                                <span className="text-muted-foreground font-medium min-w-[60px]">Path:</span>
-                                                <span className="break-all">{urlParts.path}</span>
-                                              </div>
-                                            )}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  )}
-                                  
-                                  {/* Author */}
-                                  {result.author && (
-                                    <div className="flex items-center gap-2 text-sm">
-                                      <User className="h-4 w-4 text-muted-foreground" />
-                                      <span className="text-muted-foreground">Author:</span>
-                                      <span className="font-medium">{result.author}</span>
-                                    </div>
-                                  )}
-                                  
-                                  {/* Metadata */}
-                                  {result.metadata && Object.keys(result.metadata).length > 0 && (
-                                    <div>
-                                      <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                                        Additional Info
-                                      </h5>
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                                        {Object.entries(result.metadata).map(([key, value]) => {
-                                          // Format the key nicely
-                                          const formattedKey = key
-                                            .replace(/([A-Z])/g, ' $1')
-                                            .replace(/_/g, ' ')
-                                            .trim();
-                                          
-                                          // Handle different value types
-                                          let displayValue: React.ReactNode = String(value);
-                                          if (typeof value === 'boolean') {
-                                            displayValue = value ? 'Yes' : 'No';
-                                          } else if (typeof value === 'string' && value.startsWith('http')) {
-                                            displayValue = (
-                                              <a
-                                                href={value}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-cobalt-600 hover:underline break-all"
-                                              >
-                                                {value.length > 50 ? value.slice(0, 50) + '...' : value}
-                                              </a>
-                                            );
-                                          }
-                                          
-                                          return (
-                                            <div key={key} className="flex items-start gap-2">
-                                              <span className="text-muted-foreground capitalize shrink-0">{formattedKey}:</span>
-                                              <span className="font-medium break-all">{displayValue}</span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  )}
-                                </CardContent>
-                              </div>
-                            )}
-                          </Card>
-                        );
-                      })}
+                            {/* Preview */}
+                            <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words">
+                              {result.content}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
                   )}
 
@@ -2011,71 +1864,141 @@ export default function WorkbenchPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Crawler Raw Results Fullscreen Modal */}
-      <Dialog open={crawlerRawResultsModalOpen} onOpenChange={setCrawlerRawResultsModalOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-[90vh] flex flex-col">
+      {/* Individual Raw Result Modal */}
+      <Dialog open={rawResultModalOpen} onOpenChange={setRawResultModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="font-heading">
-              Raw Results ({selectedCrawlerJob?.results?.length || 0})
+            <DialogTitle className="font-heading break-words pr-8">
+              {selectedRawResult?.title || 'Result Details'}
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 min-h-0">
-            {selectedCrawlerJob?.results && selectedCrawlerJob.results.length > 0 && (
-              <div className="space-y-3 p-4 overflow-hidden">
-                {selectedCrawlerJob.results.map((result) => (
-                  <Card key={result.id} className="overflow-hidden">
-                    <CardContent className="p-4 overflow-hidden">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1 overflow-hidden">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="outline" className="text-xs shrink-0">
-                              {result.source}
-                            </Badge>
-                            {result.author && (
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <User className="h-3 w-3" />
-                                {result.author}
-                              </span>
-                            )}
-                            {result.publishedAt && (
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {new Date(result.publishedAt).toLocaleDateString()}
-                              </span>
+            {selectedRawResult && (
+              <div className="space-y-6 p-4">
+                {/* Source and Date */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Badge variant="outline" className="text-sm">
+                    {selectedRawResult.source}
+                  </Badge>
+                  {selectedRawResult.author && (
+                    <span className="text-sm text-muted-foreground flex items-center gap-1">
+                      <User className="h-4 w-4" />
+                      {selectedRawResult.author}
+                    </span>
+                  )}
+                  {selectedRawResult.publishedAt && (
+                    <span className="text-sm text-muted-foreground flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(selectedRawResult.publishedAt).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+
+                {/* Full Content */}
+                <div>
+                  <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                    Content
+                  </h5>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                    {selectedRawResult.content}
+                  </p>
+                </div>
+
+                {/* URL Details */}
+                {selectedRawResult.url && (() => {
+                  let urlParts: { domain?: string; path?: string } = {};
+                  try {
+                    const parsed = new URL(selectedRawResult.url);
+                    urlParts = { domain: parsed.hostname, path: parsed.pathname + parsed.search };
+                  } catch { /* ignore */ }
+                  
+                  return (
+                    <div>
+                      <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                        Source URL
+                      </h5>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border overflow-hidden">
+                          <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
+                          <a
+                            href={selectedRawResult.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cobalt-600 hover:underline truncate flex-1 min-w-0"
+                          >
+                            {selectedRawResult.url}
+                          </a>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                            className="shrink-0"
+                          >
+                            <a href={selectedRawResult.url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        </div>
+                        {urlParts.domain && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div className="flex items-start gap-2">
+                              <span className="text-muted-foreground font-medium min-w-[60px]">Domain:</span>
+                              <span className="break-all">{urlParts.domain}</span>
+                            </div>
+                            {urlParts.path && urlParts.path !== '/' && (
+                              <div className="flex items-start gap-2">
+                                <span className="text-muted-foreground font-medium min-w-[60px]">Path:</span>
+                                <span className="break-all">{urlParts.path}</span>
+                              </div>
                             )}
                           </div>
-                          <h4 className="mt-2 font-medium break-words">{result.title}</h4>
-                          <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap break-words">
-                            {result.content}
-                          </p>
-                          {result.url && (
-                            <div className="mt-3 flex items-center gap-2 p-2 rounded-lg bg-muted/50 border overflow-hidden">
-                              <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
-                              <a
-                                href={result.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm text-cobalt-600 hover:underline truncate flex-1 min-w-0"
-                              >
-                                {result.url}
-                              </a>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                asChild
-                                className="shrink-0"
-                              >
-                                <a href={result.url} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              </Button>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    </div>
+                  );
+                })()}
+
+                {/* Metadata */}
+                {selectedRawResult.metadata && Object.keys(selectedRawResult.metadata).length > 0 && (
+                  <div>
+                    <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                      Additional Info
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                      {Object.entries(selectedRawResult.metadata).map(([key, value]) => {
+                        // Format the key nicely
+                        const formattedKey = key
+                          .replace(/([A-Z])/g, ' $1')
+                          .replace(/_/g, ' ')
+                          .trim();
+                        
+                        // Handle different value types
+                        let displayValue: React.ReactNode = String(value);
+                        if (typeof value === 'boolean') {
+                          displayValue = value ? 'Yes' : 'No';
+                        } else if (typeof value === 'string' && value.startsWith('http')) {
+                          displayValue = (
+                            <a
+                              href={value}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-cobalt-600 hover:underline break-all"
+                            >
+                              {value.length > 50 ? value.slice(0, 50) + '...' : value}
+                            </a>
+                          );
+                        }
+                        
+                        return (
+                          <div key={key} className="flex items-start gap-2">
+                            <span className="text-muted-foreground capitalize shrink-0">{formattedKey}:</span>
+                            <span className="font-medium break-all">{displayValue}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </ScrollArea>
