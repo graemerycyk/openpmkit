@@ -196,7 +196,7 @@ enum JobStatus { Pending, Running, ... }
 
 ### Jobs
 
-- 9 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`, `release_notes`
+- 10 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`, `release_notes`, `deck_content`
 - Job handlers implement `JobHandler` interface
 - All jobs produce artifacts in markdown format
 - Jobs run via `JobRunner.runJob()` which creates a `JobContext`
@@ -204,7 +204,7 @@ enum JobStatus { Pending, Running, ... }
 ### Artifacts
 
 - Generated documents from job runs
-- Types: `brief`, `meeting_pack`, `voc_report`, `competitor_report`, `alignment_memo`, `prd`
+- Types: `brief`, `meeting_pack`, `voc_report`, `competitor_report`, `alignment_memo`, `prd`, `sprint_review`, `release_notes`, `prototype`, `deck_content`
 - Format is typically markdown
 - Stored with `storageKey` for S3/local retrieval
 

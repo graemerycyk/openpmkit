@@ -356,7 +356,7 @@ export default function HowItWorksPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">Nine Workflow Jobs</h2>
+            <h2 className="font-heading text-3xl font-bold">Ten Workflow Jobs</h2>
             <p className="mt-4 text-muted-foreground">
               Pre-built workflows for the most common PM tasks. Run on-demand or on a schedule.
             </p>
@@ -409,6 +409,12 @@ export default function HowItWorksPage() {
                 description: 'Generate customer-facing release notes from completed work.',
                 frequency: 'Per release',
               },
+              {
+                name: 'Deck Content',
+                description: 'Generate slide content tailored for exec, customer, team, or stakeholder audiences.',
+                frequency: 'On-demand',
+                highlight: true,
+              },
             ].map((job) => (
               <Card key={job.name} className={'highlight' in job && job.highlight ? 'ring-2 ring-cobalt-200 bg-cobalt-50/30' : ''}>
                 <CardHeader>
@@ -437,7 +443,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See It In Action</h2>
             <p className="mt-4 text-cobalt-100">
-              Try all nine jobs in the interactive demo with a complete demo enterprise dataset.
+              Try all ten jobs in the interactive demo with a complete demo enterprise dataset.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

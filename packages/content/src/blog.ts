@@ -28,6 +28,22 @@ export type BlogTag =
   | 'founders-notes';
 
 export const blogPosts: BlogPost[] = [
+  // Deck Content blog post
+  {
+    slug: 'deck-content-ai-slide-generation',
+    title: 'Deck Content: AI-Generated Slide Content for Every PM Presentation',
+    description:
+      'Learn how to generate tailored slide content for exec, customer, team, or stakeholder presentations—headlines, bullets, speaker notes, and Q&A prep in minutes.',
+    publishedAt: '2026-01-17',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'AI slide content',
+    tags: ['agents', 'product-management'],
+    readingTime: 10,
+    relatedResources: ['deck-content-generation', 'roadmap-alignment-memos', 'product-ops-automation'],
+    relatedPosts: ['10-pm-workflows-automate-today', 'enterprise-pm-toolkit', 'prd-to-prototype-ai-ui-generation'],
+    featured: true,
+  },
   // AI Crawler blog posts
   {
     slug: 'reddit-to-roadmap-mining-social-platforms',
@@ -55,7 +71,7 @@ export const blogPosts: BlogPost[] = [
     tags: ['competitor-research', 'agents', 'integrations'],
     readingTime: 14,
     relatedResources: ['web-search-integration', 'news-crawler-integration', 'competitor-research'],
-    relatedPosts: ['competitor-research', '9-pm-workflows-automate-today', 'enterprise-pm-toolkit'],
+    relatedPosts: ['competitor-research', '10-pm-workflows-automate-today', 'enterprise-pm-toolkit'],
   },
   {
     slug: 'social-listening-for-product-managers',
@@ -114,10 +130,10 @@ export const blogPosts: BlogPost[] = [
     relatedPosts: ['agent-workflows-with-mcp', 'jira-confluence-slack-operating-system', 'what-is-a-product-management-agent'],
   },
   {
-    slug: '9-pm-workflows-automate-today',
-    title: '9 PM Workflows You Can Automate Today',
+    slug: '10-pm-workflows-automate-today',
+    title: '10 PM Workflows You Can Automate Today',
     description:
-      'A comprehensive guide to the nine product management workflows you can automate with AI agents—from daily briefs to release notes, with time savings for each.',
+      'A comprehensive guide to the ten product management workflows you can automate with AI agents—from daily briefs to deck content, with time savings for each.',
     publishedAt: '2026-01-10',
     author: 'pmkit team',
     authorRole: 'Product',

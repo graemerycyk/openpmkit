@@ -31,7 +31,7 @@ export const resources: ResourcePage[] = [
     slug: 'product-management-agent',
     title: 'Product Management Agent: AI That Runs PM Workflows',
     description:
-      'Learn how product management agents automate 9 PM workflows (daily briefs, meeting prep, VoC clustering, PRD drafts, and more) while keeping humans in control.',
+      'Learn how product management agents automate 10 PM workflows (daily briefs, meeting prep, VoC clustering, PRD drafts, deck content, and more) while keeping humans in control.',
     primaryKeyword: 'product management agent',
     secondaryKeywords: ['AI PM agent', 'PM automation', 'agentic product management'],
     category: 'agents',
@@ -1260,6 +1260,76 @@ export const resources: ResourcePage[] = [
         question: 'What if user feedback contradicts the PRD?',
         answer:
           'That\'s the point! Update the PRD based on what you learned, then regenerate the prototype. Each iteration takes minutes, not weeks.',
+      },
+    ],
+  },
+  {
+    slug: 'deck-content-generation',
+    title: 'Deck Content Generation: AI Slide Content for Any Audience',
+    description:
+      'Generate presentation slide content tailored for exec, customer, team, or stakeholder audiences. Copy-paste ready text for your existing templates.',
+    primaryKeyword: 'AI slide content',
+    secondaryKeywords: ['presentation content generator', 'slide deck AI', 'executive presentation', 'PM presentation automation'],
+    category: 'workflows',
+    relatedPages: ['/demo', '/resources/prd-automation', '/resources/roadmap-alignment-memos'],
+    workedExample: {
+      title: 'Q4 Board Update in 20 Minutes',
+      scenario: 'A PM has a board meeting in 2 hours. They need a deck covering Q4 progress, key metrics, and the Q1 roadmap ask. Instead of starting from scratch, they run Deck Content.',
+      steps: [
+        'Agent pulls recent VoC report, competitor research, and sprint metrics from pmkit',
+        'Identifies key wins: search filters shipped, 40% improvement in search-to-click time',
+        'Structures content for exec audience: business impact first, minimal technical detail',
+        'Generates 8 slides with headlines, bullets, speaker notes, and visual suggestions',
+        'Includes Q&A prep with likely questions and recommended answers',
+      ],
+      outcome: 'The PM pastes content into the company deck template, makes minor tweaks, and is ready with 90 minutes to spare. The board meeting goes smoothly with data-backed answers to every question.',
+    },
+    checklist: [
+      'Do you spend hours gathering data for presentations?',
+      'Do you struggle to tailor content for different audiences?',
+      'Are your decks inconsistent in quality and structure?',
+      'Do you wish you had speaker notes and Q&A prep?',
+      'Do you have company templates but struggle with content?',
+    ],
+    keyBenefits: [
+      'Presentation content in minutes, not hours',
+      'Audience-appropriate tone and depth',
+      'Consistent structure across all decks',
+      'Speaker notes and Q&A prep included',
+    ],
+    useCases: [
+      'Executive/board presentations',
+      'Customer QBRs and business reviews',
+      'Team sprint reviews and demos',
+      'Stakeholder alignment meetings',
+      'Investor updates',
+      'Sales enablement decks',
+    ],
+    faqItems: [
+      {
+        question: 'Does this generate actual slides?',
+        answer:
+          'No. Deck Content generates the text content for slides—headlines, bullets, speaker notes, and visual suggestions. You paste this into your existing company templates. This approach works with any presentation tool (PowerPoint, Google Slides, Keynote) and respects your brand guidelines.',
+      },
+      {
+        question: 'What audiences are supported?',
+        answer:
+          'Four audience types: Executive (business impact, strategic), Customer (outcomes, value), Team (technical details, action items), and Stakeholder (cross-functional, dependencies). Each gets different tone, depth, and content focus.',
+      },
+      {
+        question: 'What data sources inform the content?',
+        answer:
+          'Deck Content pulls from pmkit artifacts (VoC reports, competitor research, PRDs), Jira (sprint metrics, roadmap), Amplitude (product metrics), and Confluence (existing documentation). The more context you provide, the better the output.',
+      },
+      {
+        question: 'Can I customize the slide structure?',
+        answer:
+          'Yes. Specify your requirements in the job input—number of slides, specific topics to cover, asks to include. Enterprise customers can create custom templates for recurring presentation types.',
+      },
+      {
+        question: 'How does it handle confidential data?',
+        answer:
+          'Deck Content follows pmkit\'s draft-only model. All content is generated as a draft for your review. You control what goes into the final presentation. Sensitive data is never shared externally.',
       },
     ],
   },

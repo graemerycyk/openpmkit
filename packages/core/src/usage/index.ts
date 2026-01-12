@@ -10,7 +10,7 @@ import type { ConnectorKey } from '../connectors';
 // ============================================================================
 
 export const UsageEventTypeSchema = z.enum([
-  // Job runs (all 9 job types)
+  // Job runs (all 10 job types)
   'job.run.daily_brief',
   'job.run.meeting_prep',
   'job.run.voc_clustering',
@@ -329,6 +329,7 @@ export class UsageTracker {
         sprint_review: 0,
         prototype_generation: 0,
         release_notes: 0,
+        deck_content: 0,
       },
       toolCalls: 0,
       llmTokens: { input: 0, output: 0 },

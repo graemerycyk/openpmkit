@@ -928,4 +928,120 @@ Treasury teams cannot efficiently manage cash flow because settlement status upd
 
 ---
 
+## Deck Content Data
+
+### Exec Presentation: Q1 Treasury Roadmap
+
+#### Topic
+```
+Q1 2026 Treasury Product Roadmap - Board Update
+```
+
+#### Meeting Type
+```
+exec
+```
+
+#### Duration
+```
+30 minutes
+```
+
+#### Decision Needed
+```
+Approval for $2M engineering investment in real-time treasury infrastructure
+```
+
+#### Metrics Data
+```
+**Key Metrics:**
+- Settlement volume: $45B/month (+18% QoQ)
+- Real-time adoption: 0% → 45% target by Q2
+- Customer NPS: 28 (target: 45)
+- Enterprise pipeline: $2.1M ARR blocked on real-time
+
+**Financial Impact:**
+- $770K ARR blocked by real-time gaps
+- $50K/month customer float costs
+- 3x expansion potential with First Republic
+```
+
+#### Strategic Context
+```
+**Market Position:**
+- Modern Treasury launched real-time (Jan 4) - competitive pressure
+- Ramp multi-currency gaining traction
+- Enterprise segment demanding real-time as table stakes
+
+**Strategic Priorities:**
+1. Close competitive gap on real-time features
+2. Unblock $2.1M enterprise pipeline
+3. Achieve SOC 2 Type II certification
+```
+
+#### Supporting Evidence
+```
+**Customer Evidence:**
+- First Republic: "Real-time notifications would eliminate 3 FTEs" - VP Treasury
+- Stripe Connect: "Settlement timing is our biggest pain point" - Ops Lead
+- 134 community votes for real-time notifications
+
+**Competitive Intelligence:**
+- Modern Treasury: Real-time tracking launched Jan 4
+- All major competitors have real-time features
+- 4 lost deals cited real-time as deciding factor
+```
+
+#### Risks and Mitigations
+```
+**Risks:**
+1. Engineering capacity - 10-week timeline aggressive
+   - Mitigation: Hire 2 senior engineers, defer API v3
+2. Customer churn during development
+   - Mitigation: Early access program for at-risk accounts
+3. Integration complexity with banking partners
+   - Mitigation: Phased rollout starting with top 5 banks
+
+**Dependencies:**
+- Kafka cluster setup (Ops team) - 2 weeks
+- WebSocket infrastructure (Platform) - 3 weeks
+- Banking partner API updates - External dependency
+```
+
+---
+
+## AI Crawlers
+
+### Social Crawler
+**Description**: Monitor social platforms for payment/treasury discussions, competitor mentions, and FinTech sentiment.
+
+| Platform | Keywords | Sample Results |
+|----------|----------|----------------|
+| Reddit | "PayFlow", "treasury automation", "payment reconciliation" | 8 posts, 34 comments, sentiment: 71% positive |
+| Hacker News | "treasury software", "B2B payments" | 5 posts, 42 comments, sentiment: 68% positive |
+| X/Twitter | "@PayFlow", "#treasurytech" | 67 mentions, sentiment: 74% positive |
+| LinkedIn | "PayFlow Platform", "treasury automation" | 23 posts, sentiment: 82% positive |
+
+### Web Search Crawler
+**Description**: Search for competitor intelligence, FinTech news, and treasury market research.
+
+| Query Type | Sample Query | Results |
+|------------|--------------|---------|
+| Competitor pricing | "Modern Treasury pricing 2026" | Enterprise tier increased 15% |
+| Feature launches | "Ramp multi-currency launch" | 50+ currencies now supported |
+| Industry trends | "real-time payments B2B trends" | 12 relevant articles |
+| Regulatory | "payment processing regulations 2026" | New compliance requirements identified |
+
+### News Crawler
+**Description**: Monitor news sources for FinTech updates, competitor announcements, and regulatory changes.
+
+| Source Type | Sample Sources | Recent Items |
+|-------------|----------------|--------------|
+| FinTech publications | FinTech Today, Payments Journal | 6 relevant articles |
+| Press releases | PR Newswire, Business Wire | Modern Treasury Series C, Ramp expansion |
+| Industry blogs | a]16z FinTech, Stripe blog | 8 treasury/payments posts |
+| Regulatory | Federal Reserve, OCC | 2 payment regulation updates |
+
+---
+
 *Generated from pmkit mock-tenant package • FinTech Variation (PayFlow)*

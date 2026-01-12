@@ -46,6 +46,7 @@ export const JobTypeSchema = z.enum([
   'sprint_review',
   'prototype_generation',
   'release_notes',
+  'deck_content',
 ]);
 export type JobType = z.infer<typeof JobTypeSchema>;
 
@@ -155,6 +156,7 @@ export const ArtifactTypeSchema = z.enum([
   'sprint_review',
   'release_notes',
   'prototype',
+  'deck_content',
 ]);
 export type ArtifactType = z.infer<typeof ArtifactTypeSchema>;
 

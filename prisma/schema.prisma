@@ -378,6 +378,7 @@ enum JobType {
   sprint_review
   prototype_generation
   release_notes
+  deck_content
 }
 
 enum JobStatus {
@@ -507,6 +508,7 @@ enum ArtifactType {
   sprint_review
   release_notes
   prototype
+  deck_content
 }
 
 // ============================================================================

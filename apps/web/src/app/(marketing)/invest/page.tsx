@@ -215,7 +215,7 @@ export default function InvestPage() {
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 md:text-xl">
-              pmkit runs 9 PM workflows (briefs, meeting prep, VoC clustering, PRD drafts,
+              pmkit runs 10 PM workflows (briefs, meeting prep, VoC clustering, PRD drafts, deck content,
               prototypes, and release notes) so PMs can focus on strategy.
             </p>
 
@@ -384,7 +384,7 @@ export default function InvestPage() {
               <Play className="mx-auto h-12 w-12 text-cobalt-400" />
               <h3 className="mt-4 font-heading text-xl font-semibold">See it in action</h3>
               <p className="mt-2 text-muted-foreground">
-                Run all 9 workflow jobs in the interactive demo with simulated data.
+                Run all 10 workflow jobs in the interactive demo with simulated data.
               </p>
               <Button className="mt-6" asChild>
                 <Link href="/demo">
@@ -564,7 +564,7 @@ export default function InvestPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium mb-2">Cadence Jobs</div>
-                  <p className="text-sm text-muted-foreground">All 9 workflows included</p>
+                  <p className="text-sm text-muted-foreground">All 10 workflows included</p>
                 </div>
                 <div>
                   <div className="text-sm font-medium mb-2">Connectors</div>

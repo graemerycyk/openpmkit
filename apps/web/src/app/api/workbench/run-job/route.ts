@@ -17,6 +17,7 @@ const JOB_MAX_TOKENS: Record<JobType, number> = {
   sprint_review: 12288,
   prototype_generation: 24000,
   release_notes: 12288,
+  deck_content: 12288,
 };
 
 export async function POST(request: NextRequest) {

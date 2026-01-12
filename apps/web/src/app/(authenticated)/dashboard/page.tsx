@@ -17,6 +17,7 @@ import {
   Plug,
   Wand2,
   Megaphone,
+  Presentation,
 } from 'lucide-react';
 
 const quickActions = [
@@ -60,6 +61,7 @@ const jobTypes = [
   { name: 'Sprint Review', icon: Clock, job: 'sprint_review' },
   { name: 'Prototype', icon: Wand2, job: 'prototype_generation' },
   { name: 'Release Notes', icon: Megaphone, job: 'release_notes' },
+  { name: 'Deck Content', icon: Presentation, job: 'deck_content' },
 ];
 
 export default function DashboardPage() {

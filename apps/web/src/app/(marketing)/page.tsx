@@ -19,6 +19,7 @@ import {
   Mail,
   Wand2,
   Megaphone,
+  Presentation,
 } from 'lucide-react';
 
 const features = [
@@ -76,6 +77,13 @@ const features = [
     title: 'Release Notes',
     description:
       'Generate customer-facing release notes from Jira and Confluence; clear, benefit-focused, and ready to publish.',
+  },
+  {
+    icon: Presentation,
+    title: 'Deck Content',
+    description:
+      'Generate slide content tailored for exec, customer, team, or stakeholder audiences—ready to paste into your templates.',
+    highlight: true,
   },
 ];
 
@@ -149,7 +157,7 @@ export default function HomePage() {
             '@type': 'Product',
             name: 'pmkit',
             description:
-              'AI-powered product management agent that runs 9 PM workflows: daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, and release notes.',
+              'AI-powered product management agent that runs 10 PM workflows: daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, release notes, and deck content.',
             brand: {
               '@type': 'Brand',
               name: 'pmkit',
@@ -299,7 +307,7 @@ export default function HomePage() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              9 workflows every PM needs
+              10 workflows every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               AI briefs, VoC themes, PRD drafts, prototypes, and release notes—run end-to-end with traceability and governance.
@@ -374,7 +382,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-heading text-lg font-semibold">Run Jobs</h3>
               <p className="mt-2 text-muted-foreground">
-                Trigger any of the 9 PM workflows; on demand or scheduled.
+                Trigger any of the 10 PM workflows; on demand or scheduled.
               </p>
             </div>
             <div className="text-center">
@@ -603,7 +611,7 @@ export default function HomePage() {
               Ready to try pmkit?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
-              Run all 9 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
+              Run all 10 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
               competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, and release notes.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

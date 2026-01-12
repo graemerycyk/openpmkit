@@ -20,12 +20,13 @@ import {
   Globe,
   Newspaper,
   Hash,
+  Presentation,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Demo',
   description:
-    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 9 PM workflow jobs end-to-end.',
+    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 10 PM workflow jobs end-to-end.',
   openGraph: {
     title: 'pmkit Demo',
     description: 'Try the Agent Console with a complete demo enterprise dataset.',
@@ -106,6 +107,15 @@ const jobs = [
     duration: '~30s',
     sources: ['Jira', 'Confluence', 'pmkit'],
   },
+  {
+    id: 'deck_content',
+    name: 'Deck Content',
+    description: 'Generate slide content tailored for exec, customer, team, or stakeholder audiences.',
+    icon: Presentation,
+    duration: '~35s',
+    sources: ['pmkit', 'Jira', 'Amplitude', 'Confluence'],
+    highlight: true,
+  },
 ];
 
 const demoFeatures = [
@@ -145,7 +155,7 @@ export default function DemoPage() {
               Try the Agent Console
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Run all 9 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
+              Run all 10 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
               sources, and downloadable artifacts.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">

@@ -16,6 +16,7 @@ const JOB_MAX_TOKENS: Record<JobType, number> = {
   sprint_review: 12288,
   prototype_generation: 24000,
   release_notes: 12288,
+  deck_content: 12288,
 };
 
 // Mock data for demo - simulates what real connectors would return
@@ -471,6 +472,53 @@ Key outcomes:
 3. Improvements (grouped by area)
 4. Bug Fixes (customer-facing only)
 5. Coming Soon (optional preview)
+        `.trim(),
+      };
+
+    case 'deck_content':
+      return {
+        ...baseContext,
+        topic: 'Q4 Product Update: Search Improvements',
+        audienceType: 'exec',
+        purpose: 'Quarterly business review with leadership',
+        duration: '15',
+        keyDataPoints: `
+**Key Metrics**
+- Search filters shipped 2 weeks ahead of schedule
+- 40% reduction in search-to-click time (target: 30%)
+- 45% filter adoption rate in first week (target: 40%)
+- NPS for search improved from 3.2 to 4.1 in beta
+- 3 enterprise deals ($450K ARR) unblocked
+
+**Sprint Performance**
+- Velocity: 16/19 points completed (84%)
+- P1 bug resolved in 24 hours
+- Zero carryover on critical path items
+        `.trim(),
+        supportingEvidence: `
+**Customer Evidence**
+- "This changes everything for our team" — Globex Corp (expansion now confirmed)
+- "Finally, search that works" — Initech (moving to paid plan)
+- 89 community votes addressed
+- 47 support tickets resolved by this feature
+
+**Competitive Context**
+- Notion launched AI search Dec 22
+- We're now at feature parity on filters
+- AI search planned for Q1 to differentiate
+        `.trim(),
+        relatedArtifacts: `
+**Related pmkit Artifacts**
+- VoC Report (Dec 15): Search was #1 pain point (35% of mentions)
+- Competitor Report (Dec 20): Notion AI search launch analysis
+- PRD: Search Filters (Approved Nov 15)
+        `.trim(),
+        requirements: `
+**Presentation Requirements**
+- Focus on business impact, not technical details
+- Include clear ask: AI search resourcing for Q1
+- Prepare for questions about Notion competition
+- Have expansion pipeline data ready
         `.trim(),
       };
 

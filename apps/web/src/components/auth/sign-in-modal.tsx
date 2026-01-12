@@ -52,7 +52,7 @@ export function SignInModal({
             You&apos;ve used your {maxFreeJobs} free demo jobs
           </DialogTitle>
           <DialogDescription className="text-base">
-            Sign in to unlock unlimited access to all 9 PM workflow jobs, save your artifacts, and
+            Sign in to unlock unlimited access to all 10 PM workflow jobs, save your artifacts, and
             connect your real tools.
           </DialogDescription>
         </DialogHeader>

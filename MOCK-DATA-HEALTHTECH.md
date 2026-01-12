@@ -982,4 +982,120 @@ Patients struggle to engage with their healthcare providers because the current 
 
 ---
 
+## Deck Content Data
+
+### Exec Presentation: FHIR R4 Investment Case
+
+#### Topic
+```
+FHIR R4 Implementation - Board Investment Request
+```
+
+#### Meeting Type
+```
+exec
+```
+
+#### Duration
+```
+30 minutes
+```
+
+#### Decision Needed
+```
+Approval for $1.5M investment in FHIR R4 infrastructure and Epic certification
+```
+
+#### Metrics Data
+```
+**Key Metrics:**
+- Patient volume: 8.2M patients across customers (+12% QoQ)
+- FHIR R4 requests: 45% of API calls (up from 30%)
+- Integration success rate: 98.2% (target: 99.5%)
+- Enterprise NPS: 28 (target: 42)
+
+**Financial Impact:**
+- $2.67M ARR blocked by FHIR R4 gaps
+- Cleveland Clinic: $420K → $1.62M expansion blocked
+- 78% of enterprise customers requesting FHIR R4
+```
+
+#### Strategic Context
+```
+**Market Position:**
+- Phreesia achieved Epic App Orchard certification (Dec 30)
+- CMS Interoperability Rule mandates FHIR support
+- ONC certification depends on FHIR R4 compliance
+
+**Strategic Priorities:**
+1. Achieve Epic App Orchard certification by Q2
+2. Unblock $2.67M enterprise pipeline
+3. Meet regulatory compliance deadlines
+```
+
+#### Supporting Evidence
+```
+**Customer Evidence:**
+- Cleveland Clinic: "Epic Hyperdrive migration requires FHIR R4 - no exceptions" - CMIO
+- Kaiser: "We can't recommend you without FHIR R4" - IT Director
+- 156 community votes for FHIR R4 support
+
+**Regulatory Pressure:**
+- CMS Interoperability Rule effective 2026
+- ONC certification requires FHIR R4
+- Payer contracts increasingly mandate interoperability
+```
+
+#### Risks and Mitigations
+```
+**Risks:**
+1. 17-week timeline may slip
+   - Mitigation: Dedicated FHIR team, external consultants
+2. Epic certification process unpredictable
+   - Mitigation: Early engagement with Epic, buffer time
+3. Customer migration complexity
+   - Mitigation: Parallel support for R2/R4, migration guides
+
+**Dependencies:**
+- HAPI FHIR server upgrade - 4 weeks
+- Epic App Orchard application - 6 weeks review
+- US Core profile validation - External testing
+```
+
+---
+
+## AI Crawlers
+
+### Social Crawler
+**Description**: Monitor social platforms for healthcare IT discussions, patient engagement trends, and competitor mentions.
+
+| Platform | Keywords | Sample Results |
+|----------|----------|----------------|
+| Reddit | "MedSync", "patient portal", "EHR integration" | 15 posts, 67 comments, sentiment: 69% positive |
+| Hacker News | "healthcare IT", "FHIR", "patient engagement" | 8 posts, 53 comments, sentiment: 72% positive |
+| X/Twitter | "@MedSync", "#healthIT", "#patientengagement" | 124 mentions, sentiment: 71% positive |
+| LinkedIn | "MedSync Platform", "patient engagement" | 34 posts, sentiment: 78% positive |
+
+### Web Search Crawler
+**Description**: Search for competitor intelligence, healthcare IT news, and regulatory updates.
+
+| Query Type | Sample Query | Results |
+|------------|--------------|---------|
+| Competitor features | "Phreesia AI intake 2026" | AI-powered intake launched Jan 5 |
+| FHIR updates | "FHIR R4 implementation guide" | Updated US Core profiles released |
+| Industry trends | "patient engagement trends 2026" | 18 relevant articles |
+| Regulatory | "CMS interoperability rule 2026" | Compliance deadlines confirmed |
+
+### News Crawler
+**Description**: Monitor news sources for healthcare IT updates, competitor announcements, and regulatory changes.
+
+| Source Type | Sample Sources | Recent Items |
+|-------------|----------------|--------------|
+| Healthcare IT publications | Healthcare IT News, HIMSS, Becker's | 12 relevant articles |
+| Press releases | PR Newswire, Business Wire | Phreesia AI launch, Luma Health funding |
+| Industry blogs | CHIME, AMIA | 9 interoperability posts |
+| Regulatory | CMS, ONC, HHS | 4 compliance updates |
+
+---
+
 *Generated from pmkit mock-tenant package • HealthTech Variation (MedSync)*

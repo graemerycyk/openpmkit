@@ -48,6 +48,7 @@ import {
   Mail,
   Zap,
   Copy,
+  Presentation,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SignInModal } from '@/components/auth/sign-in-modal';
@@ -72,7 +73,8 @@ type JobType =
   | 'prd_draft'
   | 'sprint_review'
   | 'prototype_generation'
-  | 'release_notes';
+  | 'release_notes'
+  | 'deck_content';
 
 type JobStatus = 'idle' | 'running' | 'completed' | 'error';
 
@@ -320,6 +322,19 @@ const jobConfigs: Record<
       { name: 'get_recent_artifacts', server: 'pmkit', input: { type: 'prd', limit: 5 } },
     ],
   },
+  deck_content: {
+    name: 'Deck Content',
+    description: 'Generate slide content for any audience',
+    icon: Presentation,
+    sources: ['pmkit', 'jira', 'amplitude', 'confluence'],
+    highlight: true,
+    toolCalls: [
+      { name: 'get_recent_artifacts', server: 'pmkit', input: { types: ['voc_report', 'competitor_report', 'prd'], limit: 5 } },
+      { name: 'get_sprint_metrics', server: 'jira', input: { sprintId: 'sprint-42' } },
+      { name: 'get_feature_usage', server: 'amplitude', input: { period: 'month' } },
+      { name: 'search_pages', server: 'confluence', input: { query: 'roadmap', spaceKey: 'PROD' } },
+    ],
+  },
 };
 
 // Command parsing for Slack/Teams/Email
@@ -348,6 +363,10 @@ const jobTypeMap: Record<string, { type: JobType; name: string; icon: typeof Fil
   release: { type: 'release_notes', name: 'Release Notes', icon: Megaphone },
   release_notes: { type: 'release_notes', name: 'Release Notes', icon: Megaphone },
   notes: { type: 'release_notes', name: 'Release Notes', icon: Megaphone },
+  deck: { type: 'deck_content', name: 'Deck Content', icon: Presentation },
+  deck_content: { type: 'deck_content', name: 'Deck Content', icon: Presentation },
+  slides: { type: 'deck_content', name: 'Deck Content', icon: Presentation },
+  presentation: { type: 'deck_content', name: 'Deck Content', icon: Presentation },
 };
 
 // Workflow examples for each job type, per channel
@@ -447,6 +466,16 @@ const workflowExamples: WorkflowExample[] = [
       slack: '/pmkit release notes v2.4.0',
       teams: '@pmkit release notes',
       email: 'Subject: pmkit: release notes v2.4',
+    },
+  },
+  {
+    jobType: 'deck_content',
+    jobName: 'Deck Content',
+    icon: Presentation,
+    commands: {
+      slack: '/pmkit deck content for exec on Q4',
+      teams: '@pmkit slides for customer',
+      email: 'Subject: pmkit: deck for board meeting',
     },
   },
 ];
@@ -599,6 +628,7 @@ function ConsolePageContent() {
     sprint_review: null,
     prototype_generation: null,
     release_notes: null,
+    deck_content: null,
   });
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'artifact' | 'connectors'>(
     'overview'

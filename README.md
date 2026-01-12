@@ -2,11 +2,11 @@
 
 > Your daily PM toolkit - briefs, meetings, and PRDs made simple.
 
-pmkit is an AI-powered product management agent that runs daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, and prototype generation; all with draft-only governance and full traceability.
+pmkit is an AI-powered product management agent that runs daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, and deck content; all with draft-only governance and full traceability.
 
 ## Features
 
-- **9 Workflow Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, release notes
+- **10 Workflow Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, release notes, deck content
 - **3 AI Crawlers**: Social (Reddit, Hacker News), Web Search (Google, DuckDuckGo), News (NewsAPI, Google News) with AI-powered analysis
 - **Draft-Only**: Agents propose changes but never write directly to external systems
 - **Full Traceability**: Every tool call, source, and artifact is logged
@@ -133,7 +133,7 @@ npm run docker:down
 The demo runs with a complete mock enterprise dataset and doesn't require any external services. All tool calls use mocked MCP servers, and artifact generation uses stub responses.
 
 Visit `/demo/console` to try:
-- **PM Workflows**: Run any of the 9 job types with mock data and real LLM analysis
+- **PM Workflows**: Run any of the 10 job types with mock data and real LLM analysis
 - **Slack & Teams Commands**: Test natural language commands
 - **AI Crawlers**: Run mock crawls with real AI-powered analysis
 

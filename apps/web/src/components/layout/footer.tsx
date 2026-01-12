@@ -18,7 +18,7 @@ const footerLinks = {
     { name: 'PRD Automation', href: '/resources/prd-automation' },
     { name: 'Meeting Prep Packs', href: '/resources/meeting-prep-pack-for-product-managers' },
     { name: 'Roadmap Alignment', href: '/resources/roadmap-alignment-memos' },
-    { name: 'Product Ops Automation', href: '/resources/product-ops-automation' },
+    { name: 'Deck Content', href: '/resources/deck-content-generation' },
     { name: 'Sprint Review Packs', href: '/resources/ai-release-notes-and-sprint-review-packs' },
   ],
   integrations: [
@@ -36,8 +36,9 @@ const footerLinks = {
   voc: [
     { name: 'VoC Clustering', href: '/resources/voice-of-customer-clustering' },
     { name: 'Competitor Research', href: '/resources/competitor-research' },
-    { name: 'Customer Escalations', href: '/resources/customer-escalation-to-fix-spec' },
-    { name: 'Search Analytics', href: '/resources/search-product-analytics-insights' },
+    { name: 'Social Crawler', href: '/resources/social-crawler-integration' },
+    { name: 'Web Search', href: '/resources/web-search-integration' },
+    { name: 'News Crawler', href: '/resources/news-crawler-integration' },
   ],
   compare: [
     { name: 'vs Automation Tools', href: '/compare/automation-tools' },

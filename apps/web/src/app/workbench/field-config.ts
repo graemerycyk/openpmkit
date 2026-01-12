@@ -653,6 +653,102 @@ Key outcomes:
       multiline: true,
     },
   ],
+
+  deck_content: [
+    {
+      key: 'topic',
+      label: 'Presentation Topic',
+      placeholder: 'Q4 Product Update: Search Improvements',
+      required: true,
+      multiline: false,
+      hint: 'What is this presentation about?',
+    },
+    {
+      key: 'audienceType',
+      label: 'Audience Type',
+      placeholder: 'exec, customer, team, or stakeholder',
+      required: true,
+      multiline: false,
+      hint: 'Who will you be presenting to? (exec, customer, team, stakeholder)',
+    },
+    {
+      key: 'purpose',
+      label: 'Purpose',
+      placeholder: 'Quarterly business review with leadership',
+      required: false,
+      multiline: false,
+      hint: 'What is the goal of this presentation?',
+    },
+    {
+      key: 'duration',
+      label: 'Duration (minutes)',
+      placeholder: '15',
+      required: false,
+      multiline: false,
+      hint: 'Approximate presentation length in minutes',
+    },
+    {
+      key: 'keyDataPoints',
+      label: 'Key Data Points',
+      placeholder: `Paste key metrics and data...
+
+**Key Metrics**
+- Search filters shipped 2 weeks ahead of schedule
+- 40% reduction in search-to-click time
+- 45% filter adoption rate in first week
+- NPS for search improved from 3.2 to 4.1
+
+**Sprint Performance**
+- Velocity: 16/19 points completed (84%)
+- P1 bug resolved in 24 hours`,
+      required: true,
+      multiline: true,
+      hint: 'Include metrics, KPIs, and quantitative data',
+    },
+    {
+      key: 'supportingEvidence',
+      label: 'Supporting Evidence',
+      placeholder: `Paste customer quotes, competitive context...
+
+**Customer Evidence**
+- "This changes everything for our team" — Globex Corp
+- "Finally, search that works" — Initech
+- 89 community votes addressed
+
+**Competitive Context**
+- Notion launched AI search Dec 22
+- We're now at feature parity on filters`,
+      required: false,
+      multiline: true,
+      hint: 'Customer quotes, competitive intel, market context',
+    },
+    {
+      key: 'relatedArtifacts',
+      label: 'Related Artifacts',
+      placeholder: `Reference previous pmkit outputs...
+
+**Related pmkit Artifacts**
+- VoC Report (Dec 15): Search was #1 pain point
+- Competitor Report (Dec 20): Notion AI search analysis
+- PRD: Search Filters (Approved Nov 15)`,
+      required: false,
+      multiline: true,
+      hint: 'Reference VoC reports, PRDs, competitor research',
+    },
+    {
+      key: 'requirements',
+      label: 'Specific Requirements',
+      placeholder: `Any specific requirements for this deck...
+
+**Presentation Requirements**
+- Focus on business impact, not technical details
+- Include clear ask: AI search resourcing for Q1
+- Prepare for questions about Notion competition`,
+      required: false,
+      multiline: true,
+      hint: 'Special requirements, asks, or constraints',
+    },
+  ],
 };
 
 // Job type metadata for the UI
@@ -708,5 +804,10 @@ export const JOB_TYPE_INFO: Record<
     name: 'Release Notes',
     description: 'Generate customer-facing release notes',
     icon: 'Megaphone',
+  },
+  deck_content: {
+    name: 'Deck Content',
+    description: 'Generate slide content tailored to any audience',
+    icon: 'Presentation',
   },
 };

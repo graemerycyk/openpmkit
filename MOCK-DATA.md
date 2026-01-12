@@ -8,6 +8,7 @@
 
 - [Demo Tenant & Users](#demo-tenant--users)
 - [Demo Arcs (Guided Scenarios)](#demo-arcs-guided-scenarios)
+- [AI Crawlers](#ai-crawlers)
 - [Jira Data](#jira-data)
 - [Confluence Data](#confluence-data)
 - [Slack Data](#slack-data)
@@ -100,6 +101,74 @@
 | 1 | Collect evidence | Gather VoC themes, feature requests, and analytics |
 | 2 | Review existing specs | Check Confluence for related documentation |
 | 3 | Generate PRD draft | Create the PRD with evidence and open questions |
+
+### 7. Sprint Review Pack
+**Description**: Generate sprint review pack with completed work, metrics, demos, and stakeholder updates.
+
+| Step | Title | Description |
+|------|-------|-------------|
+| 1 | Pull sprint data | Get completed stories, bugs, and velocity from Jira |
+| 2 | Gather metrics | Pull feature usage and analytics data |
+| 3 | Generate review pack | Create the sprint review document |
+
+### 8. Prototype Generation
+**Description**: Turn PRDs into interactive HTML prototypes for rapid user validation.
+
+| Step | Title | Description |
+|------|-------|-------------|
+| 1 | Extract requirements | Parse user stories and acceptance criteria from PRD |
+| 2 | Identify UI components | Determine key interface elements needed |
+| 3 | Generate prototype | Create interactive HTML/CSS/JS prototype |
+
+### 9. Release Notes
+**Description**: Generate customer-facing release notes from completed Jira tickets.
+
+| Step | Title | Description |
+|------|-------|-------------|
+| 1 | Pull completed issues | Get all tickets in the release version |
+| 2 | Categorize changes | Group into features, improvements, fixes |
+| 3 | Generate release notes | Create customer-friendly release notes |
+
+### 10. Deck Content
+**Description**: Generate slide content tailored for exec, customer, team, or stakeholder audiences.
+
+| Step | Title | Description |
+|------|-------|-------------|
+| 1 | Gather context | Pull VoC reports, competitor research, sprint metrics from pmkit |
+| 2 | Identify key data | Extract metrics, quotes, and supporting evidence |
+| 3 | Generate deck content | Create structured slide content with speaker notes |
+
+---
+
+## AI Crawlers
+
+### Social Crawler
+**Description**: Monitor social platforms (Reddit, Hacker News, X, LinkedIn) for product mentions, competitor discussions, and sentiment.
+
+| Platform | Keywords | Sample Results |
+|----------|----------|----------------|
+| Reddit | "acme platform", "search filters" | 12 posts, 45 comments, sentiment: 72% positive |
+| Hacker News | "acme", "productivity tools" | 3 posts, 28 comments, sentiment: 65% positive |
+| X/Twitter | "@acme", "#acmeplatform" | 89 mentions, sentiment: 68% positive |
+| LinkedIn | "Acme SaaS", "Acme Platform" | 15 posts, sentiment: 81% positive |
+
+### Web Search Crawler
+**Description**: Search Google/Bing for competitor intelligence, industry news, and market research.
+
+| Query Type | Sample Query | Results |
+|------------|--------------|---------|
+| Competitor pricing | "Notion pricing 2026" | Pricing page changes detected |
+| Feature launches | "Coda AI features" | New AI search feature announced |
+| Industry trends | "productivity software trends" | 15 relevant articles |
+
+### News Crawler
+**Description**: Monitor news sources for industry updates, competitor announcements, and press releases.
+
+| Source Type | Sample Sources | Recent Items |
+|-------------|----------------|--------------|
+| Tech publications | TechCrunch, The Verge, Wired | 8 relevant articles |
+| Press releases | PR Newswire, Business Wire | 3 competitor announcements |
+| Industry blogs | Product Hunt, Hacker Noon | 12 product mentions |
 
 ---
 

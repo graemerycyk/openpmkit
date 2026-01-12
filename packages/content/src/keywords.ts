@@ -406,14 +406,14 @@ export const keywords: KeywordEntry[] = [
     relatedPages: ['/blog/mcp-for-product-management', '/resources/jira-and-confluence-ai-workflows'],
   },
 
-  // 9 PM Workflows Keywords
+  // 10 PM Workflows Keywords
   {
     keyword: 'PM workflow automation',
     category: 'primary',
     searchVolume: 'medium',
     difficulty: 'medium',
     intent: 'commercial',
-    relatedPages: ['/blog/9-pm-workflows-automate-today', '/demo', '/how-it-works'],
+    relatedPages: ['/blog/10-pm-workflows-automate-today', '/demo', '/how-it-works'],
   },
   {
     keyword: 'product management automation',
@@ -421,7 +421,7 @@ export const keywords: KeywordEntry[] = [
     searchVolume: 'medium',
     difficulty: 'high',
     intent: 'commercial',
-    relatedPages: ['/blog/9-pm-workflows-automate-today', '/resources/product-ops-automation'],
+    relatedPages: ['/blog/10-pm-workflows-automate-today', '/resources/product-ops-automation'],
   },
   {
     keyword: 'AI PM workflows',
@@ -429,7 +429,7 @@ export const keywords: KeywordEntry[] = [
     searchVolume: 'medium',
     difficulty: 'medium',
     intent: 'commercial',
-    relatedPages: ['/blog/9-pm-workflows-automate-today', '/demo'],
+    relatedPages: ['/blog/10-pm-workflows-automate-today', '/demo'],
   },
   {
     keyword: 'automate PM tasks',
@@ -437,7 +437,7 @@ export const keywords: KeywordEntry[] = [
     searchVolume: 'low',
     difficulty: 'low',
     intent: 'commercial',
-    relatedPages: ['/blog/9-pm-workflows-automate-today', '/resources/product-management-agent'],
+    relatedPages: ['/blog/10-pm-workflows-automate-today', '/resources/product-management-agent'],
   },
   {
     keyword: 'product manager daily brief automation',
@@ -445,7 +445,7 @@ export const keywords: KeywordEntry[] = [
     searchVolume: 'low',
     difficulty: 'low',
     intent: 'informational',
-    relatedPages: ['/blog/9-pm-workflows-automate-today', '/demo'],
+    relatedPages: ['/blog/10-pm-workflows-automate-today', '/demo'],
   },
   {
     keyword: 'AI meeting prep for PMs',
@@ -453,7 +453,7 @@ export const keywords: KeywordEntry[] = [
     searchVolume: 'low',
     difficulty: 'low',
     intent: 'commercial',
-    relatedPages: ['/blog/9-pm-workflows-automate-today', '/resources/meeting-prep-pack-for-product-managers'],
+    relatedPages: ['/blog/10-pm-workflows-automate-today', '/resources/meeting-prep-pack-for-product-managers'],
   },
 ];
 
