@@ -259,7 +259,12 @@ export default function WorkbenchPage() {
   const [tenantName, setTenantName] = useState('');
   const [productName, setProductName] = useState('');
   const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{
+    message: string;
+    details?: string;
+    status?: number;
+    timestamp?: string;
+  } | null>(null);
   const [result, setResult] = useState<WorkbenchRun | null>(null);
   const [history, setHistory] = useState<WorkbenchRun[]>([]);
   const [activeTab, setActiveTab] = useState<'input' | 'output'>('input');
@@ -330,6 +335,7 @@ export default function WorkbenchPage() {
     setSelectedJobType(jobType);
     setContextValues({});
     setError(null);
+    setResult(null);
   };
 
   // Handle field change
@@ -346,7 +352,7 @@ export default function WorkbenchPage() {
   // Run job
   const runJob = async () => {
     if (!isFormValid()) {
-      setError('Please fill in all required fields');
+      setError({ message: 'Please fill in all required fields' });
       return;
     }
 
@@ -354,24 +360,38 @@ export default function WorkbenchPage() {
     setError(null);
     setActiveTab('output');
 
+    const requestBody = {
+      jobType: selectedJobType,
+      context: {
+        ...contextValues,
+        tenantName: tenantName || 'My Company',
+        productName: productName || 'My Product',
+      },
+    };
+
     try {
       const response = await fetch('/api/workbench/run-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jobType: selectedJobType,
-          context: {
-            ...contextValues,
-            tenantName: tenantName || 'My Company',
-            productName: productName || 'My Product',
-          },
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || 'Failed to run job');
+        // Enhanced error with debugging info
+        setError({
+          message: data.message || data.error || 'Failed to run job',
+          details: JSON.stringify({
+            status: response.status,
+            statusText: response.statusText,
+            jobType: selectedJobType,
+            responseData: data,
+          }, null, 2),
+          status: response.status,
+          timestamp: new Date().toISOString(),
+        });
+        return;
       }
 
       const run: WorkbenchRun = {
@@ -390,7 +410,17 @@ export default function WorkbenchPage() {
         return updated;
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      // Network or parsing error
+      setError({
+        message: err instanceof Error ? err.message : 'An unexpected error occurred',
+        details: JSON.stringify({
+          errorType: err instanceof Error ? err.name : 'Unknown',
+          stack: err instanceof Error ? err.stack : undefined,
+          jobType: selectedJobType,
+          request: requestBody,
+        }, null, 2),
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setIsRunning(false);
     }
@@ -817,9 +847,39 @@ export default function WorkbenchPage() {
             {/* Output tab */}
             <TabsContent value="output" className="flex-1 overflow-hidden m-0">
               {error && (
-                <div className="m-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-                  <AlertCircle className="h-5 w-5 shrink-0" />
-                  <p>{error}</p>
+                <div className="m-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <div className="flex items-start gap-2 text-red-700">
+                    <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">{error.message}</p>
+                      {error.status && (
+                        <p className="text-sm mt-1">HTTP Status: {error.status}</p>
+                      )}
+                      {error.timestamp && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {new Date(error.timestamp).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setError(null)}
+                      className="shrink-0 text-red-600 hover:text-red-700 hover:bg-red-100"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                  {error.details && (
+                    <details className="text-sm">
+                      <summary className="cursor-pointer text-red-600 hover:text-red-700 font-medium">
+                        Show Debug Details
+                      </summary>
+                      <pre className="mt-2 p-3 bg-red-100 rounded text-xs overflow-x-auto whitespace-pre-wrap break-all text-red-800 font-mono">
+                        {error.details}
+                      </pre>
+                    </details>
+                  )}
                 </div>
               )}
 

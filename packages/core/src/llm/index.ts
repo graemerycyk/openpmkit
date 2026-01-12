@@ -155,51 +155,110 @@ export class OpenAIClient implements LLMClient {
   async complete(request: LLMCompletionRequest): Promise<LLMCompletionResponse> {
     const model = request.model || this.config.model;
     const startTime = Date.now();
+    
+    // Create AbortController for timeout (120 seconds for large requests like prototype generation)
+    const controller = new AbortController();
+    const timeoutMs = 120_000; // 2 minutes
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: request.messages,
-        max_completion_tokens: request.maxTokens || this.config.maxTokens,
-        // Note: GPT-5 models only support temperature=1, so we omit it
-      }),
-    });
+    try {
+      console.log(`[LLM] Starting request to ${model} with max_tokens=${request.maxTokens || this.config.maxTokens}`);
+      
+      const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: request.messages,
+          max_completion_tokens: request.maxTokens || this.config.maxTokens,
+          // Note: GPT-5 models only support temperature=1, so we omit it
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorDetails: string;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorDetails = errorJson.error?.message || errorJson.message || errorText;
+        } catch {
+          errorDetails = errorText;
+        }
+        console.error(`[LLM] API error: ${response.status} - ${errorDetails}`);
+        throw new LLMError(
+          `OpenAI API error: ${errorDetails}`,
+          'API_ERROR',
+          response.status
+        );
+      }
+
+      const data = await response.json();
+      const latencyMs = Date.now() - startTime;
+
+      console.log(`[LLM] Request completed in ${latencyMs}ms, model: ${data.model}`);
+
+      const messageContent = data.choices[0]?.message?.content || '';
+      const finishReason = data.choices[0]?.finish_reason;
+
+      // Log errors only - content filtering or truncation issues
+      if (data.choices[0]?.message?.refusal) {
+        console.error('[LLM] Content refused:', data.choices[0].message.refusal);
+      }
+      if (finishReason === 'length' && !messageContent) {
+        console.error('[LLM] Response truncated with no content - increase max_tokens');
+      }
+
+      return {
+        content: messageContent,
+        model: data.model,
+        usage: {
+          inputTokens: data.usage?.prompt_tokens || 0,
+          outputTokens: data.usage?.completion_tokens || 0,
+          totalTokens: data.usage?.total_tokens || 0,
+        },
+        finishReason: finishReason === 'stop' ? 'stop' : 'length',
+        latencyMs,
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      // Handle abort/timeout
+      if (error instanceof Error && error.name === 'AbortError') {
+        const elapsed = Date.now() - startTime;
+        console.error(`[LLM] Request timed out after ${elapsed}ms (limit: ${timeoutMs}ms)`);
+        throw new LLMError(
+          `Request timed out after ${Math.round(elapsed / 1000)} seconds. Large requests like prototype generation may take longer - please try again.`,
+          'TIMEOUT',
+          408
+        );
+      }
+      
+      // Handle network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('[LLM] Network error:', error.message);
+        throw new LLMError(
+          `Network error: ${error.message}. Check your internet connection and API key.`,
+          'NETWORK_ERROR',
+          0
+        );
+      }
+      
+      // Re-throw LLMError as-is
+      if (error instanceof LLMError) {
+        throw error;
+      }
+      
+      // Wrap unknown errors
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[LLM] Unknown error:', message);
+      throw new LLMError(message, 'UNKNOWN_ERROR');
     }
-
-    const data = await response.json();
-    const latencyMs = Date.now() - startTime;
-
-    const messageContent = data.choices[0]?.message?.content || '';
-    const finishReason = data.choices[0]?.finish_reason;
-
-    // Log errors only - content filtering or truncation issues
-    if (data.choices[0]?.message?.refusal) {
-      console.error('[LLM] Content refused:', data.choices[0].message.refusal);
-    }
-    if (finishReason === 'length' && !messageContent) {
-      console.error('[LLM] Response truncated with no content - increase max_tokens');
-    }
-
-    return {
-      content: messageContent,
-      model: data.model,
-      usage: {
-        inputTokens: data.usage?.prompt_tokens || 0,
-        outputTokens: data.usage?.completion_tokens || 0,
-        totalTokens: data.usage?.total_tokens || 0,
-      },
-      finishReason: finishReason === 'stop' ? 'stop' : 'length',
-      latencyMs,
-    };
   }
 
   getModel(): LLMModel {

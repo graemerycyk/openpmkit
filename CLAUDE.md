@@ -13,6 +13,8 @@
 - Database and testing information
 - Frontend design system
 
+> **Model Reference**: See [OpenAI Models Documentation](https://platform.openai.com/docs/models) for full details on GPT-5 series capabilities.
+
 ## ⚠️ TODO.md - Check Before/After Changes
 
 **Always check `TODO.md`** for incomplete features and "coming soon" claims.
