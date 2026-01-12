@@ -4,7 +4,7 @@ import type { LLMService, LLMMessage } from '@pmkit/core';
 // Crawler Analysis Types
 // ============================================================================
 
-export type CrawlerType = 'social' | 'web_search' | 'news';
+export type CrawlerType = 'social' | 'web_search' | 'news' | 'url_scrape';
 
 export interface CrawlerAnalysisContext {
   crawlerType: CrawlerType;
@@ -119,6 +119,22 @@ Guidelines:
 - Note market trends and analyst opinions
 - Provide strategic implications for product teams
 - Include specific quotes and sources
+- Be concise but comprehensive
+- Return ONLY valid JSON, no other text`,
+
+  url_scrape: `You are a competitive research analyst specializing in web page analysis for product teams.
+
+Your job is to analyze specific web pages to extract competitive research and strategic insights.
+
+Guidelines:
+- Identify the page's main purpose and target audience
+- Extract key messaging, positioning, and value propositions
+- Note pricing information, feature lists, and differentiators
+- Identify calls-to-action and conversion strategies
+- Compare to industry standards and best practices
+- Extract any claims, statistics, or social proof
+- Note the content structure and information hierarchy
+- Provide actionable recommendations for product teams
 - Be concise but comprehensive
 - Return ONLY valid JSON, no other text`,
 };
@@ -621,6 +637,98 @@ export const MOCK_CRAWLER_DATA = {
       url: 'https://forbes.com/sites/ai-product-manager',
       publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
       metadata: { publication: 'Forbes', category: 'Leadership' },
+    },
+  ],
+  url_scrape: [
+    {
+      id: 'url-1',
+      source: 'competitora.com',
+      title: 'Competitor A - Enterprise Product Management Platform',
+      content: `Enterprise Product Management Platform
+
+Transform how your team builds products with AI-powered automation.
+
+Pricing:
+- Starter: $29/seat/month - Up to 5 users, basic integrations
+- Pro: $79/seat/month - Unlimited users, all integrations, AI features
+- Enterprise: Custom pricing - SSO, dedicated support, custom integrations
+
+Key Features:
+• AI-powered PRD generation
+• Jira and Confluence integration
+• Real-time collaboration
+• Roadmap visualization
+• Sprint planning automation
+
+Trusted by 500+ companies including Fortune 500 enterprises.
+
+"Competitor A has transformed how we manage our product development process." - VP Product, TechCorp
+
+Start your free 14-day trial today. No credit card required.`,
+      url: 'https://competitora.com/pricing',
+      publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      metadata: { domain: 'competitora.com', path: '/pricing', contentLength: 892, pageType: 'pricing' },
+    },
+    {
+      id: 'url-2',
+      source: 'competitorb.com',
+      title: 'Competitor B - The Modern PM Toolkit',
+      content: `The Modern PM Toolkit - Built for Speed
+
+Ship products faster with our streamlined workflow tools.
+
+Why teams choose Competitor B:
+1. 50% faster PRD creation with AI assistance
+2. Native Slack integration - work where you already are
+3. Automatic status updates from Jira
+4. Meeting prep packs generated in seconds
+
+Pricing Plans:
+- Free: $0/month - 3 users, limited features
+- Team: $49/seat/month - 10 users, core integrations
+- Business: $99/seat/month - Unlimited users, all features, priority support
+
+New: AI PRD Generator now available! Create comprehensive product requirements in minutes.
+
+Join 10,000+ product managers who trust Competitor B.
+
+Book a demo to see how we can help your team.`,
+      url: 'https://competitorb.com',
+      publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      metadata: { domain: 'competitorb.com', path: '/', contentLength: 756, pageType: 'homepage' },
+    },
+    {
+      id: 'url-3',
+      source: 'notion.so',
+      title: 'Notion - Your connected workspace for wiki, docs & projects',
+      content: `Notion - The all-in-one workspace
+
+Write, plan, collaborate, and get organized — all in one tool.
+
+For Product Teams:
+• Product roadmaps and wikis
+• Sprint planning templates
+• Meeting notes and decisions
+• Customer feedback tracking
+
+Notion AI Features:
+- Summarize meeting notes
+- Generate action items
+- Draft product specs
+- Translate content
+
+Pricing:
+- Free: $0 - For individuals
+- Plus: $10/seat/month - For small teams
+- Business: $18/seat/month - For companies
+- Enterprise: Custom - Advanced controls
+
+Used by teams at Figma, Pixar, Nike, and more.
+
+Start free today - no credit card needed.`,
+      url: 'https://notion.so/product',
+      publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      metadata: { domain: 'notion.so', path: '/product', contentLength: 634, pageType: 'product' },
     },
   ],
 };

@@ -47,37 +47,37 @@ News intelligence tells you about market-level changes—funding, partnerships, 
 
 ## Architecture of an AI Crawler System
 
-A complete competitive research system combines three crawler types:
+A complete competitive research system combines four crawler types:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Competitive Research                  │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Social    │  │    Web      │  │    News     │        │
-│  │   Crawler   │  │   Crawler   │  │   Crawler   │        │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
-│         │                │                │                │
-│         ▼                ▼                ▼                │
-│  ┌─────────────────────────────────────────────────┐      │
-│  │              Synthesis Engine                    │      │
-│  │  - Deduplicate across sources                   │      │
-│  │  - Classify by type and significance            │      │
-│  │  - Score by business impact                     │      │
-│  │  - Generate actionable insights                 │      │
-│  └─────────────────────────────────────────────────┘      │
-│                          │                                 │
-│                          ▼                                 │
-│  ┌─────────────────────────────────────────────────┐      │
-│  │              Output Channels                     │      │
-│  │  - Daily brief integration                      │      │
-│  │  - Weekly competitor digest                     │      │
-│  │  - Real-time alerts (high-impact)              │      │
-│  │  - Battlecard updates                          │      │
-│  └─────────────────────────────────────────────────┘      │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                       Competitive Research                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
+│  │  Social  │  │   Web    │  │   News   │  │   URL    │           │
+│  │  Crawler │  │  Search  │  │  Crawler │  │  Scraper │           │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘           │
+│       │             │             │             │                   │
+│       ▼             ▼             ▼             ▼                   │
+│  ┌─────────────────────────────────────────────────────────┐       │
+│  │                  Synthesis Engine                        │       │
+│  │  - Deduplicate across sources                           │       │
+│  │  - Classify by type and significance                    │       │
+│  │  - Score by business impact                             │       │
+│  │  - Generate actionable insights                         │       │
+│  └─────────────────────────────────────────────────────────┘       │
+│                            │                                        │
+│                            ▼                                        │
+│  ┌─────────────────────────────────────────────────────────┐       │
+│  │                  Output Channels                         │       │
+│  │  - Daily brief integration                              │       │
+│  │  - Weekly competitor digest                             │       │
+│  │  - Real-time alerts (high-impact)                       │       │
+│  │  - Battlecard updates                                   │       │
+│  └─────────────────────────────────────────────────────────┘       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Social Crawler
@@ -122,6 +122,30 @@ Monitors competitor web presence for changes:
 - Change alerts with before/after
 - New feature summaries
 - Pricing change analysis
+
+### URL Scraper
+
+Deep-dives into specific competitor pages for detailed analysis:
+
+**Targets:**
+- Pricing pages (extract tiers, features, pricing)
+- Feature comparison pages
+- Documentation pages
+- Blog posts and announcements
+- Landing pages (messaging, positioning)
+
+**Analysis:**
+- Content structure and hierarchy
+- Key messaging and value propositions
+- Pricing tier extraction
+- Feature list comparison
+- Social proof and testimonials
+
+**Output:**
+- Structured data extraction
+- Competitive positioning analysis
+- Pricing comparison tables
+- Feature gap analysis
 
 ### News Crawler
 
@@ -468,4 +492,4 @@ A: Focus on moves that affect your customers. A competitor's enterprise push mat
 
 ---
 
-*See automated competitive research in action with pmkit. The Social, Web, and News crawlers work together to surface competitive signals in your daily briefs and weekly digests.*
+*See automated competitive research in action with pmkit. The four AI crawlers—Social, Web Search, News, and URL Scraper—work together to surface competitive signals in your daily briefs and weekly digests.*

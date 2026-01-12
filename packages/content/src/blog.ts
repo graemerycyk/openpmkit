@@ -63,14 +63,14 @@ export const blogPosts: BlogPost[] = [
     slug: 'competitive-research-system-ai-crawlers',
     title: 'Building a Competitive Research System with AI Crawlers',
     description:
-      'A practical guide to building an automated competitive research system using social, web, and news crawlers—from setup to daily briefs.',
+      'A practical guide to building an automated competitive research system using four AI crawlers—Social, Web Search, News, and URL Scraper—from setup to daily briefs.',
     publishedAt: '2026-01-15',
     author: 'pmkit team',
     authorRole: 'Product',
     primaryKeyword: 'competitive research automation',
     tags: ['competitor-research', 'agents', 'integrations'],
     readingTime: 14,
-    relatedResources: ['web-search-integration', 'news-crawler-integration', 'competitor-research'],
+    relatedResources: ['web-search-integration', 'news-crawler-integration', 'url-scraper-integration', 'competitor-research'],
     relatedPosts: ['competitor-research', '10-pm-workflows-automate-today', 'enterprise-pm-toolkit'],
   },
   {

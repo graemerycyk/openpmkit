@@ -4,7 +4,7 @@ import { z } from 'zod';
 // Crawler Types
 // ============================================================================
 
-export const CrawlerTypeSchema = z.enum(['social', 'web_search', 'news']);
+export const CrawlerTypeSchema = z.enum(['social', 'web_search', 'news', 'url_scrape']);
 export type CrawlerType = z.infer<typeof CrawlerTypeSchema>;
 
 export const CrawlerStatusSchema = z.enum(['pending', 'running', 'analyzing', 'completed', 'failed']);
@@ -80,6 +80,17 @@ export const NewsCrawlerInputSchema = z.object({
 });
 
 export type NewsCrawlerInput = z.infer<typeof NewsCrawlerInputSchema>;
+
+export const UrlScrapeCrawlerInputSchema = z.object({
+  urls: z.array(z.string().url()).min(1).max(10),
+  extractOptions: z.object({
+    includeMetadata: z.boolean().default(true),
+    includeLinks: z.boolean().default(false),
+    maxContentLength: z.number().default(10000),
+  }).optional(),
+});
+
+export type UrlScrapeCrawlerInput = z.infer<typeof UrlScrapeCrawlerInputSchema>;
 
 // ============================================================================
 // Crawler Response

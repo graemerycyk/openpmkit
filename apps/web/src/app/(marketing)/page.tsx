@@ -109,6 +109,7 @@ const integrations = [
   { name: 'Social Crawler', category: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
   { name: 'Web Search', category: 'Google & Bing' },
   { name: 'News Crawler', category: 'Industry News' },
+  { name: 'URL Scraper', category: 'Specific Page Analysis' },
 ];
 
 export default function HomePage() {

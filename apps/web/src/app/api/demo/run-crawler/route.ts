@@ -37,26 +37,36 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { crawlerType, keywords, platforms } = body as { 
+    const { crawlerType, keywords, urls, platforms } = body as { 
       crawlerType: CrawlerType; 
-      keywords: string[];
+      keywords?: string[];
+      urls?: string[];
       platforms?: string[];
     };
 
     // Validate crawler type
-    if (!['social', 'web_search', 'news'].includes(crawlerType)) {
+    if (!['social', 'web_search', 'news', 'url_scrape'].includes(crawlerType)) {
       return NextResponse.json(
         { error: `Invalid crawler type: ${crawlerType}` },
         { status: 400 }
       );
     }
 
-    // Validate keywords
-    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
-      return NextResponse.json(
-        { error: 'Keywords are required' },
-        { status: 400 }
-      );
+    // Validate input based on crawler type
+    if (crawlerType === 'url_scrape') {
+      if (!urls || !Array.isArray(urls) || urls.length === 0) {
+        return NextResponse.json(
+          { error: 'URLs are required for URL scrape crawler' },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+        return NextResponse.json(
+          { error: 'Keywords are required' },
+          { status: 400 }
+        );
+      }
     }
 
     // Get mock data based on crawler type
@@ -104,12 +114,29 @@ export async function POST(request: NextRequest) {
           metadata: r.metadata,
         }));
         break;
+      case 'url_scrape':
+        mockResults = MOCK_CRAWLER_DATA.url_scrape.map(r => ({
+          source: r.source,
+          title: r.title,
+          content: r.content,
+          url: r.url,
+          publishedAt: r.publishedAt,
+          metadata: r.metadata,
+        }));
+        break;
     }
 
     // Build analysis context
+    // For URL scrape, use hostnames as "keywords" for context
+    const contextKeywords = crawlerType === 'url_scrape' && urls
+      ? urls.map(url => {
+          try { return new URL(url).hostname; } catch { return url; }
+        })
+      : keywords || [];
+
     const analysisContext: CrawlerAnalysisContext = {
       crawlerType,
-      keywords,
+      keywords: contextKeywords,
       platforms: platforms || (crawlerType === 'social' ? ['reddit', 'hackernews'] : undefined),
       results: mockResults,
       productName: 'Acme Platform',
@@ -133,7 +160,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       crawlerType,
-      keywords,
+      keywords: keywords || [],
+      urls: urls || [],
       platforms: analysisContext.platforms,
       resultCount: mockResults.length,
       results: mockResults,
@@ -195,6 +223,12 @@ export async function GET() {
         name: 'News Crawler',
         description: 'Monitor industry news and press releases',
         platforms: ['techcrunch', 'venturebeat', 'reuters', 'forbes'],
+      },
+      {
+        id: 'url_scrape',
+        name: 'URL Scraper',
+        description: 'Fetch and analyze specific URLs for deep competitive research',
+        platforms: [],
       },
     ],
   });

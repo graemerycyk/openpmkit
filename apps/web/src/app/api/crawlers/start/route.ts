@@ -6,10 +6,12 @@ import {
   runSocialCrawler,
   runWebSearchCrawler,
   runNewsCrawler,
+  runUrlScrapeCrawler,
   getLLMService,
   type SocialCrawlerInput,
   type WebSearchCrawlerInput,
   type NewsCrawlerInput,
+  type UrlScrapeCrawlerInput,
   type CrawlerType,
 } from '@pmkit/core';
 import { executeCrawlerAnalysis, type CrawlerAnalysisContext } from '@pmkit/prompts';
@@ -34,26 +36,37 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, keywords, platforms, config } = body as {
+    const { type, keywords, urls, platforms, config } = body as {
       type: CrawlerType;
-      keywords: string[];
+      keywords?: string[];
+      urls?: string[];
       platforms?: string[];
       config?: Record<string, unknown>;
     };
 
     // Validate input
-    if (!type || !['social', 'web_search', 'news'].includes(type)) {
+    if (!type || !['social', 'web_search', 'news', 'url_scrape'].includes(type)) {
       return NextResponse.json(
         { error: 'Invalid crawler type' },
         { status: 400 }
       );
     }
 
-    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
-      return NextResponse.json(
-        { error: 'Keywords are required' },
-        { status: 400 }
-      );
+    // URL scrape requires URLs, others require keywords
+    if (type === 'url_scrape') {
+      if (!urls || !Array.isArray(urls) || urls.length === 0) {
+        return NextResponse.json(
+          { error: 'URLs are required for URL scrape crawler' },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+        return NextResponse.json(
+          { error: 'Keywords are required' },
+          { status: 400 }
+        );
+      }
     }
 
     // Create job
@@ -62,7 +75,8 @@ export async function POST(request: NextRequest) {
       id: jobId,
       type,
       status: 'pending',
-      keywords,
+      keywords: keywords || [],
+      urls: urls || [],
       platforms: platforms || [],
       config: config || {},
       createdAt: new Date(),
@@ -133,6 +147,19 @@ async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
         break;
       }
 
+      case 'url_scrape': {
+        const input: UrlScrapeCrawlerInput = {
+          urls: job.urls || [],
+          extractOptions: {
+            includeMetadata: true,
+            includeLinks: false,
+            maxContentLength: (job.config.maxContentLength as number) || 10000,
+          },
+        };
+        response = await runUrlScrapeCrawler(input);
+        break;
+      }
+
       default:
         throw new Error(`Unknown crawler type: ${job.type}`);
     }
@@ -161,9 +188,20 @@ async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
       const llmService = getLLMService();
       
       // Build analysis context
+      // For URL scrape, use the URLs as "keywords" for context
+      const contextKeywords = job.type === 'url_scrape' 
+        ? (job.urls || []).map(url => {
+            try {
+              return new URL(url).hostname;
+            } catch {
+              return url;
+            }
+          })
+        : job.keywords;
+
       const analysisContext: CrawlerAnalysisContext = {
         crawlerType: job.type as CrawlerType,
-        keywords: job.keywords,
+        keywords: contextKeywords,
         platforms: job.platforms.length > 0 ? job.platforms : undefined,
         results: response.results.map(r => ({
           source: r.source,

@@ -140,6 +140,7 @@ Items that have been discussed but not committed to.
 
 | Idea | Category | Notes |
 |------|----------|-------|
+| **File Upload Crawler (5th AI Crawler)** | Crawlers | Upload PDF, DOCX, PPTX for AI analysis. Extract key data, synthesize insights, compare documents. Use cases: competitor whitepapers, analyst reports, sales decks, RFPs, contracts. Would need: file upload UI, document parsing (pdf-parse, mammoth), chunking for large docs, specialized analysis prompts. |
 | AI-powered anomaly detection | Telemetry | Use LLM to analyze patterns |
 | Slack/Teams bot for status alerts | Status | Push notifications for incidents |
 | Self-service connector OAuth | Connectors | Let users connect without sales |
@@ -175,3 +176,5 @@ Items that have been discussed but not committed to.
 - Added localStorage persistence for Crawler Jobs (similar to PM Jobs history)
 - Added TODO item for database persistence of Workbench data
 - Added Deck Content workbench data to `MOCK-DATA.md` (was missing, now consistent with FINTECH and HEALTHTECH variations)
+- **Added 4th AI Crawler: URL Scraper** - Fetch and analyze specific URLs for deep competitive research (pricing pages, feature pages, blog posts)
+- Added File Upload Crawler idea to future considerations (5th AI Crawler for PDF/DOCX/PPTX analysis)

@@ -748,10 +748,12 @@ Real-time web crawlers for competitive research with AI-powered analysis.
 | Social | Reddit API (official) | Hacker News API | 100 req/min |
 | Web Search | Serper.dev | DuckDuckGo | 2,500/month |
 | News | NewsAPI.org | Google News RSS | 100/day |
+| URL Scrape | Direct fetch | N/A | No limit |
 
 - **Social Crawler**: Searches Reddit and Hacker News for discussions, mentions, and sentiment
 - **Web Search Crawler**: Searches Google/DuckDuckGo for competitor pages and market research
 - **News Crawler**: Searches news sources for industry updates and press releases
+- **URL Scrape Crawler**: Fetches and analyzes specific URLs for deep competitive research (pricing pages, feature pages, blog posts)
 
 ### AI Analysis
 
@@ -773,10 +775,10 @@ After crawling, results are automatically analyzed by AI to produce:
 - Great for seeing the analysis output format
 
 **Workbench** (`/workbench` → AI Crawlers tab, admin only):
-1. Select crawler type (Social, Web Search, or News)
-2. Enter keywords to search for
+1. Select crawler type (Social, Web Search, News, or URL Scrape)
+2. Enter keywords to search for (or URLs for URL Scrape)
 3. Select platforms (for Social crawler)
-4. Click "Start Crawl"
+4. Click "Start Crawl" (or "Start Scrape" for URL Scrape)
 5. Status shows: Crawling → Analyzing with AI → Completed
 6. View AI analysis and raw results
 
@@ -804,6 +806,7 @@ After crawling, results are automatically analyzed by AI to produce:
 | Social Crawler | `MockSocialCrawlerMCPServer` | In-memory | `search_social_posts`, `get_trending_topics`, `get_competitor_mentions` |
 | Web Search | `MockWebSearchMCPServer` | In-memory | `search_web`, `get_page_content`, `compare_competitor_pages` |
 | News Crawler | `MockNewsCrawlerMCPServer` | In-memory | `search_news`, `get_competitor_news`, `get_press_releases`, `get_industry_reports` |
+| URL Scraper | `MockUrlScrapeMCPServer` | In-memory | `scrape_url`, `scrape_urls`, `compare_pages`, `extract_page_data` |
 
 ## User Roles
 

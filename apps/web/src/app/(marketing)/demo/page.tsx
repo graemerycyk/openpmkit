@@ -21,6 +21,7 @@ import {
   Newspaper,
   Hash,
   Presentation,
+  Link2,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -81,7 +82,7 @@ const jobs = [
     description: 'Track competitor product changes and releases.',
     icon: Target,
     duration: '~20s',
-    sources: ['Social Crawler', 'Web Search', 'News Crawler'],
+    sources: ['Social Crawler', 'Web Search', 'News Crawler', 'URL Scraper'],
   },
   {
     id: 'roadmap_alignment',
@@ -321,7 +322,7 @@ export default function DemoPage() {
               and market trends - automatically fed into your PM workflows.
             </p>
           </div>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
+          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader>
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100">
@@ -358,6 +359,19 @@ export default function DemoPage() {
               <CardContent>
                 <CardDescription>
                   Track industry news, press releases, and analyst reports for competitive research.
+                </CardDescription>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100">
+                  <Link2 className="h-6 w-6 text-emerald-600" />
+                </div>
+                <CardTitle className="mt-4">URL Scraper</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Fetch and analyze specific URLs for deep competitive research on pricing, features, and positioning.
                 </CardDescription>
               </CardContent>
             </Card>

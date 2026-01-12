@@ -7,6 +7,7 @@ export interface CrawlerJobState {
   type: CrawlerType;
   status: 'pending' | 'running' | 'analyzing' | 'completed' | 'failed';
   keywords: string[];
+  urls?: string[]; // For URL scrape crawler
   platforms: string[];
   config: Record<string, unknown>;
   createdAt: Date;

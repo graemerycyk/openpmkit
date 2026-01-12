@@ -1909,6 +1909,58 @@ export const resources: ResourcePage[] = [
       },
     ],
   },
+
+  // URL Scraper Integration
+  {
+    slug: 'url-scraper-integration',
+    title: 'URL Scraper: Deep Analysis of Specific Pages',
+    description:
+      'Fetch and analyze specific URLs for deep competitive research on pricing, features, and positioning.',
+    primaryKeyword: 'url scraper',
+    secondaryKeywords: ['page analysis', 'competitive page scraping', 'pricing page analysis'],
+    category: 'integrations',
+    relatedPages: ['/demo', '/resources/competitor-research', '/resources/web-search-integration'],
+    workedExample: {
+      title: 'Analyzing Competitor Pricing Pages',
+      scenario: 'You want to compare pricing structures across 5 competitors. URL Scraper fetches and analyzes each pricing page.',
+      steps: [
+        'Enter competitor pricing page URLs',
+        'URL Scraper fetches and extracts content from each page',
+        'AI analyzes pricing tiers, features, and positioning',
+        'Structured comparison is generated with insights',
+        'Battlecard is updated with current pricing intelligence',
+      ],
+      outcome: 'Pricing intelligence is always current. Feature comparisons are automated. Competitive positioning is data-driven.',
+    },
+    keyBenefits: [
+      'Deep-dive into specific competitor pages',
+      'Extract structured data from unstructured content',
+      'Compare pricing and features across competitors',
+      'Track page changes over time',
+    ],
+    faqItems: [
+      {
+        question: 'What types of pages can URL Scraper analyze?',
+        answer:
+          'Pricing pages, feature pages, blog posts, documentation, landing pages, and any publicly accessible web page.',
+      },
+      {
+        question: 'How does URL Scraper differ from Web Search?',
+        answer:
+          'Web Search finds pages based on keywords. URL Scraper does deep analysis of specific URLs you provide. Use Web Search to discover pages, then URL Scraper to analyze them in detail.',
+      },
+      {
+        question: 'Can URL Scraper extract pricing information?',
+        answer:
+          'Yes. The AI analyzes page content to extract pricing tiers, features per tier, and pricing models (per-seat, usage-based, etc.).',
+      },
+      {
+        question: 'How many URLs can I analyze at once?',
+        answer:
+          'Up to 10 URLs per analysis job. For larger batches, schedule multiple jobs or use the API.',
+      },
+    ],
+  },
 ];
 
 export function getResourceBySlug(slug: string): ResourcePage | undefined {

@@ -11,6 +11,7 @@ export * from './pmkit';
 export * from './social-crawler';
 export * from './web-search';
 export * from './news-crawler';
+export * from './url-scrape';
 
 // Import all mock servers
 import { mockJiraServer } from './jira';
@@ -25,6 +26,7 @@ import { pmkitServer } from './pmkit';
 import { mockSocialCrawlerServer } from './social-crawler';
 import { mockWebSearchServer } from './web-search';
 import { mockNewsCrawlerServer } from './news-crawler';
+import { mockUrlScrapeServer } from './url-scrape';
 import { MCPClient, ConnectorFactory, type ConnectorKey } from '@pmkit/mcp';
 
 // ============================================================================
@@ -46,6 +48,7 @@ export function createMockMCPClient(): MCPClient {
   client.registerServer(mockSocialCrawlerServer);
   client.registerServer(mockWebSearchServer);
   client.registerServer(mockNewsCrawlerServer);
+  client.registerServer(mockUrlScrapeServer);
 
   return client;
 }
@@ -95,4 +98,5 @@ export {
   mockSocialCrawlerServer,
   mockWebSearchServer,
   mockNewsCrawlerServer,
+  mockUrlScrapeServer,
 };

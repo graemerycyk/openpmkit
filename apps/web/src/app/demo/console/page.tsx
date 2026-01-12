@@ -209,6 +209,7 @@ const connectors: Connector[] = [
   { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_demo', type: 'crawler', description: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
   { id: 'web_search', name: 'Web Search', icon: Globe, status: 'connected_demo', type: 'crawler', description: 'Google & Bing' },
   { id: 'news_crawler', name: 'News Crawler', icon: Newspaper, status: 'connected_demo', type: 'crawler', description: 'Industry news & press releases' },
+  { id: 'url_scrape', name: 'URL Scraper', icon: Plug, status: 'connected_demo', type: 'crawler', description: 'Scrape specific URLs for deep analysis' },
 ];
 
 const jobConfigs: Record<
@@ -654,11 +655,12 @@ function ConsolePageContent() {
   const [commandRunId, setCommandRunId] = useState<string | null>(null);
   
   // Crawler demo state
-  type CrawlerType = 'social' | 'web_search' | 'news';
+  type CrawlerType = 'social' | 'web_search' | 'news' | 'url_scrape';
   const [crawlerRunning, setCrawlerRunning] = useState<CrawlerType | null>(null);
   const [crawlerResult, setCrawlerResult] = useState<{
     type: CrawlerType;
     keywords: string[];
+    urls?: string[];
     resultCount: number;
     analysis: CrawlerAnalysis | null;
     metadata?: {
@@ -922,7 +924,7 @@ function ConsolePageContent() {
   };
 
   // Handler for crawler demo buttons
-  const handleCrawlerDemo = async (crawlerType: 'social' | 'web_search' | 'news') => {
+  const handleCrawlerDemo = async (crawlerType: CrawlerType) => {
     // Check free job limit for unauthenticated users
     if (!isAuthenticated && hasExceededFreeJobLimit()) {
       setSignInModalOpen(true);
@@ -940,12 +942,18 @@ function ConsolePageContent() {
     }
     
     try {
-      // Default keywords based on crawler type
+      // Default keywords/urls based on crawler type
       const keywords = crawlerType === 'social' 
         ? ['product management', 'notion', 'coda']
         : crawlerType === 'web_search'
           ? ['product management tools 2026', 'notion vs coda']
-          : ['AI product management', 'SaaS funding'];
+          : crawlerType === 'url_scrape'
+            ? [] // URL scrape uses urls, not keywords
+            : ['AI product management', 'SaaS funding'];
+      
+      const urls = crawlerType === 'url_scrape' 
+        ? ['https://competitora.com/pricing', 'https://competitorb.com', 'https://notion.so/product']
+        : undefined;
       
       const platforms = crawlerType === 'social' ? ['reddit', 'hackernews'] : undefined;
       
@@ -954,7 +962,8 @@ function ConsolePageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           crawlerType,
-          keywords,
+          keywords: keywords.length > 0 ? keywords : undefined,
+          urls,
           platforms,
         }),
       });
@@ -969,6 +978,7 @@ function ConsolePageContent() {
       setCrawlerResult({
         type: crawlerType,
         keywords,
+        urls,
         resultCount: data.resultCount,
         analysis: data.analysis,
         metadata: data.metadata,
@@ -2037,7 +2047,7 @@ function ConsolePageContent() {
             </Card>
 
             {/* Crawler Cards */}
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {/* Social Crawler */}
               <Card className="relative overflow-hidden flex flex-col">
                 <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-purple-50 opacity-50" />
@@ -2201,6 +2211,61 @@ function ConsolePageContent() {
                       <>
                         <Play className="mr-2 h-4 w-4" />
                         Run Demo Crawl
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* URL Scraper */}
+              <Card className="relative overflow-hidden flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-50" />
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100">
+                      <Plug className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <CardTitle>URL Scraper</CardTitle>
+                      <CardDescription>Specific page analysis</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative flex flex-1 flex-col">
+                  <div className="flex-1 space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Fetch and analyze specific URLs for deep competitive research on pricing, features, and positioning.
+                    </p>
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">USE CASES</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline">Pricing Pages</Badge>
+                        <Badge variant="outline">Feature Pages</Badge>
+                        <Badge variant="outline">Blog Posts</Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">EXAMPLE URLS</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="cobalt" className="text-xs">competitor.com/pricing</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <Button 
+                    className="mt-4 w-full" 
+                    variant="outline"
+                    onClick={() => handleCrawlerDemo('url_scrape')}
+                    disabled={crawlerRunning !== null}
+                  >
+                    {crawlerRunning === 'url_scrape' ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Scraping...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        Run Demo Scrape
                       </>
                     )}
                   </Button>

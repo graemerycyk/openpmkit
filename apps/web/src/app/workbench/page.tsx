@@ -80,6 +80,7 @@ interface CrawlerJob {
   type: CrawlerType;
   status: 'pending' | 'running' | 'analyzing' | 'completed' | 'failed';
   keywords: string[];
+  urls?: string[]; // For URL scrape crawler
   platforms: string[];
   createdAt: string;
   startedAt?: string;
@@ -267,6 +268,7 @@ export default function WorkbenchPage() {
   // Crawler state
   const [crawlerType, setCrawlerType] = useState<CrawlerType>('social');
   const [crawlerKeywords, setCrawlerKeywords] = useState('');
+  const [crawlerUrls, setCrawlerUrls] = useState('');
   const [crawlerPlatforms, setCrawlerPlatforms] = useState<string[]>(['reddit']);
   const [crawlerJobs, setCrawlerJobs] = useState<CrawlerJob[]>([]);
   const [selectedCrawlerJob, setSelectedCrawlerJob] = useState<CrawlerJob | null>(null);
@@ -424,23 +426,39 @@ export default function WorkbenchPage() {
   // ============================================================================
   
   const startCrawler = async () => {
-    if (!crawlerKeywords.trim()) {
-      setCrawlerError('Please enter at least one keyword');
-      return;
+    // Validate input based on crawler type
+    if (crawlerType === 'url_scrape') {
+      if (!crawlerUrls.trim()) {
+        setCrawlerError('Please enter at least one URL');
+        return;
+      }
+    } else {
+      if (!crawlerKeywords.trim()) {
+        setCrawlerError('Please enter at least one keyword');
+        return;
+      }
     }
     
     setIsCrawlerRunning(true);
     setCrawlerError(null);
     
     try {
-      const keywords = crawlerKeywords.split(',').map(k => k.trim()).filter(Boolean);
+      // Parse input based on crawler type
+      const keywords = crawlerType !== 'url_scrape' 
+        ? crawlerKeywords.split(',').map(k => k.trim()).filter(Boolean)
+        : [];
+      
+      const urls = crawlerType === 'url_scrape'
+        ? crawlerUrls.split('\n').map(u => u.trim()).filter(Boolean).slice(0, 10)
+        : [];
       
       const response = await fetch('/api/crawlers/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: crawlerType,
-          keywords,
+          keywords: keywords.length > 0 ? keywords : undefined,
+          urls: urls.length > 0 ? urls : undefined,
           platforms: crawlerType === 'social' ? crawlerPlatforms : undefined,
           config: {
             limit: 25,
@@ -461,6 +479,7 @@ export default function WorkbenchPage() {
         type: crawlerType,
         status: 'pending',
         keywords,
+        urls: urls.length > 0 ? urls : undefined,
         platforms: crawlerPlatforms,
         createdAt: new Date().toISOString(),
         resultCount: 0,
@@ -473,6 +492,7 @@ export default function WorkbenchPage() {
       });
       setSelectedCrawlerJob(newJob);
       setCrawlerKeywords('');
+      setCrawlerUrls('');
     } catch (err) {
       setCrawlerError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -934,7 +954,7 @@ export default function WorkbenchPage() {
                 ) : (
                   <div className="space-y-1 p-2">
                     {crawlerJobs.map((job) => {
-                      const CrawlerIcon = job.type === 'social' ? Hash : job.type === 'news' ? Newspaper : Globe;
+                      const CrawlerIcon = job.type === 'social' ? Hash : job.type === 'news' ? Newspaper : job.type === 'url_scrape' ? Link2 : Globe;
                       return (
                         <button
                           key={job.id}
@@ -950,8 +970,19 @@ export default function WorkbenchPage() {
                               {job.type.replace('_', ' ')}
                             </p>
                             <p className="truncate text-xs text-muted-foreground">
-                              {job.keywords.slice(0, 2).join(', ')}
-                              {job.keywords.length > 2 && ` +${job.keywords.length - 2}`}
+                              {job.type === 'url_scrape' && job.urls ? (
+                                <>
+                                  {job.urls.slice(0, 1).map(u => {
+                                    try { return new URL(u).hostname; } catch { return u; }
+                                  }).join(', ')}
+                                  {job.urls.length > 1 && ` +${job.urls.length - 1}`}
+                                </>
+                              ) : (
+                                <>
+                                  {job.keywords.slice(0, 2).join(', ')}
+                                  {job.keywords.length > 2 && ` +${job.keywords.length - 2}`}
+                                </>
+                              )}
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-1">
@@ -1016,6 +1047,15 @@ export default function WorkbenchPage() {
                       <Newspaper className="h-4 w-4" />
                       News
                     </Button>
+                    <Button
+                      variant={crawlerType === 'url_scrape' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCrawlerType('url_scrape')}
+                      className="gap-2"
+                    >
+                      <Link2 className="h-4 w-4" />
+                      URL Scrape
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -1023,41 +1063,76 @@ export default function WorkbenchPage() {
                 {crawlerType === 'social' && 'Search Reddit and Hacker News for discussions and mentions.'}
                 {crawlerType === 'web_search' && 'Search Google/DuckDuckGo for competitor pages and market research.'}
                 {crawlerType === 'news' && 'Search news sources for industry updates and press releases.'}
+                {crawlerType === 'url_scrape' && 'Fetch and analyze content from specific URLs (competitor pages, blog posts, docs).'}
               </p>
             </div>
 
             {/* Crawler Input */}
             <div className="border-b bg-muted/30 p-4">
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="crawler-keywords">Keywords (comma-separated)</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="crawler-keywords"
-                      value={crawlerKeywords}
-                      onChange={(e) => setCrawlerKeywords(e.target.value)}
-                      placeholder="notion, coda, monday.com, project management"
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={startCrawler}
-                      disabled={isCrawlerRunning || !crawlerKeywords.trim()}
-                      className="gap-2"
-                    >
-                      {isCrawlerRunning ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Starting...
-                        </>
-                      ) : (
-                        <>
-                          <Play className="h-4 w-4" />
-                          Start Crawl
-                        </>
-                      )}
-                    </Button>
+                {crawlerType === 'url_scrape' ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="crawler-urls">URLs (one per line, max 10)</Label>
+                    <div className="flex gap-2">
+                      <Textarea
+                        id="crawler-urls"
+                        value={crawlerUrls}
+                        onChange={(e) => setCrawlerUrls(e.target.value)}
+                        placeholder="https://competitor.com/pricing&#10;https://competitor.com/features&#10;https://blog.example.com/article"
+                        className="flex-1 min-h-[100px] font-mono text-sm"
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={startCrawler}
+                        disabled={isCrawlerRunning || !crawlerUrls.trim()}
+                        className="gap-2"
+                      >
+                        {isCrawlerRunning ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Starting...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-4 w-4" />
+                            Start Scrape
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="crawler-keywords">Keywords (comma-separated)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="crawler-keywords"
+                        value={crawlerKeywords}
+                        onChange={(e) => setCrawlerKeywords(e.target.value)}
+                        placeholder="notion, coda, monday.com, project management"
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={startCrawler}
+                        disabled={isCrawlerRunning || !crawlerKeywords.trim()}
+                        className="gap-2"
+                      >
+                        {isCrawlerRunning ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Starting...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-4 w-4" />
+                            Start Crawl
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {crawlerType === 'social' && (
                   <div className="space-y-2">
@@ -1102,7 +1177,8 @@ export default function WorkbenchPage() {
                           {selectedCrawlerJob.type === 'social' && <Hash className="h-5 w-5 text-pink-600" />}
                           {selectedCrawlerJob.type === 'web_search' && <Globe className="h-5 w-5 text-blue-600" />}
                           {selectedCrawlerJob.type === 'news' && <Newspaper className="h-5 w-5 text-amber-600" />}
-                          {selectedCrawlerJob.type.replace('_', ' ')} Crawler
+                          {selectedCrawlerJob.type === 'url_scrape' && <Link2 className="h-5 w-5 text-emerald-600" />}
+                          {selectedCrawlerJob.type.replace('_', ' ')} {selectedCrawlerJob.type === 'url_scrape' ? 'Scraper' : 'Crawler'}
                         </CardTitle>
                         <div className="flex items-center gap-2">
                           {selectedCrawlerJob.status === 'running' || selectedCrawlerJob.status === 'pending' ? (
@@ -1140,7 +1216,11 @@ export default function WorkbenchPage() {
                         </div>
                       </div>
                       <CardDescription>
-                        Keywords: {selectedCrawlerJob.keywords.join(', ')}
+                        {selectedCrawlerJob.type === 'url_scrape' && selectedCrawlerJob.urls ? (
+                          <>URLs: {selectedCrawlerJob.urls.length} page{selectedCrawlerJob.urls.length !== 1 ? 's' : ''}</>
+                        ) : (
+                          <>Keywords: {selectedCrawlerJob.keywords.join(', ')}</>
+                        )}
                         {selectedCrawlerJob.platforms.length > 0 && (
                           <> • Platforms: {selectedCrawlerJob.platforms.join(', ')}</>
                         )}
