@@ -47,6 +47,8 @@ npm run typecheck
 | MCP Framework | `packages/mcp/src/index.ts` |
 | Job Runner | `packages/core/src/jobs/index.ts` |
 | Prompt Templates | `packages/prompts/src/index.ts` |
+| Crawler Analysis | `packages/prompts/src/crawler-analysis.ts` |
+| Real Crawlers | `packages/core/src/crawlers/` |
 | Database Schema | `prisma/schema.prisma` |
 | Web App | `apps/web/src/` |
 
@@ -54,11 +56,11 @@ npm run typecheck
 
 ```
 packages/
-├── core/          # Domain types, RBAC, audit, jobs
+├── core/          # Domain types, RBAC, audit, jobs, crawlers
 ├── mcp/           # MCP framework, tool helpers
 ├── mcp-servers/   # Demo MCP servers per connector
 ├── mock-tenant/   # Demo dataset
-├── prompts/       # Prompt templates
+├── prompts/       # Prompt templates, crawler analysis
 └── content/       # Marketing content
 
 apps/

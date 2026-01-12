@@ -7,6 +7,7 @@ pmkit is an AI-powered product management agent that runs daily briefs, meeting 
 ## Features
 
 - **9 Workflow Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, release notes
+- **3 AI Crawlers**: Social (Reddit, Hacker News), Web Search (Google, DuckDuckGo), News (NewsAPI, Google News) with AI-powered analysis
 - **Draft-Only**: Agents propose changes but never write directly to external systems
 - **Full Traceability**: Every tool call, source, and artifact is logged
 - **Enterprise Governance**: RBAC, permission simulation, audit logging
@@ -120,6 +121,9 @@ npm run docker:down
 - `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`: Microsoft OAuth
 - `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`: S3 storage
 - `OPENAI_API_KEY`: For LLM-powered responses (uses stubs if not set)
+- `SERPER_API_KEY`: Serper.dev for Google search (2,500 free/month)
+- `NEWSAPI_KEY`: NewsAPI.org for news (100 free/day)
+- `ADMIN_EMAILS`: Comma-separated admin emails for Workbench access
 - `NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN`: Simple Analytics domain
 - `NEXT_PUBLIC_GSC_VERIFICATION`: Google Search Console verification
 - `NEXT_PUBLIC_BING_VERIFICATION`: Bing Webmaster Tools verification
@@ -128,7 +132,12 @@ npm run docker:down
 
 The demo runs with a complete mock enterprise dataset and doesn't require any external services. All tool calls use mocked MCP servers, and artifact generation uses stub responses.
 
-Visit `/demo/console` to try the Agent Console.
+Visit `/demo/console` to try:
+- **PM Workflows**: Run any of the 9 job types with mock data and real LLM analysis
+- **Slack & Teams Commands**: Test natural language commands
+- **AI Crawlers**: Run mock crawls with real AI-powered analysis
+
+Unauthenticated users get 2 free job runs. Sign in for unlimited access.
 
 ## Architecture
 

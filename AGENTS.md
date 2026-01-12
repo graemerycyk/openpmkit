@@ -23,6 +23,8 @@
 | MCP framework | `packages/mcp/src/index.ts` |
 | Job runner | `packages/core/src/jobs/index.ts` |
 | Prompt templates | `packages/prompts/src/index.ts` |
+| Crawler analysis | `packages/prompts/src/crawler-analysis.ts` |
+| Real crawlers | `packages/core/src/crawlers/` |
 | Database schema | `prisma/schema.prisma` |
 | Demo data | `packages/mock-tenant/src/data/` |
 | Web app | `apps/web/src/app/` |
@@ -140,11 +142,11 @@ This enables workflows where each job builds on previous outputs, reducing hallu
 
 | Package | Purpose | Key Exports |
 |---------|---------|-------------|
-| `@pmkit/core` | Domain types, RBAC, audit logging, job runner | `JobRunner`, `AuditLogger`, `RBACService`, all type schemas |
+| `@pmkit/core` | Domain types, RBAC, audit logging, job runner, crawlers | `JobRunner`, `AuditLogger`, `RBACService`, `runSocialCrawler`, `runWebSearchCrawler`, `runNewsCrawler` |
 | `@pmkit/mcp` | MCP framework, tool definitions, policy enforcement | `BaseMCPServer`, `MCPClient`, `createProposalTool` |
 | `@pmkit/mcp-servers` | Mock MCP servers for each connector | `mockJiraServer`, `mockSlackServer`, etc. |
 | `@pmkit/mock-tenant` | Demo dataset for all connectors | `mockTenant`, `mockUsers`, connector data |
-| `@pmkit/prompts` | Prompt templates and stub generators | `PROMPT_TEMPLATES`, `renderPrompt`, `generateStubResponse` |
+| `@pmkit/prompts` | Prompt templates, stub generators, crawler analysis | `PROMPT_TEMPLATES`, `renderPrompt`, `executeCrawlerAnalysis`, `MOCK_CRAWLER_DATA` |
 | `@pmkit/content` | Marketing content, blog posts, keywords | `blogPosts`, `resources`, `keywords` |
 
 ### Apps
@@ -715,7 +717,9 @@ GNEWS_API_KEY=...         # GNews.io alternative (600 free/day)
 
 ## AI Crawlers
 
-Real-time web crawlers for competitive intelligence. Available in the Workbench for admin users.
+Real-time web crawlers for competitive intelligence with AI-powered analysis.
+
+### Crawler Types
 
 | Crawler | Free API | Fallback | Rate Limit |
 |---------|----------|----------|------------|
@@ -723,18 +727,44 @@ Real-time web crawlers for competitive intelligence. Available in the Workbench 
 | Web Search | Serper.dev | DuckDuckGo | 2,500/month |
 | News | NewsAPI.org | Google News RSS | 100/day |
 
-### Crawler Types
-
 - **Social Crawler**: Searches Reddit and Hacker News for discussions, mentions, and sentiment
 - **Web Search Crawler**: Searches Google/DuckDuckGo for competitor pages and market research
 - **News Crawler**: Searches news sources for industry updates and press releases
 
+### AI Analysis
+
+After crawling, results are automatically analyzed by AI to produce:
+
+- **Executive Summary**: 2-3 sentence overview of findings
+- **Sentiment Analysis**: Overall sentiment with breakdown (positive/negative/neutral)
+- **Key Themes**: Identified topics with mention counts and representative quotes
+- **Insights**: Categorized as opportunities, threats, trends, or action items
+- **Competitor Mentions**: Tracked mentions with context and sentiment
+- **Notable Quotes**: Key quotes with source attribution
+- **Recommendations**: Actionable next steps for product teams
+
 ### Usage
 
-1. Go to `/workbench` (admin only)
-2. Switch to "AI Crawlers" tab
-3. Select crawler type and enter keywords
-4. Click "Start Crawl" - results appear in 1-2 minutes
+**Demo Console** (`/demo/console` → AI Crawlers tab):
+- Uses mock data with real LLM analysis
+- Subject to demo rate limits (unauthenticated users get 2 free jobs total across all demo features)
+- Great for seeing the analysis output format
+
+**Workbench** (`/workbench` → AI Crawlers tab, admin only):
+1. Select crawler type (Social, Web Search, or News)
+2. Enter keywords to search for
+3. Select platforms (for Social crawler)
+4. Click "Start Crawl"
+5. Status shows: Crawling → Analyzing with AI → Completed
+6. View AI analysis and raw results
+
+### Key Files
+
+- `packages/prompts/src/crawler-analysis.ts` - AI analysis prompts and execution
+- `packages/core/src/crawlers/` - Real crawler implementations
+- `apps/web/src/app/api/demo/run-crawler/route.ts` - Demo crawler API (mock data + real LLM)
+- `apps/web/src/app/api/crawlers/start/route.ts` - Workbench crawler API (real data + real LLM)
+- `apps/web/src/lib/crawler-store.ts` - In-memory job state for workbench
 
 ## Connectors Reference
 
@@ -749,6 +779,9 @@ Real-time web crawlers for competitive intelligence. Available in the Workbench 
 | Community | `MockCommunityMCPServer` | `community.ts` | `get_posts`, `search_posts`, `get_feature_requests` |
 | Competitor | `MockCompetitorMCPServer` | `competitor.ts` | `get_competitor`, `get_feature_comparison`, `get_recent_changes` |
 | pmkit | `PmkitMCPServer` | `pmkit.ts` | `get_artifact`, `list_artifacts`, `search_artifacts`, `get_job`, `list_jobs`, `get_proposal`, `list_proposals`, `propose_artifact_update`, `propose_artifact_link` |
+| Social Crawler | `MockSocialCrawlerMCPServer` | In-memory | `search_social_posts`, `get_trending_topics`, `get_competitor_mentions` |
+| Web Search | `MockWebSearchMCPServer` | In-memory | `search_web`, `get_page_content`, `compare_competitor_pages` |
+| News Crawler | `MockNewsCrawlerMCPServer` | In-memory | `search_news`, `get_competitor_news`, `get_press_releases`, `get_industry_reports` |
 
 ## User Roles
 

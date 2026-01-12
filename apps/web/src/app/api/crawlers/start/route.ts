@@ -6,11 +6,13 @@ import {
   runSocialCrawler,
   runWebSearchCrawler,
   runNewsCrawler,
+  getLLMService,
   type SocialCrawlerInput,
   type WebSearchCrawlerInput,
   type NewsCrawlerInput,
   type CrawlerType,
 } from '@pmkit/core';
+import { executeCrawlerAnalysis, type CrawlerAnalysisContext } from '@pmkit/prompts';
 
 export async function POST(request: NextRequest) {
   try {
@@ -136,10 +138,65 @@ async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
     }
 
     // Update job with results
-    jobState.status = response.success ? 'completed' : 'failed';
-    jobState.completedAt = new Date();
     jobState.results = response.results.map(r => ({ ...r, jobId }));
-    jobState.error = response.error;
+    
+    if (!response.success) {
+      jobState.status = 'failed';
+      jobState.completedAt = new Date();
+      jobState.error = response.error;
+      return;
+    }
+
+    // Run AI analysis on the results
+    jobState.status = 'analyzing';
+    
+    try {
+      const llmService = getLLMService();
+      
+      // Build analysis context
+      const analysisContext: CrawlerAnalysisContext = {
+        crawlerType: job.type as CrawlerType,
+        keywords: job.keywords,
+        platforms: job.platforms.length > 0 ? job.platforms : undefined,
+        results: response.results.map(r => ({
+          source: r.source,
+          title: r.title,
+          content: r.content,
+          url: r.url,
+          author: r.author,
+          publishedAt: r.publishedAt?.toISOString(),
+          metadata: r.metadata as Record<string, unknown>,
+        })),
+        productName: 'Acme Platform',
+        competitors: ['Notion', 'Coda', 'Monday.com'],
+      };
+
+      // Execute AI analysis
+      const analysisResult = await executeCrawlerAnalysis(
+        llmService,
+        'workbench', // Use workbench tenant (not demo rate limited)
+        analysisContext,
+        { maxTokens: 8192 }
+      );
+
+      jobState.analysis = analysisResult.analysis;
+      jobState.analysisMetadata = {
+        model: analysisResult.model,
+        usage: analysisResult.usage,
+        latencyMs: analysisResult.latencyMs,
+        estimatedCostUsd: analysisResult.estimatedCostUsd,
+        isStub: analysisResult.isStub,
+      };
+      jobState.status = 'completed';
+      jobState.completedAt = new Date();
+      
+    } catch (analysisError) {
+      console.error('AI analysis error:', analysisError);
+      // Still mark as completed but note the analysis failure
+      jobState.status = 'completed';
+      jobState.completedAt = new Date();
+      jobState.analysisError = analysisError instanceof Error ? analysisError.message : 'Analysis failed';
+    }
 
   } catch (error) {
     jobState.status = 'failed';

@@ -1,5 +1,8 @@
 import type { JobType } from '@pmkit/core';
 
+// Re-export crawler analysis
+export * from './crawler-analysis';
+
 // ============================================================================
 // Prompt Template Types
 // ============================================================================
@@ -1831,4 +1834,3 @@ To use real LLM responses, set \`USE_STUB_LLM=false\` and provide an \`OPENAI_AP
 *Generated at ${new Date().toISOString()}*`;
   };
 }
-

@@ -7,7 +7,7 @@ import { z } from 'zod';
 export const CrawlerTypeSchema = z.enum(['social', 'web_search', 'news']);
 export type CrawlerType = z.infer<typeof CrawlerTypeSchema>;
 
-export const CrawlerStatusSchema = z.enum(['pending', 'running', 'completed', 'failed']);
+export const CrawlerStatusSchema = z.enum(['pending', 'running', 'analyzing', 'completed', 'failed']);
 export type CrawlerStatus = z.infer<typeof CrawlerStatusSchema>;
 
 // ============================================================================
@@ -95,4 +95,79 @@ export interface CrawlerResponse {
     source: string;
     rateLimitRemaining?: number;
   };
+}
+
+// ============================================================================
+// AI Analysis Types
+// ============================================================================
+
+export const SentimentSchema = z.enum(['positive', 'negative', 'neutral', 'mixed']);
+export type Sentiment = z.infer<typeof SentimentSchema>;
+
+export interface CrawlerTheme {
+  name: string;
+  description: string;
+  mentionCount: number;
+  sentiment: Sentiment;
+  keyQuotes: string[];
+  sources: string[];
+}
+
+export interface CompetitorMention {
+  competitor: string;
+  context: string;
+  sentiment: Sentiment;
+  source: string;
+  url?: string;
+}
+
+export interface CrawlerInsight {
+  type: 'opportunity' | 'threat' | 'trend' | 'action_item';
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  evidence: string[];
+}
+
+export interface CrawlerAnalysis {
+  // Executive summary
+  summary: string;
+  
+  // Key themes identified
+  themes: CrawlerTheme[];
+  
+  // Overall sentiment
+  overallSentiment: Sentiment;
+  sentimentBreakdown: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+  
+  // Competitive intelligence
+  competitorMentions: CompetitorMention[];
+  
+  // Actionable insights
+  insights: CrawlerInsight[];
+  
+  // Key quotes worth highlighting
+  topQuotes: Array<{
+    quote: string;
+    source: string;
+    url?: string;
+    relevance: string;
+  }>;
+  
+  // Recommendations
+  recommendations: string[];
+  
+  // Metadata
+  analyzedAt: Date;
+  resultCount: number;
+  model?: string;
+}
+
+// Extended crawler response with AI analysis
+export interface CrawlerResponseWithAnalysis extends CrawlerResponse {
+  analysis?: CrawlerAnalysis;
 }

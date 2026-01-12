@@ -43,11 +43,11 @@ pmkit/
 │   ├── web/              # Next.js 15 marketing + demo app
 │   └── worker/           # BullMQ job worker
 ├── packages/
-│   ├── core/             # Domain types, RBAC, audit, job runner
+│   ├── core/             # Domain types, RBAC, audit, job runner, crawlers
 │   ├── mcp/              # MCP framework, tool helpers
 │   ├── mcp-servers/      # Demo MCP servers (Jira, Slack, etc.)
 │   ├── mock-tenant/      # Demo dataset
-│   ├── prompts/          # Prompt templates + stub generators
+│   ├── prompts/          # Prompt templates, stub generators, crawler analysis
 │   └── content/          # Marketing content, blog posts
 ├── prisma/               # Database schema
 └── docker/               # Docker configuration

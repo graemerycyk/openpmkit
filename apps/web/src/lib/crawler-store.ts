@@ -1,10 +1,11 @@
 import type { CrawlerType, CrawlerResult } from '@pmkit/core';
+import type { CrawlerAnalysis } from '@pmkit/prompts';
 
 // In-memory storage for crawler jobs (in production, use database)
 export interface CrawlerJobState {
   id: string;
   type: CrawlerType;
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  status: 'pending' | 'running' | 'analyzing' | 'completed' | 'failed';
   keywords: string[];
   platforms: string[];
   config: Record<string, unknown>;
@@ -13,6 +14,20 @@ export interface CrawlerJobState {
   completedAt?: Date;
   error?: string;
   results: CrawlerResult[];
+  // AI Analysis
+  analysis?: CrawlerAnalysis;
+  analysisMetadata?: {
+    model: string;
+    usage: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+    };
+    latencyMs: number;
+    estimatedCostUsd: number;
+    isStub: boolean;
+  };
+  analysisError?: string;
 }
 
 // Global job store (in production, use Redis or database)

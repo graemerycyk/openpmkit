@@ -91,6 +91,45 @@ interface Connector {
   description?: string;
 }
 
+interface CrawlerAnalysis {
+  summary: string;
+  themes: Array<{
+    name: string;
+    description: string;
+    mentionCount: number;
+    sentiment: 'positive' | 'negative' | 'neutral' | 'mixed';
+    keyQuotes: string[];
+    sources: string[];
+  }>;
+  overallSentiment: 'positive' | 'negative' | 'neutral' | 'mixed';
+  sentimentBreakdown: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+  competitorMentions: Array<{
+    competitor: string;
+    context: string;
+    sentiment: 'positive' | 'negative' | 'neutral' | 'mixed';
+    source: string;
+    url?: string;
+  }>;
+  insights: Array<{
+    type: 'opportunity' | 'threat' | 'trend' | 'action_item';
+    title: string;
+    description: string;
+    priority: 'high' | 'medium' | 'low';
+    evidence: string[];
+  }>;
+  topQuotes: Array<{
+    quote: string;
+    source: string;
+    url?: string;
+    relevance: string;
+  }>;
+  recommendations: string[];
+}
+
 interface ToolCall {
   id: string;
   name: string;
@@ -574,6 +613,22 @@ function ConsolePageContent() {
   const [draftResponse, setDraftResponse] = useState<DraftResponse | null>(null);
   const [commandRunId, setCommandRunId] = useState<string | null>(null);
   
+  // Crawler demo state
+  type CrawlerType = 'social' | 'web_search' | 'news';
+  const [crawlerRunning, setCrawlerRunning] = useState<CrawlerType | null>(null);
+  const [crawlerResult, setCrawlerResult] = useState<{
+    type: CrawlerType;
+    keywords: string[];
+    resultCount: number;
+    analysis: CrawlerAnalysis | null;
+    metadata?: {
+      model: string;
+      latencyMs: number;
+      isStub: boolean;
+    };
+  } | null>(null);
+  const [crawlerError, setCrawlerError] = useState<string | null>(null);
+  
   // Demo job counter state
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [demoJobCount, setDemoJobCount] = useState(0);
@@ -821,15 +876,62 @@ function ConsolePageContent() {
   };
 
   // Handler for crawler demo buttons
-  const handleCrawlerDemo = (jobType: JobType) => {
+  const handleCrawlerDemo = async (crawlerType: 'social' | 'web_search' | 'news') => {
     // Check free job limit for unauthenticated users
     if (!isAuthenticated && hasExceededFreeJobLimit()) {
       setSignInModalOpen(true);
       return;
     }
     
-    setDemoView('workflows');
-    setSelectedJob(jobType);
+    setCrawlerRunning(crawlerType);
+    setCrawlerError(null);
+    setCrawlerResult(null);
+    
+    // Increment demo job count for unauthenticated users
+    if (!isAuthenticated) {
+      const newCount = incrementDemoJobCount();
+      setDemoJobCount(newCount);
+    }
+    
+    try {
+      // Default keywords based on crawler type
+      const keywords = crawlerType === 'social' 
+        ? ['product management', 'notion', 'coda']
+        : crawlerType === 'web_search'
+          ? ['product management tools 2026', 'notion vs coda']
+          : ['AI product management', 'SaaS funding'];
+      
+      const platforms = crawlerType === 'social' ? ['reddit', 'hackernews'] : undefined;
+      
+      const response = await fetch('/api/demo/run-crawler', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          crawlerType,
+          keywords,
+          platforms,
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to run crawler');
+      }
+      
+      const data = await response.json();
+      
+      setCrawlerResult({
+        type: crawlerType,
+        keywords,
+        resultCount: data.resultCount,
+        analysis: data.analysis,
+        metadata: data.metadata,
+      });
+    } catch (error) {
+      setCrawlerError(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setCrawlerRunning(null);
+    }
   };
 
   const handleExampleClick = (example: string) => {
@@ -1863,10 +1965,20 @@ function ConsolePageContent() {
                   <Button 
                     className="mt-4 w-full" 
                     variant="outline"
-                    onClick={() => handleCrawlerDemo('competitor_research')}
+                    onClick={() => handleCrawlerDemo('social')}
+                    disabled={crawlerRunning !== null}
                   >
-                    <Play className="mr-2 h-4 w-4" />
-                    Run Demo Crawl
+                    {crawlerRunning === 'social' ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Running...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        Run Demo Crawl
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -1908,10 +2020,20 @@ function ConsolePageContent() {
                   <Button 
                     className="mt-4 w-full" 
                     variant="outline"
-                    onClick={() => handleCrawlerDemo('competitor_research')}
+                    onClick={() => handleCrawlerDemo('web_search')}
+                    disabled={crawlerRunning !== null}
                   >
-                    <Play className="mr-2 h-4 w-4" />
-                    Run Demo Search
+                    {crawlerRunning === 'web_search' ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        Run Demo Search
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -1954,14 +2076,196 @@ function ConsolePageContent() {
                   <Button 
                     className="mt-4 w-full" 
                     variant="outline"
-                    onClick={() => handleCrawlerDemo('competitor_research')}
+                    onClick={() => handleCrawlerDemo('news')}
+                    disabled={crawlerRunning !== null}
                   >
-                    <Play className="mr-2 h-4 w-4" />
-                    Run Demo Crawl
+                    {crawlerRunning === 'news' ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Crawling...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        Run Demo Crawl
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Crawler Error */}
+            {crawlerError && (
+              <Card className="mt-8 border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-red-700">
+                    <AlertCircle className="h-5 w-5" />
+                    <span className="font-medium">Error:</span>
+                    <span>{crawlerError}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Crawler Results */}
+            {crawlerResult && crawlerResult.analysis && (
+              <Card className="mt-8 border-cobalt-200 bg-gradient-to-br from-cobalt-50/50 to-background">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Wand2 className="h-5 w-5 text-cobalt-600" />
+                    <CardTitle>AI Analysis Results</CardTitle>
+                    {crawlerResult.metadata && (
+                      <Badge variant="outline" className="ml-auto">
+                        {crawlerResult.metadata.model}
+                      </Badge>
+                    )}
+                  </div>
+                  <CardDescription>
+                    Analyzed {crawlerResult.resultCount} results for: {crawlerResult.keywords.join(', ')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Executive Summary */}
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Executive Summary</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {crawlerResult.analysis.summary}
+                    </p>
+                  </div>
+
+                  {/* Sentiment Overview */}
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Sentiment Overview</h4>
+                    <div className="flex items-center gap-4">
+                      <Badge 
+                        variant={
+                          crawlerResult.analysis.overallSentiment === 'positive' ? 'default' :
+                          crawlerResult.analysis.overallSentiment === 'negative' ? 'destructive' :
+                          'secondary'
+                        }
+                        className="capitalize"
+                      >
+                        {crawlerResult.analysis.overallSentiment}
+                      </Badge>
+                      <div className="flex-1 flex items-center gap-2 text-xs">
+                        <span className="text-green-600">+{crawlerResult.analysis.sentimentBreakdown.positive}%</span>
+                        <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden flex">
+                          <div 
+                            className="bg-green-500 h-full" 
+                            style={{ width: `${crawlerResult.analysis.sentimentBreakdown.positive}%` }}
+                          />
+                          <div 
+                            className="bg-gray-400 h-full" 
+                            style={{ width: `${crawlerResult.analysis.sentimentBreakdown.neutral}%` }}
+                          />
+                          <div 
+                            className="bg-red-500 h-full" 
+                            style={{ width: `${crawlerResult.analysis.sentimentBreakdown.negative}%` }}
+                          />
+                        </div>
+                        <span className="text-red-600">-{crawlerResult.analysis.sentimentBreakdown.negative}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Key Themes */}
+                  {crawlerResult.analysis.themes.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Key Themes</h4>
+                      <div className="space-y-2">
+                        {crawlerResult.analysis.themes.slice(0, 3).map((theme, i) => (
+                          <div key={i} className="p-3 rounded-lg border bg-background">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium text-sm">{theme.name}</span>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {theme.mentionCount} mentions
+                                </Badge>
+                                <Badge 
+                                  variant={
+                                    theme.sentiment === 'positive' ? 'default' :
+                                    theme.sentiment === 'negative' ? 'destructive' :
+                                    'secondary'
+                                  }
+                                  className="text-xs capitalize"
+                                >
+                                  {theme.sentiment}
+                                </Badge>
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{theme.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Key Insights */}
+                  {crawlerResult.analysis.insights.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Key Insights</h4>
+                      <div className="space-y-2">
+                        {crawlerResult.analysis.insights.slice(0, 3).map((insight, i) => (
+                          <div key={i} className="p-3 rounded-lg border bg-background">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge 
+                                variant={
+                                  insight.type === 'opportunity' ? 'default' :
+                                  insight.type === 'threat' ? 'destructive' :
+                                  'secondary'
+                                }
+                                className="text-xs capitalize"
+                              >
+                                {insight.type.replace('_', ' ')}
+                              </Badge>
+                              <Badge 
+                                variant="outline"
+                                className={cn(
+                                  "text-xs",
+                                  insight.priority === 'high' && "border-red-200 text-red-700",
+                                  insight.priority === 'medium' && "border-amber-200 text-amber-700"
+                                )}
+                              >
+                                {insight.priority}
+                              </Badge>
+                            </div>
+                            <h5 className="font-medium text-sm">{insight.title}</h5>
+                            <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recommendations */}
+                  {crawlerResult.analysis.recommendations.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Recommendations</h4>
+                      <ul className="space-y-1">
+                        {crawlerResult.analysis.recommendations.slice(0, 4).map((rec, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-cobalt-600 mt-0.5 shrink-0" />
+                            <span>{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Metadata */}
+                  {crawlerResult.metadata && (
+                    <div className="pt-3 border-t text-xs text-muted-foreground flex items-center gap-4">
+                      <span>Model: {crawlerResult.metadata.model}</span>
+                      <span>Latency: {(crawlerResult.metadata.latencyMs / 1000).toFixed(1)}s</span>
+                      {crawlerResult.metadata.isStub && (
+                        <Badge variant="outline" className="text-xs">Stub Response</Badge>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </div>
         </main>
       ) : null}
