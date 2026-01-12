@@ -156,9 +156,9 @@ export class OpenAIClient implements LLMClient {
     const model = request.model || this.config.model;
     const startTime = Date.now();
     
-    // Create AbortController for timeout (120 seconds for large requests like prototype generation)
+    // Create AbortController for timeout (5 minutes for large requests like prototype generation)
     const controller = new AbortController();
-    const timeoutMs = 120_000; // 2 minutes
+    const timeoutMs = 300_000; // 5 minutes
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
