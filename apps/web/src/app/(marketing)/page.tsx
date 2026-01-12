@@ -182,8 +182,8 @@ export default function HomePage() {
               <span className="text-cobalt-600"> briefs, PRDs, and prototypes</span> - made simple.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Draft smarter. Decide faster. pmkit runs your PM workflows—daily briefs, meeting
-              prep, PRD drafts, and interactive prototypes—while you focus on strategy.
+              Draft smarter. Decide faster. pmkit runs your PM workflows - daily briefs, meeting
+              prep, PRD drafts, and interactive prototypes - while you focus on strategy.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
