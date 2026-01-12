@@ -120,7 +120,9 @@ npm run docker:down
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: Google OAuth
 - `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`: Microsoft OAuth
 - `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`: S3 storage
-- `OPENAI_API_KEY`: For LLM-powered responses (uses stubs if not set)
+- `OPENAI_API_KEY_DEMO`: OpenAI API key for demo/workbench (uses stubs if not set)
+- `OPENAI_API_KEY_PROD`: OpenAI API key for production tenants (uses stubs if not set)
+- `USE_STUB_LLM`: Set to `true` to use stub responses instead of real LLM
 - `SERPER_API_KEY`: Serper.dev for Google search (2,500 free/month)
 - `NEWSAPI_KEY`: NewsAPI.org for news (100 free/day)
 - `ADMIN_EMAILS`: Comma-separated admin emails for Workbench access

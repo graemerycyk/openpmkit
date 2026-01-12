@@ -727,8 +727,13 @@ Copy `apps/web/env.example` to `apps/web/.env.local`:
 DATABASE_URL=postgresql://...
 NEXTAUTH_SECRET=...
 
-# Optional (demo works without these)
-OPENAI_API_KEY=...        # Uses stubs if not set
+# OpenAI API Keys (use DEMO for demo/workbench, PROD for production)
+# Note: OPENAI_API_KEY alone is NOT used - always use _DEMO or _PROD suffix
+OPENAI_API_KEY_DEMO=sk-...   # For demo console and workbench
+OPENAI_API_KEY_PROD=sk-...   # For production tenant jobs
+USE_STUB_LLM=false           # Set to true to use stubs instead of real LLM
+
+# Optional
 REDIS_URL=...             # Uses inline fallback if not set
 
 # AI Crawlers (optional - free fallbacks available)
@@ -969,11 +974,20 @@ For end-to-end tests, use the demo console at `/demo/console`:
 | `DATABASE_URL` | PostgreSQL connection string |
 | `NEXTAUTH_SECRET` | Session encryption key |
 
+### OpenAI API Keys
+
+**Important**: Use `OPENAI_API_KEY_DEMO` and `OPENAI_API_KEY_PROD` - NOT `OPENAI_API_KEY` alone.
+
+| Variable | Purpose | Fallback |
+|----------|---------|----------|
+| `OPENAI_API_KEY_DEMO` | LLM for demo console and workbench | Stub responses |
+| `OPENAI_API_KEY_PROD` | LLM for production tenant jobs | Stub responses |
+| `USE_STUB_LLM` | Set to `true` to bypass LLM entirely | `false` |
+
 ### Optional (Demo Works Without)
 
 | Variable | Purpose | Fallback |
 |----------|---------|----------|
-| `OPENAI_API_KEY` | LLM inference | Stub responses |
 | `REDIS_URL` | Job queue | Inline processing |
 | `S3_*` | Artifact storage | Local filesystem |
 | `GOOGLE_CLIENT_ID/SECRET` | Google OAuth | Demo auth only |

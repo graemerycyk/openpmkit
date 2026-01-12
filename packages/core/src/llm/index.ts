@@ -156,31 +156,23 @@ export class OpenAIClient implements LLMClient {
     const model = request.model || this.config.model;
     const startTime = Date.now();
     
-    // Create AbortController for timeout (5 minutes for large requests like prototype generation)
+    // Create AbortController for timeout (2 minutes - sufficient for most requests)
     const controller = new AbortController();
-    const timeoutMs = 300_000; // 5 minutes
+    const timeoutMs = 120_000; // 2 minutes
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const requestBody = {
-        model: model,
-        messages: request.messages,
-        max_completion_tokens: request.maxTokens || this.config.maxTokens,
-      };
-      
-      console.log(`[LLM] Starting request to ${model}`);
-      console.log(`[LLM] URL: ${this.config.baseUrl}/chat/completions`);
-      console.log(`[LLM] max_completion_tokens: ${requestBody.max_completion_tokens}`);
-      console.log(`[LLM] Input message count: ${request.messages.length}`);
-      console.log(`[LLM] Input approx chars: ${request.messages.reduce((sum, m) => sum + m.content.length, 0)}`);
-      
       const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.config.apiKey}`,
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          model: model,
+          messages: request.messages,
+          max_completion_tokens: request.maxTokens || this.config.maxTokens,
+        }),
         signal: controller.signal,
       });
 
@@ -195,7 +187,6 @@ export class OpenAIClient implements LLMClient {
         } catch {
           errorDetails = errorText;
         }
-        console.error(`[LLM] API error: ${response.status} - ${errorDetails}`);
         throw new LLMError(
           `OpenAI API error: ${errorDetails}`,
           'API_ERROR',
@@ -206,18 +197,8 @@ export class OpenAIClient implements LLMClient {
       const data = await response.json();
       const latencyMs = Date.now() - startTime;
 
-      console.log(`[LLM] Request completed in ${latencyMs}ms, model: ${data.model}`);
-
       const messageContent = data.choices[0]?.message?.content || '';
       const finishReason = data.choices[0]?.finish_reason;
-
-      // Log errors only - content filtering or truncation issues
-      if (data.choices[0]?.message?.refusal) {
-        console.error('[LLM] Content refused:', data.choices[0].message.refusal);
-      }
-      if (finishReason === 'length' && !messageContent) {
-        console.error('[LLM] Response truncated with no content - increase max_tokens');
-      }
 
       return {
         content: messageContent,
@@ -236,9 +217,8 @@ export class OpenAIClient implements LLMClient {
       // Handle abort/timeout
       if (error instanceof Error && error.name === 'AbortError') {
         const elapsed = Date.now() - startTime;
-        console.error(`[LLM] Request timed out after ${elapsed}ms (limit: ${timeoutMs}ms)`);
         throw new LLMError(
-          `Request timed out after ${Math.round(elapsed / 1000)} seconds. Large requests like prototype generation may take longer - please try again.`,
+          `Request timed out after ${Math.round(elapsed / 1000)} seconds. Please try again.`,
           'TIMEOUT',
           408
         );
@@ -246,9 +226,8 @@ export class OpenAIClient implements LLMClient {
       
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.error('[LLM] Network error:', error.message);
         throw new LLMError(
-          `Network error: ${error.message}. Check your internet connection and API key.`,
+          `Network error: Unable to connect to OpenAI API.`,
           'NETWORK_ERROR',
           0
         );
@@ -503,7 +482,8 @@ export class LLMService {
       return this.stubClient;
     }
 
-    if (tenantId === 'demo') {
+    // Both 'demo' and 'workbench' use the demo client (OPENAI_API_KEY_DEMO)
+    if (tenantId === 'demo' || tenantId === 'workbench') {
       return this.demoClient;
     }
 
@@ -544,7 +524,8 @@ export class LLMService {
       return MODEL_INFO['stub'];
     }
 
-    if (tenantId === 'demo') {
+    // Both 'demo' and 'workbench' use the demo model
+    if (tenantId === 'demo' || tenantId === 'workbench') {
       return MODEL_INFO[this.config.demoModel];
     }
 
