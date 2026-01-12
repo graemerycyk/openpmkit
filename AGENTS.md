@@ -1073,10 +1073,11 @@ The Workbench (`/workbench`) allows admins to select between models:
 
 | Model | Use Case | Notes |
 |-------|----------|-------|
+| **GPT-5 Nano** | Ultra-fast testing | Cheapest, good for quick iterations |
 | **GPT-5 Mini** (default) | Fast iteration | Cost-efficient, good for most jobs |
 | **GPT-5.2** | Impressive demos | Higher quality output, slower |
 
-The model selector is in the job toolbar next to the "Run Job" button. Both models use `OPENAI_API_KEY_DEMO`.
+The model selector is in the job toolbar next to the "Run Job" button. All models use `OPENAI_API_KEY_DEMO`.
 
 ## Related Files
 

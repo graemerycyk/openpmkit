@@ -219,4 +219,5 @@ Items that have been discussed but not committed to.
 - **Increased prototype_generation token limit** - Doubled from 24K to 48K tokens for complex HTML prototypes (FHIR dashboards, etc.)
 - **Increased LLM timeout to 10 minutes** - Large requests like prototype generation (48K tokens) need more time to complete
 - **Fixed workbench history viewing** - Can now view completed jobs from history while another job is running
-- **Added model selector to workbench** - Switch between GPT-5 Mini (fast, default) and GPT-5.2 (high quality) for demos
+- **Added model selector to workbench** - Switch between GPT-5 Nano (cheapest), GPT-5 Mini (default), and GPT-5.2 (high quality) for demos
+- **Fixed missing Deck Content workflow** - Added `deck_content` to workbench job types (was missing from the list)

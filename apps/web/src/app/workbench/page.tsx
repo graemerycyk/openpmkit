@@ -181,6 +181,7 @@ const JOB_TYPES: JobType[] = [
   'roadmap_alignment',
   'sprint_review',
   'release_notes',
+  'deck_content',
   'prototype_generation',
 ];
 
