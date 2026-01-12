@@ -772,7 +772,7 @@ This release transforms the patient experience with a redesigned portal, improve
 
 ### Prototype Generation Data
 
-#### PRD Content (Sample)
+#### PRD Content (Sample 1 - Patient Portal)
 ```
 # PRD: Patient Portal Redesign
 
@@ -823,7 +823,65 @@ Patients struggle to engage with their healthcare providers because the current 
 7. Provider responds within portal
 ```
 
-#### Design System Guidelines (for Prototype)
+#### PRD Content (Sample 2 - FHIR R4 Integration Dashboard)
+```
+# PRD: FHIR R4 Integration Dashboard
+
+## 1. Overview
+
+### Problem Statement
+Healthcare IT administrators cannot efficiently monitor and manage FHIR R4 integrations because there is no centralized dashboard showing connection status, data flow metrics, and error diagnostics.
+
+### Goals
+| Goal | Metric | Target |
+|------|--------|--------|
+| Reduce integration troubleshooting time | Avg. time to identify issues | 4 hours → 15 min |
+| Improve data sync visibility | Real-time status awareness | 0% → 100% |
+| Decrease support escalations | Integration-related tickets | -60% |
+
+## 2. User Stories
+
+1. **As an IT Administrator**, I want to see all FHIR connections at a glance
+   - Acceptance: Dashboard showing all connected EHR systems with status indicators
+
+2. **As an IT Administrator**, I want real-time sync status for each connection
+   - Acceptance: Live data showing last sync time, records processed, and error counts
+
+3. **As an IT Administrator**, I want to drill into connection errors
+   - Acceptance: Error log with timestamps, error codes, and affected records
+
+4. **As a Compliance Officer**, I want audit trails for all data exchanges
+   - Acceptance: Searchable log of all FHIR transactions with timestamps
+
+5. **As a Support Engineer**, I want to test connections on demand
+   - Acceptance: "Test Connection" button with detailed response diagnostics
+
+## 3. Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1 | Connection status overview cards | P0 |
+| F2 | Real-time sync metrics display | P0 |
+| F3 | Error log with filtering | P0 |
+| F4 | Connection health indicators | P0 |
+| F5 | Test connection functionality | P1 |
+| F6 | Audit trail viewer | P1 |
+| F7 | Alert configuration | P2 |
+| F8 | Export reports | P2 |
+
+## 4. Key Flows
+
+1. Admin logs into MedSync admin panel
+2. Navigates to Integrations → FHIR Dashboard
+3. Views overview of all EHR connections (Epic, Cerner, etc.)
+4. Clicks on a connection to see detailed metrics
+5. Reviews recent sync activity and error counts
+6. Drills into specific errors to diagnose issues
+7. Tests connection to verify fix
+8. Views audit trail for compliance reporting
+```
+
+#### Design System Guidelines (for Patient Portal Prototype)
 ```
 **Design System Guidelines**
 
@@ -879,7 +937,63 @@ Patients struggle to engage with their healthcare providers because the current 
 - Error: border-red-500, text-red-600
 ```
 
-#### Focus Areas (for Prototype)
+#### Design System Guidelines (for FHIR Dashboard Prototype)
+```
+**Design System Guidelines**
+
+**Components:**
+- Use shadcn/ui components (Card, Badge, Button, Tabs, Table, ScrollArea)
+- Status cards: grid layout with connection health indicators
+- Metrics displays: real-time counters with trend indicators
+- Error tables: sortable, filterable data tables
+- Connection cards: expandable with detailed metrics
+
+**Colors:**
+- Primary actions: teal-600 (#0d9488) - healthcare/trust theme
+- Connected/Healthy: emerald-500 (#10b981)
+- Warning/Degraded: amber-500 (#f59e0b)
+- Error/Disconnected: red-500 (#ef4444)
+- Syncing/Processing: blue-500 (#3b82f6)
+- Borders: slate-200 (#e2e8f0)
+- Muted text: slate-500 (#64748b)
+- Background cards: slate-50 (#f8fafc)
+
+**Typography:**
+- Dashboard title: text-2xl (24px), font-bold
+- Card titles: text-lg (18px), font-semibold
+- Metric values: text-3xl (30px), font-bold, tabular-nums
+- Metric labels: text-sm (14px), text-muted-foreground
+- Table headers: text-sm (14px), font-medium, uppercase
+- Table cells: text-sm (14px), font-normal
+- Timestamps: text-xs (12px), font-mono, text-muted-foreground
+
+**Icons:**
+- Use Lucide React icons
+- Activity for sync status
+- CheckCircle2 for connected
+- AlertTriangle for warnings
+- XCircle for errors
+- RefreshCw for syncing
+- Database for data metrics
+- Shield for security/compliance
+- Clock for timestamps
+
+**Spacing:**
+- Dashboard padding: 24px
+- Card padding: 16px 20px
+- Gap between cards: 16px
+- Table row padding: 12px 16px
+- Metric card internal gap: 8px
+
+**States:**
+- Hover on cards: shadow-md, border-teal-200
+- Focus: ring-2 ring-teal-500/20
+- Active connection: border-l-4 border-emerald-500
+- Error connection: border-l-4 border-red-500
+- Syncing: pulse animation on status indicator
+```
+
+#### Focus Areas (for Patient Portal Prototype)
 ```
 **Focus Areas for Prototype**
 
@@ -924,6 +1038,54 @@ Patients struggle to engage with their healthcare providers because the current 
    - Pull to refresh
    - Offline appointment viewing
    - Push notification preferences
+```
+
+#### Focus Areas (for FHIR Dashboard Prototype)
+```
+**Focus Areas for Prototype**
+
+1. **Connection Overview**
+   - Grid of connection cards (Epic, Cerner, Meditech, etc.)
+   - Status indicator (Connected, Warning, Error, Syncing)
+   - Last sync timestamp
+   - Records processed today
+   - Quick action buttons (Test, Configure, View Logs)
+
+2. **Connection Detail Card**
+   - EHR system name and logo
+   - Connection status with colored indicator
+   - Sync metrics: Total synced, Failed, Pending
+   - Last successful sync timestamp
+   - Error count badge (if any)
+   - Expand/collapse for more details
+
+3. **Real-Time Metrics Panel**
+   - Total active connections count
+   - Records synced today (with trend arrow)
+   - Current sync rate (records/minute)
+   - Error rate percentage
+   - Auto-refresh indicator
+
+4. **Error Log Table**
+   - Sortable columns: Timestamp, Connection, Error Type, Message
+   - Severity badges (Critical, Warning, Info)
+   - Filter by connection, date range, severity
+   - Click to expand error details
+   - Copy error ID button
+
+5. **Test Connection Modal**
+   - Connection selector dropdown
+   - Test type options (Quick, Full, Specific Resource)
+   - Progress indicator during test
+   - Results display with response time
+   - Success/failure status with details
+
+6. **Audit Trail Viewer**
+   - Timeline of all FHIR transactions
+   - Filter by date, connection, operation type
+   - Transaction details: Resource type, ID, operation
+   - Export to CSV/JSON
+   - Compliance report generation
 ```
 
 ---
@@ -1061,6 +1223,56 @@ Approval for $1.5M investment in FHIR R4 infrastructure and Epic certification
 - Epic App Orchard application - 6 weeks review
 - US Core profile validation - External testing
 ```
+
+---
+
+## pmkit Artifacts
+
+### PRD: FHIR R4 Support (`artifact-prd-h01`)
+- **Created**: January 8, 2026
+- **Status**: Approved
+- **Epic**: MS-410
+
+**Summary**:
+- Problem: Enterprise customers blocked without FHIR R4 support for Epic/Cerner migrations
+- Goals: Achieve Epic App Orchard certification, unblock $2.67M ARR, meet CMS compliance deadlines
+- Requirements: Full FHIR R4 implementation (P0), SMART on FHIR authorization (P0), US Core profile compliance (P1), Bulk data export (P1)
+
+### PRD: Patient Portal Redesign (`artifact-prd-h02`)
+- **Created**: January 6, 2026
+- **Status**: Draft
+- **Epic**: MS-400
+
+**Summary**:
+- Problem: Patients struggle to engage with healthcare providers due to poor portal UX and accessibility issues
+- Goals: Increase portal adoption from 67% to 85%, achieve WCAG 2.1 AA compliance
+- Requirements: Responsive mobile-first design (P0), WCAG 2.1 AA compliance (P0), Appointment scheduling widget (P0), Secure messaging center (P0)
+
+### VoC Report - Q4 2025 (`artifact-voc-h01`)
+- **Created**: January 5, 2026
+- **Period**: October - December 2025
+- **Sources**: 131 tickets, 35 calls, 567 community posts
+
+**Top Themes**:
+| Theme | Mentions | Trend |
+|-------|----------|-------|
+| EHR Integration | 42 | ↑ 25% |
+| Patient Portal | 35 | ↑ 15% |
+| Telehealth | 28 | ↑ 40% |
+| Compliance/HIPAA | 18 | → Stable |
+
+### Daily Brief - January 9, 2026 (`artifact-brief-h01`)
+- **Created**: January 9, 2026
+
+**TL;DR**: Patient portal v3 launching Thursday with WCAG 2.1 AA compliance. P1 HIPAA audit logging gap closed. Cleveland Clinic expansion discussion scheduled.
+
+### Competitor Research - January 2026 (`artifact-competitor-h01`)
+- **Created**: January 7, 2026
+
+**Key Changes**:
+- Phreesia: AI-powered patient intake (High impact)
+- Luma Health: Predictive scheduling AI (High impact)
+- Klara: Unified patient communication (Medium impact)
 
 ---
 

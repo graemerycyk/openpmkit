@@ -1548,6 +1548,113 @@ Users cannot efficiently find content because search results lack filtering capa
 
 ---
 
+### Deck Content Data
+
+#### Topic
+```
+Q4 Product Update: Search Improvements Launch
+```
+
+#### Audience Type
+```
+exec
+```
+
+#### Purpose
+```
+Quarterly business review with leadership - celebrating search improvements launch and requesting AI search investment for Q1
+```
+
+#### Duration
+```
+30
+```
+
+#### Key Data Points
+```
+**Key Metrics:**
+- Search filters shipped 2 weeks ahead of schedule
+- 40% reduction in search-to-click time (8.2s → 4.9s)
+- 45% filter adoption rate in first week (target was 40%)
+- Search satisfaction improved from 3.2 to 4.1
+- No-results rate dropped from 23% to 12%
+
+**Sprint Performance:**
+- Sprint 42 velocity: 16/19 points completed (84%)
+- P1 bug (ACME-350) resolved in 24 hours
+- Zero bugs escaped to production
+- Test coverage increased to 78%
+
+**Business Impact:**
+- Globex Corp expansion unblocked: 50 → 200 seats ($144K ARR)
+- Initech expansion confirmed: 30 → 100 seats ($84K ARR)
+- 3 enterprise deals now moving forward
+- Total pipeline unblocked: $408K ARR
+
+**Customer Adoption:**
+- 89 community votes addressed
+- 47 support tickets resolved
+- Enterprise NPS improved: 28 → 35 (projected)
+```
+
+#### Supporting Evidence
+```
+**Customer Evidence:**
+- "This changes everything for our team" - Globex Corp VP
+- "Finally, search that actually works" - Initech PM
+- "Date filters will save us hours every week" - Community power user
+- 89 community feature request votes addressed
+
+**Competitive Context:**
+- Notion launched AI search Dec 22 - we're now at feature parity on filters
+- Coda reduced enterprise pricing 20% - our value prop strengthened
+- Monday.com added Slack integration - we already have this
+
+**Market Position:**
+- Search was #1 customer pain point (35% of VoC mentions)
+- All major competitors have search filters - we've closed the gap
+- AI search is the next battleground - Notion leading
+```
+
+#### Related Artifacts
+```
+**Related pmkit Artifacts:**
+- VoC Report (Dec 15): Search was #1 pain point with 52 mentions
+- Competitor Report (Dec 20): Notion AI search analysis, Coda pricing changes
+- PRD: Search Filters (Approved Nov 15): All P0 requirements delivered
+- Sprint Review (Dec 29): 84% velocity, zero escaped bugs
+- Daily Brief (Jan 9): Search filters at 45% adoption
+
+**Jira References:**
+- Epic ACME-100: Search Experience Improvements - Phase 1 complete
+- ACME-342: Date filters - Done
+- ACME-343: Ranking improvements - Done
+- ACME-350: P1 bug fix - Done in 24 hours
+```
+
+#### Specific Requirements
+```
+**Presentation Requirements:**
+- Focus on business impact, not technical details
+- Include clear ask: AI search resourcing for Q1 (2 engineers, 12 weeks)
+- Prepare for questions about Notion competition
+- Highlight customer quotes and expansion wins
+- Show roadmap: Phase 2 (Saved Searches) → Phase 3 (AI Search)
+
+**Key Messages:**
+1. We delivered ahead of schedule with quality
+2. Customer impact is immediate and measurable
+3. Competitive gap closed, but AI search is next priority
+4. Investment ask: $180K for AI search in Q1
+
+**Anticipated Questions:**
+- "How do we compare to Notion's AI search?" → We're planning Phase 3
+- "What's the ROI on the AI search investment?" → $408K pipeline already unblocked
+- "When will customers see AI search?" → Q2 2026 target
+```
+
+---
+
 ## Data Files Location
 
 All mock data is located in `packages/mock-tenant/src/data/`:

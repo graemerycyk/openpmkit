@@ -95,6 +95,7 @@ Nice-to-have improvements and optimizations.
 | Real connector OAuth flows | 🔜 Planned | Currently all mock data |
 | Workbench audit log tab | 🔜 Planned | Show audit trail for admin users |
 | Demo rate limit UI improvements | 💡 Idea | Better feedback when rate limited |
+| Persist Workbench data to database | 🔜 Planned | Currently uses localStorage; should persist PM Jobs and Crawler Results to database for logged-in users |
 
 ### Telemetry & Observability
 
@@ -170,3 +171,7 @@ Items that have been discussed but not committed to.
 - Added tracking for all "coming soon" claims from marketing pages
 - Added SIEM export demo to Demo Console (Audit tab) and Workbench (Output tab)
 - Created reusable `SIEMExportPreview` component with JSON/CEF format toggle, copy, and download
+- Fixed horizontal overflow in Workbench Crawler Results (CSS min-w-0, max-w-full)
+- Added localStorage persistence for Crawler Jobs (similar to PM Jobs history)
+- Added TODO item for database persistence of Workbench data
+- Added Deck Content workbench data to `MOCK-DATA.md` (was missing, now consistent with FINTECH and HEALTHTECH variations)

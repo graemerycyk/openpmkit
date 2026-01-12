@@ -199,6 +199,7 @@ interface WorkbenchRun {
 
 // Local storage key for history
 const HISTORY_KEY = 'pmkit-workbench-history';
+const CRAWLER_HISTORY_KEY = 'pmkit-workbench-crawler-history';
 
 function loadHistory(): WorkbenchRun[] {
   if (typeof window === 'undefined') return [];
@@ -220,6 +221,24 @@ function saveHistory(history: WorkbenchRun[]) {
   // Keep only last 20 runs
   const trimmed = history.slice(0, 20);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+}
+
+function loadCrawlerHistory(): CrawlerJob[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem(CRAWLER_HISTORY_KEY);
+    if (!stored) return [];
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+}
+
+function saveCrawlerHistory(jobs: CrawlerJob[]) {
+  if (typeof window === 'undefined') return;
+  // Keep only last 20 crawler jobs
+  const trimmed = jobs.slice(0, 20);
+  localStorage.setItem(CRAWLER_HISTORY_KEY, JSON.stringify(trimmed));
 }
 
 export default function WorkbenchPage() {
@@ -258,6 +277,7 @@ export default function WorkbenchPage() {
   // Load history on mount
   useEffect(() => {
     setHistory(loadHistory());
+    setCrawlerJobs(loadCrawlerHistory());
   }, []);
   
   // Poll for crawler job updates
@@ -271,7 +291,11 @@ export default function WorkbenchPage() {
           const response = await fetch(`/api/crawlers/${job.id}`);
           if (response.ok) {
             const updatedJob = await response.json();
-            setCrawlerJobs(prev => prev.map(j => j.id === job.id ? updatedJob : j));
+            setCrawlerJobs(prev => {
+              const updated = prev.map(j => j.id === job.id ? updatedJob : j);
+              saveCrawlerHistory(updated);
+              return updated;
+            });
             if (selectedCrawlerJob?.id === job.id) {
               setSelectedCrawlerJob(updatedJob);
             }
@@ -442,7 +466,11 @@ export default function WorkbenchPage() {
         resultCount: 0,
       };
       
-      setCrawlerJobs(prev => [newJob, ...prev]);
+      setCrawlerJobs(prev => {
+        const updated = [newJob, ...prev];
+        saveCrawlerHistory(updated);
+        return updated;
+      });
       setSelectedCrawlerJob(newJob);
       setCrawlerKeywords('');
     } catch (err) {
@@ -457,7 +485,11 @@ export default function WorkbenchPage() {
       const response = await fetch(`/api/crawlers/${jobId}`);
       if (response.ok) {
         const updatedJob = await response.json();
-        setCrawlerJobs(prev => prev.map(j => j.id === jobId ? updatedJob : j));
+        setCrawlerJobs(prev => {
+          const updated = prev.map(j => j.id === jobId ? updatedJob : j);
+          saveCrawlerHistory(updated);
+          return updated;
+        });
         if (selectedCrawlerJob?.id === jobId) {
           setSelectedCrawlerJob(updatedJob);
         }
@@ -470,7 +502,11 @@ export default function WorkbenchPage() {
   const deleteCrawlerJob = async (jobId: string) => {
     try {
       await fetch(`/api/crawlers/${jobId}`, { method: 'DELETE' });
-      setCrawlerJobs(prev => prev.filter(j => j.id !== jobId));
+      setCrawlerJobs(prev => {
+        const updated = prev.filter(j => j.id !== jobId);
+        saveCrawlerHistory(updated);
+        return updated;
+      });
       if (selectedCrawlerJob?.id === jobId) {
         setSelectedCrawlerJob(null);
       }
@@ -1057,7 +1093,7 @@ export default function WorkbenchPage() {
             {/* Crawler Results */}
             <ScrollArea className="flex-1">
               {selectedCrawlerJob ? (
-                <div className="p-4 space-y-4 overflow-hidden">
+                <div className="p-4 space-y-4 overflow-hidden min-w-0">
                   {/* Job Header */}
                   <Card>
                     <CardHeader className="pb-2">
@@ -1128,11 +1164,11 @@ export default function WorkbenchPage() {
 
                   {/* AI Analysis Section */}
                   {selectedCrawlerJob.analysis && (
-                    <Card className="border-cobalt-200 bg-gradient-to-br from-cobalt-50/50 to-background overflow-hidden">
+                    <Card className="border-cobalt-200 bg-gradient-to-br from-cobalt-50/50 to-background overflow-hidden max-w-full">
                       <CardHeader className="pb-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           <Wand2 className="h-5 w-5 text-cobalt-600 shrink-0" />
-                          <CardTitle className="text-base">AI Analysis</CardTitle>
+                          <CardTitle className="text-base truncate">AI Analysis</CardTitle>
                           <Button
                             variant="outline"
                             size="sm"
@@ -1144,7 +1180,7 @@ export default function WorkbenchPage() {
                           </Button>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-6 overflow-hidden">
+                      <CardContent className="space-y-6 overflow-hidden min-w-0">
                         {/* Executive Summary */}
                         <div className="overflow-hidden">
                           <h4 className="text-sm font-semibold mb-2">Executive Summary</h4>

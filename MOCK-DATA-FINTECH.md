@@ -731,7 +731,7 @@ This release delivers real-time settlement visibility that treasury teams have b
 
 ### Prototype Generation Data
 
-#### PRD Content (Sample)
+#### PRD Content (Sample 1 - Settlement Notifications)
 ```
 # PRD: Real-Time Settlement Notifications
 
@@ -782,7 +782,65 @@ Treasury teams cannot efficiently manage cash flow because settlement status upd
 7. ETA prediction updated for pending settlements
 ```
 
-#### Design System Guidelines (for Prototype)
+#### PRD Content (Sample 2 - Multi-Currency Dashboard)
+```
+# PRD: Multi-Currency Reconciliation Dashboard
+
+## 1. Overview
+
+### Problem Statement
+Finance teams managing international payments cannot efficiently reconcile transactions across multiple currencies because there is no unified view of multi-currency balances, conversions, and reconciliation status.
+
+### Goals
+| Goal | Metric | Target |
+|------|--------|--------|
+| Reduce reconciliation time | Hours per currency per day | 2 hours → 15 min |
+| Improve accuracy | Reconciliation error rate | 2.3% → <0.5% |
+| Increase visibility | Currencies with real-time view | 5 → 50+ |
+
+## 2. User Stories
+
+1. **As a Treasury Manager**, I want to see all currency balances in one view
+   - Acceptance: Dashboard showing balances in 50+ currencies with USD equivalent
+
+2. **As a Controller**, I want automatic currency conversion tracking
+   - Acceptance: Real-time FX rates with conversion history and P&L impact
+
+3. **As a Reconciliation Analyst**, I want to match transactions across currencies
+   - Acceptance: Auto-matching with confidence scores and manual override
+
+4. **As a Finance Director**, I want currency exposure reporting
+   - Acceptance: Risk dashboard showing exposure by currency with hedging suggestions
+
+5. **As an Auditor**, I want complete conversion audit trails
+   - Acceptance: Every FX conversion logged with rate source and timestamp
+
+## 3. Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1 | Multi-currency balance overview | P0 |
+| F2 | Real-time FX rate integration | P0 |
+| F3 | Currency conversion calculator | P0 |
+| F4 | Auto-reconciliation engine | P1 |
+| F5 | Currency exposure dashboard | P1 |
+| F6 | Conversion audit trail | P0 |
+| F7 | Custom exchange rate overrides | P2 |
+| F8 | Hedging recommendations | P2 |
+
+## 4. Key Flows
+
+1. User opens Multi-Currency Dashboard
+2. Views consolidated balances across all currencies
+3. Selects a currency to see detailed transactions
+4. Reviews pending reconciliation items
+5. Approves auto-matched transactions
+6. Manually matches remaining items
+7. Views FX conversion impact on P&L
+8. Exports reconciliation report for audit
+```
+
+#### Design System Guidelines (for Settlement Notifications Prototype)
 ```
 **Design System Guidelines**
 
@@ -829,7 +887,61 @@ Treasury teams cannot efficiently manage cash flow because settlement status upd
 - New notification: slide-in from right with fade
 ```
 
-#### Focus Areas (for Prototype)
+#### Design System Guidelines (for Multi-Currency Dashboard Prototype)
+```
+**Design System Guidelines**
+
+**Components:**
+- Use shadcn/ui components (Card, Badge, Button, Tabs, Table, Select, ScrollArea)
+- Currency cards: horizontal layout with flag icons
+- Balance displays: large numbers with currency symbols
+- Reconciliation table: sortable with status indicators
+- FX rate ticker: horizontal scrolling display
+
+**Colors:**
+- Primary actions: emerald-600 (#059669) - financial/success theme
+- Positive change: emerald-500 (#10b981)
+- Negative change: red-500 (#ef4444)
+- Neutral: slate-500 (#64748b)
+- Matched: emerald-100 bg, emerald-700 text
+- Unmatched: amber-100 bg, amber-700 text
+- Borders: slate-200 (#e2e8f0)
+- Card backgrounds: white with subtle shadow
+
+**Typography:**
+- Balance amounts: text-3xl (30px), font-bold, tabular-nums
+- Currency codes: text-lg (18px), font-mono, font-semibold
+- FX rates: text-base (16px), font-mono, tabular-nums
+- Change percentages: text-sm (14px), font-medium
+- Table headers: text-sm (14px), font-medium, uppercase
+- Table cells: text-sm (14px), tabular-nums for amounts
+
+**Icons:**
+- Use Lucide React icons
+- Banknote for currency/money
+- TrendingUp/TrendingDown for rate changes
+- RefreshCw for sync/update
+- CheckCircle2 for matched
+- AlertCircle for unmatched
+- Globe for international
+- Calculator for conversions
+
+**Spacing:**
+- Dashboard padding: 24px
+- Currency card padding: 20px 24px
+- Gap between currency cards: 16px
+- Table row padding: 12px 16px
+- FX ticker item gap: 24px
+
+**States:**
+- Hover on currency card: shadow-lg, scale-[1.02]
+- Selected currency: ring-2 ring-emerald-500, border-emerald-500
+- Rate increase: text-emerald-600 with TrendingUp icon
+- Rate decrease: text-red-600 with TrendingDown icon
+- Reconciliation match: bg-emerald-50, border-l-4 border-emerald-500
+```
+
+#### Focus Areas (for Settlement Notifications Prototype)
 ```
 **Focus Areas for Prototype**
 
@@ -870,6 +982,53 @@ Treasury teams cannot efficiently manage cash flow because settlement status upd
    - Timeline of status changes
    - Related notifications sent
    - Audit trail with timestamps
+```
+
+#### Focus Areas (for Multi-Currency Dashboard Prototype)
+```
+**Focus Areas for Prototype**
+
+1. **Currency Overview Panel**
+   - Grid of currency cards with balances
+   - Flag icons for each currency
+   - USD equivalent shown below native amount
+   - Trend indicator (up/down arrow with %)
+   - Click to drill into currency details
+
+2. **FX Rate Ticker**
+   - Horizontal scrolling rate display
+   - Major currency pairs (EUR/USD, GBP/USD, etc.)
+   - Real-time rate with change indicator
+   - Last updated timestamp
+   - Click to see rate history
+
+3. **Currency Detail View**
+   - Large balance display with currency symbol
+   - Transaction list for selected currency
+   - Pending reconciliation items count
+   - FX conversion history
+   - Export transactions button
+
+4. **Reconciliation Queue**
+   - Table of unmatched transactions
+   - Confidence score for suggested matches
+   - Accept/Reject buttons for each match
+   - Bulk actions for high-confidence matches
+   - Manual match search functionality
+
+5. **Currency Converter**
+   - From/To currency selectors
+   - Amount input with live conversion
+   - Current rate display with source
+   - Historical rate comparison
+   - Save conversion as transaction
+
+6. **Exposure Dashboard**
+   - Pie chart of currency exposure
+   - Risk indicators by currency
+   - Hedging coverage percentage
+   - Recommended actions panel
+   - Export exposure report
 ```
 
 ---
@@ -1007,6 +1166,56 @@ Approval for $2M engineering investment in real-time treasury infrastructure
 - WebSocket infrastructure (Platform) - 3 weeks
 - Banking partner API updates - External dependency
 ```
+
+---
+
+## pmkit Artifacts
+
+### PRD: Real-Time Settlement Notifications (`artifact-prd-f01`)
+- **Created**: January 8, 2026
+- **Status**: Approved
+- **Epic**: PF-800
+
+**Summary**:
+- Problem: Treasury teams cannot efficiently manage cash flow due to delayed settlement status updates
+- Goals: Reduce manual checks from 12/day to 2/day, achieve 80% settlement prediction accuracy
+- Requirements: Real-time status updates (P0), Push notifications (P0), Notification preferences (P1), Settlement ETA predictions (P1)
+
+### PRD: Multi-Currency Reconciliation (`artifact-prd-f02`)
+- **Created**: January 6, 2026
+- **Status**: Draft
+- **Epic**: PF-810
+
+**Summary**:
+- Problem: Customers cannot reconcile transactions across multiple currencies efficiently
+- Goals: Support 50+ currencies, <1% reconciliation errors, 90% automation rate
+- Requirements: Currency conversion (P0), Multi-currency reporting (P0), FX rate integration (P1)
+
+### VoC Report - Q4 2025 (`artifact-voc-f01`)
+- **Created**: January 5, 2026
+- **Period**: October - December 2025
+- **Sources**: 122 tickets, 28 calls, 412 community posts
+
+**Top Themes**:
+| Theme | Mentions | Trend |
+|-------|----------|-------|
+| Settlement Timing | 34 | ↑ 20% |
+| Multi-Currency | 28 | ↑ 35% |
+| API/Integration | 22 | → Stable |
+| Compliance/Reporting | 18 | ↑ 10% |
+
+### Daily Brief - January 9, 2026 (`artifact-brief-f01`)
+- **Created**: January 9, 2026
+
+**TL;DR**: Real-time notifications shipped with 45% adoption in 48 hours. P1 currency rounding bug resolved. First Republic expansion discussion scheduled.
+
+### Competitor Research - January 2026 (`artifact-competitor-f01`)
+- **Created**: January 7, 2026
+
+**Key Changes**:
+- Modern Treasury: Real-time payment tracking (High impact)
+- Ramp: Multi-currency expense management (High impact)
+- Mercury: Treasury management features (Medium impact)
 
 ---
 
