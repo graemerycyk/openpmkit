@@ -1006,6 +1006,8 @@ For end-to-end tests, use the demo console at `/demo/console`:
 | `gpt-5-nano` | Testing | 64K | $0.10 in / $0.40 out |
 | `stub` | Development | N/A | Free (pre-generated) |
 
+> **Model Reference**: See [OpenAI Models Documentation](https://platform.openai.com/docs/models) for full details on GPT-5 series capabilities.
+
 ### Token Limits by Job Type
 
 Demo jobs have per-job-type token limits to balance output quality and cost:
@@ -1020,7 +1022,7 @@ Demo jobs have per-job-type token limits to balance output quality and cost:
 | `prd_draft` | 12,288 | Standard markdown output |
 | `sprint_review` | 12,288 | Standard markdown output |
 | `release_notes` | 12,288 | Standard markdown output |
-| `prototype_generation` | 24,000 | Full HTML with inline CSS/JS |
+| `prototype_generation` | 48,000 | Full HTML with inline CSS/JS for complex dashboards |
 
 Configuration is in `apps/web/src/app/api/demo/run-job/route.ts`:
 
@@ -1029,13 +1031,13 @@ const JOB_MAX_TOKENS: Record<JobType, number> = {
   daily_brief: 12288,
   meeting_prep: 12288,
   // ... etc
-  prototype_generation: 24000,
+  prototype_generation: 48000,
 };
 ```
 
 ### Cost Estimates (Demo)
 
-With default rate limits (50 calls/day) using GPT-5 mini:
+With default rate limits (50 calls/day) using GPT-5 Mini:
 
 | Scenario | Per Call | Daily Max | Monthly Max |
 |----------|----------|-----------|-------------|

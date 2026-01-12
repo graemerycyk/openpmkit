@@ -5,7 +5,7 @@ import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 
 // Max output tokens per job type
 // Standard jobs: 12,288 tokens (~9K words) - sufficient for detailed markdown
-// Prototype: 24,000 tokens - needed for complete HTML with inline CSS/JS
+// Prototype: 48,000 tokens - needed for complete HTML with inline CSS/JS for complex dashboards
 const JOB_MAX_TOKENS: Record<JobType, number> = {
   daily_brief: 12288,
   meeting_prep: 12288,
@@ -14,7 +14,7 @@ const JOB_MAX_TOKENS: Record<JobType, number> = {
   roadmap_alignment: 12288,
   prd_draft: 12288,
   sprint_review: 12288,
-  prototype_generation: 24000,
+  prototype_generation: 48000,
   release_notes: 12288,
   deck_content: 12288,
 };

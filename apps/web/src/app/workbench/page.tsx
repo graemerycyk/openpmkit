@@ -31,6 +31,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  ShareDialog,
+  type ShareableJobResult,
+  type ShareableCrawlerResult,
+} from '@/components/ui/share-dialog';
+import {
   FileText,
   Users,
   BarChart3,
@@ -60,6 +65,7 @@ import {
   Link2,
   Calendar,
   User,
+  Share2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JOB_CONTEXT_FIELDS, JOB_TYPE_INFO, type ContextField } from './field-config';
@@ -265,6 +271,10 @@ export default function WorkbenchPage() {
   const [crawlerAnalysisModalOpen, setCrawlerAnalysisModalOpen] = useState(false);
   const [crawlerRawResultsModalOpen, setCrawlerRawResultsModalOpen] = useState(false);
   
+  // Share dialog state
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareContent, setShareContent] = useState<ShareableJobResult | ShareableCrawlerResult | null>(null);
+  
   // Crawler state
   const [crawlerType, setCrawlerType] = useState<CrawlerType>('social');
   const [crawlerKeywords, setCrawlerKeywords] = useState('');
@@ -405,6 +415,40 @@ export default function WorkbenchPage() {
     a.download = `${selectedJobType}-${new Date().toISOString().split('T')[0]}.md`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Open share dialog for PM Job result
+  const openShareDialogForJob = () => {
+    if (!result) return;
+    const shareableJob: ShareableJobResult = {
+      type: 'job',
+      jobType: result.jobType,
+      content: result.content,
+      timestamp: result.timestamp,
+      metadata: result.metadata,
+      context: result.context,
+    };
+    setShareContent(shareableJob);
+    setShareDialogOpen(true);
+  };
+
+  // Open share dialog for Crawler result
+  const openShareDialogForCrawler = () => {
+    if (!selectedCrawlerJob || !selectedCrawlerJob.analysis) return;
+    const shareableCrawler: ShareableCrawlerResult = {
+      type: 'crawler',
+      crawlerType: selectedCrawlerJob.type,
+      keywords: selectedCrawlerJob.keywords,
+      urls: selectedCrawlerJob.urls,
+      platforms: selectedCrawlerJob.platforms,
+      resultCount: selectedCrawlerJob.resultCount,
+      analysis: selectedCrawlerJob.analysis,
+      createdAt: selectedCrawlerJob.createdAt,
+      completedAt: selectedCrawlerJob.completedAt,
+      analysisMetadata: selectedCrawlerJob.analysisMetadata,
+    };
+    setShareContent(shareableCrawler);
+    setShareDialogOpen(true);
   };
 
   // Load from history
@@ -852,6 +896,15 @@ export default function WorkbenchPage() {
                         <Download className="h-4 w-4" />
                         Download
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openShareDialogForJob}
+                        className="gap-2"
+                      >
+                        <Share2 className="h-4 w-4" />
+                        Share
+                      </Button>
                     </div>
                   </div>
 
@@ -1249,15 +1302,26 @@ export default function WorkbenchPage() {
                         <div className="flex items-center gap-2 min-w-0">
                           <Wand2 className="h-5 w-5 text-cobalt-600 shrink-0" />
                           <CardTitle className="text-base truncate">AI Analysis</CardTitle>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCrawlerAnalysisModalOpen(true)}
-                            className="ml-auto gap-2 shrink-0"
-                          >
-                            <Expand className="h-4 w-4" />
-                            Expand
-                          </Button>
+                          <div className="ml-auto flex items-center gap-2 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setCrawlerAnalysisModalOpen(true)}
+                              className="gap-2"
+                            >
+                              <Expand className="h-4 w-4" />
+                              Expand
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={openShareDialogForCrawler}
+                              className="gap-2"
+                            >
+                              <Share2 className="h-4 w-4" />
+                              Share
+                            </Button>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-6 overflow-hidden min-w-0">
@@ -1950,6 +2014,15 @@ export default function WorkbenchPage() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {/* Share Dialog */}
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        content={shareContent}
+        tenantName={tenantName || 'My Company'}
+        productName={productName || 'My Product'}
+      />
     </TooltipProvider>
   );
 }

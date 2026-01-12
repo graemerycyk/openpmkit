@@ -97,6 +97,42 @@ Nice-to-have improvements and optimizations.
 | Demo rate limit UI improvements | 💡 Idea | Better feedback when rate limited |
 | Persist Workbench data to database | 🔜 Planned | Currently uses localStorage; should persist PM Jobs and Crawler Results to database for logged-in users |
 
+### Shareable Results (Workbench)
+
+Share Crawler Results and PM Job artifacts via secure links or document export.
+
+**MVP (Basic Sharing)**
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Export as Markdown file | ✅ Done | Download formatted .md file with full results |
+| Export as HTML file | ✅ Done | For PRD to Prototype workflow; styled, self-contained HTML |
+| Copy as formatted text | ✅ Done | One-click copy for Slack/email/Notion (Markdown and plain text) |
+| Share dialog UI | ✅ Done | Modal with export options for PM Jobs and Crawler Results |
+
+**Phase 2 (Shareable Links)**
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `SharedArtifact` database model | 🔜 Planned | Store shared content with secure token |
+| `POST /api/share/create` endpoint | 🔜 Planned | Generate shareable link |
+| `/share/[token]` public page | 🔜 Planned | View-only page, no auth required |
+| Expiration options (24h, 7d, 30d, never) | 🔜 Planned | Auto-expire old shares |
+| Copy link button | 🔜 Planned | Easy sharing UX |
+| List/revoke shares | 🔜 Planned | Manage active shares |
+
+**Phase 3 (Advanced Features)**
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Password-protected shares | 💡 Idea | Optional security layer |
+| View count tracking | 💡 Idea | Analytics on share engagement |
+| QR code generation | 💡 Idea | For presentations/meetings |
+| Export to PDF | 💡 Idea | Formatted PDF with branding |
+| Export to Confluence (proposal) | 💡 Idea | Uses draft-only pattern |
+| Embed snippet for websites | 💡 Idea | `<iframe>` embed code |
+| Share audit logging | 💡 Idea | Track who shared what, who viewed |
+
 ### Telemetry & Observability
 
 | Item | Status | Notes |
@@ -178,3 +214,6 @@ Items that have been discussed but not committed to.
 - Added Deck Content workbench data to `MOCK-DATA.md` (was missing, now consistent with FINTECH and HEALTHTECH variations)
 - **Added 4th AI Crawler: URL Scraper** - Fetch and analyze specific URLs for deep competitive research (pricing pages, feature pages, blog posts)
 - Added File Upload Crawler idea to future considerations (5th AI Crawler for PDF/DOCX/PPTX analysis)
+- Added Shareable Results feature plan (MVP: export as Markdown/copy, Phase 2: shareable links, Phase 3: advanced features)
+- **Implemented MVP Sharing for Workbench** - Share dialog with export as Markdown/HTML, copy as formatted text for both PM Jobs and Crawler Results
+- **Increased prototype_generation token limit** - Doubled from 24K to 48K tokens for complex HTML prototypes (FHIR dashboards, etc.)

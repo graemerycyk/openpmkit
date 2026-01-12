@@ -4,11 +4,12 @@ import { z } from 'zod';
 // LLM Configuration
 // ============================================================================
 
-// GPT-5 series models
+// OpenAI GPT-5 series models (Jan 2026)
+// See: https://platform.openai.com/docs/models
 export const LLMModelSchema = z.enum([
-  'gpt-5.2',       // Best quality for production
-  'gpt-5-mini',    // Cost-effective for demos
-  'gpt-5-nano',    // Ultra cost-effective for testing
+  'gpt-5.2',       // Flagship model for complex reasoning and agentic tasks
+  'gpt-5-mini',    // Cost-efficient for well-defined tasks
+  'gpt-5-nano',    // Most cost-efficient for high-throughput tasks
   'stub',          // For development without API
 ]);
 export type LLMModel = z.infer<typeof LLMModelSchema>;
@@ -64,6 +65,7 @@ export interface ModelInfo {
 }
 
 // OpenAI GPT-5 series pricing (Jan 2026)
+// See: https://platform.openai.com/docs/models
 export const MODEL_INFO: Record<LLMModel, ModelInfo> = {
   'gpt-5.2': {
     id: 'gpt-5.2',
@@ -72,25 +74,25 @@ export const MODEL_INFO: Record<LLMModel, ModelInfo> = {
     contextWindow: 400_000,
     inputPricePerMillion: 1.75,
     outputPricePerMillion: 14.00,
-    description: 'Best quality for production workloads',
+    description: 'Flagship model for complex reasoning and agentic tasks',
   },
   'gpt-5-mini': {
     id: 'gpt-5-mini',
-    name: 'GPT-5 mini',
+    name: 'GPT-5 Mini',
     provider: 'openai',
     contextWindow: 128_000,
     inputPricePerMillion: 0.25,
     outputPricePerMillion: 2.00,
-    description: 'Cost-effective for demos',
+    description: 'Cost-efficient for well-defined tasks',
   },
   'gpt-5-nano': {
     id: 'gpt-5-nano',
-    name: 'GPT-5 nano',
+    name: 'GPT-5 Nano',
     provider: 'openai',
     contextWindow: 64_000,
     inputPricePerMillion: 0.10,
     outputPricePerMillion: 0.40,
-    description: 'Ultra cost-effective for testing',
+    description: 'Most cost-efficient for high-throughput tasks',
   },
   'stub': {
     id: 'stub',
