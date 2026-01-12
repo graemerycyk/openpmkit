@@ -485,9 +485,9 @@ export default function WorkbenchPage() {
         return;
       }
     } else {
-      if (!crawlerKeywords.trim()) {
-        setCrawlerError('Please enter at least one keyword');
-        return;
+    if (!crawlerKeywords.trim()) {
+      setCrawlerError('Please enter at least one keyword');
+      return;
       }
     }
     
@@ -1001,9 +1001,9 @@ export default function WorkbenchPage() {
                   <span className="font-medium">Crawler Results</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  {crawlerJobs.length > 0 && (
+                {crawlerJobs.length > 0 && (
                     <>
-                      <Badge variant="secondary">{crawlerJobs.length}</Badge>
+                  <Badge variant="secondary">{crawlerJobs.length}</Badge>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1014,7 +1014,7 @@ export default function WorkbenchPage() {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </>
-                  )}
+                )}
                 </div>
               </div>
               <ScrollArea className="flex-1">
@@ -1050,8 +1050,8 @@ export default function WorkbenchPage() {
                                 </>
                               ) : (
                                 <>
-                                  {job.keywords.slice(0, 2).join(', ')}
-                                  {job.keywords.length > 2 && ` +${job.keywords.length - 2}`}
+                              {job.keywords.slice(0, 2).join(', ')}
+                              {job.keywords.length > 2 && ` +${job.keywords.length - 2}`}
                                 </>
                               )}
                             </p>
@@ -1174,35 +1174,35 @@ export default function WorkbenchPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="crawler-keywords">Keywords (comma-separated)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="crawler-keywords"
-                        value={crawlerKeywords}
-                        onChange={(e) => setCrawlerKeywords(e.target.value)}
-                        placeholder="notion, coda, monday.com, project management"
-                        className="flex-1"
-                      />
-                      <Button
-                        onClick={startCrawler}
-                        disabled={isCrawlerRunning || !crawlerKeywords.trim()}
-                        className="gap-2"
-                      >
-                        {isCrawlerRunning ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Starting...
-                          </>
-                        ) : (
-                          <>
-                            <Play className="h-4 w-4" />
-                            Start Crawl
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="crawler-keywords">Keywords (comma-separated)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="crawler-keywords"
+                      value={crawlerKeywords}
+                      onChange={(e) => setCrawlerKeywords(e.target.value)}
+                      placeholder="notion, coda, monday.com, project management"
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={startCrawler}
+                      disabled={isCrawlerRunning || !crawlerKeywords.trim()}
+                      className="gap-2"
+                    >
+                      {isCrawlerRunning ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Starting...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          Start Crawl
+                        </>
+                      )}
+                    </Button>
                   </div>
+                </div>
                 )}
 
                 {crawlerType === 'social' && (
@@ -1321,15 +1321,15 @@ export default function WorkbenchPage() {
                           <Wand2 className="h-5 w-5 text-cobalt-600 shrink-0" />
                           <CardTitle className="text-base truncate">AI Analysis</CardTitle>
                           <div className="ml-auto flex items-center gap-2 shrink-0">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setCrawlerAnalysisModalOpen(true)}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCrawlerAnalysisModalOpen(true)}
                               className="gap-2"
-                            >
-                              <Expand className="h-4 w-4" />
-                              Expand
-                            </Button>
+                          >
+                            <Expand className="h-4 w-4" />
+                            Expand
+                          </Button>
                             <Button
                               variant="outline"
                               size="sm"
@@ -1557,31 +1557,31 @@ export default function WorkbenchPage() {
                   {/* Results List */}
                   {selectedCrawlerJob.results && selectedCrawlerJob.results.length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="font-medium">Raw Results ({selectedCrawlerJob.results.length})</h3>
+                        <h3 className="font-medium">Raw Results ({selectedCrawlerJob.results.length})</h3>
                       {selectedCrawlerJob.results.map((result) => (
                         <Card key={result.id} className="overflow-hidden">
-                          <CardContent className="p-4">
+                              <CardContent className="p-4">
                             {/* Header with source badge and expand button */}
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <Badge variant="outline" className="text-xs shrink-0">
-                                    {result.source}
-                                  </Badge>
-                                  {result.publishedAt && (
-                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                      <Calendar className="h-3 w-3" />
-                                      {new Date(result.publishedAt).toLocaleDateString()}
-                                    </span>
-                                  )}
-                                </div>
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <Badge variant="outline" className="text-xs shrink-0">
+                                        {result.source}
+                                      </Badge>
+                                      {result.publishedAt && (
+                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                          <Calendar className="h-3 w-3" />
+                                          {new Date(result.publishedAt).toLocaleDateString()}
+                                        </span>
+                                      )}
+                                    </div>
                                 <h4 className="mt-2 font-medium break-words">
-                                  {result.title}
-                                </h4>
-                              </div>
-                              <Button
+                                      {result.title}
+                                    </h4>
+                                  </div>
+                                        <Button
                                 variant="outline"
-                                size="sm"
+                                          size="sm"
                                 onClick={() => {
                                   setSelectedRawResult(result);
                                   setRawResultModalOpen(true);
@@ -1590,15 +1590,15 @@ export default function WorkbenchPage() {
                               >
                                 <Expand className="h-3 w-3" />
                                 Expand
-                              </Button>
-                            </div>
-                            
+                                        </Button>
+                                      </div>
+                                  
                             {/* Preview */}
                             <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words">
                               {result.content}
                             </p>
-                          </CardContent>
-                        </Card>
+                                </CardContent>
+                          </Card>
                       ))}
                     </div>
                   )}
@@ -1889,20 +1889,20 @@ export default function WorkbenchPage() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <Badge variant="outline" className="text-sm">
                     {selectedRawResult.source}
-                  </Badge>
+                            </Badge>
                   {selectedRawResult.author && (
                     <span className="text-sm text-muted-foreground flex items-center gap-1">
                       <User className="h-4 w-4" />
                       {selectedRawResult.author}
-                    </span>
-                  )}
+                              </span>
+                            )}
                   {selectedRawResult.publishedAt && (
                     <span className="text-sm text-muted-foreground flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       {new Date(selectedRawResult.publishedAt).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
+                              </span>
+                            )}
+                          </div>
 
                 {/* Full Content */}
                 <div>
@@ -1911,7 +1911,7 @@ export default function WorkbenchPage() {
                   </h5>
                   <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                     {selectedRawResult.content}
-                  </p>
+                          </p>
                 </div>
 
                 {/* URL Details */}
@@ -1929,25 +1929,25 @@ export default function WorkbenchPage() {
                       </h5>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border overflow-hidden">
-                          <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
-                          <a
+                              <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
+                              <a
                             href={selectedRawResult.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                                target="_blank"
+                                rel="noopener noreferrer"
                             className="text-cobalt-600 hover:underline truncate flex-1 min-w-0"
-                          >
+                              >
                             {selectedRawResult.url}
-                          </a>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                            className="shrink-0"
-                          >
+                              </a>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                asChild
+                                className="shrink-0"
+                              >
                             <a href={selectedRawResult.url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          </Button>
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
                         </div>
                         {urlParts.domain && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -1959,9 +1959,9 @@ export default function WorkbenchPage() {
                               <div className="flex items-start gap-2">
                                 <span className="text-muted-foreground font-medium min-w-[60px]">Path:</span>
                                 <span className="break-all">{urlParts.path}</span>
-                              </div>
-                            )}
-                          </div>
+                            </div>
+                          )}
+                        </div>
                         )}
                       </div>
                     </div>

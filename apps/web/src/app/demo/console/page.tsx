@@ -949,7 +949,7 @@ function ConsolePageContent() {
           ? ['product management tools 2026', 'notion vs coda']
           : crawlerType === 'url_scrape'
             ? [] // URL scrape uses urls, not keywords
-            : ['AI product management', 'SaaS funding'];
+          : ['AI product management', 'SaaS funding'];
       
       const urls = crawlerType === 'url_scrape' 
         ? ['https://competitora.com/pricing', 'https://competitorb.com', 'https://notion.so/product']

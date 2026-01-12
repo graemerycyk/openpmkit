@@ -61,11 +61,11 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
-      if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
-        return NextResponse.json(
-          { error: 'Keywords are required' },
-          { status: 400 }
-        );
+    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+      return NextResponse.json(
+        { error: 'Keywords are required' },
+        { status: 400 }
+      );
       }
     }
 

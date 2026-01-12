@@ -155,30 +155,30 @@ export class OpenAIClient implements LLMClient {
   async complete(request: LLMCompletionRequest): Promise<LLMCompletionResponse> {
     const model = request.model || this.config.model;
     const startTime = Date.now();
-    
-    // Create AbortController for timeout (2 minutes - sufficient for most requests)
+
+    // Create AbortController for timeout (5 minutes for large requests like prototype generation)
     const controller = new AbortController();
-    const timeoutMs = 120_000; // 2 minutes
+    const timeoutMs = 300_000; // 5 minutes
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: request.messages,
-          max_completion_tokens: request.maxTokens || this.config.maxTokens,
-        }),
+    const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: request.messages,
+        max_completion_tokens: request.maxTokens || this.config.maxTokens,
+      }),
         signal: controller.signal,
-      });
+    });
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
+    if (!response.ok) {
         const errorText = await response.text();
         let errorDetails: string;
         try {
@@ -192,25 +192,25 @@ export class OpenAIClient implements LLMClient {
           'API_ERROR',
           response.status
         );
-      }
+    }
 
-      const data = await response.json();
-      const latencyMs = Date.now() - startTime;
+    const data = await response.json();
+    const latencyMs = Date.now() - startTime;
 
-      const messageContent = data.choices[0]?.message?.content || '';
-      const finishReason = data.choices[0]?.finish_reason;
+    const messageContent = data.choices[0]?.message?.content || '';
+    const finishReason = data.choices[0]?.finish_reason;
 
-      return {
-        content: messageContent,
-        model: data.model,
-        usage: {
-          inputTokens: data.usage?.prompt_tokens || 0,
-          outputTokens: data.usage?.completion_tokens || 0,
-          totalTokens: data.usage?.total_tokens || 0,
-        },
-        finishReason: finishReason === 'stop' ? 'stop' : 'length',
-        latencyMs,
-      };
+    return {
+      content: messageContent,
+      model: data.model,
+      usage: {
+        inputTokens: data.usage?.prompt_tokens || 0,
+        outputTokens: data.usage?.completion_tokens || 0,
+        totalTokens: data.usage?.total_tokens || 0,
+      },
+      finishReason: finishReason === 'stop' ? 'stop' : 'length',
+      latencyMs,
+    };
     } catch (error) {
       clearTimeout(timeoutId);
       
