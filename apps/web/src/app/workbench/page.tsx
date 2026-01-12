@@ -236,6 +236,10 @@ export default function WorkbenchPage() {
   const [copied, setCopied] = useState(false);
   const [expandModalOpen, setExpandModalOpen] = useState(false);
   
+  // Crawler expand modal state
+  const [crawlerAnalysisModalOpen, setCrawlerAnalysisModalOpen] = useState(false);
+  const [crawlerRawResultsModalOpen, setCrawlerRawResultsModalOpen] = useState(false);
+  
   // Crawler state
   const [crawlerType, setCrawlerType] = useState<CrawlerType>('social');
   const [crawlerKeywords, setCrawlerKeywords] = useState('');
@@ -1087,10 +1091,19 @@ export default function WorkbenchPage() {
                           <Wand2 className="h-5 w-5 text-cobalt-600" />
                           <CardTitle className="text-base">AI Analysis</CardTitle>
                           {selectedCrawlerJob.analysisMetadata && (
-                            <Badge variant="outline" className="ml-auto text-xs">
+                            <Badge variant="outline" className="text-xs">
                               {selectedCrawlerJob.analysisMetadata.model}
                             </Badge>
                           )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCrawlerAnalysisModalOpen(true)}
+                            className="ml-auto gap-2"
+                          >
+                            <Expand className="h-4 w-4" />
+                            Expand
+                          </Button>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-6">
@@ -1309,7 +1322,18 @@ export default function WorkbenchPage() {
                   {/* Results List */}
                   {selectedCrawlerJob.results && selectedCrawlerJob.results.length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="font-medium">Raw Results ({selectedCrawlerJob.results.length})</h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-medium">Raw Results ({selectedCrawlerJob.results.length})</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCrawlerRawResultsModalOpen(true)}
+                          className="gap-2"
+                        >
+                          <Expand className="h-4 w-4" />
+                          Expand
+                        </Button>
+                      </div>
                       {selectedCrawlerJob.results.map((result) => {
                         const isExpanded = expandedResults.has(result.id);
                         return (
@@ -1483,6 +1507,300 @@ export default function WorkbenchPage() {
               )
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Crawler AI Analysis Fullscreen Modal */}
+      <Dialog open={crawlerAnalysisModalOpen} onOpenChange={setCrawlerAnalysisModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="font-heading flex items-center gap-2">
+              <Wand2 className="h-5 w-5 text-cobalt-600" />
+              AI Analysis
+              {selectedCrawlerJob?.analysisMetadata && (
+                <Badge variant="outline" className="ml-2 text-xs">
+                  {selectedCrawlerJob.analysisMetadata.model}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="flex-1 min-h-0">
+            {selectedCrawlerJob?.analysis && (
+              <div className="space-y-6 p-4">
+                {/* Executive Summary */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Executive Summary</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {selectedCrawlerJob.analysis.summary}
+                  </p>
+                </div>
+
+                {/* Sentiment Overview */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Sentiment Overview</h4>
+                  <div className="flex items-center gap-4">
+                    <Badge 
+                      variant={
+                        selectedCrawlerJob.analysis.overallSentiment === 'positive' ? 'default' :
+                        selectedCrawlerJob.analysis.overallSentiment === 'negative' ? 'destructive' :
+                        'secondary'
+                      }
+                      className="capitalize"
+                    >
+                      {selectedCrawlerJob.analysis.overallSentiment}
+                    </Badge>
+                    <div className="flex-1 flex items-center gap-2 text-xs">
+                      <span className="text-green-600">+{selectedCrawlerJob.analysis.sentimentBreakdown.positive}%</span>
+                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden flex">
+                        <div 
+                          className="bg-green-500 h-full" 
+                          style={{ width: `${selectedCrawlerJob.analysis.sentimentBreakdown.positive}%` }}
+                        />
+                        <div 
+                          className="bg-gray-400 h-full" 
+                          style={{ width: `${selectedCrawlerJob.analysis.sentimentBreakdown.neutral}%` }}
+                        />
+                        <div 
+                          className="bg-red-500 h-full" 
+                          style={{ width: `${selectedCrawlerJob.analysis.sentimentBreakdown.negative}%` }}
+                        />
+                      </div>
+                      <span className="text-red-600">-{selectedCrawlerJob.analysis.sentimentBreakdown.negative}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Themes */}
+                {selectedCrawlerJob.analysis.themes.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Key Themes</h4>
+                    <div className="space-y-2">
+                      {selectedCrawlerJob.analysis.themes.map((theme, i) => (
+                        <div key={i} className="p-3 rounded-lg border bg-background">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-sm">{theme.name}</span>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {theme.mentionCount} mentions
+                              </Badge>
+                              <Badge 
+                                variant={
+                                  theme.sentiment === 'positive' ? 'default' :
+                                  theme.sentiment === 'negative' ? 'destructive' :
+                                  'secondary'
+                                }
+                                className="text-xs capitalize"
+                              >
+                                {theme.sentiment}
+                              </Badge>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{theme.description}</p>
+                          {theme.keyQuotes.length > 0 && (
+                            <div className="mt-2 pl-3 border-l-2 border-cobalt-200">
+                              <p className="text-xs italic text-muted-foreground">
+                                &quot;{theme.keyQuotes[0]}&quot;
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Insights */}
+                {selectedCrawlerJob.analysis.insights.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Key Insights</h4>
+                    <div className="space-y-2">
+                      {selectedCrawlerJob.analysis.insights.map((insight, i) => (
+                        <div key={i} className="p-3 rounded-lg border bg-background">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge 
+                              variant={
+                                insight.type === 'opportunity' ? 'default' :
+                                insight.type === 'threat' ? 'destructive' :
+                                insight.type === 'action_item' ? 'secondary' :
+                                'outline'
+                              }
+                              className="text-xs capitalize"
+                            >
+                              {insight.type.replace('_', ' ')}
+                            </Badge>
+                            <Badge 
+                              variant="outline"
+                              className={cn(
+                                "text-xs",
+                                insight.priority === 'high' && "border-red-200 text-red-700",
+                                insight.priority === 'medium' && "border-amber-200 text-amber-700",
+                                insight.priority === 'low' && "border-green-200 text-green-700"
+                              )}
+                            >
+                              {insight.priority} priority
+                            </Badge>
+                          </div>
+                          <h5 className="font-medium text-sm">{insight.title}</h5>
+                          <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Competitor Mentions */}
+                {selectedCrawlerJob.analysis.competitorMentions.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Competitor Mentions</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCrawlerJob.analysis.competitorMentions.map((mention, i) => (
+                        <div key={i} className="p-2 rounded-lg border bg-background text-xs">
+                          <span className="font-medium">{mention.competitor}</span>
+                          <span className="text-muted-foreground"> • {mention.source}</span>
+                          <Badge 
+                            variant="outline"
+                            className={cn(
+                              "ml-2 text-xs",
+                              mention.sentiment === 'positive' && "border-green-200 text-green-700",
+                              mention.sentiment === 'negative' && "border-red-200 text-red-700"
+                            )}
+                          >
+                            {mention.sentiment}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Top Quotes */}
+                {selectedCrawlerJob.analysis.topQuotes.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Notable Quotes</h4>
+                    <div className="space-y-2">
+                      {selectedCrawlerJob.analysis.topQuotes.map((quote, i) => (
+                        <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30">
+                          <p className="text-sm italic">&quot;{quote.quote}&quot;</p>
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <span>- {quote.source}</span>
+                            {quote.url && (
+                              <a 
+                                href={quote.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-cobalt-600 hover:underline flex items-center gap-1"
+                              >
+                                View source <ExternalLink className="h-3 w-3" />
+                              </a>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{quote.relevance}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {selectedCrawlerJob.analysis.recommendations.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Recommendations</h4>
+                    <ul className="space-y-1">
+                      {selectedCrawlerJob.analysis.recommendations.map((rec, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-cobalt-600 mt-0.5 shrink-0" />
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Analysis Metadata */}
+                {selectedCrawlerJob.analysisMetadata && (
+                  <div className="pt-3 border-t text-xs text-muted-foreground flex items-center gap-4">
+                    <span>Model: {selectedCrawlerJob.analysisMetadata.model}</span>
+                    <span>Tokens: {selectedCrawlerJob.analysisMetadata.usage.totalTokens.toLocaleString()}</span>
+                    <span>Latency: {(selectedCrawlerJob.analysisMetadata.latencyMs / 1000).toFixed(1)}s</span>
+                    {selectedCrawlerJob.analysisMetadata.estimatedCostUsd > 0 && (
+                      <span>Cost: ${selectedCrawlerJob.analysisMetadata.estimatedCostUsd.toFixed(4)}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Crawler Raw Results Fullscreen Modal */}
+      <Dialog open={crawlerRawResultsModalOpen} onOpenChange={setCrawlerRawResultsModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="font-heading">
+              Raw Results ({selectedCrawlerJob?.results?.length || 0})
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="flex-1 min-h-0">
+            {selectedCrawlerJob?.results && selectedCrawlerJob.results.length > 0 && (
+              <div className="space-y-3 p-4">
+                {selectedCrawlerJob.results.map((result) => (
+                  <Card key={result.id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge variant="outline" className="text-xs shrink-0">
+                              {result.source}
+                            </Badge>
+                            {result.author && (
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {result.author}
+                              </span>
+                            )}
+                            {result.publishedAt && (
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {new Date(result.publishedAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="mt-2 font-medium">{result.title}</h4>
+                          <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">
+                            {result.content}
+                          </p>
+                          {result.url && (
+                            <div className="mt-3 flex items-center gap-2 p-2 rounded-lg bg-muted/50 border">
+                              <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
+                              <a
+                                href={result.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-cobalt-600 hover:underline truncate flex-1"
+                              >
+                                {result.url}
+                              </a>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                asChild
+                                className="shrink-0"
+                              >
+                                <a href={result.url} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </TooltipProvider>

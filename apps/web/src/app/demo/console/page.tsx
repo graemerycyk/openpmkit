@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
   DialogContent,
@@ -658,6 +659,7 @@ function ConsolePageContent() {
     };
   } | null>(null);
   const [crawlerError, setCrawlerError] = useState<string | null>(null);
+  const [crawlerAnalysisModalOpen, setCrawlerAnalysisModalOpen] = useState(false);
   
   // Demo job counter state
   const [signInModalOpen, setSignInModalOpen] = useState(false);
@@ -2146,10 +2148,19 @@ function ConsolePageContent() {
                     <Wand2 className="h-5 w-5 text-cobalt-600" />
                     <CardTitle>AI Analysis Results</CardTitle>
                     {crawlerResult.metadata && (
-                      <Badge variant="outline" className="ml-auto">
+                      <Badge variant="outline" className="text-xs">
                         {crawlerResult.metadata.model}
                       </Badge>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCrawlerAnalysisModalOpen(true)}
+                      className="ml-auto gap-2"
+                    >
+                      <Expand className="h-4 w-4" />
+                      Expand
+                    </Button>
                   </div>
                   <CardDescription>
                     Analyzed {crawlerResult.resultCount} results for: {crawlerResult.keywords.join(', ')}
@@ -2326,6 +2337,220 @@ function ConsolePageContent() {
               )
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Crawler AI Analysis Fullscreen Modal */}
+      <Dialog open={crawlerAnalysisModalOpen} onOpenChange={setCrawlerAnalysisModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="font-heading flex items-center gap-2">
+              <Wand2 className="h-5 w-5 text-cobalt-600" />
+              AI Analysis Results
+              {crawlerResult?.metadata && (
+                <Badge variant="outline" className="ml-2 text-xs">
+                  {crawlerResult.metadata.model}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="flex-1 min-h-0">
+            {crawlerResult?.analysis && (
+              <div className="space-y-6 p-4">
+                {/* Executive Summary */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Executive Summary</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {crawlerResult.analysis.summary}
+                  </p>
+                </div>
+
+                {/* Sentiment Overview */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Sentiment Overview</h4>
+                  <div className="flex items-center gap-4">
+                    <Badge 
+                      variant={
+                        crawlerResult.analysis.overallSentiment === 'positive' ? 'default' :
+                        crawlerResult.analysis.overallSentiment === 'negative' ? 'destructive' :
+                        'secondary'
+                      }
+                      className="capitalize"
+                    >
+                      {crawlerResult.analysis.overallSentiment}
+                    </Badge>
+                    <div className="flex-1 flex items-center gap-2 text-xs">
+                      <span className="text-green-600">+{crawlerResult.analysis.sentimentBreakdown.positive}%</span>
+                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden flex">
+                        <div 
+                          className="bg-green-500 h-full" 
+                          style={{ width: `${crawlerResult.analysis.sentimentBreakdown.positive}%` }}
+                        />
+                        <div 
+                          className="bg-gray-400 h-full" 
+                          style={{ width: `${crawlerResult.analysis.sentimentBreakdown.neutral}%` }}
+                        />
+                        <div 
+                          className="bg-red-500 h-full" 
+                          style={{ width: `${crawlerResult.analysis.sentimentBreakdown.negative}%` }}
+                        />
+                      </div>
+                      <span className="text-red-600">-{crawlerResult.analysis.sentimentBreakdown.negative}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Themes */}
+                {crawlerResult.analysis.themes.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Key Themes</h4>
+                    <div className="space-y-2">
+                      {crawlerResult.analysis.themes.map((theme, i) => (
+                        <div key={i} className="p-3 rounded-lg border bg-background">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-sm">{theme.name}</span>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {theme.mentionCount} mentions
+                              </Badge>
+                              <Badge 
+                                variant={
+                                  theme.sentiment === 'positive' ? 'default' :
+                                  theme.sentiment === 'negative' ? 'destructive' :
+                                  'secondary'
+                                }
+                                className="text-xs capitalize"
+                              >
+                                {theme.sentiment}
+                              </Badge>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{theme.description}</p>
+                          {theme.keyQuotes && theme.keyQuotes.length > 0 && (
+                            <div className="mt-2 pl-3 border-l-2 border-cobalt-200">
+                              <p className="text-xs italic text-muted-foreground">
+                                &quot;{theme.keyQuotes[0]}&quot;
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Insights */}
+                {crawlerResult.analysis.insights.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Key Insights</h4>
+                    <div className="space-y-2">
+                      {crawlerResult.analysis.insights.map((insight, i) => (
+                        <div key={i} className="p-3 rounded-lg border bg-background">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge 
+                              variant={
+                                insight.type === 'opportunity' ? 'default' :
+                                insight.type === 'threat' ? 'destructive' :
+                                insight.type === 'action_item' ? 'secondary' :
+                                'outline'
+                              }
+                              className="text-xs capitalize"
+                            >
+                              {insight.type.replace('_', ' ')}
+                            </Badge>
+                            <Badge 
+                              variant="outline"
+                              className={cn(
+                                "text-xs",
+                                insight.priority === 'high' && "border-red-200 text-red-700",
+                                insight.priority === 'medium' && "border-amber-200 text-amber-700",
+                                insight.priority === 'low' && "border-green-200 text-green-700"
+                              )}
+                            >
+                              {insight.priority} priority
+                            </Badge>
+                          </div>
+                          <h5 className="font-medium text-sm">{insight.title}</h5>
+                          <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Competitor Mentions */}
+                {crawlerResult.analysis.competitorMentions && crawlerResult.analysis.competitorMentions.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Competitor Mentions</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {crawlerResult.analysis.competitorMentions.map((mention, i) => (
+                        <div key={i} className="p-2 rounded-lg border bg-background text-xs">
+                          <span className="font-medium">{mention.competitor}</span>
+                          <span className="text-muted-foreground"> • {mention.source}</span>
+                          <Badge 
+                            variant="outline"
+                            className={cn(
+                              "ml-2 text-xs",
+                              mention.sentiment === 'positive' && "border-green-200 text-green-700",
+                              mention.sentiment === 'negative' && "border-red-200 text-red-700"
+                            )}
+                          >
+                            {mention.sentiment}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Top Quotes */}
+                {crawlerResult.analysis.topQuotes && crawlerResult.analysis.topQuotes.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Notable Quotes</h4>
+                    <div className="space-y-2">
+                      {crawlerResult.analysis.topQuotes.map((quote, i) => (
+                        <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30">
+                          <p className="text-sm italic">&quot;{quote.quote}&quot;</p>
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <span>- {quote.source}</span>
+                          </div>
+                          {quote.relevance && (
+                            <p className="text-xs text-muted-foreground mt-1">{quote.relevance}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {crawlerResult.analysis.recommendations.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Recommendations</h4>
+                    <ul className="space-y-1">
+                      {crawlerResult.analysis.recommendations.map((rec, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-cobalt-600 mt-0.5 shrink-0" />
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                {crawlerResult.metadata && (
+                  <div className="pt-3 border-t text-xs text-muted-foreground flex items-center gap-4">
+                    <span>Model: {crawlerResult.metadata.model}</span>
+                    <span>Latency: {(crawlerResult.metadata.latencyMs / 1000).toFixed(1)}s</span>
+                    {crawlerResult.metadata.isStub && (
+                      <Badge variant="outline" className="text-xs">Stub Response</Badge>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
 
