@@ -162,7 +162,17 @@ export class OpenAIClient implements LLMClient {
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      console.log(`[LLM] Starting request to ${model} with max_tokens=${request.maxTokens || this.config.maxTokens}`);
+      const requestBody = {
+        model: model,
+        messages: request.messages,
+        max_completion_tokens: request.maxTokens || this.config.maxTokens,
+      };
+      
+      console.log(`[LLM] Starting request to ${model}`);
+      console.log(`[LLM] URL: ${this.config.baseUrl}/chat/completions`);
+      console.log(`[LLM] max_completion_tokens: ${requestBody.max_completion_tokens}`);
+      console.log(`[LLM] Input message count: ${request.messages.length}`);
+      console.log(`[LLM] Input approx chars: ${request.messages.reduce((sum, m) => sum + m.content.length, 0)}`);
       
       const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
         method: 'POST',
@@ -170,12 +180,7 @@ export class OpenAIClient implements LLMClient {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.config.apiKey}`,
         },
-        body: JSON.stringify({
-          model: model,
-          messages: request.messages,
-          max_completion_tokens: request.maxTokens || this.config.maxTokens,
-          // Note: GPT-5 models only support temperature=1, so we omit it
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
 
