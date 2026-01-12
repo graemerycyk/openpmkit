@@ -528,7 +528,6 @@ export default function WorkbenchPage() {
             >
               <Globe className="h-4 w-4" />
               AI Crawlers
-              <Badge variant="cobalt" className="text-[10px] px-1.5 py-0">Live</Badge>
             </button>
           </div>
         </div>
@@ -1090,11 +1089,6 @@ export default function WorkbenchPage() {
                         <div className="flex items-center gap-2">
                           <Wand2 className="h-5 w-5 text-cobalt-600" />
                           <CardTitle className="text-base">AI Analysis</CardTitle>
-                          {selectedCrawlerJob.analysisMetadata && (
-                            <Badge variant="outline" className="text-xs">
-                              {selectedCrawlerJob.analysisMetadata.model}
-                            </Badge>
-                          )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -1299,7 +1293,6 @@ export default function WorkbenchPage() {
                         {/* Analysis Metadata */}
                         {selectedCrawlerJob.analysisMetadata && (
                           <div className="pt-3 border-t text-xs text-muted-foreground flex items-center gap-4">
-                            <span>Model: {selectedCrawlerJob.analysisMetadata.model}</span>
                             <span>Tokens: {selectedCrawlerJob.analysisMetadata.usage.totalTokens.toLocaleString()}</span>
                             <span>Latency: {(selectedCrawlerJob.analysisMetadata.latencyMs / 1000).toFixed(1)}s</span>
                             {selectedCrawlerJob.analysisMetadata.estimatedCostUsd > 0 && (
@@ -1517,11 +1510,6 @@ export default function WorkbenchPage() {
             <DialogTitle className="font-heading flex items-center gap-2">
               <Wand2 className="h-5 w-5 text-cobalt-600" />
               AI Analysis
-              {selectedCrawlerJob?.analysisMetadata && (
-                <Badge variant="outline" className="ml-2 text-xs">
-                  {selectedCrawlerJob.analysisMetadata.model}
-                </Badge>
-              )}
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 min-h-0">
@@ -1719,7 +1707,6 @@ export default function WorkbenchPage() {
                 {/* Analysis Metadata */}
                 {selectedCrawlerJob.analysisMetadata && (
                   <div className="pt-3 border-t text-xs text-muted-foreground flex items-center gap-4">
-                    <span>Model: {selectedCrawlerJob.analysisMetadata.model}</span>
                     <span>Tokens: {selectedCrawlerJob.analysisMetadata.usage.totalTokens.toLocaleString()}</span>
                     <span>Latency: {(selectedCrawlerJob.analysisMetadata.latencyMs / 1000).toFixed(1)}s</span>
                     {selectedCrawlerJob.analysisMetadata.estimatedCostUsd > 0 && (
