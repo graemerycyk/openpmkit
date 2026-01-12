@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { getLLMService, type JobType } from '@pmkit/core';
-import { executeJob, PROMPT_TEMPLATES, type PromptContext } from '@pmkit/prompts';
+import { getLLMService, type JobType, LLMError } from '@pmkit/core';
+import { executeJob, PROMPT_TEMPLATES, renderPrompt, type PromptContext } from '@pmkit/prompts';
 import { isAdminEmail } from '@/lib/admin';
 
 // Max output tokens per job type
@@ -21,7 +21,24 @@ const JOB_MAX_TOKENS: Record<JobType, number> = {
 };
 
 export async function POST(request: NextRequest) {
+  // Track debug info throughout the request
+  const debugInfo: {
+    startTime: number;
+    jobType?: string;
+    model?: string;
+    maxTokens?: number;
+    inputCharCount?: number;
+    isUsingStubs?: boolean;
+    apiKeyPresent?: boolean;
+    stages: string[];
+  } = {
+    startTime: Date.now(),
+    stages: [],
+  };
+
   try {
+    debugInfo.stages.push('Starting request');
+    
     // Check authentication
     const session = await getServerSession();
     if (!session?.user?.email) {
@@ -38,11 +55,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    debugInfo.stages.push('Auth passed');
+
     const body = await request.json();
     const { jobType, context } = body as {
       jobType: JobType;
       context: Record<string, string>;
     };
+
+    debugInfo.jobType = jobType;
 
     // Validate job type
     if (!PROMPT_TEMPLATES[jobType]) {
@@ -51,6 +72,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    debugInfo.stages.push('Job type validated');
 
     // Build prompt context from user-provided data
     const promptContext: PromptContext = {
@@ -66,8 +89,24 @@ export async function POST(request: NextRequest) {
     // Note: Workbench uses production LLM key, not demo rate-limited key
     const llmService = getLLMService();
     const maxTokens = JOB_MAX_TOKENS[jobType] || 12288;
+    const modelInfo = llmService.getModelForTenant('workbench');
+
+    debugInfo.model = modelInfo.id;
+    debugInfo.maxTokens = maxTokens;
+    debugInfo.isUsingStubs = llmService.isUsingStubs();
+    debugInfo.apiKeyPresent = !!process.env.OPENAI_API_KEY;
+
+    // Calculate input size
+    const template = PROMPT_TEMPLATES[jobType];
+    const { system, user } = renderPrompt(template, promptContext);
+    debugInfo.inputCharCount = system.length + user.length;
+
+    debugInfo.stages.push('LLM service initialized');
 
     console.log(`[Workbench] Running ${jobType} job for ${session.user.email}`);
+    console.log(`[Workbench] Debug info:`, JSON.stringify(debugInfo, null, 2));
+
+    debugInfo.stages.push('Calling LLM...');
 
     const result = await executeJob(
       llmService,
@@ -79,6 +118,8 @@ export async function POST(request: NextRequest) {
         temperature: 0.7,
       }
     );
+
+    debugInfo.stages.push('LLM call completed');
 
     console.log(`[Workbench] Job completed: ${result.model}, ${result.latencyMs}ms`);
 
@@ -94,22 +135,37 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const elapsedMs = Date.now() - debugInfo.startTime;
+    debugInfo.stages.push(`Error after ${elapsedMs}ms`);
+
     console.error('Workbench job execution error:', error);
 
     // Extract detailed error info
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
+    const errorName = error instanceof Error ? error.name : 'Unknown';
+    const errorCode = error instanceof LLMError ? error.code : undefined;
+    const errorStatusCode = error instanceof LLMError ? error.statusCode : undefined;
 
     // Log detailed error for debugging
     console.error('Detailed error:', {
       message: errorMessage,
-      stack: errorStack,
+      name: errorName,
+      code: errorCode,
+      statusCode: errorStatusCode,
+      debugInfo,
     });
 
     return NextResponse.json(
       {
         error: 'Failed to execute job',
         message: errorMessage,
+        debug: {
+          errorName,
+          errorCode,
+          errorStatusCode,
+          elapsedMs,
+          ...debugInfo,
+        },
       },
       { status: 500 }
     );
