@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { jobType, model, context } = body as {
       jobType: JobType;
-      model?: 'gpt-5-mini' | 'gpt-5.2';
+      model?: 'gpt-5-nano' | 'gpt-5-mini' | 'gpt-5.2';
       context: Record<string, string>;
     };
 

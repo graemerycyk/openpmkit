@@ -258,7 +258,7 @@ export default function WorkbenchPage() {
   const [contextValues, setContextValues] = useState<Record<string, string>>({});
   const [tenantName, setTenantName] = useState('');
   const [productName, setProductName] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'gpt-5-mini' | 'gpt-5.2'>('gpt-5-mini');
+  const [selectedModel, setSelectedModel] = useState<'gpt-5-nano' | 'gpt-5-mini' | 'gpt-5.2'>('gpt-5-mini');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<WorkbenchRun | null>(null);
@@ -762,12 +762,18 @@ export default function WorkbenchPage() {
                 </Label>
                 <Select
                   value={selectedModel}
-                  onValueChange={(value: 'gpt-5-mini' | 'gpt-5.2') => setSelectedModel(value)}
+                  onValueChange={(value: 'gpt-5-nano' | 'gpt-5-mini' | 'gpt-5.2') => setSelectedModel(value)}
                 >
                   <SelectTrigger className="w-[140px]" id="model-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="gpt-5-nano">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-3 w-3 text-green-500" />
+                        GPT-5 Nano
+                      </div>
+                    </SelectItem>
                     <SelectItem value="gpt-5-mini">
                       <div className="flex items-center gap-2">
                         <Zap className="h-3 w-3 text-yellow-500" />
@@ -787,8 +793,9 @@ export default function WorkbenchPage() {
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-[250px]">
+                    <TooltipContent side="bottom" className="max-w-[280px]">
                       <p className="text-xs">
+                        <strong>GPT-5 Nano:</strong> Ultra-fast & cheapest<br />
                         <strong>GPT-5 Mini:</strong> Fast & cost-efficient<br />
                         <strong>GPT-5.2:</strong> Higher quality for demos
                       </p>
