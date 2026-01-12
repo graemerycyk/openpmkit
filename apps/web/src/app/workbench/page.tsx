@@ -53,7 +53,6 @@ import {
   Trash2,
   History,
   ChevronRight,
-  ChevronDown,
   AlertCircle,
   Expand,
   Globe,
@@ -463,6 +462,13 @@ export default function WorkbenchPage() {
   const clearHistory = () => {
     setHistory([]);
     localStorage.removeItem(HISTORY_KEY);
+  };
+
+  // Clear crawler history
+  const clearCrawlerHistory = () => {
+    setCrawlerJobs([]);
+    setSelectedCrawlerJob(null);
+    localStorage.removeItem(CRAWLER_HISTORY_KEY);
   };
   
   // ============================================================================
@@ -995,9 +1001,22 @@ export default function WorkbenchPage() {
                   <Globe className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">Crawler Results</span>
                 </div>
-                {crawlerJobs.length > 0 && (
-                  <Badge variant="secondary">{crawlerJobs.length}</Badge>
-                )}
+                <div className="flex items-center gap-1">
+                  {crawlerJobs.length > 0 && (
+                    <>
+                      <Badge variant="secondary">{crawlerJobs.length}</Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearCrawlerHistory}
+                        className="h-8 px-2 text-muted-foreground hover:text-destructive"
+                        title="Clear all crawler history"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <ScrollArea className="flex-1">
                 {crawlerJobs.length === 0 ? (
@@ -1548,59 +1567,59 @@ export default function WorkbenchPage() {
                           className="gap-2"
                         >
                           <Expand className="h-4 w-4" />
-                          Expand
+                          Expand All
                         </Button>
                       </div>
                       {selectedCrawlerJob.results.map((result) => {
                         const isExpanded = expandedResults.has(result.id);
+                        // Parse URL for metadata display
+                        let urlParts: { domain?: string; path?: string } = {};
+                        if (result.url) {
+                          try {
+                            const parsed = new URL(result.url);
+                            urlParts = { domain: parsed.hostname, path: parsed.pathname + parsed.search };
+                          } catch { /* ignore */ }
+                        }
+                        
                         return (
-                          <Card key={result.id} className="overflow-hidden transition-all">
-                            <button
-                              onClick={() => toggleResultExpanded(result.id)}
-                              className="w-full text-left"
-                            >
-                              <CardContent className="p-4">
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <Badge variant="outline" className="text-xs shrink-0">
-                                        {result.source}
-                                      </Badge>
-                                      {result.author && (
-                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                          <User className="h-3 w-3" />
-                                          {result.author}
-                                        </span>
-                                      )}
-                                      {result.publishedAt && (
-                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                          <Calendar className="h-3 w-3" />
-                                          {new Date(result.publishedAt).toLocaleDateString()}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <h4 className={cn(
-                                      "mt-2 font-medium break-words",
-                                      !isExpanded && "line-clamp-2"
-                                    )}>
-                                      {result.title}
-                                    </h4>
-                                    {!isExpanded && (
-                                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2 break-words">
-                                        {result.content}
-                                      </p>
+                          <Card key={result.id} className="overflow-hidden">
+                            <CardContent className="p-4">
+                              {/* Header with source badge and expand button */}
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <Badge variant="outline" className="text-xs shrink-0">
+                                      {result.source}
+                                    </Badge>
+                                    {result.publishedAt && (
+                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                        <Calendar className="h-3 w-3" />
+                                        {new Date(result.publishedAt).toLocaleDateString()}
+                                      </span>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-1 shrink-0">
-                                    {isExpanded ? (
-                                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                                    ) : (
-                                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                                    )}
-                                  </div>
+                                  <h4 className="mt-2 font-medium break-words">
+                                    {result.title}
+                                  </h4>
                                 </div>
-                              </CardContent>
-                            </button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => toggleResultExpanded(result.id)}
+                                  className="gap-1 shrink-0"
+                                >
+                                  <Expand className="h-3 w-3" />
+                                  {isExpanded ? 'Collapse' : 'Expand'}
+                                </Button>
+                              </div>
+                              
+                              {/* Preview (when collapsed) */}
+                              {!isExpanded && (
+                                <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words">
+                                  {result.content}
+                                </p>
+                              )}
+                            </CardContent>
                             
                             {/* Expanded Content */}
                             {isExpanded && (
@@ -1616,35 +1635,58 @@ export default function WorkbenchPage() {
                                     </p>
                                   </div>
                                   
-                                  {/* Citation / Source Link */}
+                                  {/* URL Details */}
                                   {result.url && (
                                     <div className="overflow-hidden">
                                       <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                                        Citation
+                                        Source URL
                                       </h5>
-                                      <div className="flex items-center gap-2 p-3 rounded-lg bg-background border overflow-hidden">
-                                        <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
-                                        <a
-                                          href={result.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-sm text-cobalt-600 hover:underline truncate flex-1 min-w-0"
-                                          onClick={(e) => e.stopPropagation()}
-                                        >
-                                          {result.url}
-                                        </a>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          asChild
-                                          className="shrink-0"
-                                          onClick={(e) => e.stopPropagation()}
-                                        >
-                                          <a href={result.url} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="h-4 w-4" />
+                                      <div className="space-y-2 text-sm">
+                                        <div className="flex items-center gap-2 p-3 rounded-lg bg-background border overflow-hidden">
+                                          <Link2 className="h-4 w-4 text-cobalt-600 shrink-0" />
+                                          <a
+                                            href={result.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-cobalt-600 hover:underline truncate flex-1 min-w-0"
+                                          >
+                                            {result.url}
                                           </a>
-                                        </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            asChild
+                                            className="shrink-0"
+                                          >
+                                            <a href={result.url} target="_blank" rel="noopener noreferrer">
+                                              <ExternalLink className="h-4 w-4" />
+                                            </a>
+                                          </Button>
+                                        </div>
+                                        {urlParts.domain && (
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                            <div className="flex items-start gap-2">
+                                              <span className="text-muted-foreground font-medium min-w-[60px]">Domain:</span>
+                                              <span className="break-all">{urlParts.domain}</span>
+                                            </div>
+                                            {urlParts.path && urlParts.path !== '/' && (
+                                              <div className="flex items-start gap-2">
+                                                <span className="text-muted-foreground font-medium min-w-[60px]">Path:</span>
+                                                <span className="break-all">{urlParts.path}</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
                                       </div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Author */}
+                                  {result.author && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <User className="h-4 w-4 text-muted-foreground" />
+                                      <span className="text-muted-foreground">Author:</span>
+                                      <span className="font-medium">{result.author}</span>
                                     </div>
                                   )}
                                   
@@ -1654,13 +1696,38 @@ export default function WorkbenchPage() {
                                       <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                                         Additional Info
                                       </h5>
-                                      <div className="grid grid-cols-2 gap-2 text-sm">
-                                        {Object.entries(result.metadata).map(([key, value]) => (
-                                          <div key={key} className="flex items-center gap-2">
-                                            <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
-                                            <span className="font-medium">{String(value)}</span>
-                                          </div>
-                                        ))}
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                        {Object.entries(result.metadata).map(([key, value]) => {
+                                          // Format the key nicely
+                                          const formattedKey = key
+                                            .replace(/([A-Z])/g, ' $1')
+                                            .replace(/_/g, ' ')
+                                            .trim();
+                                          
+                                          // Handle different value types
+                                          let displayValue: React.ReactNode = String(value);
+                                          if (typeof value === 'boolean') {
+                                            displayValue = value ? 'Yes' : 'No';
+                                          } else if (typeof value === 'string' && value.startsWith('http')) {
+                                            displayValue = (
+                                              <a
+                                                href={value}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-cobalt-600 hover:underline break-all"
+                                              >
+                                                {value.length > 50 ? value.slice(0, 50) + '...' : value}
+                                              </a>
+                                            );
+                                          }
+                                          
+                                          return (
+                                            <div key={key} className="flex items-start gap-2">
+                                              <span className="text-muted-foreground capitalize shrink-0">{formattedKey}:</span>
+                                              <span className="font-medium break-all">{displayValue}</span>
+                                            </div>
+                                          );
+                                        })}
                                       </div>
                                     </div>
                                   )}
