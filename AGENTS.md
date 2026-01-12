@@ -1056,8 +1056,27 @@ With default rate limits (50 calls/day) using GPT-5 Mini:
 | Scenario | Per Call | Daily Max | Monthly Max |
 |----------|----------|-----------|-------------|
 | Standard jobs (12K tokens) | ~$0.025 | ~$1.25 | ~$37 |
-| Prototype (24K tokens) | ~$0.048 | ~$2.40 | ~$72 |
+| Prototype (48K tokens) | ~$0.098 | ~$4.90 | ~$147 |
 | Mixed usage (realistic) | ~$0.030 | ~$1.50 | ~$45 |
+
+### Timeout Configuration
+
+LLM requests have a **10-minute timeout** to accommodate large outputs like prototype generation (48K tokens). This is configured in `packages/core/src/llm/index.ts`:
+
+```typescript
+const timeoutMs = 600_000; // 10 minutes
+```
+
+### Workbench Model Selection
+
+The Workbench (`/workbench`) allows admins to select between models:
+
+| Model | Use Case | Notes |
+|-------|----------|-------|
+| **GPT-5 Mini** (default) | Fast iteration | Cost-efficient, good for most jobs |
+| **GPT-5.2** | Impressive demos | Higher quality output, slower |
+
+The model selector is in the job toolbar next to the "Run Job" button. Both models use `OPENAI_API_KEY_DEMO`.
 
 ## Related Files
 

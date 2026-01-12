@@ -39,8 +39,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { jobType, context } = body as {
+    const { jobType, model, context } = body as {
       jobType: JobType;
+      model?: 'gpt-5-mini' | 'gpt-5.2';
       context: Record<string, string>;
     };
 
@@ -67,7 +68,8 @@ export async function POST(request: NextRequest) {
     const llmService = getLLMService();
     const maxTokens = JOB_MAX_TOKENS[jobType] || 12288;
 
-    console.log(`[Workbench] Running ${jobType} job for ${session.user.email}`);
+    const selectedModel = model || 'gpt-5-mini';
+    console.log(`[Workbench] Running ${jobType} job for ${session.user.email} with model ${selectedModel}`);
 
     const result = await executeJob(
       llmService,
@@ -77,6 +79,7 @@ export async function POST(request: NextRequest) {
       {
         maxTokens,
         temperature: 0.7,
+        model: selectedModel,
       }
     );
 

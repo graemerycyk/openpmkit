@@ -217,3 +217,6 @@ Items that have been discussed but not committed to.
 - Added Shareable Results feature plan (MVP: export as Markdown/copy, Phase 2: shareable links, Phase 3: advanced features)
 - **Implemented MVP Sharing for Workbench** - Share dialog with export as Markdown/HTML, copy as formatted text for both PM Jobs and Crawler Results
 - **Increased prototype_generation token limit** - Doubled from 24K to 48K tokens for complex HTML prototypes (FHIR dashboards, etc.)
+- **Increased LLM timeout to 10 minutes** - Large requests like prototype generation (48K tokens) need more time to complete
+- **Fixed workbench history viewing** - Can now view completed jobs from history while another job is running
+- **Added model selector to workbench** - Switch between GPT-5 Mini (fast, default) and GPT-5.2 (high quality) for demos

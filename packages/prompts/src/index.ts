@@ -1,4 +1,4 @@
-import type { JobType } from '@pmkit/core';
+import type { JobType, LLMModel } from '@pmkit/core';
 
 // Re-export crawler analysis
 export * from './crawler-analysis';
@@ -1964,6 +1964,7 @@ export interface JobExecutionResult {
 export interface JobExecutorOptions {
   maxTokens?: number;
   temperature?: number;
+  model?: string;
 }
 
 /**
@@ -2003,6 +2004,7 @@ export async function executeJob(
   // Execute the completion
   const response = await llmService.complete(tenantId, {
     messages,
+    model: options.model as LLMModel | undefined,
     maxTokens: options.maxTokens,
     temperature: options.temperature,
   });

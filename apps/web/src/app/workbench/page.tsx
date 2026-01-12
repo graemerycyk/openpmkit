@@ -258,10 +258,12 @@ export default function WorkbenchPage() {
   const [contextValues, setContextValues] = useState<Record<string, string>>({});
   const [tenantName, setTenantName] = useState('');
   const [productName, setProductName] = useState('');
+  const [selectedModel, setSelectedModel] = useState<'gpt-5-mini' | 'gpt-5.2'>('gpt-5-mini');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<WorkbenchRun | null>(null);
   const [history, setHistory] = useState<WorkbenchRun[]>([]);
+  const [viewingHistoryItem, setViewingHistoryItem] = useState(false);
   const [activeTab, setActiveTab] = useState<'input' | 'output'>('input');
   const [copied, setCopied] = useState(false);
   const [expandModalOpen, setExpandModalOpen] = useState(false);
@@ -354,6 +356,7 @@ export default function WorkbenchPage() {
     setIsRunning(true);
     setError(null);
     setActiveTab('output');
+    setViewingHistoryItem(false);
 
     try {
       const response = await fetch('/api/workbench/run-job', {
@@ -361,6 +364,7 @@ export default function WorkbenchPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jobType: selectedJobType,
+          model: selectedModel,
           context: {
             ...contextValues,
             tenantName: tenantName || 'My Company',
@@ -458,6 +462,7 @@ export default function WorkbenchPage() {
     setContextValues(run.context);
     setResult(run);
     setActiveTab('output');
+    setViewingHistoryItem(true);
   };
 
   // Clear history
@@ -750,6 +755,47 @@ export default function WorkbenchPage() {
                   className="w-[150px]"
                 />
               </div>
+              <Separator orientation="vertical" className="h-6" />
+              <div className="flex items-center gap-2">
+                <Label htmlFor="model-select" className="shrink-0 text-muted-foreground">
+                  Model:
+                </Label>
+                <Select
+                  value={selectedModel}
+                  onValueChange={(value: 'gpt-5-mini' | 'gpt-5.2') => setSelectedModel(value)}
+                >
+                  <SelectTrigger className="w-[140px]" id="model-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-5-mini">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-3 w-3 text-yellow-500" />
+                        GPT-5 Mini
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="gpt-5.2">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-3 w-3 text-cobalt-500" />
+                        GPT-5.2
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-[250px]">
+                      <p className="text-xs">
+                        <strong>GPT-5 Mini:</strong> Fast & cost-efficient<br />
+                        <strong>GPT-5.2:</strong> Higher quality for demos
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <div className="ml-auto">
                 <Button
                   onClick={runJob}
@@ -833,7 +879,7 @@ export default function WorkbenchPage() {
                 </div>
               )}
 
-              {isRunning && (
+              {isRunning && !viewingHistoryItem && (
                 <div className="flex h-full flex-col items-center justify-center gap-4">
                   <Loader2 className="h-12 w-12 animate-spin text-cobalt-600" />
                   <div className="text-center">
@@ -845,7 +891,7 @@ export default function WorkbenchPage() {
                 </div>
               )}
 
-              {!isRunning && !result && !error && (
+              {!result && !error && !(isRunning && !viewingHistoryItem) && (
                 <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                     <JobIcon className="h-8 w-8 text-muted-foreground" />
@@ -859,7 +905,7 @@ export default function WorkbenchPage() {
                 </div>
               )}
 
-              {!isRunning && result && (
+              {result && (viewingHistoryItem || !isRunning) && (
                 <div className="flex h-full flex-col">
                   {/* Output toolbar */}
                   <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2">
