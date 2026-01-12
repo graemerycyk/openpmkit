@@ -64,7 +64,7 @@ export const cadenceJobs = [
   {
     id: 'competitor-digest',
     name: 'Competitor Digest',
-    description: 'Monitors competitor activity and generates weekly competitive intelligence report',
+    description: 'Monitors competitor activity and generates weekly competitive research report',
     schedule: 'Weekly on Friday',
     sources: ['competitor', 'community'],
     estimatedDuration: '2-3 minutes',

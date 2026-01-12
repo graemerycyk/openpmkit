@@ -720,7 +720,7 @@ Key outcomes:
 - We're now at feature parity on filters`,
       required: false,
       multiline: true,
-      hint: 'Customer quotes, competitive intel, market context',
+      hint: 'Customer quotes, competitive research, market context',
     },
     {
       key: 'relatedArtifacts',

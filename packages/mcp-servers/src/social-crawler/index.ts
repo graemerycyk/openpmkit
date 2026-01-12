@@ -142,7 +142,7 @@ export class MockSocialCrawlerMCPServer extends BaseMCPServer {
   constructor() {
     super({
       name: 'social_crawler',
-      description: 'Monitor social media platforms for brand mentions and competitive intelligence',
+      description: 'Monitor social media platforms for brand mentions and competitive research',
       version: '1.0.0',
     });
     this.registerTools();

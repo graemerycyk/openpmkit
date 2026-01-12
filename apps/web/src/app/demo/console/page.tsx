@@ -1901,7 +1901,7 @@ function ConsolePageContent() {
             <div className="text-center">
               <h1 className="font-heading text-3xl font-bold">AI Crawlers</h1>
               <p className="mt-2 text-muted-foreground">
-                Monitor social media, web, and news for competitive intelligence and customer insights.
+                Monitor social media, web, and news for competitive research and customer insights.
               </p>
             </div>
 
@@ -2087,7 +2087,7 @@ function ConsolePageContent() {
                 <CardContent className="relative flex flex-1 flex-col">
                   <div className="flex-1 space-y-4">
                     <p className="text-sm text-muted-foreground">
-                      Track industry news, press releases, and analyst reports for competitive intelligence.
+                      Track industry news, press releases, and analyst reports for competitive research.
                     </p>
                     <div className="space-y-2">
                       <p className="text-xs font-medium text-muted-foreground">SOURCES</p>

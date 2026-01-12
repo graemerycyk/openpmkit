@@ -315,7 +315,7 @@ export default function DemoPage() {
             <Badge variant="cobalt" className="mb-4">
               AI Crawlers
             </Badge>
-            <h2 className="font-heading text-3xl font-bold">Real-Time Competitive Intelligence</h2>
+            <h2 className="font-heading text-3xl font-bold">Real-Time Competitive Research</h2>
             <p className="mt-4 text-muted-foreground">
               Monitor social media, web, and news sources for competitor updates, customer sentiment,
               and market trends - automatically fed into your PM workflows.
@@ -357,7 +357,7 @@ export default function DemoPage() {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Track industry news, press releases, and analyst reports for competitive intelligence.
+                  Track industry news, press releases, and analyst reports for competitive research.
                 </CardDescription>
               </CardContent>
             </Card>

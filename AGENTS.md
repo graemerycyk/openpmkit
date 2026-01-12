@@ -717,7 +717,7 @@ GNEWS_API_KEY=...         # GNews.io alternative (600 free/day)
 
 ## AI Crawlers
 
-Real-time web crawlers for competitive intelligence with AI-powered analysis.
+Real-time web crawlers for competitive research with AI-powered analysis.
 
 ### Crawler Types
 

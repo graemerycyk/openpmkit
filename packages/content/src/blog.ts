@@ -60,14 +60,14 @@ export const blogPosts: BlogPost[] = [
     relatedPosts: ['voice-of-customer-at-scale', 'social-listening-for-product-managers', 'from-slack-to-prd'],
   },
   {
-    slug: 'competitive-intelligence-system-ai-crawlers',
-    title: 'Building a Competitive Intelligence System with AI Crawlers',
+    slug: 'competitive-research-system-ai-crawlers',
+    title: 'Building a Competitive Research System with AI Crawlers',
     description:
-      'A practical guide to building an automated competitive intelligence system using social, web, and news crawlers—from setup to daily briefs.',
+      'A practical guide to building an automated competitive research system using social, web, and news crawlers—from setup to daily briefs.',
     publishedAt: '2026-01-15',
     author: 'pmkit team',
     authorRole: 'Product',
-    primaryKeyword: 'competitive intelligence automation',
+    primaryKeyword: 'competitive research automation',
     tags: ['competitor-research', 'agents', 'integrations'],
     readingTime: 14,
     relatedResources: ['web-search-integration', 'news-crawler-integration', 'competitor-research'],

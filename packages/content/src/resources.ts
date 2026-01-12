@@ -1759,7 +1759,7 @@ export const resources: ResourcePage[] = [
     slug: 'social-crawler-integration',
     title: 'Social Crawler: Monitor Social Media for Product Signal',
     description:
-      'Monitor X, Reddit, LinkedIn, Discord, Bluesky, and Threads for mentions, sentiment, and competitive intelligence.',
+      'Monitor X, Reddit, LinkedIn, Discord, Bluesky, and Threads for mentions, sentiment, and competitive research.',
     primaryKeyword: 'social media monitoring',
     secondaryKeywords: ['social crawler', 'social listening AI', 'brand monitoring'],
     category: 'integrations',
@@ -1809,11 +1809,11 @@ export const resources: ResourcePage[] = [
   // Web Search Integration
   {
     slug: 'web-search-integration',
-    title: 'Web Search: Competitive Intelligence from the Web',
+    title: 'Web Search: Competitive Research from the Web',
     description:
       'Search Google and Bing for competitor intelligence, industry news, and market research.',
     primaryKeyword: 'web search integration',
-    secondaryKeywords: ['competitive intelligence', 'market research AI', 'web crawler'],
+    secondaryKeywords: ['competitive research', 'market research AI', 'web crawler'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/competitor-research', '/resources/agentic-product-management'],
     workedExample: {
@@ -1863,7 +1863,7 @@ export const resources: ResourcePage[] = [
     slug: 'news-crawler-integration',
     title: 'News Crawler: Track Industry News and Press Releases',
     description:
-      'Monitor industry news, press releases, and analyst reports for competitive intelligence and market context.',
+      'Monitor industry news, press releases, and analyst reports for competitive research and market context.',
     primaryKeyword: 'news monitoring',
     secondaryKeywords: ['news crawler', 'press release tracking', 'industry news AI'],
     category: 'integrations',

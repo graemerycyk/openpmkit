@@ -187,7 +187,7 @@ export async function GET() {
       {
         id: 'web_search',
         name: 'Web Search',
-        description: 'Search Google and Bing for competitive intelligence',
+        description: 'Search Google and Bing for competitive research',
         platforms: ['google', 'bing'],
       },
       {

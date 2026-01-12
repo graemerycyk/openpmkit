@@ -289,7 +289,7 @@ export default function IntegrationsPage() {
         <div className="mb-4">
           <h2 className="font-heading text-xl font-semibold">AI Crawlers</h2>
           <p className="text-sm text-muted-foreground">
-            Let pmkit automatically gather competitive intelligence and social signals
+            Let pmkit automatically gather competitive research and social signals
           </p>
         </div>
         <div className="grid gap-4">

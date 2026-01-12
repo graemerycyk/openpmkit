@@ -144,7 +144,7 @@ export interface CrawlerAnalysis {
     neutral: number;
   };
   
-  // Competitive intelligence
+  // Competitive research
   competitorMentions: CompetitorMention[];
   
   // Actionable insights

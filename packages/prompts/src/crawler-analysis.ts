@@ -80,7 +80,7 @@ export interface CrawlerAnalysisResult {
 // ============================================================================
 
 const CRAWLER_SYSTEM_PROMPTS: Record<CrawlerType, string> = {
-  social: `You are a competitive intelligence analyst specializing in social media monitoring for product teams.
+  social: `You are a competitive research analyst specializing in social media monitoring for product teams.
 
 Your job is to analyze social media posts and discussions to extract actionable product insights.
 
@@ -94,9 +94,9 @@ Guidelines:
 - Be concise but comprehensive
 - Return ONLY valid JSON, no other text`,
 
-  web_search: `You are a competitive intelligence analyst specializing in web research for product teams.
+  web_search: `You are a competitive research analyst specializing in web research for product teams.
 
-Your job is to analyze web search results to extract competitive intelligence and market insights.
+Your job is to analyze web search results to extract competitive research and market insights.
 
 Guidelines:
 - Identify competitor positioning and messaging
@@ -108,7 +108,7 @@ Guidelines:
 - Be concise but comprehensive
 - Return ONLY valid JSON, no other text`,
 
-  news: `You are a competitive intelligence analyst specializing in industry news monitoring for product teams.
+  news: `You are a competitive research analyst specializing in industry news monitoring for product teams.
 
 Your job is to analyze news articles and press releases to extract market intelligence.
 
@@ -492,7 +492,7 @@ export const MOCK_CRAWLER_DATA = {
       {
         id: 'reddit-3',
         source: 'reddit',
-        title: 'How do you handle competitive intelligence?',
+        title: 'How do you handle competitive research?',
         content: 'Our team spends hours every week manually checking competitor websites and news. Looking for automation. Tried a few tools but they either miss things or give too much noise.',
         author: 'competitive_pm',
         url: 'https://reddit.com/r/ProductManagement/comments/ghi789',

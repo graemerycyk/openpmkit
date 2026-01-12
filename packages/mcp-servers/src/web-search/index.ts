@@ -94,7 +94,7 @@ export class MockWebSearchMCPServer extends BaseMCPServer {
   constructor() {
     super({
       name: 'web_search',
-      description: 'Search the web for competitive intelligence and market research',
+      description: 'Search the web for competitive research and market research',
       version: '1.0.0',
     });
     this.registerTools();

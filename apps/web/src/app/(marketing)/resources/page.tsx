@@ -20,7 +20,7 @@ const categoryLabels: Record<ResourcePage['category'], string> = {
   workflows: 'PM Workflows',
   integrations: 'Integrations',
   governance: 'Governance',
-  competitive: 'Competitive Intel',
+  competitive: 'Competition Research',
   voc: 'Voice of Customer',
 };
 

@@ -986,7 +986,7 @@ Approval for $2M engineering investment in real-time treasury infrastructure
 - Stripe Connect: "Settlement timing is our biggest pain point" - Ops Lead
 - 134 community votes for real-time notifications
 
-**Competitive Intelligence:**
+**Competitive Research:**
 - Modern Treasury: Real-time tracking launched Jan 4
 - All major competitors have real-time features
 - 4 lost deals cited real-time as deciding factor
