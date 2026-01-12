@@ -87,7 +87,7 @@ export function Header() {
             <div className="h-9 w-20 animate-pulse rounded-md bg-muted" />
           ) : isAuthenticated ? (
             <>
-              <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
+              <Button asChild>
                 <Link href="/demo/console">Try Demo</Link>
               </Button>
               {/* User dropdown menu */}
@@ -197,7 +197,7 @@ export function Header() {
                       Dashboard
                     </Link>
                   </Button>
-                  <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button asChild>
                     <Link href="/demo/console" onClick={() => setMobileMenuOpen(false)}>
                       Try Demo
                     </Link>

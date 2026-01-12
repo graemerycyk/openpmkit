@@ -48,6 +48,9 @@ export async function GET(
       error: job.error,
       resultCount: job.results.length,
       results: job.status === 'completed' ? job.results : undefined,
+      analysis: job.status === 'completed' ? job.analysis : undefined,
+      analysisMetadata: job.status === 'completed' ? job.analysisMetadata : undefined,
+      analysisError: job.status === 'completed' ? job.analysisError : undefined,
     });
   } catch (error) {
     console.error('Crawler status error:', error);

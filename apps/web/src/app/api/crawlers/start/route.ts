@@ -147,6 +147,13 @@ async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
       return;
     }
 
+    // Skip AI analysis if no results
+    if (response.results.length === 0) {
+      jobState.status = 'completed';
+      jobState.completedAt = new Date();
+      return;
+    }
+
     // Run AI analysis on the results
     jobState.status = 'analyzing';
     

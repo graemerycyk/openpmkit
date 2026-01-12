@@ -253,7 +253,7 @@ export default function WorkbenchPage() {
   
   // Poll for crawler job updates
   useEffect(() => {
-    const runningJobs = crawlerJobs.filter(j => j.status === 'pending' || j.status === 'running');
+    const runningJobs = crawlerJobs.filter(j => j.status === 'pending' || j.status === 'running' || j.status === 'analyzing');
     if (runningJobs.length === 0) return;
     
     const interval = setInterval(async () => {
@@ -872,8 +872,13 @@ export default function WorkbenchPage() {
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-1">
-                            {job.status === 'running' || job.status === 'pending' ? (
-                              <Loader2 className="h-4 w-4 animate-spin text-cobalt-600" />
+                            {job.status === 'running' || job.status === 'pending' || job.status === 'analyzing' ? (
+                              <div className="flex items-center gap-1.5">
+                                <Loader2 className="h-4 w-4 animate-spin text-cobalt-600" />
+                                {job.status === 'analyzing' && (
+                                  <span className="text-[10px] text-cobalt-600">AI</span>
+                                )}
+                              </div>
                             ) : job.status === 'completed' ? (
                               <Badge variant="outline" className="text-xs border-green-200 bg-green-50 text-green-700">
                                 {job.resultCount}
