@@ -711,8 +711,8 @@ Key outcomes:
       placeholder: `Paste customer quotes, competitive context...
 
 **Customer Evidence**
-- "This changes everything for our team" — Globex Corp
-- "Finally, search that works" — Initech
+- "This changes everything for our team" - Globex Corp
+- "Finally, search that works" - Initech
 - 89 community votes addressed
 
 **Competitive Context**

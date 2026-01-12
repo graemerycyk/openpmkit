@@ -39,7 +39,7 @@ const features = [
     icon: Wand2,
     title: 'PRD to Prototype',
     description:
-      'Turn PRDs into interactive HTML prototypes with working UI—validate ideas in minutes, not weeks.',
+      'Turn PRDs into interactive HTML prototypes with working UI - validate ideas in minutes, not weeks.',
     highlight: true,
   },
   {
@@ -82,7 +82,7 @@ const features = [
     icon: Presentation,
     title: 'Deck Content',
     description:
-      'Generate slide content tailored for exec, customer, team, or stakeholder audiences—ready to paste into your templates.',
+      'Generate slide content tailored for exec, customer, team, or stakeholder audiences - ready to paste into your templates.',
     highlight: true,
   },
 ];
@@ -296,7 +296,7 @@ export default function HomePage() {
               </Button>
             </div>
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              PRD → Prototype is part of pmkit&apos;s artifact chaining—each job builds on previous outputs.
+              PRD → Prototype is part of pmkit&apos;s artifact chaining - each job builds on previous outputs.
             </p>
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function HomePage() {
               10 workflows every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              AI briefs, VoC themes, PRD drafts, prototypes, and release notes—run end-to-end with traceability and governance.
+              AI briefs, VoC themes, PRD drafts, prototypes, and release notes - run end-to-end with traceability and governance.
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">

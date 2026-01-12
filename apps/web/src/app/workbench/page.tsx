@@ -1249,7 +1249,7 @@ export default function WorkbenchPage() {
                                 <div key={i} className="p-3 rounded-lg border-l-4 border-cobalt-400 bg-muted/30">
                                   <p className="text-sm italic">"{quote.quote}"</p>
                                   <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                                    <span>— {quote.source}</span>
+                                    <span>- {quote.source}</span>
                                     {quote.url && (
                                       <a 
                                         href={quote.url} 

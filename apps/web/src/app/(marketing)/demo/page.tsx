@@ -53,7 +53,7 @@ const jobs = [
   {
     id: 'prototype_generation',
     name: 'PRD to Prototype',
-    description: 'Turn PRDs into interactive HTML prototypes—validate ideas in minutes, not weeks.',
+    description: 'Turn PRDs into interactive HTML prototypes - validate ideas in minutes, not weeks.',
     icon: Wand2,
     duration: '~50s',
     sources: ['pmkit', 'Confluence', 'Jira'],
@@ -264,7 +264,7 @@ export default function DemoPage() {
             </Badge>
             <h2 className="font-heading text-3xl font-bold">Launch Jobs from Anywhere</h2>
             <p className="mt-4 text-muted-foreground">
-              Trigger pmkit jobs directly from Slack, Microsoft Teams, or Email. No dashboard required—get
+              Trigger pmkit jobs directly from Slack, Microsoft Teams, or Email. No dashboard required - get
               results delivered right where you work.
             </p>
           </div>
@@ -293,7 +293,7 @@ export default function DemoPage() {
               </div>
               <h3 className="mt-4 font-heading font-semibold">Draft-Only Responses</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                All responses are proposals—review and approve before posting.
+                All responses are proposals - review and approve before posting.
               </p>
             </div>
           </div>
@@ -318,7 +318,7 @@ export default function DemoPage() {
             <h2 className="font-heading text-3xl font-bold">Real-Time Competitive Intelligence</h2>
             <p className="mt-4 text-muted-foreground">
               Monitor social media, web, and news sources for competitor updates, customer sentiment,
-              and market trends—automatically fed into your PM workflows.
+              and market trends - automatically fed into your PM workflows.
             </p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-3">

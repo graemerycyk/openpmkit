@@ -112,7 +112,7 @@ export default function WorkbenchLayout({
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white">
+          <Button size="sm" asChild className="bg-cobalt-600 hover:bg-cobalt-700 text-white">
             <Link href="/demo/console">
               Try Demo
             </Link>

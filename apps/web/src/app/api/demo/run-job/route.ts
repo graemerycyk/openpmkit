@@ -497,8 +497,8 @@ Key outcomes:
         `.trim(),
         supportingEvidence: `
 **Customer Evidence**
-- "This changes everything for our team" — Globex Corp (expansion now confirmed)
-- "Finally, search that works" — Initech (moving to paid plan)
+- "This changes everything for our team" - Globex Corp (expansion now confirmed)
+- "Finally, search that works" - Initech (moving to paid plan)
 - 89 community votes addressed
 - 47 support tickets resolved by this feature
 
