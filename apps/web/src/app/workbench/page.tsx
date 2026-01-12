@@ -1930,7 +1930,7 @@ export default function WorkbenchPage() {
 
       {/* Individual Raw Result Modal */}
       <Dialog open={rawResultModalOpen} onOpenChange={setRawResultModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-[90vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="font-heading break-words pr-8">
               {selectedRawResult?.title || 'Result Details'}
