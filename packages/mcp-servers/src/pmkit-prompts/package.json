@@ -1,0 +1,27 @@
+{
+  "name": "@pmkit/mcp-server-prompts",
+  "version": "1.0.0",
+  "description": "MCP server exposing pmkit PM workflows for Claude app",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "pmkit-prompts-server": "./server.js"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "mcp",
+    "pmkit",
+    "product-management",
+    "claude",
+    "ai"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@pmkit/core": "workspace:*",
+    "@pmkit/mcp": "workspace:*",
+    "@pmkit/prompts": "workspace:*",
+    "zod": "^3.23.8"
+  }
+}

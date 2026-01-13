@@ -8,6 +8,7 @@ export * from './analytics';
 export * from './competitor';
 export * from './community';
 export * from './pmkit';
+export * from './pmkit-prompts';
 export * from './social-crawler';
 export * from './web-search';
 export * from './news-crawler';

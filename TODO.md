@@ -202,6 +202,15 @@ Items that have been discussed but not committed to.
 
 ## Changelog
 
+### 2026-01-13
+- **Added pmkit-prompts MCP Server** - Standalone MCP server exposing all 10 PM workflows as tools for the Claude app
+  - Created `packages/mcp-servers/src/pmkit-prompts/` with server implementation
+  - All 10 workflows available: daily_brief, meeting_prep, voc_clustering, competitor_research, roadmap_alignment, prd_draft, sprint_review, prototype_generation, release_notes, deck_content
+  - Comprehensive README.md with setup instructions, usage examples, and troubleshooting
+  - QUICKSTART.md for 5-minute setup
+  - Standalone server executable with environment configuration
+  - Natural language invocation: "Create a Prototype based on this PRD draft"
+
 ### 2026-01-12
 - Created TODO.md
 - Completed: Infrastructure fix, AuditLog wiring, /status page, SIEM schema, telemetry schema, analysis types, guardrail events
