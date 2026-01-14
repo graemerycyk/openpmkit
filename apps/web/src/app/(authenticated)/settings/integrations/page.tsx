@@ -1,8 +1,13 @@
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   FileText,
   MessageSquare,
@@ -18,9 +23,17 @@ import {
   CheckCircle2,
   Circle,
   Sparkles,
+  AlertCircle,
+  Loader2,
 } from 'lucide-react';
 
 type ConnectionStatus = 'connected' | 'not_connected' | 'coming_soon';
+
+interface ConnectorData {
+  connectorKey: string;
+  status: 'mock' | 'real' | 'disabled';
+  workspaceName?: string;
+}
 
 interface Integration {
   id: string;
@@ -31,9 +44,11 @@ interface Integration {
   status: ConnectionStatus;
   category: 'tools' | 'crawlers';
   docsUrl?: string;
+  workspaceName?: string;
+  supportsOAuth?: boolean;
 }
 
-const integrations: Integration[] = [
+const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = [
   // Tool Integrations
   {
     id: 'jira',
@@ -41,7 +56,6 @@ const integrations: Integration[] = [
     description: 'Sync issues, epics, and sprint data for PRDs and daily briefs',
     icon: FileText,
     iconBg: 'bg-blue-100 text-blue-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/jira-integration',
   },
@@ -51,19 +65,18 @@ const integrations: Integration[] = [
     description: 'Access documentation and publish PRDs directly',
     icon: Database,
     iconBg: 'bg-blue-100 text-blue-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/confluence-integration',
   },
   {
     id: 'slack',
     name: 'Slack',
-    description: 'Get notifications and trigger jobs from Slack channels',
+    description: 'Read channel messages for Daily Brief and get notifications',
     icon: MessageSquare,
     iconBg: 'bg-purple-100 text-purple-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/slack-integration',
+    supportsOAuth: true,
   },
   {
     id: 'gong',
@@ -71,7 +84,6 @@ const integrations: Integration[] = [
     description: 'Extract customer insights from sales and CS calls',
     icon: Phone,
     iconBg: 'bg-green-100 text-green-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/gong-integration',
   },
@@ -81,7 +93,6 @@ const integrations: Integration[] = [
     description: 'Analyze support tickets for VoC clustering and trends',
     icon: HelpCircle,
     iconBg: 'bg-emerald-100 text-emerald-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/zendesk-integration',
   },
@@ -91,7 +102,6 @@ const integrations: Integration[] = [
     description: 'Pull product analytics for data-driven PRDs',
     icon: BarChart3,
     iconBg: 'bg-indigo-100 text-indigo-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/amplitude-integration',
   },
@@ -101,7 +111,6 @@ const integrations: Integration[] = [
     description: 'Monitor community discussions and feature requests',
     icon: Users,
     iconBg: 'bg-amber-100 text-amber-600',
-    status: 'not_connected',
     category: 'tools',
     docsUrl: '/resources/discourse-integration',
   },
@@ -111,7 +120,6 @@ const integrations: Integration[] = [
     description: 'Sync issues and projects from Linear',
     icon: FileText,
     iconBg: 'bg-violet-100 text-violet-600',
-    status: 'coming_soon',
     category: 'tools',
   },
   {
@@ -120,7 +128,6 @@ const integrations: Integration[] = [
     description: 'Export PRDs and artifacts to Notion pages',
     icon: Database,
     iconBg: 'bg-gray-100 text-gray-600',
-    status: 'coming_soon',
     category: 'tools',
   },
   // AI Crawlers
@@ -130,7 +137,6 @@ const integrations: Integration[] = [
     description: 'Monitor X, Reddit, LinkedIn, Discord, Bluesky, and Threads',
     icon: Hash,
     iconBg: 'bg-pink-100 text-pink-600',
-    status: 'not_connected',
     category: 'crawlers',
     docsUrl: '/resources/social-crawler-integration',
   },
@@ -140,7 +146,6 @@ const integrations: Integration[] = [
     description: 'Search Google and Bing for competitor intelligence',
     icon: Globe,
     iconBg: 'bg-cyan-100 text-cyan-600',
-    status: 'not_connected',
     category: 'crawlers',
     docsUrl: '/resources/web-search-integration',
   },
@@ -150,18 +155,23 @@ const integrations: Integration[] = [
     description: 'Track industry news and press releases',
     icon: Newspaper,
     iconBg: 'bg-orange-100 text-orange-600',
-    status: 'not_connected',
     category: 'crawlers',
     docsUrl: '/resources/news-crawler-integration',
   },
 ];
 
-function StatusBadge({ status }: { status: ConnectionStatus }) {
+// Connectors that support OAuth
+const oauthConnectors = ['slack'];
+
+// Connectors that are coming soon (no OAuth yet)
+const comingSoonConnectors = ['linear', 'notion'];
+
+function StatusBadge({ status, workspaceName }: { status: ConnectionStatus; workspaceName?: string }) {
   if (status === 'connected') {
     return (
       <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
         <CheckCircle2 className="mr-1 h-3 w-3" />
-        Connected
+        {workspaceName ? `Connected to ${workspaceName}` : 'Connected'}
       </Badge>
     );
   }
@@ -180,7 +190,19 @@ function StatusBadge({ status }: { status: ConnectionStatus }) {
   );
 }
 
-function IntegrationCard({ integration }: { integration: Integration }) {
+function IntegrationCard({
+  integration,
+  onConnect,
+  onDisconnect,
+  isLoading,
+}: {
+  integration: Integration;
+  onConnect: (id: string) => void;
+  onDisconnect: (id: string) => void;
+  isLoading: boolean;
+}) {
+  const showConnect = integration.supportsOAuth && integration.status !== 'coming_soon';
+
   return (
     <Card className="transition-all hover:shadow-md">
       <CardContent className="p-6">
@@ -194,7 +216,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
                 <h3 className="font-semibold">{integration.name}</h3>
               </div>
               <p className="text-sm text-muted-foreground">{integration.description}</p>
-              <StatusBadge status={integration.status} />
+              <StatusBadge status={integration.status} workspaceName={integration.workspaceName} />
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -203,8 +225,18 @@ function IntegrationCard({ integration }: { integration: Integration }) {
                 Coming Soon
               </Button>
             ) : integration.status === 'connected' ? (
-              <Button variant="outline">
-                Manage
+              <Button
+                variant="outline"
+                onClick={() => onDisconnect(integration.id)}
+                disabled={isLoading}
+              >
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Disconnect
+              </Button>
+            ) : showConnect ? (
+              <Button onClick={() => onConnect(integration.id)} disabled={isLoading}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Connect
               </Button>
             ) : (
               <Button asChild>
@@ -227,7 +259,117 @@ function IntegrationCard({ integration }: { integration: Integration }) {
   );
 }
 
-export default function IntegrationsPage() {
+function IntegrationsPageContent() {
+  const [connectors, setConnectors] = useState<ConnectorData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Handle URL params from OAuth callback
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    const successParam = searchParams.get('success');
+    const workspace = searchParams.get('workspace');
+
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        unauthorized: 'Please sign in to connect integrations.',
+        invalid_state: 'OAuth state validation failed. Please try again.',
+        missing_code: 'Authorization code missing. Please try again.',
+        config_error: 'Integration not configured. Contact support.',
+        user_not_found: 'User account not found. Please contact support.',
+        access_denied: 'Access denied. Please grant the required permissions.',
+        server_error: 'Server error. Please try again later.',
+      };
+      setError(errorMessages[errorParam] || `OAuth error: ${errorParam}`);
+    }
+
+    if (successParam === 'slack_connected') {
+      setSuccess(`Successfully connected to Slack${workspace ? ` workspace "${workspace}"` : ''}!`);
+    }
+
+    // Clear URL params
+    if (errorParam || successParam) {
+      router.replace('/settings/integrations');
+    }
+  }, [searchParams, router]);
+
+  // Fetch connector status
+  useEffect(() => {
+    async function fetchConnectors() {
+      try {
+        const res = await fetch('/api/connectors');
+        if (res.ok) {
+          const data = await res.json();
+          setConnectors(data.connectors || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch connectors:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchConnectors();
+  }, []);
+
+  // Build integrations with real status
+  const integrations: Integration[] = integrationDefinitions.map((def) => {
+    const connector = connectors.find((c) => c.connectorKey === def.id);
+    let status: ConnectionStatus = 'not_connected';
+
+    if (comingSoonConnectors.includes(def.id)) {
+      status = 'coming_soon';
+    } else if (connector?.status === 'real') {
+      status = 'connected';
+    }
+
+    return {
+      ...def,
+      status,
+      workspaceName: connector?.workspaceName,
+      supportsOAuth: oauthConnectors.includes(def.id),
+    };
+  });
+
+  const handleConnect = async (connectorId: string) => {
+    setActionLoading(connectorId);
+    setError(null);
+
+    // Redirect to OAuth flow
+    if (connectorId === 'slack') {
+      window.location.href = '/api/connectors/slack/authorize';
+    }
+  };
+
+  const handleDisconnect = async (connectorId: string) => {
+    setActionLoading(connectorId);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/connectors/${connectorId}/disconnect`, {
+        method: 'POST',
+      });
+
+      if (res.ok) {
+        setConnectors((prev) =>
+          prev.map((c) => (c.connectorKey === connectorId ? { ...c, status: 'disabled' } : c))
+        );
+        setSuccess(`Disconnected from ${connectorId}`);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to disconnect');
+      }
+    } catch {
+      setError('Failed to disconnect. Please try again.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const toolIntegrations = integrations.filter((i) => i.category === 'tools');
   const crawlerIntegrations = integrations.filter((i) => i.category === 'crawlers');
   const connectedCount = integrations.filter((i) => i.status === 'connected').length;
@@ -246,6 +388,22 @@ export default function IntegrationsPage() {
           {connectedCount}/{integrations.length} connected
         </Badge>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert className="border-green-200 bg-green-50 text-green-800">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Upgrade Banner */}
       <Card className="border-cobalt-200 bg-gradient-to-r from-cobalt-50 to-background">
@@ -275,11 +433,23 @@ export default function IntegrationsPage() {
             Connect your PM tools to pull data into jobs automatically
           </p>
         </div>
-        <div className="grid gap-4">
-          {toolIntegrations.map((integration) => (
-            <IntegrationCard key={integration.id} integration={integration} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {toolIntegrations.map((integration) => (
+              <IntegrationCard
+                key={integration.id}
+                integration={integration}
+                onConnect={handleConnect}
+                onDisconnect={handleDisconnect}
+                isLoading={actionLoading === integration.id}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <Separator />
@@ -294,7 +464,13 @@ export default function IntegrationsPage() {
         </div>
         <div className="grid gap-4">
           {crawlerIntegrations.map((integration) => (
-            <IntegrationCard key={integration.id} integration={integration} />
+            <IntegrationCard
+              key={integration.id}
+              integration={integration}
+              onConnect={handleConnect}
+              onDisconnect={handleDisconnect}
+              isLoading={actionLoading === integration.id}
+            />
           ))}
         </div>
       </div>
@@ -336,5 +512,17 @@ export default function IntegrationsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function IntegrationsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <IntegrationsPageContent />
+    </Suspense>
   );
 }

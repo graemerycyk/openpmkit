@@ -1,8 +1,11 @@
 import { Worker, Queue, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { JobType } from '@pmkit/core';
+import { PrismaClient } from '@prisma/client';
+import { JobType, type DailyBriefConfig } from '@pmkit/core';
 import { createMockMCPClient, initializeMockData } from '@pmkit/mock-tenant';
 import { generateStubResponse, PROMPT_TEMPLATES } from '@pmkit/prompts';
+import { initializeScheduler, createAgentWorker } from './agent-scheduler';
+import { processDailyBriefJob } from './daily-brief-job';
 
 // ============================================================================
 // Configuration
@@ -187,20 +190,68 @@ async function startWorker(): Promise<void> {
 
   console.log('[Worker] Worker started and listening for jobs');
 
-  // Handle shutdown
-  process.on('SIGTERM', async () => {
-    console.log('[Worker] Received SIGTERM, shutting down...');
-    await worker.close();
-    await connection.quit();
-    process.exit(0);
-  });
+  // Initialize agent scheduler and load active configs
+  try {
+    const scheduler = await initializeScheduler(REDIS_URL);
 
-  process.on('SIGINT', async () => {
-    console.log('[Worker] Received SIGINT, shutting down...');
-    await worker.close();
-    await connection.quit();
-    process.exit(0);
-  });
+    // Create agent worker
+    const agentWorker = await createAgentWorker(connection, processDailyBriefJob);
+    console.log('[Worker] Agent worker started');
+
+    // Load and schedule all active daily brief configs
+    const prisma = new PrismaClient();
+    const activeConfigs = await prisma.agentConfig.findMany({
+      where: {
+        status: 'active',
+        agentType: 'daily_brief',
+      },
+    });
+
+    console.log(`[Worker] Found ${activeConfigs.length} active daily brief configs`);
+
+    for (const config of activeConfigs) {
+      await scheduler.scheduleAgent({
+        ...config,
+        config: config.config as DailyBriefConfig,
+      });
+    }
+
+    await prisma.$disconnect();
+
+    // Handle shutdown - include agent worker
+    process.on('SIGTERM', async () => {
+      console.log('[Worker] Received SIGTERM, shutting down...');
+      await worker.close();
+      await agentWorker.close();
+      await connection.quit();
+      process.exit(0);
+    });
+
+    process.on('SIGINT', async () => {
+      console.log('[Worker] Received SIGINT, shutting down...');
+      await worker.close();
+      await agentWorker.close();
+      await connection.quit();
+      process.exit(0);
+    });
+  } catch (error) {
+    console.warn('[Worker] Agent scheduler initialization failed:', error);
+
+    // Handle shutdown without agent worker
+    process.on('SIGTERM', async () => {
+      console.log('[Worker] Received SIGTERM, shutting down...');
+      await worker.close();
+      await connection.quit();
+      process.exit(0);
+    });
+
+    process.on('SIGINT', async () => {
+      console.log('[Worker] Received SIGINT, shutting down...');
+      await worker.close();
+      await connection.quit();
+      process.exit(0);
+    });
+  }
 }
 
 // ============================================================================

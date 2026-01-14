@@ -77,6 +77,45 @@ export const JobSchema = z.object({
 export type Job = z.infer<typeof JobSchema>;
 
 // ============================================================================
+// Agent Config Types
+// ============================================================================
+
+export const AgentTypeSchema = z.enum(['daily_brief']);
+export type AgentType = z.infer<typeof AgentTypeSchema>;
+
+export const AgentStatusSchema = z.enum(['active', 'paused']);
+export type AgentStatus = z.infer<typeof AgentStatusSchema>;
+
+// Daily Brief specific config
+export const DailyBriefConfigSchema = z.object({
+  dataTimeframeHours: z.number().min(12).max(48).default(24),
+  deliveryTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format'),
+  timezone: z.string(), // IANA timezone, e.g., 'America/New_York'
+  slackChannels: z.array(z.string()).min(1), // Array of channel IDs
+});
+export type DailyBriefConfig = z.infer<typeof DailyBriefConfigSchema>;
+
+// Union of all agent config types (will grow as we add more agents)
+export const AgentConfigDataSchema = z.discriminatedUnion('agentType', [
+  z.object({ agentType: z.literal('daily_brief'), ...DailyBriefConfigSchema.shape }),
+]);
+export type AgentConfigData = z.infer<typeof AgentConfigDataSchema>;
+
+export const AgentConfigSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  tenantId: z.string(),
+  agentType: AgentTypeSchema,
+  status: AgentStatusSchema,
+  config: z.record(z.unknown()), // Validated against specific schema based on agentType
+  nextRunAt: z.date().optional(),
+  lastRunAt: z.date().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type AgentConfig = z.infer<typeof AgentConfigSchema>;
+
+// ============================================================================
 // Tool Call Types (MCP)
 // ============================================================================
 

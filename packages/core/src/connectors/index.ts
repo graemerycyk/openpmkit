@@ -1,5 +1,96 @@
 import { z } from 'zod';
 import { nanoid } from 'nanoid';
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
+
+// ============================================================================
+// Encryption Utilities
+// ============================================================================
+
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 16;
+const TAG_LENGTH = 16;
+const SALT_LENGTH = 32;
+
+/**
+ * Derive a key from the encryption key using scrypt
+ */
+function deriveKey(encryptionKey: string, salt: Buffer): Buffer {
+  return scryptSync(encryptionKey, salt, 32);
+}
+
+/**
+ * Encrypt sensitive data (e.g., OAuth tokens) using AES-256-GCM
+ * Returns base64-encoded string: salt:iv:tag:ciphertext
+ */
+export function encryptCredential(plaintext: string, encryptionKey: string): string {
+  const salt = randomBytes(SALT_LENGTH);
+  const key = deriveKey(encryptionKey, salt);
+  const iv = randomBytes(IV_LENGTH);
+
+  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const encrypted = Buffer.concat([
+    cipher.update(plaintext, 'utf8'),
+    cipher.final(),
+  ]);
+  const tag = cipher.getAuthTag();
+
+  // Combine salt + iv + tag + ciphertext, encode as base64
+  const combined = Buffer.concat([salt, iv, tag, encrypted]);
+  return combined.toString('base64');
+}
+
+/**
+ * Decrypt credential data encrypted with encryptCredential
+ */
+export function decryptCredential(encryptedBase64: string, encryptionKey: string): string {
+  const combined = Buffer.from(encryptedBase64, 'base64');
+
+  // Extract components
+  const salt = combined.subarray(0, SALT_LENGTH);
+  const iv = combined.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
+  const tag = combined.subarray(SALT_LENGTH + IV_LENGTH, SALT_LENGTH + IV_LENGTH + TAG_LENGTH);
+  const ciphertext = combined.subarray(SALT_LENGTH + IV_LENGTH + TAG_LENGTH);
+
+  const key = deriveKey(encryptionKey, salt);
+
+  const decipher = createDecipheriv(ALGORITHM, key, iv);
+  decipher.setAuthTag(tag);
+
+  const decrypted = Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final(),
+  ]);
+
+  return decrypted.toString('utf8');
+}
+
+/**
+ * OAuth token structure for storage
+ */
+export interface OAuthTokens {
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt?: string; // ISO date string
+  tokenType?: string;
+  scope?: string;
+  teamId?: string; // For Slack workspace ID
+  teamName?: string; // For Slack workspace name
+}
+
+/**
+ * Encrypt OAuth tokens for storage
+ */
+export function encryptTokens(tokens: OAuthTokens, encryptionKey: string): string {
+  return encryptCredential(JSON.stringify(tokens), encryptionKey);
+}
+
+/**
+ * Decrypt OAuth tokens from storage
+ */
+export function decryptTokens(encryptedBlob: string, encryptionKey: string): OAuthTokens {
+  const json = decryptCredential(encryptedBlob, encryptionKey);
+  return JSON.parse(json) as OAuthTokens;
+}
 
 // ============================================================================
 // Connector Types

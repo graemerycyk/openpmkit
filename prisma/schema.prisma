@@ -40,6 +40,7 @@ model Tenant {
   connectorInstalls  ConnectorInstall[]
   connectorPolicies  ConnectorPolicy[]
   policyDecisionLogs PolicyDecisionLog[]
+  agentConfigs       AgentConfig[]
 
   @@map("tenants")
 }
@@ -55,14 +56,15 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  jobs            Job[]
-  proposals       Proposal[] @relation("ProposalCreator")
-  reviews         Proposal[] @relation("ProposalReviewer")
-  auditLogs       AuditLog[]
-  seatAssignment  SeatAssignment?
-  usageEvents     UsageEvent[]
+  tenant            Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  jobs              Job[]
+  proposals         Proposal[] @relation("ProposalCreator")
+  reviews           Proposal[] @relation("ProposalReviewer")
+  auditLogs         AuditLog[]
+  seatAssignment    SeatAssignment?
+  usageEvents       UsageEvent[]
   connectorInstalls ConnectorInstall[]
+  agentConfigs      AgentConfig[]
 
   @@unique([tenantId, email])
   @@map("users")
@@ -337,6 +339,31 @@ model PolicyDecisionLog {
 enum PolicyDecision {
   ALLOW
   DENY
+}
+
+// ============================================================================
+// Agent Config Models
+// ============================================================================
+
+model AgentConfig {
+  id        String    @id @default(cuid())
+  userId    String
+  tenantId  String
+  agentType String    // 'daily_brief', etc.
+  status    String    @default("active") // 'active', 'paused'
+  config    Json      // Agent-specific config (e.g., { dataTimeframeHours, deliveryTimeLocal, timezone, slackChannels })
+  nextRunAt DateTime?
+  lastRunAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, agentType])
+  @@index([tenantId])
+  @@index([status, nextRunAt])
+  @@map("agent_configs")
 }
 
 // ============================================================================

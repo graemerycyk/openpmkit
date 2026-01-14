@@ -62,6 +62,8 @@ You should see a table of all 10 PM workflows.
 | `/release` | Release Notes | Customer-facing release notes |
 | `/deck` | Deck Content | Presentation slides |
 | `/ideate` | Feature Ideation | Feature ideation with action items |
+| `/onepager` | One-Pager | Executive summary / pre-read |
+| `/tldr` | TL;DR | Quick Slack-style summary |
 
 ## 📊 Workflow Input Reference
 
@@ -174,6 +176,25 @@ You should see a table of all 10 PM workflows.
 | `competitiveContext` | | What competitors are doing |
 | `constraints` | | Technical, resource, or timeline constraints |
 
+### `/onepager` - One-Pager
+| Input | Required | Description |
+|-------|----------|-------------|
+| `purpose` | ✅ | What is this one-pager for? (e.g., "Board pre-read", "Exec review") |
+| `documents` | ✅ | Source materials to synthesize (paste docs, reports, context) |
+| `audience` | | Who will read this? (e.g., "C-suite", "Cross-functional leads") |
+| `dataPoints` | | Key metrics and numbers to include |
+| `background` | | Historical context or background info |
+| `currentStatus` | | Current state of the project/initiative |
+| `requirements` | | Any specific requirements or constraints |
+
+### `/tldr` - TL;DR
+| Input | Required | Description |
+|-------|----------|-------------|
+| `sourceContent` | ✅ | The full content to summarize |
+| `contextType` | | Type of summary (e.g., "Sprint update", "Meeting recap", "Decision needed") |
+| `keyPoints` | | Specific points you want highlighted |
+| `callToAction` | | What should readers do after reading? |
+
 ## 💡 How to Use
 
 ### Method 1: Natural Language
@@ -237,7 +258,7 @@ node /path/to/pmkit/packages/mcp-servers/dist/pmkit-prompts/standalone-server.js
 You should see:
 ```
 pmkit MCP server started
-Available workflows: /brief, /meeting, /voc, /competitor, /roadmap, /prd, /sprint, /prototype, /release, /deck, /ideate
+Available workflows: /brief, /meeting, /voc, /competitor, /roadmap, /prd, /sprint, /prototype, /release, /deck, /ideate, /onepager, /tldr
 Ready to accept tool calls from Claude app
 ```
 

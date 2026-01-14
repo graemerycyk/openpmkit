@@ -36,7 +36,9 @@ type JobType =
   | 'prototype_generation'
   | 'release_notes'
   | 'deck_content'
-  | 'feature_ideation';
+  | 'feature_ideation'
+  | 'one_pager'
+  | 'tldr';
 
 interface PromptTemplate {
   id: string;
@@ -602,6 +604,136 @@ Tailor the tone, depth, and content focus based on the {{audienceType}} audience
     requiredContext: ['topic', 'audienceType'],
   },
 
+  one_pager: {
+    id: 'one-pager-v1',
+    name: 'One-Pager',
+    description: 'Synthesize multiple inputs into a concise one-page executive summary or meeting pre-read',
+    jobType: 'one_pager',
+    systemPrompt: `You are an executive communications expert helping PMs create concise, impactful one-pagers.
+
+Your job is to take multiple inputs (documents, data, context) and distill them into a single-page summary that busy executives or stakeholders can read in 2-3 minutes.
+
+Guidelines:
+- Ruthlessly prioritize - only include what matters most
+- Lead with the "so what?" - why should they care?
+- Use concrete numbers over vague statements
+- Structure for skimmability (headers, bullets, bold key points)
+- Include a clear ask or decision needed (if applicable)
+- Keep it to ONE page when printed (roughly 400-500 words max)
+- Assume the reader has 2 minutes and zero context
+- End with clear next steps or recommendations`,
+    userPromptTemplate: `Create a one-pager for {{tenantName}}.
+
+## Purpose
+{{purpose}}
+
+## Target Audience
+{{audience}}
+
+## Source Materials
+
+### Documents / Context
+{{documents}}
+
+### Key Data Points
+{{dataPoints}}
+
+### Background / History
+{{background}}
+
+### Current Status
+{{currentStatus}}
+
+## Specific Requirements
+{{requirements}}
+
+## Output Format
+
+Create a one-pager with:
+
+1. **Title** - Clear, descriptive title
+
+2. **TL;DR** (2-3 sentences max)
+   - What is this about?
+   - Why does it matter?
+   - What's the ask/outcome?
+
+3. **Context** (3-4 bullets)
+   - Essential background only
+   - Key numbers that frame the situation
+
+4. **Key Findings / Status** (4-6 bullets)
+   - Most important points
+   - Bold the critical items
+   - Include specific metrics
+
+5. **Options / Recommendations** (if applicable)
+   - 2-3 options with one-line trade-offs
+   - Or clear recommendation with rationale
+
+6. **Ask / Decision Needed** (if applicable)
+   - What do you need from the reader?
+   - By when?
+
+7. **Next Steps** (3-4 bullets)
+   - Concrete actions
+   - Owners and dates if known
+
+Keep total length under 500 words. Format for easy skimming.`,
+    outputFormat: 'markdown',
+    requiredContext: ['purpose', 'documents'],
+  },
+
+  tldr: {
+    id: 'tldr-v1',
+    name: 'TL;DR',
+    description: 'Create a quick summary for Slack, email, or async communication',
+    jobType: 'tldr',
+    systemPrompt: `You are a communication expert helping PMs write concise, scannable summaries for busy teams.
+
+Your job is to take complex information and distill it into a TL;DR that can be read in 30 seconds or less - perfect for Slack messages, email summaries, or async updates.
+
+Guidelines:
+- Maximum 3-5 bullet points
+- Each bullet is one line (under 15 words)
+- Lead with the most important point
+- Use emoji sparingly for visual scanning (📊 🚀 ⚠️ ✅ 🎯)
+- Include a clear call-to-action if needed
+- Link to details rather than including them
+- Write for someone scrolling on mobile
+- No fluff, no preamble, just the essentials`,
+    userPromptTemplate: `Create a TL;DR summary.
+
+## Context Type
+{{contextType}}
+
+## Source Content
+{{sourceContent}}
+
+## Key Points to Emphasize
+{{keyPoints}}
+
+## Call to Action (if any)
+{{callToAction}}
+
+## Output Format
+
+Create a TL;DR in this format:
+
+**TL;DR: [One-line summary]**
+
+• [Most important point]
+• [Second most important point]  
+• [Third point if needed]
+• [Fourth point if needed]
+
+[Call to action or link to details]
+
+Keep it under 100 words total. Optimize for Slack/mobile reading.`,
+    outputFormat: 'markdown',
+    requiredContext: ['sourceContent'],
+  },
+
   feature_ideation: {
     id: 'feature-ideation-v1',
     name: 'Feature Ideation',
@@ -870,6 +1002,31 @@ Problem: Users spend 20-30 min/day searching, keyword search doesn't understand 
 Slack: Team debating build vs buy, concerns about LLM costs
 Customers: 3 enterprise accounts asking about AI search after Notion launch`,
   },
+  one_pager: {
+    name: 'One-Pager',
+    command: '/onepager',
+    description: 'Synthesize multiple inputs into a concise one-page executive summary or meeting pre-read',
+    shortDescription: 'Executive summary / pre-read',
+    requiredFields: ['purpose', 'documents'],
+    optionalFields: ['audience', 'dataPoints', 'background', 'currentStatus', 'requirements', 'tenantName'],
+    example: `/onepager
+Purpose: Board meeting pre-read on Q1 search initiative
+Audience: C-suite and board members
+Documents: [paste PRD, sprint reviews, metrics]
+Data: Search time -40%, NPS +28%, $450K pipeline unblocked`,
+  },
+  tldr: {
+    name: 'TL;DR',
+    command: '/tldr',
+    description: 'Create a quick summary for Slack, email, or async communication',
+    shortDescription: 'Quick Slack-style summary',
+    requiredFields: ['sourceContent'],
+    optionalFields: ['contextType', 'keyPoints', 'callToAction'],
+    example: `/tldr
+Type: Sprint update
+Content: [paste full sprint review or meeting notes]
+CTA: Reply in thread with questions`,
+  },
 };
 
 // ============================================================================
@@ -940,6 +1097,8 @@ Available workflows:
 - /release - Customer-facing release notes
 - /deck - Presentation slide content
 - /ideate - Feature ideation with action items
+- /onepager - Executive summary / pre-read
+- /tldr - Quick Slack-style summary
 
 Use this when the user invokes a workflow command or asks for PM artifacts.`,
     inputSchema: {
@@ -1145,7 +1304,7 @@ Use this when the user invokes a workflow command or asks for PM artifacts.`,
 
   // Log startup message to stderr (stdout is used for MCP protocol)
   console.error('pmkit MCP server started');
-  console.error('Available workflows: /brief, /meeting, /voc, /competitor, /roadmap, /prd, /sprint, /prototype, /release, /deck, /ideate');
+  console.error('Available workflows: /brief, /meeting, /voc, /competitor, /roadmap, /prd, /sprint, /prototype, /release, /deck, /ideate, /onepager, /tldr');
   console.error('Ready to accept tool calls from Claude app');
 }
 
