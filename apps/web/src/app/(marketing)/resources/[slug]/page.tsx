@@ -327,7 +327,19 @@ export default async function ResourcePageComponent({ params }: PageProps) {
                     </li>
                     <li>
                       • <strong>Sprint Review</strong>: Generate sprint summaries with completed
-                      work and release notes
+                      work
+                    </li>
+                    <li>
+                      • <strong>Release Notes</strong>: Auto-generate release notes from Jira
+                      tickets
+                    </li>
+                    <li>
+                      • <strong>Deck Content</strong>: Generate presentation content and talking
+                      points
+                    </li>
+                    <li>
+                      • <strong>Prototype Generation</strong>: Convert PRDs to interactive
+                      prototypes
                     </li>
                   </ul>
                 </CardContent>
@@ -431,29 +443,36 @@ export default async function ResourcePageComponent({ params }: PageProps) {
       )}
 
       {/* Contact CTA */}
-      <section className="py-12 md:py-16">
+      <section className="bg-cobalt-600 py-12 md:py-16">
         <div className="container">
-          <div className="mx-auto max-w-3xl">
-            <div className="rounded-lg border p-8 text-center">
-              <h3 className="font-heading text-xl font-bold">Ready to get started?</h3>
-              <p className="mt-2 text-muted-foreground">
-                Contact sales for a personalized demo and pricing.
-              </p>
-              <Button variant="outline" className="mt-4" asChild>
+          <div className="mx-auto max-w-3xl text-center">
+            <h3 className="font-heading text-2xl font-bold text-white">Ready to get started?</h3>
+            <p className="mt-2 text-cobalt-100">
+              Contact sales for a personalized demo and pricing.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+              <Button className="bg-white text-cobalt-600 hover:bg-cobalt-50" asChild>
                 <Link href="/contact">Contact Sales</Link>
               </Button>
+              <Button variant="outline" className="bg-white text-cobalt-600 border-white hover:bg-cobalt-50" asChild>
+                <Link href="/pricing">View Pricing</Link>
+              </Button>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Back link */}
-            <div className="mt-12">
-              <Link
-                href="/resources"
-                className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Resources
-              </Link>
-            </div>
+      {/* Back link */}
+      <section className="py-8">
+        <div className="container">
+          <div className="mx-auto max-w-3xl">
+            <Link
+              href="/resources"
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Resources
+            </Link>
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import { SlackFetcher, type SlackMessage } from './slack-fetcher';
 import { CitationTracker, formatMessagesForPrompt } from './citation-tracker';
 import type { DailyBriefConfig } from '../../types';
+import type { AuditLogger } from '../../audit';
 
 export interface DailyBriefContext {
   tenantId: string;
@@ -11,6 +12,7 @@ export interface DailyBriefContext {
     encryptedBlob: string;
     encryptionKey: string;
   };
+  auditLogger?: AuditLogger;
 }
 
 export interface DailyBriefResult {
@@ -71,12 +73,16 @@ export async function executeDailyBrief(
   callbacks?: OrchestratorCallbacks
 ): Promise<DailyBriefResult> {
   const startTime = Date.now();
-  const { config, slackCredentials, tenantId } = context;
+  const { config, slackCredentials, tenantId, userId, jobId, auditLogger } = context;
 
-  callbacks?.onProgress?.('Starting Daily Brief generation');
+  try {
+    callbacks?.onProgress?.('Starting Daily Brief generation');
 
-  // Initialize fetcher
-  callbacks?.onProgress?.('Initializing Slack connection');
+    // Audit: Job started
+    await auditLogger?.logJobStarted(tenantId, jobId);
+
+    // Initialize fetcher
+    callbacks?.onProgress?.('Initializing Slack connection');
   const fetcher = SlackFetcher.fromEncrypted(
     slackCredentials.encryptedBlob,
     slackCredentials.encryptionKey
@@ -91,6 +97,10 @@ export async function executeDailyBrief(
 
     callbacks?.onToolCall?.('slack.conversations.history', { channelId });
     const toolStart = Date.now();
+    const toolCallId = `${jobId}-slack-${channelId}`;
+
+    // Audit: Tool call started
+    await auditLogger?.logToolCalled(tenantId, jobId, toolCallId, 'slack.conversations.history', 'slack');
 
     try {
       const messages = await fetcher.fetchChannelMessages(
@@ -100,9 +110,13 @@ export async function executeDailyBrief(
         (msg) => callbacks?.onProgress?.(msg)
       );
 
-      callbacks?.onToolComplete?.('slack.conversations.history', Date.now() - toolStart, {
+      const toolDuration = Date.now() - toolStart;
+      callbacks?.onToolComplete?.('slack.conversations.history', toolDuration, {
         messageCount: messages.length,
       });
+
+      // Audit: Tool call completed
+      await auditLogger?.logToolCompleted(tenantId, toolCallId, toolDuration);
 
       // Get permalinks for citation URLs
       for (const msg of messages) {
@@ -190,14 +204,25 @@ Use [N] citation format to reference specific messages. Be concise but comprehen
 
   callbacks?.onProgress?.('Daily Brief generation complete');
 
-  return {
-    content: fullContent,
-    sources: sourceRecords,
-    stats: {
-      channelsProcessed: config.slackChannels.length,
-      messagesProcessed: allMessages.length,
-      tokensUsed: llmResponse.usage.promptTokens + llmResponse.usage.completionTokens,
-      latencyMs: Date.now() - startTime,
-    },
-  };
+  const totalLatency = Date.now() - startTime;
+
+  // Audit: Job completed
+    await auditLogger?.logJobCompleted(tenantId, jobId, totalLatency);
+
+    return {
+      content: fullContent,
+      sources: sourceRecords,
+      stats: {
+        channelsProcessed: config.slackChannels.length,
+        messagesProcessed: allMessages.length,
+        tokensUsed: llmResponse.usage.promptTokens + llmResponse.usage.completionTokens,
+        latencyMs: totalLatency,
+      },
+    };
+  } catch (error) {
+    // Audit: Job failed
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    await auditLogger?.logJobFailed(tenantId, jobId, errorMessage);
+    throw error;
+  }
 }

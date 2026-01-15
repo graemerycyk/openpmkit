@@ -41,11 +41,14 @@ const footerLinks = {
     { name: 'News Crawler', href: '/resources/news-crawler-integration' },
   ],
   compare: [
-    { name: 'vs Automation Tools', href: '/compare/automation-tools' },
-    { name: 'vs ChatPRD', href: '/compare/chatprd' },
-    { name: 'vs Nalin', href: '/compare/nalin' },
-    { name: 'vs Jira Product Discovery', href: '/compare/jira-product-discovery' },
     { name: 'vs Productboard', href: '/compare/productboard' },
+    { name: 'vs Jira Product Discovery', href: '/compare/jira-product-discovery' },
+    { name: 'vs ChatPRD', href: '/compare/chatprd' },
+    { name: 'vs Aha!', href: '/compare/aha' },
+    { name: 'vs Linear', href: '/compare/linear' },
+    { name: 'vs Notion AI', href: '/compare/notion-ai' },
+    { name: 'vs Nalin', href: '/compare/nalin' },
+    { name: 'vs Automation Tools', href: '/compare/automation-tools' },
   ],
   company: [
     { name: 'Blog', href: '/blog' },
