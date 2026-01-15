@@ -12,14 +12,25 @@ import {
   Zap,
   AlertTriangle,
 } from 'lucide-react';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'System Status',
+  title: 'System Status | pmkit',
   description:
     'pmkit system status and service health. Check the current operational status of all pmkit services.',
+  keywords: [
+    'pmkit status',
+    'pmkit uptime',
+    'service status',
+    'system health',
+  ],
   openGraph: {
     title: 'pmkit System Status',
     description: 'Current operational status of pmkit services.',
+    url: `${siteConfig.url}/status`,
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/status`,
   },
 };
 

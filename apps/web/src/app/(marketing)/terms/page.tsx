@@ -1,9 +1,24 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
-  description: 'pmkit terms of service and usage agreement.',
+  title: 'Terms of Service | pmkit',
+  description: 'pmkit terms of service and usage agreement. Fair use policy, acceptable use, and service terms.',
+  keywords: [
+    'pmkit terms of service',
+    'AI service agreement',
+    'product management SaaS terms',
+    'fair use policy',
+  ],
+  openGraph: {
+    title: 'pmkit Terms of Service',
+    description: 'Service agreement and usage terms for pmkit.',
+    url: `${siteConfig.url}/terms`,
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/terms`,
+  },
 };
 
 export default function TermsPage() {

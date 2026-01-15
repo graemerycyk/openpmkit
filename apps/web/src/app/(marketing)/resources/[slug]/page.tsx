@@ -77,7 +77,38 @@ export default async function ResourcePageComponent({ params }: PageProps) {
 
   return (
     <>
-      {/* JSON-LD for FAQPage */}
+      {/* JSON-LD for BreadcrumbList (AEO/GEO - improves navigation in search results) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: siteConfig.url,
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Resources',
+                item: `${siteConfig.url}/resources`,
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: resource.title,
+                item: `${siteConfig.url}/resources/${resource.slug}`,
+              },
+            ],
+          }),
+        }}
+      />
+
+      {/* JSON-LD for FAQPage (AEO/GEO - appears in "People Also Ask") */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -95,6 +126,26 @@ export default async function ResourcePageComponent({ params }: PageProps) {
           }),
         }}
       />
+
+      {/* JSON-LD for HowTo (AEO/GEO - for workflow pages with steps) */}
+      {resource.workedExample && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'HowTo',
+              name: `How to use ${resource.primaryKeyword}`,
+              description: resource.workedExample.scenario,
+              step: resource.workedExample.steps.map((step, index) => ({
+                '@type': 'HowToStep',
+                position: index + 1,
+                text: step,
+              })),
+            }),
+          }}
+        />
+      )}
 
       {/* Breadcrumb */}
       <section className="border-b bg-muted/30 py-4">

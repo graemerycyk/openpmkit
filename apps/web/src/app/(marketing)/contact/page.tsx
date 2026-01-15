@@ -5,13 +5,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { MailtoButton } from '@/components/ui/mailto-button';
 import { Calendar, DollarSign, HelpCircle, Shield, ArrowRight } from 'lucide-react';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Contact Sales',
-  description: 'Contact the pmkit team for pricing, demos, and enterprise inquiries.',
+  title: 'Contact Sales | pmkit',
+  description: 'Contact the pmkit team for pricing, demos, and enterprise inquiries. Book a demo or get a custom quote.',
+  keywords: [
+    'pmkit contact',
+    'pmkit demo',
+    'product management demo',
+    'AI PM demo',
+    'enterprise inquiry',
+    'pmkit sales',
+  ],
   openGraph: {
     title: 'Contact pmkit Sales',
     description: 'Contact the pmkit team for pricing, demos, and enterprise inquiries.',
+    url: `${siteConfig.url}/contact`,
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Contact pmkit',
+    description: 'Book a demo or get enterprise pricing.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/contact`,
   },
 };
 

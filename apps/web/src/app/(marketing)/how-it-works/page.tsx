@@ -20,15 +20,34 @@ import {
   GitBranch,
   BarChart3,
 } from 'lucide-react';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'How It Works',
+  title: 'How It Works | pmkit - AI PM Workflow Architecture',
   description:
-    'Learn how pmkit runs PM workflows with draft-only AI agents, MCP connectors, and enterprise governance.',
+    'Learn how pmkit runs PM workflows with draft-only AI agents, MCP connectors, and enterprise governance. Trace every insight to its source.',
+  keywords: [
+    'how pmkit works',
+    'AI product management workflow',
+    'MCP connectors',
+    'draft-only AI',
+    'PM automation architecture',
+    'enterprise AI governance',
+    'traceable AI insights',
+  ],
   openGraph: {
     title: 'How pmkit Works',
     description:
       'Learn how pmkit runs PM workflows with draft-only AI agents, MCP connectors, and enterprise governance.',
+    url: `${siteConfig.url}/how-it-works`,
+  },
+  twitter: {
+    card: 'summary',
+    title: 'How pmkit Works',
+    description: 'Draft-only AI agents, MCP connectors, enterprise governance.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/how-it-works`,
   },
 };
 

@@ -209,7 +209,38 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <>
-      {/* JSON-LD for BlogPosting */}
+      {/* JSON-LD for BreadcrumbList (AEO/GEO) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: siteConfig.url,
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Blog',
+                item: `${siteConfig.url}/blog`,
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: post.title,
+                item: `${siteConfig.url}/blog/${post.slug}`,
+              },
+            ],
+          }),
+        }}
+      />
+
+      {/* JSON-LD for BlogPosting (enhanced for AEO/GEO) */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -221,12 +252,14 @@ export default async function BlogPostPage({ params }: PageProps) {
             datePublished: post.publishedAt,
             dateModified: post.publishedAt,
             author: {
-              '@type': 'Organization',
+              '@type': 'Person',
               name: post.author,
+              jobTitle: post.authorRole,
             },
             publisher: {
               '@type': 'Organization',
               name: 'pmkit',
+              url: siteConfig.url,
               logo: {
                 '@type': 'ImageObject',
                 url: `${siteConfig.url}/logo.png`,
@@ -235,6 +268,13 @@ export default async function BlogPostPage({ params }: PageProps) {
             mainEntityOfPage: {
               '@type': 'WebPage',
               '@id': `${siteConfig.url}/blog/${post.slug}`,
+            },
+            keywords: post.primaryKeyword,
+            articleSection: post.tags.join(', '),
+            wordCount: post.readingTime * 200, // Approximate based on reading time
+            speakable: {
+              '@type': 'SpeakableSpecification',
+              cssSelector: ['h1', '.article-summary'],
             },
           }),
         }}

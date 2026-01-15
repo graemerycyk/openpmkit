@@ -1,144 +1,229 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
-import { Battlecard, type BattlecardPoint } from '@/components/battlecard';
+import { ComparisonPage, type ComparisonPageData } from '@/components/comparison-page';
+import { siteConfig } from '@/lib/utils';
+
+// ============================================================================
+// SEO Metadata
+// ============================================================================
 
 export const metadata: Metadata = {
-  title: 'pmkit vs Jira Product Discovery',
+  title: 'pmkit vs Jira Product Discovery (2026): Complete Comparison Guide',
   description:
-    'Compare pmkit and Atlassian Jira Product Discovery (JPD). See wins, risks, and counterpunches for AI workflows vs prioritization tools.',
+    'Compare pmkit and Atlassian Jira Product Discovery (JPD). See feature comparison, pricing, and which product management tool is right for your team. Updated for 2026.',
+  keywords: [
+    'pmkit vs jira product discovery',
+    'jira product discovery alternative',
+    'JPD alternative',
+    'atlassian product discovery comparison',
+    'product prioritization tools',
+    'jira product management',
+  ],
   openGraph: {
-    title: 'pmkit vs Jira Product Discovery',
-    description: 'Compare pmkit and Atlassian JPD for product management.',
+    title: 'pmkit vs Jira Product Discovery: Which PM Tool is Right for You?',
+    description:
+      'Detailed comparison of pmkit and JPD. AI synthesis vs manual prioritization for product management.',
+    type: 'article',
+    url: `${siteConfig.url}/compare/jira-product-discovery`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'pmkit vs Jira Product Discovery Comparison',
+    description: 'Complete comparison guide for product management tools.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/compare/jira-product-discovery`,
   },
 };
 
-const battlecardPoints: BattlecardPoint[] = [
-  {
-    title: 'AI Synthesis vs Manual Prioritization',
-    wins: [
-      'AI clusters VoC feedback into themes automatically',
-      'Daily briefs synthesize updates from 5+ tools',
-      'Competitor research runs on schedule without manual work',
-    ],
-    risks: [
-      'JPD is deeply integrated with Jira ecosystem',
-      'Teams already using Jira have lower adoption friction',
-    ],
-    counterpunch:
-      'JPD helps you prioritize ideas you already have. pmkit finds the ideas by synthesizing customer feedback, support tickets, and call transcripts you don\'t have time to read.',
+// ============================================================================
+// Page Data
+// ============================================================================
+
+const comparisonData: ComparisonPageData = {
+  competitor: {
+    name: 'Jira Product Discovery',
+    tagline: 'Atlassian\'s prioritization tool',
+    website: 'https://www.atlassian.com/software/jira/product-discovery',
   },
-  {
-    title: 'Workflow Chaining to Delivery',
-    wins: [
-      'VoC themes → PRD → Jira epics in one flow',
-      'Sprint reviews generate release notes automatically',
-      'Context carries through the entire chain',
-    ],
-    risks: [
-      'JPD has native Jira integration',
-      'Delivery board features built-in',
-    ],
-    counterpunch:
-      'pmkit proposes Jira epics and stories. You approve before they\'re created. Same Jira integration, but with AI doing the synthesis work.',
+
+  headline: 'pmkit vs Jira Product Discovery: Which PM Tool is Right for You?',
+  subheadline:
+    'Jira Product Discovery (JPD) helps prioritize ideas within the Atlassian ecosystem. pmkit synthesizes customer evidence, drafts artifacts, and proposes Jira tickets with human approval. Here\'s how they compare.',
+
+  verdict: {
+    summary:
+      'JPD excels at prioritizing ideas with native Jira integration. pmkit excels at AI-powered synthesis of customer evidence into actionable artifacts that chain into Jira delivery.',
+    pmkitBestFor:
+      'You need AI to synthesize customer feedback into insights, draft artifacts, and propose Jira tickets—with governance and approval workflows.',
+    competitorBestFor:
+      'You need a prioritization and discovery board tightly integrated with Jira delivery, with manual idea management.',
   },
-  {
-    title: 'Draft-Only Governance',
-    wins: [
-      'All Jira writes are proposals for human review',
-      'Full audit trail of what was proposed and why',
-      'No accidental ticket creation or updates',
-    ],
-    risks: [
-      'JPD allows direct manipulation of ideas',
-      'Faster for quick prioritization changes',
-    ],
-    counterpunch:
-      'Direct manipulation is fine for prioritization. But when AI is creating Jira tickets, you want a review step. pmkit never writes without approval.',
-  },
-];
 
-export default function JPDComparePage() {
-  return (
-    <>
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-cobalt-50/50 to-background py-16 md:py-24">
-        <div className="container">
-          <div className="mb-6">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/compare">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                All Comparisons
-              </Link>
-            </Button>
-          </div>
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="cobalt" className="mb-4">
-              Battlecard
-            </Badge>
-            <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-              pmkit vs
-              <span className="text-cobalt-600"> Jira Product Discovery</span>
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground">
-              JPD helps prioritize ideas. pmkit synthesizes customer evidence, drafts artifacts,
-              and proposes Jira tickets, all with human approval before anything is created.
-            </p>
-          </div>
-        </div>
-      </section>
+  features: [
+    {
+      name: 'AI synthesis of customer feedback',
+      pmkit: 'yes',
+      competitor: 'no',
+      note: 'pmkit clusters VoC feedback into themes automatically',
+    },
+    {
+      name: 'Daily brief generation',
+      pmkit: 'yes',
+      competitor: 'no',
+      note: 'Synthesizes updates from 5+ tools automatically',
+    },
+    {
+      name: 'PRD drafting with evidence',
+      pmkit: 'yes',
+      competitor: 'no',
+    },
+    {
+      name: 'Workflow chaining',
+      pmkit: 'yes',
+      competitor: 'no',
+      note: 'VoC → PRD → Jira epics in one flow',
+    },
+    {
+      name: 'Draft-only Jira writes',
+      pmkit: 'yes',
+      competitor: 'no',
+      note: 'All Jira writes are proposals for review',
+    },
+    {
+      name: 'Native Jira integration',
+      pmkit: 'yes',
+      competitor: 'yes',
+      note: 'Both integrate with Jira; JPD is native Atlassian',
+    },
+    {
+      name: 'Idea prioritization matrix',
+      pmkit: 'no',
+      competitor: 'yes',
+    },
+    {
+      name: 'Delivery board features',
+      pmkit: 'no',
+      competitor: 'yes',
+    },
+    {
+      name: 'Impact/effort scoring',
+      pmkit: 'no',
+      competitor: 'yes',
+    },
+    {
+      name: 'Stakeholder voting',
+      pmkit: 'no',
+      competitor: 'yes',
+    },
+    {
+      name: 'Competitor research automation',
+      pmkit: 'yes',
+      competitor: 'no',
+      note: 'Scheduled competitor monitoring',
+    },
+    {
+      name: 'Sprint review generation',
+      pmkit: 'yes',
+      competitor: 'no',
+    },
+    {
+      name: 'Release notes automation',
+      pmkit: 'yes',
+      competitor: 'no',
+    },
+    {
+      name: 'Full audit trail',
+      pmkit: 'yes',
+      competitor: 'partial',
+    },
+  ],
 
-      {/* Battlecard */}
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-4xl">
-            <Battlecard points={battlecardPoints} />
-          </div>
-        </div>
-      </section>
+  sections: [
+    {
+      title: 'Approach to Product Discovery',
+      description:
+        'JPD helps you prioritize ideas you already have. pmkit finds the ideas by synthesizing customer feedback you don\'t have time to read.',
+      pmkitAdvantage:
+        'AI clusters VoC feedback into themes automatically. Daily briefs synthesize updates from 5+ tools. Competitor research runs on schedule without manual work.',
+      competitorAdvantage:
+        'Deeply integrated with Jira ecosystem. Teams already using Jira have lower adoption friction. Native impact/effort scoring.',
+    },
+    {
+      title: 'Workflow to Delivery',
+      description:
+        'Both tools help get from ideas to shipped features, but with different approaches.',
+      pmkitAdvantage:
+        'VoC themes → PRD → Jira epics in one flow. Sprint reviews generate release notes automatically. Context carries through the entire chain.',
+      competitorAdvantage:
+        'Native Jira integration with delivery board features built-in. Ideas flow directly to Jira issues without leaving Atlassian.',
+    },
+    {
+      title: 'Governance & Control',
+      description:
+        'When AI creates Jira tickets, you want a review step. When humans create tickets, direct manipulation is fine.',
+      pmkitAdvantage:
+        'All Jira writes are proposals for human review. Full audit trail of what was proposed and why. No accidental ticket creation or updates.',
+      competitorAdvantage:
+        'Direct manipulation of ideas and priorities. Faster for quick prioritization changes without approval overhead.',
+    },
+    {
+      title: 'AI Capabilities',
+      description:
+        'pmkit is built around AI synthesis; JPD is built around manual prioritization with some AI features.',
+      pmkitAdvantage:
+        'Every workflow is AI-powered: VoC clustering, PRD drafting, competitor research, daily briefs. AI does the synthesis work while humans make decisions.',
+      competitorAdvantage:
+        'Atlassian Intelligence features are available. Focus on manual workflows means more control over outputs.',
+    },
+    {
+      title: 'Best Use Case',
+      description:
+        'Choose based on whether you need AI synthesis or manual prioritization.',
+      pmkitAdvantage:
+        'Teams drowning in customer feedback, support tickets, and Slack noise who want AI to synthesize and draft artifacts automatically.',
+      competitorAdvantage:
+        'Teams who want a visual prioritization board integrated with Jira delivery, with manual control over idea management.',
+    },
+  ],
 
-      {/* Bottom Line */}
-      <section className="bg-muted/30 py-16 md:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-2xl font-bold">The Bottom Line</h2>
-            <p className="mt-4 text-muted-foreground">
-              <strong>Use JPD</strong> if you need a prioritization and discovery board
-              tightly integrated with Jira delivery.
-            </p>
-            <p className="mt-2 text-muted-foreground">
-              <strong>Use pmkit</strong> if you need AI to synthesize evidence, draft artifacts,
-              and propose Jira tickets, with governance and approval workflows.
-            </p>
-            <p className="mt-4 text-sm text-muted-foreground">
-              They can work together: use JPD for prioritization, pmkit for synthesis and drafting.
-            </p>
-          </div>
-        </div>
-      </section>
+  faqs: [
+    {
+      question: 'Can pmkit and Jira Product Discovery work together?',
+      answer:
+        'Yes. They serve different purposes. Use JPD for prioritization and the visual discovery board. Use pmkit for AI synthesis, PRD drafting, and automated workflows. pmkit can propose Jira epics that flow into your JPD-managed backlog.',
+    },
+    {
+      question: 'What\'s the main difference between pmkit and JPD?',
+      answer:
+        'JPD helps you prioritize ideas you already have with manual workflows. pmkit uses AI to find ideas by synthesizing customer feedback, support tickets, and call transcripts, then drafts artifacts and proposes Jira tickets.',
+    },
+    {
+      question: 'Does pmkit replace Jira?',
+      answer:
+        'No. pmkit integrates with Jira. It proposes Jira epics and stories based on synthesized customer evidence. You approve the proposals, then the tickets are created in your Jira instance. pmkit enhances Jira, not replaces it.',
+    },
+    {
+      question: 'Is JPD free for Jira users?',
+      answer:
+        'Jira Product Discovery has its own pricing, typically included in certain Jira plans or available as an add-on. Check Atlassian\'s current pricing for the latest details.',
+    },
+    {
+      question: 'Which has better Atlassian integration?',
+      answer:
+        'JPD is native Atlassian and has deeper integration with the Atlassian ecosystem. pmkit integrates with Jira via APIs and can propose tickets, but it\'s not an Atlassian product.',
+    },
+    {
+      question: 'Can pmkit help with prioritization?',
+      answer:
+        'pmkit surfaces customer evidence that informs prioritization decisions, but it doesn\'t have a visual prioritization matrix like JPD. Use pmkit to synthesize evidence, then make prioritization decisions in JPD or your preferred tool.',
+    },
+  ],
+};
 
-      {/* CTA */}
-      <section className="bg-cobalt-600 py-16 text-white md:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">See AI-Powered Synthesis</h2>
-            <p className="mt-4 text-cobalt-100">
-              Try VoC Clustering and see how pmkit synthesizes feedback into actionable themes.
-            </p>
-            <div className="mt-8">
-              <Button size="lg" variant="secondary" asChild>
-                <Link href="/demo">
-                  Try the Demo
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+// ============================================================================
+// Page Component
+// ============================================================================
+
+export default function JiraProductDiscoveryComparisonPage() {
+  return <ComparisonPage data={comparisonData} />;
 }
-

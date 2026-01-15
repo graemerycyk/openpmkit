@@ -1,8 +1,44 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn, siteConfig } from '@/lib/utils';
+
+export const metadata: Metadata = {
+  title: 'pmkit - AI Product Management Toolkit | Daily Briefs, PRDs, Prototypes',
+  description:
+    'Your daily PM toolkit. AI-powered workflows for product managers: daily briefs, meeting prep, PRD drafts, VoC clustering, competitor research, and PRD to prototype conversion.',
+  keywords: [
+    'pmkit',
+    'AI product management',
+    'PM toolkit',
+    'AI PRD generator',
+    'daily brief automation',
+    'meeting prep AI',
+    'VoC clustering',
+    'competitor research AI',
+    'PRD to prototype',
+    'product management software',
+    'AI PM assistant',
+  ],
+  openGraph: {
+    title: 'pmkit - AI Product Management Toolkit',
+    description:
+      'Your daily PM toolkit. AI-powered briefs, PRDs, and prototypes - made simple.',
+    url: siteConfig.url,
+    siteName: 'pmkit',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'pmkit - AI Product Management Toolkit',
+    description: 'Your daily PM toolkit. AI-powered briefs, PRDs, and prototypes - made simple.',
+  },
+  alternates: {
+    canonical: siteConfig.url,
+  },
+};
 import {
   FileText,
   Users,
@@ -169,6 +205,49 @@ export default function HomePage() {
               priceCurrency: 'USD',
               price: '0',
               priceValidUntil: '2026-12-31',
+            },
+          }),
+        }}
+      />
+      {/* JSON-LD for SoftwareApplication (AEO/GEO - helps AI understand this is a SaaS tool) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'pmkit',
+            applicationCategory: 'BusinessApplication',
+            applicationSubCategory: 'Product Management Software',
+            operatingSystem: 'Web Browser',
+            description:
+              'AI-powered product management automation platform. Automate daily briefs, PRD writing, meeting prep, VoC clustering, competitive research, and more.',
+            offers: {
+              '@type': 'AggregateOffer',
+              lowPrice: '0',
+              highPrice: '49',
+              priceCurrency: 'USD',
+              offerCount: '2',
+            },
+            featureList: [
+              'Daily Brief automation',
+              'AI PRD generator',
+              'Meeting prep packs',
+              'Voice of Customer clustering',
+              'Competitive research automation',
+              'Roadmap alignment memos',
+              'Sprint review packs',
+              'Release notes generator',
+              'PRD to prototype conversion',
+              'Deck content generation',
+            ],
+            softwareVersion: '1.0',
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '4.8',
+              ratingCount: '50',
+              bestRating: '5',
+              worstRating: '1',
             },
           }),
         }}

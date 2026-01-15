@@ -18,14 +18,33 @@ import {
   FileText,
   Brain,
 } from 'lucide-react';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Trust Center',
+  title: 'Trust Center | pmkit - Security & Compliance',
   description:
     'pmkit security practices, privacy controls, and compliance status. Learn how we protect your data with draft-only architecture and enterprise-grade governance.',
+  keywords: [
+    'pmkit trust center',
+    'AI security compliance',
+    'SOC 2 compliance',
+    'GDPR compliance',
+    'data processing agreement',
+    'enterprise AI security',
+    'AI data privacy',
+  ],
   openGraph: {
     title: 'pmkit Trust Center',
     description: 'Security, privacy, and compliance for enterprise product teams.',
+    url: `${siteConfig.url}/trust`,
+  },
+  twitter: {
+    card: 'summary',
+    title: 'pmkit Trust Center',
+    description: 'Security, privacy, and compliance information.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/trust`,
   },
 };
 

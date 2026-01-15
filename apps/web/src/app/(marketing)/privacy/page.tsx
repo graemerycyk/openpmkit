@@ -1,9 +1,25 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description: 'pmkit privacy policy and data handling practices.',
+  title: 'Privacy Policy | pmkit',
+  description: 'pmkit privacy policy and data handling practices. Learn how we collect, use, and protect your data.',
+  keywords: [
+    'pmkit privacy policy',
+    'AI data handling',
+    'product management privacy',
+    'data retention policy',
+    'GDPR rights',
+  ],
+  openGraph: {
+    title: 'pmkit Privacy Policy',
+    description: 'How we collect, use, and protect your data.',
+    url: `${siteConfig.url}/privacy`,
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/privacy`,
+  },
 };
 
 export default function PrivacyPage() {

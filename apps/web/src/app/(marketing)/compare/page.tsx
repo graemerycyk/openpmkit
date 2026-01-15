@@ -4,39 +4,52 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, FileText, Lightbulb, LayoutGrid, Target, Workflow } from 'lucide-react';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'pmkit vs Competitors',
+  title: 'pmkit vs Competitors | AI PM Tool Comparisons',
   description:
     'See how pmkit compares to ChatPRD, Nalin, Atlassian Jira Product Discovery, Productboard, and automation tools like Zapier. Battlecard comparisons with wins, risks, and counterpunches.',
+  keywords: [
+    'pmkit vs competitors',
+    'ChatPRD alternative',
+    'Productboard alternative',
+    'Jira Product Discovery alternative',
+    'AI product management comparison',
+    'PM tool comparison',
+    'Nalin alternative',
+    'Aha alternative',
+  ],
   openGraph: {
     title: 'pmkit vs Competitors',
     description:
       'See how pmkit compares to ChatPRD, Nalin, Atlassian Jira Product Discovery, Productboard, and automation tools.',
+    url: `${siteConfig.url}/compare`,
+  },
+  twitter: {
+    card: 'summary',
+    title: 'pmkit vs Competitors',
+    description: 'Honest comparisons with wins, risks, and counterpunches.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/compare`,
   },
 };
 
 const competitors = [
   {
-    slug: 'automation-tools',
-    name: 'Automation Tools',
-    tagline: 'Zapier, Make, n8n, and more',
-    description: 'Job automation tools are great for simple workflows. pmkit is built for PM work that needs governance, traceability, and chained deliverables.',
-    icon: Workflow,
+    slug: 'productboard',
+    name: 'Productboard',
+    tagline: 'Product management platform',
+    description: 'Productboard is a centralized PM platform. pmkit is an AI agent that automates workflows using your existing tools.',
+    icon: Target,
   },
   {
-    slug: 'chatprd',
-    name: 'ChatPRD',
-    tagline: 'AI PRD writing assistant',
-    description: 'ChatPRD generates PRDs from prompts. pmkit grounds PRDs in actual customer evidence with full traceability.',
-    icon: FileText,
-  },
-  {
-    slug: 'nalin',
-    name: 'Nalin',
-    tagline: 'AI product management copilot',
-    description: 'Nalin is a general PM copilot. pmkit is a workflow engine with draft-only governance and chained deliverables.',
-    icon: Lightbulb,
+    slug: 'aha',
+    name: 'Aha!',
+    tagline: 'Product roadmap software',
+    description: 'Aha! is comprehensive roadmap software. pmkit automates PM workflows with AI synthesis and traceable artifacts.',
+    icon: LayoutGrid,
   },
   {
     slug: 'jira-product-discovery',
@@ -46,11 +59,39 @@ const competitors = [
     icon: LayoutGrid,
   },
   {
-    slug: 'productboard',
-    name: 'Productboard',
-    tagline: 'Product management platform',
-    description: 'Productboard is a PM platform. pmkit is an AI agent that runs workflows and proposes artifacts for review.',
-    icon: Target,
+    slug: 'chatprd',
+    name: 'ChatPRD',
+    tagline: 'AI PRD writing assistant',
+    description: 'ChatPRD generates PRDs from prompts. pmkit grounds PRDs in actual customer evidence with full traceability.',
+    icon: FileText,
+  },
+  {
+    slug: 'notion-ai',
+    name: 'Notion AI',
+    tagline: 'AI-powered workspace',
+    description: 'Notion AI enhances a general workspace. pmkit is purpose-built for PM workflows with deep integrations.',
+    icon: Lightbulb,
+  },
+  {
+    slug: 'linear',
+    name: 'Linear',
+    tagline: 'Modern issue tracking',
+    description: 'Linear is fast issue tracking for dev teams. pmkit automates PM workflows that feed into Linear or Jira.',
+    icon: Workflow,
+  },
+  {
+    slug: 'nalin',
+    name: 'Nalin',
+    tagline: 'AI product management copilot',
+    description: 'Nalin is a conversational PM copilot. pmkit is a workflow engine with governance and enterprise integrations.',
+    icon: Lightbulb,
+  },
+  {
+    slug: 'automation-tools',
+    name: 'Automation Tools',
+    tagline: 'Zapier, Make, n8n, and more',
+    description: 'Job automation tools are great for simple workflows. pmkit is built for PM work that needs governance and traceability.',
+    icon: Workflow,
   },
 ];
 

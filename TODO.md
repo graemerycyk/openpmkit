@@ -6,7 +6,7 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-14
+Last updated: 2026-01-15 (SEO content pages created)
 
 ---
 
@@ -94,14 +94,59 @@ Only needed for real customer data. Demo works with mock data.
 
 **6.2 Slack**
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Slack API app | 🔲 Pending | Create from scratch |
-| Redirect URL | 🔲 Pending | `/api/connectors/slack/callback` |
-| Bot scopes | 🔲 Pending | channels:history, channels:read, groups:history, groups:read, users:read, users:read.email |
-| SLACK_CLIENT_ID | 🔲 Pending | Add to env |
-| SLACK_CLIENT_SECRET | 🔲 Pending | Add to env |
-| SLACK_SIGNING_SECRET | 🔲 Pending | Add to env |
+**Option A: Development/Testing App (Quick Setup)**
+
+Create your own Slack app for testing. Each developer needs their own app.
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create Slack app | 🔲 Pending | Go to https://api.slack.com/apps → Create New App → From scratch |
+| 2. Name the app | 🔲 Pending | e.g., "PMKit Dev" and select your test workspace |
+| 3. Add Bot Token Scopes | 🔲 Pending | OAuth & Permissions → Bot Token Scopes → Add: `channels:history`, `channels:read`, `groups:history`, `groups:read`, `users:read` |
+| 4. Set Redirect URL | 🔲 Pending | OAuth & Permissions → Redirect URLs → Add: `http://localhost:3000/api/connectors/slack/callback` |
+| 5. Copy Client ID | 🔲 Pending | Basic Information → App Credentials → Client ID |
+| 6. Copy Client Secret | 🔲 Pending | Basic Information → App Credentials → Client Secret (click Show) |
+| 7. Install to workspace | 🔲 Pending | OAuth & Permissions → Install to Workspace → Allow |
+| 8. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET` |
+| 9. Generate encryption key | 🔲 Pending | Run: `openssl rand -hex 32` → Add as `CONNECTOR_ENCRYPTION_KEY` |
+| 10. Invite bot to channels | 🔲 Pending | In Slack: `/invite @YourBotName` in channels you want to read |
+
+**Option B: Production App (Slack App Directory)**
+
+Publish a single PMKit app for all customers. One-click install experience.
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create production app | 🔲 Pending | https://api.slack.com/apps → Create New App → From scratch → "PMKit" |
+| 2. Add Bot Token Scopes | 🔲 Pending | Same scopes as Option A |
+| 3. Set production redirect | 🔲 Pending | `https://getpmkit.com/api/connectors/slack/callback` |
+| 4. Add app icon | 🔲 Pending | Basic Information → Display Information → App Icon (512x512 PNG) |
+| 5. Write short description | 🔲 Pending | Basic Information → Short description (80 chars max) |
+| 6. Write long description | 🔲 Pending | Basic Information → Long description (what the app does) |
+| 7. Add privacy policy URL | 🔲 Pending | `https://getpmkit.com/privacy` |
+| 8. Add support URL | 🔲 Pending | `https://getpmkit.com/contact` or support email |
+| 9. Request scopes justification | 🔲 Pending | Explain why each scope is needed for App Directory review |
+| 10. Submit to App Directory | 🔲 Pending | Manage Distribution → Submit to Slack App Directory |
+| 11. Respond to review feedback | 🔲 Pending | Typically 1-2 weeks, may require changes |
+| 12. Update production env vars | 🔲 Pending | Once approved, add production Client ID/Secret to DO |
+
+**Scope Justifications for App Directory**
+
+| Scope | Justification |
+|-------|---------------|
+| `channels:history` | Read messages from public channels for Daily Brief synthesis |
+| `channels:read` | List public channels so users can select which to include |
+| `groups:history` | Read messages from private channels user has added bot to |
+| `groups:read` | List private channels for selection (only those bot is in) |
+| `users:read` | Display author names in Daily Brief citations |
+
+**Environment Variables**
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| SLACK_CLIENT_ID | `apps/web/.env.local` | From Slack app Basic Information |
+| SLACK_CLIENT_SECRET | `apps/web/.env.local` | From Slack app Basic Information |
+| CONNECTOR_ENCRYPTION_KEY | `apps/web/.env.local` | Generate with `openssl rand -hex 32` |
 
 **6.3 Gong**
 
@@ -131,11 +176,78 @@ Only needed for real customer data. Demo works with mock data.
 
 ### Phase 7: Analytics & SEO 🔲 OPTIONAL
 
+**7.1 Analytics Setup**
+
 | Item | Status | Notes |
 |------|--------|-------|
 | Simple Analytics | 🔲 Pending | NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN |
 | Google Search Console | 🔲 Pending | NEXT_PUBLIC_GSC_VERIFICATION |
 | Bing Webmaster Tools | 🔲 Pending | NEXT_PUBLIC_BING_VERIFICATION |
+
+**7.2 AEO/GEO Structured Data** ✅ IMPROVED
+
+| Item | Status | Notes |
+|------|--------|-------|
+| BreadcrumbList schema (resources) | ✅ Done | Improves navigation in search results |
+| BreadcrumbList schema (blog) | ✅ Done | Improves navigation in search results |
+| FAQPage schema | ✅ Done | Appears in "People Also Ask" |
+| HowTo schema | ✅ Done | For workflow pages with steps |
+| BlogPosting with speakable | ✅ Done | Voice search optimization |
+| SoftwareApplication schema | ✅ Done | Helps AI understand this is a SaaS tool |
+| Organization schema | ✅ Done | Already on homepage |
+| Product schema | ✅ Done | Already on homepage |
+
+**7.3 SEO Content Gaps** ✅ MOSTLY COMPLETE
+
+Priority pages to create for keyword coverage:
+
+| Page Type | Status | Target Keywords |
+|-----------|--------|-----------------|
+| `/integrations/jira` | ✅ Done | "Jira AI integration", "Jira automation PM" |
+| `/integrations/slack` | ✅ Done | "Slack AI product managers", "Slack daily brief" |
+| `/integrations/gong` | ✅ Done | "Gong AI insights", "call transcript analysis PM" |
+| `/integrations/confluence` | ✅ Done | "Confluence AI", "auto-generate Confluence" |
+| `/integrations/zendesk` | ✅ Done | "Zendesk ticket analysis AI" |
+| `/integrations/amplitude` | 🔲 Pending | "Amplitude product analytics AI" (marked as coming soon) |
+| `/use-cases/saas-pm` | 🔲 Pending | "AI for SaaS product managers" |
+| `/use-cases/enterprise-pm` | 🔲 Pending | "enterprise product management AI" |
+| `/use-cases/b2b-teams` | 🔲 Pending | "B2B product management automation" |
+| `/use-cases/product-ops` | 🔲 Pending | "product operations automation" |
+| `/guides/how-to-write-prd-ai` | ✅ Done | "how to write PRD with AI" |
+| `/guides/prioritize-features-ai` | ✅ Done | "feature prioritization AI" |
+| `/guides/automate-release-notes` | ✅ Done | "automate release notes" |
+| `/templates/prd` | ✅ Done | "PRD template", "product requirements template" |
+| `/templates/daily-brief` | ✅ Done | "daily standup template PM" |
+| `/compare/notion-ai` | ✅ Done | "pmkit vs Notion AI" |
+| `/compare/linear` | ✅ Done | "pmkit vs Linear" |
+| `/compare/aha` | ✅ Done | "pmkit vs Aha" |
+
+**7.4 Long-Tail Keywords to Target** 🔲 PENDING
+
+High-value keywords not yet targeted in existing content:
+
+| Keyword | Search Intent | Suggested Content |
+|---------|---------------|-------------------|
+| "how to automate product management tasks" | Informational | Blog post or guide |
+| "AI tool for product requirements" | Commercial | Integration page |
+| "automate customer feedback analysis" | Commercial | VoC resource page enhancement |
+| "Jira to PRD automation" | Commercial | Integration landing page |
+| "daily standup brief automation" | Commercial | Daily Brief resource enhancement |
+| "competitive analysis tool PM" | Commercial | Competitor research page |
+| "feature prioritization framework AI" | Informational | Guide or blog post |
+| "product roadmap from customer feedback" | Informational | Blog post |
+| "AI sprint planning assistant" | Commercial | Sprint review resource enhancement |
+| "PRD generator free" | Commercial | Demo page SEO |
+
+**7.5 Competitor Keywords to Capture**
+
+| Competitor | Their Keywords | PMKit Opportunity |
+|------------|----------------|-------------------|
+| ChatPRD | "AI PRD generator", "AI product manager" | Compare page, PRD template page |
+| ProductBoard | "customer feedback platform", "feature prioritization" | VoC clustering, roadmap alignment |
+| Aha! | "product roadmap software", "roadmap template" | Roadmap alignment, template pages |
+| Notion AI | "product management template", "AI workspace" | All-in-one positioning, template pages |
+| Linear | "developer issue tracking", "modern Jira" | Cross-team dependencies, sprint review |
 
 ### Phase 8: Database Migration 🔲 REQUIRED
 
@@ -581,7 +693,36 @@ Items that have been discussed but not committed to.
 
 ## Changelog
 
+### 2026-01-15
+- **SEO Content Pages Created** - Major content expansion for organic traffic:
+  - **Integration landing pages**: Created `/integrations` index plus 5 integration pages (Jira, Slack, Gong, Confluence, Zendesk) with FAQPage schema, BreadcrumbList, and keyword-optimized metadata
+  - **Template pages**: Created `/templates` index plus 2 template pages (PRD, Daily Brief) with HowTo schema and step-by-step guides
+  - **How-to guides**: Created `/guides` index plus 3 guides (how-to-write-prd-ai, prioritize-features-ai, automate-release-notes) with HowTo schema and detailed step-by-step instructions
+  - **Comparison pages**: Created 3 new comparison pages (Notion AI, Linear, Aha) and converted 3 existing battlecard pages (ChatPRD, Nalin, Jira Product Discovery) to SEO-optimized ComparisonPage format with FAQPage schema, feature tables, and structured sections
+  - **Compare index**: Updated to show all 8 competitor comparisons
+- Total: 16 new pages created, 4 pages converted to SEO format
+
 ### 2026-01-14
+- **SEO/AEO/GEO Audit & Improvements** - Comprehensive search optimization:
+  - Added BreadcrumbList schema to resource and blog pages
+  - Added HowTo schema to workflow resource pages (for "how-to" search results)
+  - Added SoftwareApplication schema to homepage (helps AI understand SaaS product)
+  - Enhanced BlogPosting schema with speakable markup (voice search)
+  - Identified 18+ missing landing pages for keyword gaps
+  - Documented competitor keyword strategies (ProductBoard, Aha!, ChatPRD, Notion AI, Linear)
+  - Created content gap analysis with priority keywords
+  - Added long-tail keyword targets to TODO
+- **Updated Slack connector setup** - Added detailed step-by-step instructions for:
+  - Option A: Development/Testing app (quick setup for local testing)
+  - Option B: Production app (Slack App Directory submission for one-click customer install)
+  - Scope justifications for App Directory review
+  - Environment variable reference
+- **Daily Brief Agent MVP Complete** - Full implementation of autonomous agent:
+  - Slack OAuth flow (`/api/connectors/slack/authorize` + `/callback`)
+  - Token encryption with AES-256-GCM
+  - Agent orchestrator with citation tracking
+  - BullMQ scheduler for autonomous execution
+  - Setup UI, history page, and detail page
 - **Added Deployment Checklist** - Full 9-phase deployment tracking:
   - Phase 1-3 ✅ Complete: Infrastructure (DO PostgreSQL, Valkey, Spaces), LLM config, Google OAuth
   - Phase 4 🔲 Optional: Microsoft OAuth (Azure AD)

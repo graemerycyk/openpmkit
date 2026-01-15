@@ -3,11 +3,34 @@ import Link from 'next/link';
 import { Shield, Lock, Eye, FileCheck, Users, Server } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Security',
+  title: 'Security | pmkit - Enterprise Data Protection',
   description:
-    'Learn about pmkit security practices, data protection, and enterprise-grade governance.',
+    'Learn about pmkit security practices, data protection, and enterprise-grade governance. Draft-only architecture, encryption, and audit logging.',
+  keywords: [
+    'pmkit security',
+    'AI data protection',
+    'enterprise AI security',
+    'draft-only architecture',
+    'SOC 2 compliance',
+    'GDPR compliance',
+    'AI audit logging',
+  ],
+  openGraph: {
+    title: 'pmkit Security',
+    description: 'Enterprise-grade security with draft-only architecture and full audit trails.',
+    url: `${siteConfig.url}/security`,
+  },
+  twitter: {
+    card: 'summary',
+    title: 'pmkit Security',
+    description: 'Enterprise-grade data protection for AI PM workflows.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/security`,
+  },
 };
 
 const securityFeatures = [

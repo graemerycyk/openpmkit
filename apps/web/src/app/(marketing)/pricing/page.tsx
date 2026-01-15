@@ -4,14 +4,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Building2, Users, Zap, Shield, HelpCircle } from 'lucide-react';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'Pricing | pmkit - AI PM Workflow Automation',
   description:
     'pmkit pricing: Teams plan at $49/seat/month (billed annually) for product teams, Enterprise for custom deployments with SAML/SCIM and advanced controls.',
+  keywords: [
+    'pmkit pricing',
+    'AI product management pricing',
+    'PM automation cost',
+    'product management software pricing',
+    'enterprise PM tools',
+    'AI PRD generator pricing',
+  ],
   openGraph: {
     title: 'pmkit Pricing: Teams & Enterprise',
     description: 'Annual pricing for product teams. Teams at $49/seat/month billed annually, Enterprise custom.',
+    url: `${siteConfig.url}/pricing`,
+  },
+  twitter: {
+    card: 'summary',
+    title: 'pmkit Pricing',
+    description: 'Teams plan at $49/seat/month, Enterprise custom pricing.',
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/pricing`,
   },
 };
 
