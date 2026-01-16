@@ -51,6 +51,8 @@ import {
   Copy,
   Presentation,
   Shield,
+  FolderOpen,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SignInModal } from '@/components/auth/sign-in-modal';
@@ -204,6 +206,9 @@ const connectors: Connector[] = [
   { id: 'zendesk', name: 'Zendesk', icon: HelpCircle, status: 'connected_demo', type: 'mcp' },
   { id: 'amplitude', name: 'Amplitude', icon: BarChart3, status: 'connected_demo', type: 'mcp' },
   { id: 'discourse', name: 'Discourse', icon: Users, status: 'connected_demo', type: 'mcp' },
+  { id: 'gmail', name: 'Gmail', icon: Mail, status: 'connected_demo', type: 'mcp', description: 'Email threads and messages' },
+  { id: 'google-drive', name: 'Google Drive', icon: FolderOpen, status: 'connected_demo', type: 'mcp', description: 'Docs, Sheets, Slides' },
+  { id: 'google-calendar', name: 'Google Calendar', icon: Calendar, status: 'connected_demo', type: 'mcp', description: 'Events and meetings' },
   { id: 'pmkit', name: 'pmkit Artifacts', icon: Layers, status: 'connected_demo', type: 'mcp', description: 'PRDs, briefs, reports from previous jobs' },
   // AI Crawlers
   { id: 'social_crawler', name: 'Social Crawler', icon: Hash, status: 'connected_demo', type: 'crawler', description: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
@@ -240,23 +245,28 @@ const jobConfigs: Record<
     name: 'Daily Brief',
     description: 'Synthesize overnight activity',
     icon: FileText,
-    sources: ['slack', 'jira', 'zendesk', 'discourse'],
+    sources: ['slack', 'jira', 'zendesk', 'discourse', 'gmail', 'google-calendar'],
     toolCalls: [
       { name: 'get_channel_messages', server: 'slack', input: { channelId: 'C001', limit: 50 } },
       { name: 'get_sprint_issues', server: 'jira', input: { sprintId: 'sprint-42' } },
       { name: 'get_tickets', server: 'zendesk', input: { status: 'open', limit: 25 } },
       { name: 'get_posts', server: 'discourse', input: { limit: 20 } },
+      { name: 'get_customer_emails', server: 'gmail', input: { limit: 10 } },
+      { name: 'get_today_events', server: 'google-calendar', input: {} },
     ],
   },
   meeting_prep: {
     name: 'Meeting Prep',
     description: 'Prepare for customer meeting',
     icon: Users,
-    sources: ['gong', 'zendesk'],
+    sources: ['gong', 'zendesk', 'gmail', 'google-calendar', 'google-drive'],
     toolCalls: [
       { name: 'get_calls', server: 'gong', input: { accountName: 'Globex Corp', limit: 5 } },
       { name: 'get_insights', server: 'gong', input: { type: 'pain_point' } },
       { name: 'get_tickets', server: 'zendesk', input: { tags: ['enterprise'], limit: 10 } },
+      { name: 'search_messages', server: 'gmail', input: { query: 'Globex' } },
+      { name: 'get_meeting_context', server: 'google-calendar', input: { eventId: 'event-002' } },
+      { name: 'search_files', server: 'google-drive', input: { query: 'Globex' } },
     ],
   },
   prd_draft: {

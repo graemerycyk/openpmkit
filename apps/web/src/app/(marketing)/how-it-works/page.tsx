@@ -19,6 +19,17 @@ import {
   MessageSquare,
   GitBranch,
   BarChart3,
+  Layers,
+  Phone,
+  Headphones,
+  Mail,
+  FolderOpen,
+  Calendar,
+  Palette,
+  TrendingUp,
+  Globe,
+  Newspaper,
+  Search,
 } from 'lucide-react';
 import { siteConfig } from '@/lib/utils';
 
@@ -452,6 +463,98 @@ export default function HowItWorksPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Connected Integrations */}
+      <section className="bg-muted/30 py-16 md:py-24">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-heading text-3xl font-bold">Connected Integrations</h2>
+            <p className="mt-4 text-muted-foreground">
+              pmkit connects to the tools your team already uses. All data stays secure with OAuth and encrypted credentials.
+            </p>
+          </div>
+
+          {/* Available Now */}
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold mb-6 text-center">Available Now</h3>
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+              {[
+                { name: 'Slack', icon: MessageSquare, description: 'Team communication' },
+                { name: 'Jira', icon: Layers, description: 'Issue tracking' },
+                { name: 'Confluence', icon: FileText, description: 'Documentation' },
+                { name: 'Gong', icon: Phone, description: 'Call transcripts' },
+                { name: 'Zendesk', icon: Headphones, description: 'Support tickets' },
+              ].map((integration) => (
+                <Card key={integration.name} className="text-center">
+                  <CardContent className="pt-6">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-cobalt-100">
+                      <integration.icon className="h-6 w-6 text-cobalt-600" />
+                    </div>
+                    <h4 className="font-medium">{integration.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-1">{integration.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Coming Soon */}
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold mb-6 text-center">Coming Soon</h3>
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+              {[
+                { name: 'Gmail', icon: Mail, description: 'Email threads' },
+                { name: 'Google Drive', icon: FolderOpen, description: 'Documents' },
+                { name: 'Google Calendar', icon: Calendar, description: 'Meetings' },
+                { name: 'Figma', icon: Palette, description: 'Design files' },
+                { name: 'Amplitude', icon: BarChart3, description: 'Analytics' },
+                { name: 'Linear', icon: TrendingUp, description: 'Issue tracking' },
+              ].map((integration) => (
+                <Card key={integration.name} className="text-center opacity-70">
+                  <CardContent className="pt-6">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                      <integration.icon className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <h4 className="font-medium">{integration.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-1">{integration.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* AI-Powered Crawlers */}
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold mb-6 text-center">AI-Powered Crawlers</h3>
+            <div className="grid gap-4 md:grid-cols-3 max-w-3xl mx-auto">
+              {[
+                { name: 'Social Crawler', icon: Globe, description: 'Monitor Reddit, Twitter, and product communities' },
+                { name: 'Web Search', icon: Search, description: 'Search the web for competitive intelligence' },
+                { name: 'News Crawler', icon: Newspaper, description: 'Track industry news and announcements' },
+              ].map((crawler) => (
+                <Card key={crawler.name} className="text-center">
+                  <CardContent className="pt-6">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
+                      <crawler.icon className="h-6 w-6 text-green-600" />
+                    </div>
+                    <h4 className="font-medium">{crawler.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-1">{crawler.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Button variant="outline" asChild>
+              <Link href="/integrations">
+                View All Integrations
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

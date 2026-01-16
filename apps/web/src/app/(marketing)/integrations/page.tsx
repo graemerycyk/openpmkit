@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, MessageSquare, Layers, Phone, FileText, Headphones, BarChart3 } from 'lucide-react';
+import { ArrowRight, MessageSquare, Layers, Phone, FileText, Headphones, BarChart3, Mail, FolderOpen, Calendar, Palette, TrendingUp, Globe, Search, Newspaper } from 'lucide-react';
 import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -30,28 +30,22 @@ export const metadata: Metadata = {
 
 const integrations = [
   {
-    slug: 'jira',
-    name: 'Jira',
-    tagline: 'Issue tracking & project management',
-    description: 'Pull sprint data, propose epics and stories, generate sprint reviews from completed work.',
-    icon: Layers,
-    status: 'available',
-  },
-  {
     slug: 'slack',
     name: 'Slack',
     tagline: 'Team communication',
     description: 'Synthesize channel activity into daily briefs, cite messages in PRDs, track decisions.',
     icon: MessageSquare,
     status: 'available',
+    category: 'core',
   },
   {
-    slug: 'gong',
-    name: 'Gong',
-    tagline: 'Revenue intelligence',
-    description: 'Extract insights from call transcripts, cite customer conversations in PRDs and VoC reports.',
-    icon: Phone,
+    slug: 'jira',
+    name: 'Jira',
+    tagline: 'Issue tracking & project management',
+    description: 'Pull sprint data, propose epics and stories, generate sprint reviews from completed work.',
+    icon: Layers,
     status: 'available',
+    category: 'core',
   },
   {
     slug: 'confluence',
@@ -60,6 +54,16 @@ const integrations = [
     description: 'Pull context from existing docs, propose new pages with drafted PRDs and specs.',
     icon: FileText,
     status: 'available',
+    category: 'core',
+  },
+  {
+    slug: 'gong',
+    name: 'Gong',
+    tagline: 'Revenue intelligence',
+    description: 'Extract insights from call transcripts, cite customer conversations in PRDs and VoC reports.',
+    icon: Phone,
+    status: 'available',
+    category: 'core',
   },
   {
     slug: 'zendesk',
@@ -68,6 +72,43 @@ const integrations = [
     description: 'Cluster support tickets into themes, cite customer issues in VoC reports and PRDs.',
     icon: Headphones,
     status: 'available',
+    category: 'core',
+  },
+  {
+    slug: 'gmail',
+    name: 'Gmail',
+    tagline: 'Email communication',
+    description: 'Read email threads for context in daily briefs, search inbox for customer communications.',
+    icon: Mail,
+    status: 'coming-soon',
+    category: 'google',
+  },
+  {
+    slug: 'google-drive',
+    name: 'Google Drive',
+    tagline: 'Document storage',
+    description: 'Access documents, spreadsheets, and presentations for PRD context and reference.',
+    icon: FolderOpen,
+    status: 'coming-soon',
+    category: 'google',
+  },
+  {
+    slug: 'google-calendar',
+    name: 'Google Calendar',
+    tagline: 'Meeting scheduling',
+    description: 'Pull meeting context for meeting prep packs and daily briefs.',
+    icon: Calendar,
+    status: 'coming-soon',
+    category: 'google',
+  },
+  {
+    slug: 'figma',
+    name: 'Figma',
+    tagline: 'Design collaboration',
+    description: 'Generate prototypes directly in Figma from PRDs, integrate with design workflows.',
+    icon: Palette,
+    status: 'coming-soon',
+    category: 'design',
   },
   {
     slug: 'amplitude',
@@ -76,6 +117,34 @@ const integrations = [
     description: 'Pull usage metrics into briefs, reference data trends in PRDs.',
     icon: BarChart3,
     status: 'coming-soon',
+    category: 'analytics',
+  },
+  {
+    slug: 'linear',
+    name: 'Linear',
+    tagline: 'Modern issue tracking',
+    description: 'Sync with Linear for sprint reviews, issue tracking, and release notes.',
+    icon: TrendingUp,
+    status: 'coming-soon',
+    category: 'dev',
+  },
+];
+
+const crawlers = [
+  {
+    name: 'Social Crawler',
+    description: 'Monitor Reddit, Twitter, and product communities for customer sentiment and feature requests.',
+    icon: Globe,
+  },
+  {
+    name: 'Web Search',
+    description: 'Search the web for competitive intelligence, industry trends, and market research.',
+    icon: Search,
+  },
+  {
+    name: 'News Crawler',
+    description: 'Track industry news, competitor announcements, and market developments.',
+    icon: Newspaper,
   },
 ];
 
@@ -162,6 +231,37 @@ export default function IntegrationsPage() {
                       Coming Soon
                     </Button>
                   )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI-Powered Crawlers */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="outline" className="mb-4">AI-Powered</Badge>
+            <h2 className="font-heading text-3xl font-bold">Research Crawlers</h2>
+            <p className="mt-4 text-muted-foreground">
+              Beyond your connected tools, pmkit can search the web for competitive intelligence,
+              customer sentiment, and market research.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+            {crawlers.map((crawler) => (
+              <Card key={crawler.name} className="group transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
+                      <crawler.icon className="h-6 w-6 text-green-600" />
+                    </div>
+                    <CardTitle className="text-lg">{crawler.name}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{crawler.description}</p>
                 </CardContent>
               </Card>
             ))}

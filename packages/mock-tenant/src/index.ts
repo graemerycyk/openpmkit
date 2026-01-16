@@ -10,6 +10,9 @@ import {
   mockCommunityServer,
   pmkitServer,
   inMemoryPmkitDataStore,
+  mockGmailServer,
+  mockGoogleDriveServer,
+  mockGoogleCalendarServer,
 } from '@pmkit/mcp-servers';
 import type { Artifact } from '@pmkit/core';
 
@@ -22,6 +25,7 @@ import { analyticsData } from './data/analytics';
 import { competitorData } from './data/competitor';
 import { communityData } from './data/community';
 import { pmkitData } from './data/pmkit';
+import { googleData } from './data/google';
 
 // ============================================================================
 // Demo Tenant Configuration
@@ -317,6 +321,24 @@ export function initializeMockData(): void {
     communityData.featureRequests
   );
 
+  // Load Gmail data
+  mockGmailServer.loadMockData(
+    googleData.gmailMessages,
+    googleData.gmailThreads
+  );
+
+  // Load Google Drive data
+  mockGoogleDriveServer.loadMockData(
+    googleData.driveFiles,
+    googleData.driveFolders
+  );
+
+  // Load Google Calendar data
+  mockGoogleCalendarServer.loadMockData(
+    googleData.calendarEvents,
+    googleData.calendars
+  );
+
   // Load pmkit artifacts data
   const pmkitArtifacts: Artifact[] = pmkitData.artifacts.map((a) => ({
     id: a.id,
@@ -351,6 +373,9 @@ export function createMockMCPClient() {
     competitor: mockCompetitorServer,
     community: mockCommunityServer,
     pmkit: pmkitServer,
+    gmail: mockGmailServer,
+    googleDrive: mockGoogleDriveServer,
+    googleCalendar: mockGoogleCalendarServer,
 
     // Convenience method to call any tool
     async callTool(server: string, tool: string, input: Record<string, unknown>) {
@@ -382,6 +407,12 @@ export function createMockMCPClient() {
           return mockCommunityServer.callTool(tool, input, context);
         case 'pmkit':
           return pmkitServer.callTool(tool, input, context);
+        case 'gmail':
+          return mockGmailServer.callTool(tool, input, context);
+        case 'google-drive':
+          return mockGoogleDriveServer.callTool(tool, input, context);
+        case 'google-calendar':
+          return mockGoogleCalendarServer.callTool(tool, input, context);
         default:
           throw new Error(`Unknown server: ${server}`);
       }
@@ -400,4 +431,6 @@ export { competitorData } from './data/competitor';
 export { communityData } from './data/community';
 export { pmkitData, getArtifactById, getArtifactsByType, getRecentArtifacts, searchArtifacts } from './data/pmkit';
 export type { PmkitArtifact } from './data/pmkit';
+export { googleData } from './data/google';
+export type { GmailMessage, GmailThread, DriveFile, DriveFolder, CalendarEvent, Calendar } from './data/google';
 

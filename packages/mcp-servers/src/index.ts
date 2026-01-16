@@ -13,6 +13,9 @@ export * from './social-crawler';
 export * from './web-search';
 export * from './news-crawler';
 export * from './url-scrape';
+export * from './gmail';
+export * from './google-drive';
+export * from './google-calendar';
 
 // Import all mock servers
 import { mockJiraServer } from './jira';
@@ -28,6 +31,9 @@ import { mockSocialCrawlerServer } from './social-crawler';
 import { mockWebSearchServer } from './web-search';
 import { mockNewsCrawlerServer } from './news-crawler';
 import { mockUrlScrapeServer } from './url-scrape';
+import { mockGmailServer } from './gmail';
+import { mockGoogleDriveServer } from './google-drive';
+import { mockGoogleCalendarServer } from './google-calendar';
 import { MCPClient, ConnectorFactory, type ConnectorKey } from '@pmkit/mcp';
 
 // ============================================================================
@@ -50,6 +56,9 @@ export function createMockMCPClient(): MCPClient {
   client.registerServer(mockWebSearchServer);
   client.registerServer(mockNewsCrawlerServer);
   client.registerServer(mockUrlScrapeServer);
+  client.registerServer(mockGmailServer);
+  client.registerServer(mockGoogleDriveServer);
+  client.registerServer(mockGoogleCalendarServer);
 
   return client;
 }
@@ -100,4 +109,7 @@ export {
   mockWebSearchServer,
   mockNewsCrawlerServer,
   mockUrlScrapeServer,
+  mockGmailServer,
+  mockGoogleDriveServer,
+  mockGoogleCalendarServer,
 };

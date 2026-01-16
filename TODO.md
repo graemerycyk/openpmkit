@@ -6,7 +6,7 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-15 (SEO content pages created)
+Last updated: 2026-01-16 (Pricing, billing, Google connectors)
 
 ---
 
@@ -403,7 +403,8 @@ Items that back up marketing claims or are needed for credibility.
 
 | Item | Status | Notes |
 |------|--------|-------|
-| Gmail/Drive/Calendar connectors | 🔜 Phase 2 | Expand data sources |
+| Gmail/Drive/Calendar mock data | ✅ Done | Mock data and MCP servers created in `packages/mock-tenant/src/data/google.ts` and `packages/mcp-servers/src/gmail/`, `google-drive/`, `google-calendar/` |
+| Gmail/Drive/Calendar OAuth | 🔜 Phase 2 | Need Google OAuth flows for real data |
 | Cross-workflow orchestration | 💡 Idea | Daily Brief triggers VoC clustering |
 | Slack DM delivery | 🔜 Future | Send brief directly to Slack |
 | Email delivery | 💡 Idea | Morning email digest |
@@ -470,6 +471,75 @@ Output:
 | Generation success rate | > 95% | Briefs generated without error |
 | Delivery success rate | > 99% | Briefs delivered to user |
 | User engagement | > 50% open rate | Users read their briefs |
+
+---
+
+## 🚀 Individual Plan Implementation
+
+**Goal**: Launch the $79/month Individual Plan as the first paid tier. This is the priority path to revenue.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| **Pricing page update** | ✅ Done | Individual ($79/mo or $69/mo annual), Teams (Contact Sales), Enterprise (Contact Sales) |
+| **Billing config update** | ✅ Done | INDIVIDUAL_PLAN and INTERNAL_PLAN added to `packages/core/src/billing/index.ts` |
+| **Admin user detection** | ✅ Done | `isAdminEmail()` helper already exists in `apps/web/src/lib/admin.ts` |
+| **Stripe Individual product** | 🔜 Required | Create $79/month product + $828/year price |
+| **Checkout flow** | 🔜 Required | /upgrade page → Stripe Checkout → success/cancel handling |
+| **Subscription webhooks** | 🔜 Required | Handle checkout.session.completed, subscription.updated, subscription.deleted |
+| **User plan field** | 🔜 Required | Add `plan: 'demo' | 'individual' | 'teams'` to User model |
+| **Paywall logic** | 🔜 Required | Only Individual/Teams can connect real connectors |
+| **Billing portal link** | 🔜 Required | Link to Stripe portal for managing subscription |
+| **Usage limits** | ✅ Defined | Individual plan has unlimited on-demand (-1 in billing config) |
+
+---
+
+## 🚀 Production Agent Launch
+
+**Goal**: Get the Daily Brief agent working with real Slack data in production.
+
+### Slack App Setup
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Create Slack app | 🔲 Pending | https://api.slack.com/apps |
+| Add bot scopes | 🔲 Pending | channels:history, channels:read, groups:history, groups:read, users:read |
+| Add redirect URL | 🔲 Pending | https://getpmkit.com/api/connectors/slack/callback |
+| Generate encryption key | 🔲 Pending | `openssl rand -hex 32` → CONNECTOR_ENCRYPTION_KEY |
+| Add env vars to production | 🔲 Pending | SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, CONNECTOR_ENCRYPTION_KEY |
+
+### Production Testing
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Test OAuth flow | 🔲 Pending | Connect real Slack workspace |
+| Test channel listing | 🔲 Pending | Verify channels appear in setup UI |
+| Test brief generation | 🔲 Pending | Run with real messages |
+| Test scheduler | 🔲 Pending | Verify daily execution |
+| Monitor first week | 🔲 Pending | Watch for errors, rate limits |
+
+---
+
+## 📈 GTM & Sales Pipeline
+
+| Item | Status | Notes |
+|------|--------|-------|
+| **Contact form backend** | 🔲 Pending | /contact form → email to sales@getpmkit.com |
+| **Teams inquiry workflow** | 🔲 Pending | Contact form → HubSpot/Notion → follow-up process |
+| **Demo request tracking** | 💡 Consider | Track demo usage → reach out to active demo users |
+| **Waitlist for Teams** | 💡 Consider | Collect interest for Teams plan |
+
+---
+
+## 🎨 Figma Integration
+
+**Goal**: Allow users to push prototypes to Figma for professional editing.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Figma OAuth app | 💡 Idea | Figma Developer Console |
+| Figma API client | 💡 Idea | Create Figma file from prototype HTML |
+| "Push to Figma" button | 💡 Idea | On prototype artifacts |
+| Figma plugin (alternative) | 💡 Idea | Paste HTML → Figma conversion |
 
 ---
 
@@ -693,6 +763,40 @@ Items that have been discussed but not committed to.
 
 ## Changelog
 
+### 2026-01-16 (Pricing, Billing & Google Connectors)
+- **Pricing page overhaul** - Updated to 3-plan structure:
+  - **Individual**: $79/mo highlighted as "Most Popular", or $69/mo billed annually ($828/year)
+  - **Teams**: Contact Sales
+  - **Enterprise**: Contact Sales
+- **Billing config update** - Added INDIVIDUAL_PLAN and INTERNAL_PLAN to `packages/core/src/billing/index.ts`
+  - Individual plan has unlimited on-demand jobs (-1)
+  - Internal plan for admin users (ADMIN_EMAILS) with all features
+- **Integrations section** - Added to `/how-it-works` page showing:
+  - Available Now: Slack, Jira, Confluence, Gong, Zendesk
+  - Coming Soon: Gmail, Google Drive, Google Calendar, Figma, Amplitude, Linear
+  - AI-Powered Crawlers: Social, Web Search, News
+- **Google connectors (mock)** - Full implementation for demo/workbench:
+  - **Gmail MCP Server** (`packages/mcp-servers/src/gmail/`) - 7 tools: get_messages, get_message, get_threads, get_thread_messages, search_messages, get_customer_emails, propose_draft
+  - **Google Drive MCP Server** (`packages/mcp-servers/src/google-drive/`) - 8 tools: get_files, get_file, get_folders, search_files, get_documents, get_spreadsheets, get_presentations, get_recent_activity
+  - **Google Calendar MCP Server** (`packages/mcp-servers/src/google-calendar/`) - 8 tools: get_calendars, get_events, get_event, get_upcoming_events, get_today_events, get_customer_meetings, search_events, get_meeting_context
+  - Mock data at `packages/mock-tenant/src/data/google.ts` with realistic PM-related content
+- **Demo console updates** - Added Gmail, Google Drive, Google Calendar connectors
+  - Updated Daily Brief sources to include Gmail and Calendar
+  - Updated Meeting Prep sources to include Gmail, Calendar, and Drive
+- **Integrations page** - Added Figma (Coming Soon), Google connectors (Coming Soon), and AI Crawlers section
+
+### 2026-01-15 (GTM Strategy & Pricing Update)
+- **GTM Strategy Session** - Defined go-to-market approach:
+  - Individual Plan: $49/month (or $490/year = 2 months free)
+  - Teams Plan: On request (contact sales, no self-serve)
+  - No free tier - demo is free, but paid to connect real data
+  - Target: Individual PMs first, then expand to teams
+- **Fixed button styling** - White-on-white "View Pricing" buttons now properly styled across 7 marketing pages
+- **Fixed CTA sections** - "Ready to get started?" sections now have purple backgrounds (not white)
+- **Resource pages** - Now show all 10 workflow/job types (was only showing 7)
+- **Footer links** - Added 3 missing compare pages (Aha, Linear, Notion AI)
+- **Daily Brief audit logging** - Integrated AuditLogger for comprehensive audit trail and SIEM support
+
 ### 2026-01-15
 - **SEO Content Pages Created** - Major content expansion for organic traffic:
   - **Integration landing pages**: Created `/integrations` index plus 5 integration pages (Jira, Slack, Gong, Confluence, Zendesk) with FAQPage schema, BreadcrumbList, and keyword-optimized metadata
@@ -774,3 +878,43 @@ Items that have been discussed but not committed to.
 - **Fixed workbench history viewing** - Can now view completed jobs from history while another job is running
 - **Added model selector to workbench** - Switch between GPT-5 Nano (cheapest), GPT-5 Mini (default), and GPT-5.2 (high quality) for demos
 - **Fixed missing Deck Content workflow** - Added `deck_content` to workbench job types (was missing from the list)
+
+---
+
+## 📚 Key Context for Future Reference
+
+### The 10 Workflows (Production)
+
+1. **Daily Brief** - Morning synthesis of overnight activity
+2. **Meeting Prep** - Context pack before customer meetings
+3. **VoC Clustering** - Theme extraction from customer feedback
+4. **Competitor Research** - Track competitor product changes
+5. **Roadmap Alignment** - Generate alignment memos with trade-offs
+6. **PRD Draft** - Evidence-backed product requirements
+7. **Sprint Review** - Sprint summary with completed work
+8. **Release Notes** - Auto-generate from Jira tickets
+9. **Deck Content** - Presentation content and talking points
+10. **Prototype Generation** - PRD → interactive prototype
+
+Plus 3 beta workflows in MCP server: Feature Ideation, One-Pager, TL;DR
+
+### Key Differentiators
+
+1. **Draft-Only Pattern** - Never writes directly to external systems
+2. **Full Audit Trail** - Every action logged, SIEM-ready
+3. **Citation Links** - Every insight traces back to source
+4. **Autonomous Agents** - Run on schedule, not just on-demand
+
+### MVP Connectors
+
+- **Phase 1**: Slack (for Daily Brief)
+- **Phase 2**: Jira, Confluence, Zendesk, Gong
+- **Phase 2.5**: Gmail, Google Drive, Google Calendar (mock data ready, OAuth pending)
+- **Future**: Amplitude, Discord, Figma, Linear
+
+### Revenue Model
+
+- **Individual**: $79/month or $69/month billed annually ($828/year)
+- **Teams**: Contact sales (no self-serve, negotiated pricing)
+- **Enterprise**: Custom (data residency, SSO, custom connectors)
+- **Internal**: $0 (admin users via ADMIN_EMAILS)

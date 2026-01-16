@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Building2, Users, Zap, Shield, HelpCircle } from 'lucide-react';
+import { CheckCircle2, Building2, Users, Zap, Shield, HelpCircle, User, ArrowRight } from 'lucide-react';
 import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Pricing | pmkit - AI PM Workflow Automation',
   description:
-    'pmkit pricing: Teams plan at $49/seat/month (billed annually) for product teams, Enterprise for custom deployments with SAML/SCIM and advanced controls.',
+    'pmkit pricing: Individual plan at $79/month for solo PMs, Teams and Enterprise plans for product teams with SSO, governance, and collaboration.',
   keywords: [
     'pmkit pricing',
     'AI product management pricing',
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
     'AI PRD generator pricing',
   ],
   openGraph: {
-    title: 'pmkit Pricing: Teams & Enterprise',
-    description: 'Annual pricing for product teams. Teams at $49/seat/month billed annually, Enterprise custom.',
+    title: 'pmkit Pricing: Individual, Teams & Enterprise',
+    description: 'Individual at $79/month, Teams and Enterprise custom pricing for product teams.',
     url: `${siteConfig.url}/pricing`,
   },
   twitter: {
     card: 'summary',
     title: 'pmkit Pricing',
-    description: 'Teams plan at $49/seat/month, Enterprise custom pricing.',
+    description: 'Individual at $79/month, Teams and Enterprise custom pricing.',
   },
   alternates: {
     canonical: `${siteConfig.url}/pricing`,
@@ -46,49 +46,72 @@ interface Plan {
   price: string;
   priceDetail: string;
   billingNote: string | null;
-  minSeats: number;
+  minSeats: number | null;
   badge: string | null;
   features: PlanFeature[];
   cta: string;
   ctaHref: string;
   ctaVariant: 'default' | 'outline';
   highlighted: boolean;
+  icon: 'user' | 'users' | 'building';
 }
 
 const plans: Plan[] = [
   {
+    name: 'Individual',
+    description: 'For individual PMs who want to automate their daily workflows',
+    price: '$79',
+    priceDetail: 'per month',
+    billingNote: 'Or $69/month billed annually ($828/year)',
+    minSeats: null,
+    badge: 'Most Popular',
+    features: [
+      { name: 'Single seat', included: true },
+      { name: 'Monthly or annual billing', included: true },
+      { name: 'All 10 workflow jobs', included: true },
+      { name: 'All connectors: Slack, Jira, Confluence, Gong, Zendesk', included: true },
+      { name: 'Gmail, Google Drive, Google Calendar', included: true, detail: 'Coming soon' },
+      { name: 'Personal workspace', included: true },
+      { name: '90-day artifact retention', included: true },
+      { name: 'No training on your data', included: true },
+    ],
+    cta: 'Get Started',
+    ctaHref: '/signup?plan=individual',
+    ctaVariant: 'default' as const,
+    highlighted: true,
+    icon: 'user',
+  },
+  {
     name: 'Teams',
-    description: 'For product teams with SSO, core connectors, and governance',
-    price: '$49',
+    description: 'For product teams with SSO, governance, and collaboration',
+    price: 'Custom',
     priceDetail: 'per seat / month',
-    billingNote: 'Billed annually ($588/seat/year)',
+    billingNote: 'Contact sales for pricing',
     minSeats: 5,
     badge: null,
     features: [
+      { name: 'Everything in Individual, plus:', included: true, isHeader: true },
       { name: 'Minimum 5 seats', included: true },
-      { name: 'Annual billing only', included: true },
       { name: 'SSO (Google Workspace + Microsoft Entra ID)', included: true, detail: 'OIDC' },
-      { name: 'All connectors: Jira, Confluence, Slack, Gong, Zendesk', included: true },
-      { name: 'All 10 workflow jobs', included: true },
       { name: 'Team usage analytics', included: true },
       { name: 'RBAC + proposal approvals', included: true },
       { name: 'Audit logs (view)', included: true },
-      { name: '90-day artifact retention', included: true, detail: '30-day available' },
-      { name: 'No training on your data', included: true },
+      { name: 'Shared workspaces', included: true },
     ],
-    cta: 'Start with Teams',
+    cta: 'Contact Sales',
     ctaHref: '/contact?plan=teams',
-    ctaVariant: 'default' as const,
-    highlighted: true,
+    ctaVariant: 'outline' as const,
+    highlighted: false,
+    icon: 'users',
   },
   {
     name: 'Enterprise',
-    description: 'Custom pricing with SAML/SCIM, custom connectors, and enterprise controls',
+    description: 'For organizations with advanced security and compliance needs',
     price: 'Custom',
     priceDetail: 'annual contract',
     billingNote: null,
     minSeats: 10,
-    badge: 'Sales-led',
+    badge: null,
     features: [
       { name: 'Everything in Teams, plus:', included: true, isHeader: true },
       { name: 'SAML SSO + SCIM provisioning', included: true },
@@ -97,35 +120,39 @@ const plans: Plan[] = [
       { name: 'BYO LLM endpoint (OpenAI, Azure, self-hosted)', included: true },
       { name: 'Data residency options', included: true, detail: 'Coming soon' },
       { name: 'Customer-managed keys (KMS)', included: true, detail: 'Coming soon' },
-      { name: 'Private networking / on-prem', included: true, detail: 'Coming soon' },
       { name: 'SLAs + dedicated support', included: true },
-      { name: '5× higher workflow limits', included: true },
     ],
     cta: 'Contact Sales',
     ctaHref: '/contact?plan=enterprise',
     ctaVariant: 'outline' as const,
     highlighted: false,
+    icon: 'building',
   },
 ];
 
 const jobTypes = [
-  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: '4/month/seat' },
-  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: '4/month/seat' },
-  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: '4/month/seat' },
-  { name: 'Meeting Prep Pack', schedule: 'On-demand', onDemand: '30/month/seat' },
-  { name: 'PRD Pack', schedule: 'On-demand', onDemand: '12/month/seat' },
-  { name: 'Roadmap Alignment Memo', schedule: 'On-demand', onDemand: '12/month/seat' },
-  { name: 'Sprint Review Pack', schedule: 'On-demand', onDemand: '8/month/seat' },
-  { name: 'Release Notes', schedule: 'On-demand', onDemand: '16/month/seat' },
-  { name: 'Prototype Generation', schedule: 'On-demand', onDemand: '8/month/seat' },
-  { name: 'Deck Content', schedule: 'On-demand', onDemand: '12/month/seat' },
+  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: 'Unlimited', onDemandTeams: '4/month/seat' },
+  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: 'Unlimited', onDemandTeams: '4/month/seat' },
+  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: 'Unlimited', onDemandTeams: '4/month/seat' },
+  { name: 'Meeting Prep Pack', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '30/month/seat' },
+  { name: 'PRD Pack', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '12/month/seat' },
+  { name: 'Roadmap Alignment Memo', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '12/month/seat' },
+  { name: 'Sprint Review Pack', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '8/month/seat' },
+  { name: 'Release Notes', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '16/month/seat' },
+  { name: 'Prototype Generation', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '8/month/seat' },
+  { name: 'Deck Content', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '12/month/seat' },
 ];
 
 const faqs = [
   {
-    question: 'Why annual-only billing?',
+    question: 'What\'s included in the Individual plan?',
     answer:
-      'Agent workloads are costlier than typical SaaS tools. Annual billing aligns our economics with the value we deliver and allows us to offer better pricing than month-to-month.',
+      'Everything you need to automate your PM workflows: all 10 job types, all connectors (Slack, Jira, Confluence, Gong, Zendesk), and unlimited on-demand runs. Google Workspace connectors (Gmail, Drive, Calendar) are coming soon.',
+  },
+  {
+    question: 'Can I upgrade from Individual to Teams later?',
+    answer:
+      'Yes! You can upgrade anytime. Your workspace, artifacts, and history are preserved. Just contact sales to discuss team pricing and we\'ll handle the transition.',
   },
   {
     question: 'What counts as a seat?',
@@ -135,12 +162,7 @@ const faqs = [
   {
     question: 'Are there usage limits?',
     answer:
-      'Yes. Scheduled jobs (Daily Brief, Weekly Themes, Competitor Research) run at fixed cadences per workspace. On-demand jobs have generous per-seat monthly limits. Enterprise customers get 5× higher limits and can purchase additional capacity.',
-  },
-  {
-    question: 'What about concurrency?',
-    answer:
-      'Teams plan includes 2 concurrent runs per 10 seats. Enterprise customers get higher concurrency limits. This prevents any single team from overwhelming shared infrastructure.',
+      'Individual plan has unlimited on-demand runs. Teams plans have generous per-seat monthly limits for fair use across the organization. Enterprise customers can purchase additional capacity.',
   },
   {
     question: 'How do real connectors work vs. the demo?',
@@ -155,7 +177,7 @@ const faqs = [
   {
     question: 'Can I try before I buy?',
     answer:
-      'Yes! The demo runs all 10 jobs with realistic simulated data. For a trial with your own data, contact sales to discuss a pilot program.',
+      'Yes! The demo runs all 10 jobs with realistic simulated data. You can explore the full experience before connecting your real tools.',
   },
   {
     question: 'What SSO providers are supported?',
@@ -163,6 +185,12 @@ const faqs = [
       'Teams plan supports OIDC SSO with Google Workspace and Microsoft Entra ID (Azure AD). Enterprise plan adds SAML SSO and SCIM directory sync for any compatible identity provider.',
   },
 ];
+
+function PlanIcon({ type }: { type: 'user' | 'users' | 'building' }) {
+  if (type === 'user') return <User className="h-5 w-5 text-cobalt-600" />;
+  if (type === 'users') return <Users className="h-5 w-5 text-cobalt-600" />;
+  return <Building2 className="h-5 w-5 text-cobalt-600" />;
+}
 
 export default function PricingPage() {
   return (
@@ -175,11 +203,11 @@ export default function PricingPage() {
               Pricing
             </Badge>
             <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-              Annual pricing for product teams
+              Simple pricing for every PM
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Two plans: Teams for growing product orgs, Enterprise for custom deployments.
-              Both include all connectors, all 10 workflow jobs, and full audit trails.
+              Start with Individual for solo workflows, or contact sales for team pricing.
+              All plans include all connectors, all 10 workflow jobs, and full audit trails.
             </p>
           </div>
         </div>
@@ -188,7 +216,7 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section className="py-16 md:py-24">
         <div className="container">
-          <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
+          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
             {plans.map((plan) => (
               <Card
                 key={plan.name}
@@ -197,18 +225,14 @@ export default function PricingPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {plan.name === 'Teams' ? (
-                        <Users className="h-5 w-5 text-cobalt-600" />
-                      ) : (
-                        <Building2 className="h-5 w-5 text-cobalt-600" />
-                      )}
+                      <PlanIcon type={plan.icon} />
                       <CardTitle className="text-2xl">{plan.name}</CardTitle>
                     </div>
                     {plan.badge && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="cobalt" className="text-xs">
                         {plan.badge}
-                    </Badge>
-                  )}
+                      </Badge>
+                    )}
                   </div>
                   <CardDescription className="mt-2">{plan.description}</CardDescription>
                   <div className="mt-6">
@@ -218,14 +242,9 @@ export default function PricingPage() {
                   {plan.billingNote && (
                     <p className="mt-1 text-sm text-muted-foreground">{plan.billingNote}</p>
                   )}
-                  {plan.minSeats > 1 && (
+                  {plan.minSeats && (
                     <p className="mt-2 text-sm text-muted-foreground">
                       Minimum {plan.minSeats} seats
-                      {plan.name === 'Teams' && (
-                        <span className="ml-1">
-                          · Starting at ${(588 * plan.minSeats).toLocaleString()}/year
-                        </span>
-                      )}
                     </p>
                   )}
                 </CardHeader>
@@ -237,7 +256,7 @@ export default function PricingPage() {
                         className={`flex items-start gap-2 ${feature.isHeader ? 'font-medium text-foreground' : ''}`}
                       >
                         {!feature.isHeader && (
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />
                         )}
                         <span className={`text-sm ${feature.isHeader ? '' : ''}`}>
                           {feature.name}
@@ -252,7 +271,10 @@ export default function PricingPage() {
                   </ul>
 
                   <Button className="mt-8 w-full" variant={plan.ctaVariant} asChild>
-                    <Link href={plan.ctaHref}>{plan.cta}</Link>
+                    <Link href={plan.ctaHref}>
+                      {plan.cta}
+                      {plan.highlighted && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -264,14 +286,14 @@ export default function PricingPage() {
       {/* Job Limits Table */}
       <section className="bg-muted/30 py-16 md:py-24">
         <div className="container">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-4xl">
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
                 <Zap className="h-6 w-6 text-cobalt-600" />
               </div>
               <h2 className="font-heading text-3xl font-bold">Job Runs & Limits</h2>
               <p className="mt-4 text-muted-foreground">
-                Scheduled jobs run at fixed cadences. On-demand jobs have per-seat monthly limits.
+                Individual plan has unlimited on-demand runs. Teams plans have fair-use limits per seat.
               </p>
             </div>
 
@@ -281,7 +303,8 @@ export default function PricingPage() {
                   <tr className="border-b bg-muted/50">
                     <th className="px-4 py-3 text-left text-sm font-medium">Job Type</th>
                     <th className="px-4 py-3 text-left text-sm font-medium">Scheduled</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">On-Demand Limit</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">Individual</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">Teams</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -291,8 +314,11 @@ export default function PricingPage() {
                       <td className="px-4 py-3 text-sm text-muted-foreground">
                         {job.schedule}
                       </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                      <td className="px-4 py-3 text-sm text-cobalt-600 font-medium">
                         {job.onDemand}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {job.onDemandTeams}
                       </td>
                     </tr>
                   ))}
@@ -301,7 +327,7 @@ export default function PricingPage() {
             </div>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Need higher limits? Enterprise customers can purchase additional capacity packs.
+              Enterprise customers get 5× higher limits and can purchase additional capacity packs.
             </p>
           </div>
         </div>
@@ -358,8 +384,7 @@ export default function PricingPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold text-white">Ready to get started?</h2>
             <p className="mt-4 text-cobalt-100">
-              Try the demo with simulated data, or contact sales for a personalized walkthrough with your
-              own tools.
+              Try the demo with simulated data, or sign up for the Individual plan to connect your real tools.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>
@@ -367,11 +392,13 @@ export default function PricingPage() {
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white bg-white text-cobalt-600 hover:bg-white/90"
+                className="bg-white text-cobalt-600 hover:bg-cobalt-50"
                 asChild
               >
-                <Link href="/contact">Contact Sales</Link>
+                <Link href="/signup?plan=individual">
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>

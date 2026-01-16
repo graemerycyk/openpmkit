@@ -5,7 +5,7 @@ import type { ConnectorKey } from '../connectors';
 // Plan Definitions
 // ============================================================================
 
-export const PlanKeySchema = z.enum(['TEAMS', 'ENTERPRISE']);
+export const PlanKeySchema = z.enum(['INDIVIDUAL', 'TEAMS', 'ENTERPRISE', 'INTERNAL']);
 export type PlanKey = z.infer<typeof PlanKeySchema>;
 
 export const SubscriptionStatusSchema = z.enum([
@@ -97,6 +97,61 @@ export interface PlanFeatures {
 // ============================================================================
 // Plan Definitions
 // ============================================================================
+
+export const INDIVIDUAL_PLAN: PlanConfig = {
+  key: 'INDIVIDUAL',
+  name: 'Individual',
+  description: 'For individual PMs who want to automate their daily workflows',
+  pricePerSeatPerMonth: 79, // $79/month if monthly
+  pricePerSeatPerYear: 828, // $828/year ($69/month equivalent)
+  minSeats: 1,
+  features: {
+    // SSO: Not available for Individual
+    ssoOidc: false,
+    ssoSaml: false,
+    scimProvisioning: false,
+
+    // All MVP connectors included
+    allowedConnectors: MVP_CONNECTORS,
+    customConnectorsEnabled: false,
+
+    // Scheduled jobs
+    scheduledDailyBrief: true,
+    scheduledWeeklyThemes: true,
+    scheduledCompetitorResearch: true,
+
+    // Unlimited on-demand for Individual (-1 = unlimited)
+    maxOnDemandDailyBriefPerSeatPerMonth: -1,
+    maxOnDemandMeetingPrepPerSeatPerMonth: -1,
+    maxOnDemandPrdPackPerSeatPerMonth: -1,
+    maxOnDemandRoadmapMemoPerSeatPerMonth: -1,
+    maxOnDemandSprintReviewPerSeatPerMonth: -1,
+    maxOnDemandReleaseNotesPerSeatPerMonth: -1,
+    maxOnDemandPrototypeGenPerSeatPerMonth: -1,
+    maxOnDemandVocClusteringPerSeatPerMonth: -1,
+    maxOnDemandCompetitorResearchPerSeatPerMonth: -1,
+
+    // Concurrency: 2 concurrent runs (single user)
+    maxConcurrentRunsPer10Seats: 2,
+
+    // Retention: 90 days
+    defaultRetentionDays: 90,
+    minRetentionDays: 30,
+    maxRetentionDays: 90,
+
+    // Audit: view only, no export API
+    auditExportApi: false,
+    auditRetentionDays: 90,
+
+    // Advanced features: none
+    byoLlmEndpoint: false,
+    dataResidencyOptions: false,
+    kmsCustomerManagedKeys: false,
+    privateNetworking: false,
+    dedicatedSupport: false,
+    slaGuarantees: false,
+  },
+};
 
 export const TEAMS_PLAN: PlanConfig = {
   key: 'TEAMS',
@@ -208,9 +263,68 @@ export const ENTERPRISE_PLAN: PlanConfig = {
   },
 };
 
+// Internal plan for admin users (ADMIN_EMAILS)
+// Hidden from pricing page, auto-assigned to admin users
+export const INTERNAL_PLAN: PlanConfig = {
+  key: 'INTERNAL',
+  name: 'Internal',
+  description: 'For pmkit team members and demos',
+  pricePerSeatPerMonth: 0, // Free for internal users
+  pricePerSeatPerYear: 0,
+  minSeats: 1,
+  features: {
+    // All SSO options
+    ssoOidc: true,
+    ssoSaml: true,
+    scimProvisioning: true,
+
+    // All connectors including future ones
+    allowedConnectors: MVP_CONNECTORS,
+    customConnectorsEnabled: true,
+
+    // All scheduled jobs
+    scheduledDailyBrief: true,
+    scheduledWeeklyThemes: true,
+    scheduledCompetitorResearch: true,
+
+    // Unlimited on-demand (-1 = unlimited)
+    maxOnDemandDailyBriefPerSeatPerMonth: -1,
+    maxOnDemandMeetingPrepPerSeatPerMonth: -1,
+    maxOnDemandPrdPackPerSeatPerMonth: -1,
+    maxOnDemandRoadmapMemoPerSeatPerMonth: -1,
+    maxOnDemandSprintReviewPerSeatPerMonth: -1,
+    maxOnDemandReleaseNotesPerSeatPerMonth: -1,
+    maxOnDemandPrototypeGenPerSeatPerMonth: -1,
+    maxOnDemandVocClusteringPerSeatPerMonth: -1,
+    maxOnDemandCompetitorResearchPerSeatPerMonth: -1,
+
+    // Unlimited concurrency
+    maxConcurrentRunsPer10Seats: 100,
+
+    // Max retention
+    defaultRetentionDays: 365,
+    minRetentionDays: 30,
+    maxRetentionDays: -1, // Unlimited
+
+    // Full audit access
+    auditExportApi: true,
+    auditRetentionDays: 730, // 2 years
+
+    // All advanced features
+    byoLlmEndpoint: true,
+    dataResidencyOptions: true,
+    kmsCustomerManagedKeys: true,
+    privateNetworking: true,
+    dedicatedSupport: true,
+    slaGuarantees: true,
+  },
+};
+
 export const PLANS: Record<PlanKey, PlanConfig> = {
+  INDIVIDUAL: INDIVIDUAL_PLAN,
   TEAMS: TEAMS_PLAN,
   ENTERPRISE: ENTERPRISE_PLAN,
+  INTERNAL: INTERNAL_PLAN,
 };
 
 export function getPlan(key: PlanKey): PlanConfig {
