@@ -31,17 +31,12 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const sidebarNavItems = [
+// Base sidebar items - Demo is conditionally shown for non-admin users
+const baseSidebarNavItems = [
   {
     title: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
-  },
-  {
-    title: 'Try Demo',
-    href: '/demo/console',
-    icon: Play,
-    badge: 'Demo',
   },
   {
     title: 'Artifacts',
@@ -51,6 +46,14 @@ const sidebarNavItems = [
     badge: 'Soon',
   },
 ];
+
+// Demo item - only shown to non-admin users
+const demoNavItem = {
+  title: 'Try Demo',
+  href: '/demo/console',
+  icon: Play,
+  badge: 'Demo',
+};
 
 const settingsNavItems = [
   {
@@ -115,12 +118,17 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Button size="sm" asChild className="bg-cobalt-600 hover:bg-cobalt-700 text-white">
-            <Link href="/demo/console">
-              Try Demo
-            </Link>
-          </Button>
-          <Separator orientation="vertical" className="h-6" />
+          {/* Hide Demo button for admin users on internal plan */}
+          {!isAdmin && (
+            <>
+              <Button size="sm" asChild className="bg-cobalt-600 hover:bg-cobalt-700 text-white">
+                <Link href="/demo/console">
+                  Try Demo
+                </Link>
+              </Button>
+              <Separator orientation="vertical" className="h-6" />
+            </>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
@@ -149,12 +157,14 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                   Dashboard
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/demo/console" className="flex items-center gap-2 cursor-pointer">
-                  <Play className="h-4 w-4" />
-                  Run Jobs
-                </Link>
-              </DropdownMenuItem>
+              {!isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link href="/demo/console" className="flex items-center gap-2 cursor-pointer">
+                    <Play className="h-4 w-4" />
+                    Try Demo
+                  </Link>
+                </DropdownMenuItem>
+              )}
               {isAdmin && (
                 <>
                   <DropdownMenuSeparator />
@@ -194,16 +204,17 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
             <div className="px-3">
               {/* Main Navigation */}
               <div className="space-y-1">
-                {sidebarNavItems.map((item) => (
+                {/* Show demo nav item only for non-admin users */}
+                {[...baseSidebarNavItems, ...(isAdmin ? [] : [demoNavItem])].map((item) => (
                   <Link
                     key={item.href}
-                    href={item.disabled ? '#' : item.href}
+                    href={'disabled' in item && item.disabled ? '#' : item.href}
                     className={cn(
                       'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                       pathname === item.href
                         ? 'bg-cobalt-100 text-cobalt-700 font-medium'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                      item.disabled && 'cursor-not-allowed opacity-50'
+                      'disabled' in item && item.disabled && 'cursor-not-allowed opacity-50'
                     )}
                   >
                     <item.icon className="h-4 w-4" />
@@ -221,6 +232,25 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                     )}
                   </Link>
                 ))}
+
+                {/* Show Workbench link for admin users */}
+                {isAdmin && (
+                  <Link
+                    href="/workbench"
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                      pathname === '/workbench'
+                        ? 'bg-cobalt-100 text-cobalt-700 font-medium'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
+                  >
+                    <Wrench className="h-4 w-4" />
+                    Workbench
+                    <Badge variant="outline" className="ml-auto text-xs border-cobalt-200 bg-cobalt-50 text-cobalt-700">
+                      Admin
+                    </Badge>
+                  </Link>
+                )}
               </div>
 
               <Separator className="my-4" />
@@ -255,21 +285,25 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                 ))}
               </div>
 
-              <Separator className="my-4" />
+              {/* Upgrade CTA - hidden for admin users on internal plan */}
+              {!isAdmin && (
+                <>
+                  <Separator className="my-4" />
 
-              {/* Upgrade CTA */}
-              <div className="rounded-lg border bg-gradient-to-br from-cobalt-50 to-background p-4">
-                <div className="flex items-center gap-2 text-cobalt-600">
-                  <Sparkles className="h-4 w-4" />
-                  <span className="text-sm font-medium">Upgrade to Paid Plan</span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Connect your real tools and unlock unlimited jobs.
-                </p>
-                <Button size="sm" className="mt-3 w-full" asChild>
-                  <Link href="/pricing">View Plans</Link>
-                </Button>
-              </div>
+                  <div className="rounded-lg border bg-gradient-to-br from-cobalt-50 to-background p-4">
+                    <div className="flex items-center gap-2 text-cobalt-600">
+                      <Sparkles className="h-4 w-4" />
+                      <span className="text-sm font-medium">Upgrade to Paid Plan</span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Connect your real tools and unlock unlimited jobs.
+                    </p>
+                    <Button size="sm" className="mt-3 w-full" asChild>
+                      <Link href="/pricing">View Plans</Link>
+                    </Button>
+                  </div>
+                </>
+              )}
 
               <Separator className="my-4" />
 

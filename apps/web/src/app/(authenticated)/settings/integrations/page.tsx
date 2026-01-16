@@ -195,11 +195,13 @@ function IntegrationCard({
   onConnect,
   onDisconnect,
   isLoading,
+  isAdmin,
 }: {
   integration: Integration;
   onConnect: (id: string) => void;
   onDisconnect: (id: string) => void;
   isLoading: boolean;
+  isAdmin: boolean;
 }) {
   const showConnect = integration.supportsOAuth && integration.status !== 'coming_soon';
 
@@ -238,11 +240,11 @@ function IntegrationCard({
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Connect
               </Button>
-            ) : (
+            ) : !isAdmin ? (
               <Button asChild>
                 <Link href="/pricing">Upgrade to Paid Plan</Link>
               </Button>
-            )}
+            ) : null}
             {integration.docsUrl && (
               <Link
                 href={integration.docsUrl}
@@ -265,9 +267,26 @@ function IntegrationsPageContent() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   // Handle URL params from OAuth callback
   useEffect(() => {
@@ -405,25 +424,27 @@ function IntegrationsPageContent() {
         </Alert>
       )}
 
-      {/* Upgrade Banner */}
-      <Card className="border-cobalt-200 bg-gradient-to-r from-cobalt-50 to-background">
-        <CardContent className="flex items-center justify-between p-6">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full bg-cobalt-100 p-3">
-              <Sparkles className="h-6 w-6 text-cobalt-600" />
+      {/* Upgrade Banner - hidden for admin users */}
+      {!isAdmin && (
+        <Card className="border-cobalt-200 bg-gradient-to-r from-cobalt-50 to-background">
+          <CardContent className="flex items-center justify-between p-6">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-cobalt-100 p-3">
+                <Sparkles className="h-6 w-6 text-cobalt-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Upgrade to Paid Plan for all integrations</h3>
+                <p className="text-sm text-muted-foreground">
+                  Get access to all tool integrations and AI crawlers with a paid plan.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold">Upgrade to Paid Plan for all integrations</h3>
-              <p className="text-sm text-muted-foreground">
-                Get access to all tool integrations and AI crawlers with a paid plan.
-              </p>
-            </div>
-          </div>
-          <Button asChild>
-            <Link href="/pricing">View Plans</Link>
-          </Button>
-        </CardContent>
-      </Card>
+            <Button asChild>
+              <Link href="/pricing">View Plans</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tool Integrations */}
       <div>
@@ -446,6 +467,7 @@ function IntegrationsPageContent() {
                 onConnect={handleConnect}
                 onDisconnect={handleDisconnect}
                 isLoading={actionLoading === integration.id}
+                isAdmin={isAdmin}
               />
             ))}
           </div>
@@ -470,6 +492,7 @@ function IntegrationsPageContent() {
               onConnect={handleConnect}
               onDisconnect={handleDisconnect}
               isLoading={actionLoading === integration.id}
+              isAdmin={isAdmin}
             />
           ))}
         </div>
