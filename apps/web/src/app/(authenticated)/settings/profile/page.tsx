@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,23 @@ import { User, Mail, Shield, Calendar } from 'lucide-react';
 
 export default function ProfilePage() {
   const { data: session } = useSession();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -36,7 +54,7 @@ export default function ProfilePage() {
               <h3 className="text-xl font-semibold">{session?.user?.name || 'User'}</h3>
               <p className="text-muted-foreground">{session?.user?.email}</p>
               <Badge variant="cobalt" className="mt-2">
-                Free Plan
+                {isAdmin ? 'Internal Plan' : 'Free Plan'}
               </Badge>
             </div>
           </div>

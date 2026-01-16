@@ -240,11 +240,15 @@ function IntegrationCard({
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Connect
               </Button>
-            ) : !isAdmin ? (
+            ) : isAdmin ? (
+              <Button variant="outline" disabled>
+                Coming Soon
+              </Button>
+            ) : (
               <Button asChild>
                 <Link href="/pricing">Upgrade to Paid Plan</Link>
               </Button>
-            ) : null}
+            )}
             {integration.docsUrl && (
               <Link
                 href={integration.docsUrl}

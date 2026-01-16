@@ -117,7 +117,7 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/demo/console" className="flex items-center gap-2 cursor-pointer">
                       <Play className="h-4 w-4" />
-                      Run Jobs
+                      Try Demo
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (
