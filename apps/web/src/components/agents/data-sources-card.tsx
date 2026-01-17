@@ -42,12 +42,12 @@ const CONNECTORS = {
     description: 'Support tickets and history',
     icon: Ticket,
   },
-  google_calendar: {
+  'google-calendar': {
     name: 'Google Calendar',
     description: 'Meetings and events',
     icon: Calendar,
   },
-  google_drive: {
+  'google-drive': {
     name: 'Google Drive',
     description: 'Documents and files',
     icon: FileText,
