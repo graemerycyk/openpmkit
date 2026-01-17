@@ -20,14 +20,12 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  FileText,
   Layout,
   Loader2,
-  Palette,
   Play,
-  Plug,
   Target,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 const PROTOTYPE_TYPES = [
   { value: 'wireframe', label: 'Wireframe (Low-fi)' },
@@ -56,8 +54,12 @@ export default function PrototypeGenerationPage() {
   const [designNotes, setDesignNotes] = useState('');
 
   // Connection status (would be fetched from API)
-  const figmaConnected = false;
-  const confluenceConnected = false;
+  // In production, this would come from an API call to /api/connectors
+  const connectedSources = [
+    { key: 'figma' as const, connected: false },
+    { key: 'confluence' as const, connected: false },
+    { key: 'jira' as const, connected: false },
+  ];
 
   const canRun = featureName.trim() !== '' && description.trim() !== '';
 
@@ -200,64 +202,10 @@ export default function PrototypeGenerationPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources (Optional)</CardTitle>
-          </div>
-          <CardDescription>
-            Connect to pull existing design context
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Figma */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${figmaConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Palette className={`h-5 w-5 ${figmaConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Figma</span>
-                  <Badge variant={figmaConnected ? 'outline' : 'secondary'} className={figmaConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {figmaConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Design system and component library</p>
-              </div>
-            </div>
-            {!figmaConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Confluence */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${confluenceConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <FileText className={`h-5 w-5 ${confluenceConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Confluence</span>
-                  <Badge variant={confluenceConnected ? 'outline' : 'secondary'} className={confluenceConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {confluenceConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">PRDs and feature specs</p>
-              </div>
-            </div>
-            {!confluenceConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <DataSourcesCard
+        connectedSources={connectedSources}
+        description="Connect to pull existing design context"
+      />
 
       {/* Output Preview */}
       <Card>

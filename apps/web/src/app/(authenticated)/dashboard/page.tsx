@@ -18,36 +18,38 @@ import {
   Wand2,
   Megaphone,
   Presentation,
+  Bot,
+  Zap,
 } from 'lucide-react';
 
 const quickActions = [
   {
-    title: 'Run a Daily Brief',
-    description: 'Get your morning PM briefing with updates from all your tools',
+    title: 'Start Your Daily Brief',
+    description: 'Get your morning PM briefing with updates every day without lifting a finger',
     icon: FileText,
     href: '/agents/daily-brief',
     color: 'bg-blue-100 text-blue-600',
     enabled: true,
   },
   {
-    title: 'Prepare for a Meeting',
-    description: 'Generate a meeting prep pack with account context and talking points',
+    title: 'Automate Meeting Prep',
+    description: 'Generate a meeting prep pack with account context for all your meetings',
     icon: Users,
     href: '/agents/meeting-prep',
     color: 'bg-green-100 text-green-600',
     enabled: true,
   },
   {
-    title: 'Draft a PRD',
-    description: 'Create a product requirements document with customer evidence',
+    title: 'Automate PRD Drafts',
+    description: 'Create product requirements documents with customer evidence on demand',
     icon: Target,
     href: '/agents/prd-draft',
     color: 'bg-purple-100 text-purple-600',
     enabled: true,
   },
   {
-    title: 'Generate a Prototype',
-    description: 'Turn your PRD into an interactive HTML prototype',
+    title: 'Auto-Generate Prototypes',
+    description: 'Turn your PRDs into interactive HTML prototypes automatically',
     icon: Wand2,
     href: '/agents/prototype-generation',
     color: 'bg-amber-100 text-amber-600',
@@ -55,17 +57,97 @@ const quickActions = [
   },
 ];
 
-const jobTypes = [
-  { name: 'Daily Brief', icon: FileText, job: 'daily_brief', href: '/agents/daily-brief', enabled: true },
-  { name: 'Meeting Prep', icon: Users, job: 'meeting_prep', href: '/agents/meeting-prep', enabled: true },
-  { name: 'VoC Clustering', icon: BarChart3, job: 'voc_clustering', href: '/agents/voc-clustering', enabled: true },
-  { name: 'Competitor Research', icon: Target, job: 'competitor_research', href: '/agents/competitor-research', enabled: true },
-  { name: 'Roadmap Alignment', icon: GitBranch, job: 'roadmap_alignment', href: '/agents/roadmap-alignment', enabled: true },
-  { name: 'PRD Draft', icon: FileText, job: 'prd_draft', href: '/agents/prd-draft', enabled: true },
-  { name: 'Sprint Review', icon: Clock, job: 'sprint_review', href: '/agents/sprint-review', enabled: true },
-  { name: 'Prototype', icon: Wand2, job: 'prototype_generation', href: '/agents/prototype-generation', enabled: true },
-  { name: 'Release Notes', icon: Megaphone, job: 'release_notes', href: '/agents/release-notes', enabled: true },
-  { name: 'Deck Content', icon: Presentation, job: 'deck_content', href: '/agents/deck-content', enabled: true },
+const agents = [
+  {
+    name: 'Daily Brief',
+    description: 'Delivered every morning automatically',
+    trigger: 'Runs daily at your chosen time',
+    icon: FileText,
+    job: 'daily_brief',
+    href: '/agents/daily-brief',
+    enabled: true,
+  },
+  {
+    name: 'Meeting Prep',
+    description: 'Ready before every external meeting',
+    trigger: 'Triggered by calendar events',
+    icon: Users,
+    job: 'meeting_prep',
+    href: '/agents/meeting-prep',
+    enabled: true,
+  },
+  {
+    name: 'Sprint Review',
+    description: 'Summary when each sprint closes',
+    trigger: 'Triggered by sprint end in Jira',
+    icon: Clock,
+    job: 'sprint_review',
+    href: '/agents/sprint-review',
+    enabled: true,
+  },
+  {
+    name: 'VoC Clustering',
+    description: 'Customer themes surfaced weekly',
+    trigger: 'Runs weekly on your schedule',
+    icon: BarChart3,
+    job: 'voc_clustering',
+    href: '/agents/voc-clustering',
+    enabled: true,
+  },
+  {
+    name: 'Competitor Research',
+    description: 'Market intel delivered regularly',
+    trigger: 'Runs on your schedule',
+    icon: Target,
+    job: 'competitor_research',
+    href: '/agents/competitor-research',
+    enabled: true,
+  },
+  {
+    name: 'Roadmap Alignment',
+    description: 'Strategic checks before planning',
+    trigger: 'Runs monthly or before planning',
+    icon: GitBranch,
+    job: 'roadmap_alignment',
+    href: '/agents/roadmap-alignment',
+    enabled: true,
+  },
+  {
+    name: 'PRD Draft',
+    description: 'Created when epics are ready',
+    trigger: 'Triggered by Jira epic status',
+    icon: FileText,
+    job: 'prd_draft',
+    href: '/agents/prd-draft',
+    enabled: true,
+  },
+  {
+    name: 'Prototype',
+    description: 'Generated when PRDs are approved',
+    trigger: 'Triggered by PRD completion',
+    icon: Wand2,
+    job: 'prototype_generation',
+    href: '/agents/prototype-generation',
+    enabled: true,
+  },
+  {
+    name: 'Release Notes',
+    description: 'Published when releases ship',
+    trigger: 'Triggered by Jira release',
+    icon: Megaphone,
+    job: 'release_notes',
+    href: '/agents/release-notes',
+    enabled: true,
+  },
+  {
+    name: 'Deck Content',
+    description: 'Ready before key presentations',
+    trigger: 'Triggered by QBR/review meetings',
+    icon: Presentation,
+    job: 'deck_content',
+    href: '/agents/deck-content',
+    enabled: true,
+  },
 ];
 
 export default function DashboardPage() {
@@ -126,34 +208,56 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* All Job Types */}
+      {/* Your Agents */}
       <div>
         <div className="mb-4">
-          <h2 className="font-heading text-xl font-semibold">All PM Workflows</h2>
+          <div className="flex items-center gap-2">
+            <Bot className="h-5 w-5 text-cobalt-600" />
+            <h2 className="font-heading text-xl font-semibold">Your Agents</h2>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Configure once, they work for you automatically
+          </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {jobTypes.map((job) =>
-            job.enabled ? (
+          {agents.map((agent) =>
+            agent.enabled ? (
               <Link
-                key={job.job}
-                href={job.href || '#'}
-                className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                key={agent.job}
+                href={agent.href || '#'}
+                className="group flex items-start gap-3 rounded-lg border bg-card p-4 transition-colors hover:border-cobalt-200 hover:bg-muted/50"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-100">
-                  <job.icon className="h-5 w-5 text-cobalt-600" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cobalt-100">
+                  <agent.icon className="h-5 w-5 text-cobalt-600" />
                 </div>
-                <span className="font-medium">{job.name}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{agent.name}</span>
+                    <Zap className="h-3.5 w-3.5 text-amber-500" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {agent.description}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground/70">
+                    {agent.trigger}
+                  </p>
+                </div>
               </Link>
             ) : (
               <div
-                key={job.job}
-                className="flex items-center gap-3 rounded-lg border bg-card p-4 opacity-50 cursor-not-allowed"
+                key={agent.job}
+                className="flex items-start gap-3 rounded-lg border bg-card p-4 opacity-50 cursor-not-allowed"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                  <job.icon className="h-5 w-5 text-muted-foreground" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  <agent.icon className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <span className="font-medium text-muted-foreground">{job.name}</span>
-                <Badge variant="secondary" className="ml-auto text-xs">
+                <div className="flex-1 min-w-0">
+                  <span className="font-medium text-muted-foreground">{agent.name}</span>
+                  <p className="text-sm text-muted-foreground">
+                    {agent.description}
+                  </p>
+                </div>
+                <Badge variant="secondary" className="text-xs">
                   Soon
                 </Badge>
               </div>

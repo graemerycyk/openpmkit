@@ -117,6 +117,10 @@ export async function POST(request: NextRequest) {
           deliveryTime: configData.deliveryTimeLocal,
           timezone: configData.timezone,
           channelCount: configData.slackChannels.length,
+          includeSlackMentions: configData.includeSlackMentions,
+          includeGmail: configData.includeGmail,
+          includeGoogleDrive: configData.includeGoogleDrive,
+          includeGoogleCalendar: configData.includeGoogleCalendar,
         },
       },
     });

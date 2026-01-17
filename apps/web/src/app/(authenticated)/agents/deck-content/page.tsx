@@ -20,14 +20,12 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  FileText,
   Loader2,
   Play,
-  Plug,
   Presentation,
   Target,
-  Users,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 const DECK_TYPES = [
   { value: 'qbr', label: 'Quarterly Business Review' },
@@ -59,9 +57,14 @@ export default function DeckContentPage() {
   const [additionalContext, setAdditionalContext] = useState('');
 
   // Connection status (would be fetched from API)
-  const jiraConnected = false;
-  const confluenceConnected = false;
-  const slackConnected = false;
+  // In production, this would come from an API call to /api/connectors
+  const connectedSources = [
+    { key: 'jira' as const, connected: false },
+    { key: 'confluence' as const, connected: false },
+    { key: 'slack' as const, connected: false },
+    { key: 'gong' as const, connected: false },
+    { key: 'google_drive' as const, connected: false },
+  ];
 
   const canRun = title.trim() !== '';
 
@@ -207,87 +210,10 @@ export default function DeckContentPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources (Optional)</CardTitle>
-          </div>
-          <CardDescription>
-            Pull data from connected tools to enrich the deck
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Jira */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${jiraConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Target className={`h-5 w-5 ${jiraConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Jira</span>
-                  <Badge variant={jiraConnected ? 'outline' : 'secondary'} className={jiraConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {jiraConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Sprint metrics and roadmap items</p>
-              </div>
-            </div>
-            {!jiraConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Confluence */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${confluenceConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <FileText className={`h-5 w-5 ${confluenceConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Confluence</span>
-                  <Badge variant={confluenceConnected ? 'outline' : 'secondary'} className={confluenceConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {confluenceConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Strategy docs and meeting notes</p>
-              </div>
-            </div>
-            {!confluenceConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Slack */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${slackConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Users className={`h-5 w-5 ${slackConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Slack</span>
-                  <Badge variant={slackConnected ? 'outline' : 'secondary'} className={slackConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {slackConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Recent highlights and updates</p>
-              </div>
-            </div>
-            {!slackConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <DataSourcesCard
+        connectedSources={connectedSources}
+        description="Pull data from connected tools to enrich the deck"
+      />
 
       {/* Output Preview */}
       <Card>

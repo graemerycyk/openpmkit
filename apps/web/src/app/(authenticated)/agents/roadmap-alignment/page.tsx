@@ -13,13 +13,11 @@ import {
   CheckCircle2,
   Clock,
   Compass,
-  FileText,
   Loader2,
-  Map,
   Play,
-  Plug,
   Target,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 export default function RoadmapAlignmentPage() {
   const [isRunning, setIsRunning] = useState(false);
@@ -31,10 +29,15 @@ export default function RoadmapAlignmentPage() {
   const [additionalContext, setAdditionalContext] = useState('');
 
   // Connection status (would be fetched from API)
-  const jiraConnected = false;
-  const confluenceConnected = false;
+  // In production, this would come from an API call to /api/connectors
+  const connectedSources = [
+    { key: 'jira' as const, connected: false },
+    { key: 'confluence' as const, connected: false },
+    { key: 'slack' as const, connected: false },
+  ];
 
-  const canRun = (jiraConnected || confluenceConnected) && strategicGoals.trim() !== '';
+  const hasAnyConnected = connectedSources.some((s) => s.connected);
+  const canRun = hasAnyConnected && strategicGoals.trim() !== '';
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -135,64 +138,10 @@ export default function RoadmapAlignmentPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources</CardTitle>
-          </div>
-          <CardDescription>
-            The agent will analyze your roadmap from these sources
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Jira */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${jiraConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Map className={`h-5 w-5 ${jiraConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Jira</span>
-                  <Badge variant={jiraConnected ? 'outline' : 'secondary'} className={jiraConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {jiraConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Epics, initiatives, and roadmap items</p>
-              </div>
-            </div>
-            {!jiraConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Confluence */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${confluenceConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <FileText className={`h-5 w-5 ${confluenceConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Confluence</span>
-                  <Badge variant={confluenceConnected ? 'outline' : 'secondary'} className={confluenceConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {confluenceConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Roadmap documents and strategy pages</p>
-              </div>
-            </div>
-            {!confluenceConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <DataSourcesCard
+        connectedSources={connectedSources}
+        description="The agent will analyze your roadmap from these sources"
+      />
 
       {/* Output Preview */}
       <Card>

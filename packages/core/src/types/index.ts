@@ -91,7 +91,13 @@ export const DailyBriefConfigSchema = z.object({
   dataTimeframeHours: z.number().min(12).max(48).default(24),
   deliveryTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format'),
   timezone: z.string(), // IANA timezone, e.g., 'America/New_York'
-  slackChannels: z.array(z.string()).min(1), // Array of channel IDs
+  // Slack configuration
+  slackChannels: z.array(z.string()).default([]), // Array of channel IDs (user-selected)
+  includeSlackMentions: z.boolean().default(true), // Include messages where user is @mentioned
+  // Google connectors (optional - include if connected)
+  includeGmail: z.boolean().default(false),
+  includeGoogleDrive: z.boolean().default(false),
+  includeGoogleCalendar: z.boolean().default(false),
 });
 export type DailyBriefConfig = z.infer<typeof DailyBriefConfigSchema>;
 

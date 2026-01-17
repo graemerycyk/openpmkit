@@ -21,15 +21,12 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock,
-  Headphones,
   Loader2,
-  MessageSquare,
   Play,
-  Plug,
   Target,
-  Ticket,
   Users,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 // Meeting prep timeframes
 const TIMEFRAMES = [
@@ -82,10 +79,17 @@ export default function MeetingPrepSetupPage() {
   const [timeframe, setTimeframe] = useState('30');
 
   // Connection status (would be fetched from API)
-  const calendarConnected = false;
-  const gongConnected = false;
-  const slackConnected = false;
-  const zendeskConnected = false;
+  // In production, this would come from an API call to /api/connectors
+  const connectedSources = [
+    { key: 'google_calendar' as const, connected: false },
+    { key: 'gong' as const, connected: false },
+    { key: 'slack' as const, connected: false },
+    { key: 'zendesk' as const, connected: false },
+    { key: 'jira' as const, connected: false },
+    { key: 'confluence' as const, connected: false },
+  ];
+
+  const calendarConnected = connectedSources.find((s) => s.key === 'google_calendar')?.connected ?? false;
 
   const canRun = selectedMeeting !== '' && calendarConnected;
 
@@ -296,111 +300,11 @@ export default function MeetingPrepSetupPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources</CardTitle>
-          </div>
-          <CardDescription>
-            The agent will pull account context from these connected sources
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Google Calendar */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${calendarConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Calendar className={`h-5 w-5 ${calendarConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Google Calendar</span>
-                  <Badge variant="secondary" className="text-xs">Required</Badge>
-                  <Badge variant={calendarConnected ? 'outline' : 'secondary'} className={calendarConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {calendarConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Upcoming meetings and attendees</p>
-              </div>
-            </div>
-            {!calendarConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Gong */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${gongConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Headphones className={`h-5 w-5 ${gongConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Gong</span>
-                  <Badge variant={gongConnected ? 'outline' : 'secondary'} className={gongConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {gongConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Call recordings and insights</p>
-              </div>
-            </div>
-            {!gongConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Slack */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${slackConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <MessageSquare className={`h-5 w-5 ${slackConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Slack</span>
-                  <Badge variant={slackConnected ? 'outline' : 'secondary'} className={slackConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {slackConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Account discussions and mentions</p>
-              </div>
-            </div>
-            {!slackConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Zendesk */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${zendeskConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Ticket className={`h-5 w-5 ${zendeskConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Zendesk</span>
-                  <Badge variant={zendeskConnected ? 'outline' : 'secondary'} className={zendeskConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {zendeskConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Support tickets and history</p>
-              </div>
-            </div>
-            {!zendeskConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <DataSourcesCard
+        connectedSources={connectedSources}
+        requiredConnectors={['google_calendar']}
+        description="The agent will pull account context from your connected sources"
+      />
 
       {/* Output Preview */}
       <Card>
