@@ -246,6 +246,10 @@ export const ConnectorKeySchema = z.enum([
   'slack',
   'gong',
   'zendesk',
+  'gmail',
+  'google-drive',
+  'google-calendar',
+  'figma',
 ]);
 export type ConnectorKey = z.infer<typeof ConnectorKeySchema>;
 
@@ -516,6 +520,7 @@ export interface OAuthTokens {
 
 export * from './remote';
 export * from './factory';
+export * from './real-rest-server';
 
 // ============================================================================
 // Default MCP Client Instance

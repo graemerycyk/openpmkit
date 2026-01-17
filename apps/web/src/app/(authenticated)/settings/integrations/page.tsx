@@ -25,6 +25,10 @@ import {
   Sparkles,
   AlertCircle,
   Loader2,
+  Mail,
+  FolderOpen,
+  Calendar,
+  Palette,
 } from 'lucide-react';
 
 type ConnectionStatus = 'connected' | 'not_connected' | 'coming_soon';
@@ -58,6 +62,7 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-blue-100 text-blue-600',
     category: 'tools',
     docsUrl: '/resources/jira-integration',
+    supportsOAuth: true,
   },
   {
     id: 'confluence',
@@ -67,6 +72,7 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-blue-100 text-blue-600',
     category: 'tools',
     docsUrl: '/resources/confluence-integration',
+    supportsOAuth: true,
   },
   {
     id: 'slack',
@@ -86,6 +92,7 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-green-100 text-green-600',
     category: 'tools',
     docsUrl: '/resources/gong-integration',
+    supportsOAuth: true,
   },
   {
     id: 'zendesk',
@@ -95,6 +102,47 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-emerald-100 text-emerald-600',
     category: 'tools',
     docsUrl: '/resources/zendesk-integration',
+    supportsOAuth: true,
+  },
+  {
+    id: 'gmail',
+    name: 'Gmail',
+    description: 'Read email threads for context in daily briefs and customer communications',
+    icon: Mail,
+    iconBg: 'bg-red-100 text-red-600',
+    category: 'tools',
+    docsUrl: '/resources/gmail-integration',
+    supportsOAuth: true,
+  },
+  {
+    id: 'google-drive',
+    name: 'Google Drive',
+    description: 'Access documents, spreadsheets, and presentations for PRD context',
+    icon: FolderOpen,
+    iconBg: 'bg-yellow-100 text-yellow-600',
+    category: 'tools',
+    docsUrl: '/resources/google-drive-integration',
+    supportsOAuth: true,
+  },
+  {
+    id: 'google-calendar',
+    name: 'Google Calendar',
+    description: 'Pull meeting context for meeting prep packs and daily briefs',
+    icon: Calendar,
+    iconBg: 'bg-blue-100 text-blue-600',
+    category: 'tools',
+    docsUrl: '/resources/google-calendar-integration',
+    supportsOAuth: true,
+  },
+  {
+    id: 'figma',
+    name: 'Figma',
+    description: 'Generate prototypes directly in Figma from PRDs',
+    icon: Palette,
+    iconBg: 'bg-pink-100 text-pink-600',
+    category: 'tools',
+    docsUrl: '/resources/figma-integration',
+    supportsOAuth: true,
   },
   {
     id: 'amplitude',
@@ -161,7 +209,7 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
 ];
 
 // Connectors that support OAuth
-const oauthConnectors = ['slack'];
+const oauthConnectors = ['slack', 'jira', 'confluence', 'gong', 'zendesk', 'gmail', 'google-drive', 'google-calendar', 'figma'];
 
 // Connectors that are coming soon (no OAuth yet)
 const comingSoonConnectors = ['linear', 'notion'];
@@ -311,8 +359,16 @@ function IntegrationsPageContent() {
       setError(errorMessages[errorParam] || `OAuth error: ${errorParam}`);
     }
 
-    if (successParam === 'slack_connected') {
-      setSuccess(`Successfully connected to Slack${workspace ? ` workspace "${workspace}"` : ''}!`);
+    if (successParam) {
+      const successMessages: Record<string, string> = {
+        slack_connected: `Successfully connected to Slack${workspace ? ` workspace "${workspace}"` : ''}!`,
+        atlassian_connected: `Successfully connected to Atlassian${workspace ? ` site "${workspace}"` : ''}! Jira and Confluence are now available.`,
+        gong_connected: 'Successfully connected to Gong!',
+        zendesk_connected: `Successfully connected to Zendesk${workspace ? ` subdomain "${workspace}"` : ''}!`,
+        google_connected: 'Successfully connected to Google! Gmail, Google Drive, and Google Calendar are now available.',
+        figma_connected: 'Successfully connected to Figma!',
+      };
+      setSuccess(successMessages[successParam] || `Successfully connected${workspace ? ` to ${workspace}` : ''}!`);
     }
 
     // Clear URL params
@@ -362,9 +418,25 @@ function IntegrationsPageContent() {
     setActionLoading(connectorId);
     setError(null);
 
-    // Redirect to OAuth flow
-    if (connectorId === 'slack') {
-      window.location.href = '/api/connectors/slack/authorize';
+    // Map connector IDs to OAuth endpoints
+    const oauthEndpoints: Record<string, string> = {
+      slack: '/api/connectors/slack/authorize',
+      jira: '/api/connectors/atlassian/authorize',
+      confluence: '/api/connectors/atlassian/authorize',
+      gong: '/api/connectors/gong/authorize',
+      zendesk: '/api/connectors/zendesk/authorize',
+      gmail: '/api/connectors/google/authorize',
+      'google-drive': '/api/connectors/google/authorize',
+      'google-calendar': '/api/connectors/google/authorize',
+      figma: '/api/connectors/figma/authorize',
+    };
+
+    const endpoint = oauthEndpoints[connectorId];
+    if (endpoint) {
+      window.location.href = endpoint;
+    } else {
+      setError(`OAuth not configured for ${connectorId}`);
+      setActionLoading(null);
     }
   };
 

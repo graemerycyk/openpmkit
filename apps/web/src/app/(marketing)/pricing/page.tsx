@@ -147,7 +147,7 @@ const faqs = [
   {
     question: 'What\'s included in the Individual plan?',
     answer:
-      'Everything you need to automate your PM workflows: all 10 job types, all connectors (Slack, Jira, Confluence, Gong, Zendesk), and unlimited on-demand runs. Google Workspace connectors (Gmail, Drive, Calendar) are coming soon.',
+      'Everything you need to automate your PM workflows: all 10 job types, all connectors (Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Drive, Google Calendar, Figma), and unlimited on-demand runs.',
   },
   {
     question: 'Can I upgrade from Individual to Teams later?',

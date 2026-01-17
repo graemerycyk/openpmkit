@@ -1,0 +1,247 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  GitBranch,
+  Loader2,
+  Play,
+  Plug,
+  Repeat,
+  Target,
+} from 'lucide-react';
+
+export default function SprintReviewPage() {
+  const [isRunning, setIsRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // Form state
+  const [sprintName, setSprintName] = useState('');
+  const [sprintGoal, setSprintGoal] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  // Connection status (would be fetched from API)
+  const jiraConnected = false;
+
+  const canRun = jiraConnected && sprintName.trim() !== '';
+
+  const handleRun = async () => {
+    if (!canRun) return;
+
+    setIsRunning(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetch('/api/agents/sprint-review/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sprintName: sprintName.trim(),
+          sprintGoal: sprintGoal.trim() || undefined,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSuccess(`Sprint Review started! Job ID: ${data.jobId}`);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to start sprint review');
+      }
+    } catch {
+      setError('Failed to start. Please try again.');
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-heading text-2xl font-bold">Sprint Review Agent</h1>
+          <p className="text-muted-foreground">
+            Auto-summarize completed sprints from Jira
+          </p>
+        </div>
+        <Badge variant="outline">On-Demand</Badge>
+      </div>
+
+      {/* Alerts */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {success && (
+        <Alert className="border-green-200 bg-green-50 text-green-800">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Sprint Information */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Repeat className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Sprint Information</CardTitle>
+          </div>
+          <CardDescription>
+            Identify the sprint to review
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="sprint-name">Sprint Name or ID *</Label>
+            <Input
+              id="sprint-name"
+              placeholder="e.g., Sprint 24, or board/sprint ID from Jira"
+              value={sprintName}
+              onChange={(e) => setSprintName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sprint-goal">Sprint Goal (optional)</Label>
+            <Textarea
+              id="sprint-goal"
+              placeholder="e.g., Complete user authentication flow and deploy to staging"
+              value={sprintGoal}
+              onChange={(e) => setSprintGoal(e.target.value)}
+              rows={2}
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="start-date">Sprint Start Date (optional)</Label>
+              <Input
+                id="start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end-date">Sprint End Date (optional)</Label>
+              <Input
+                id="end-date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Sources */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Plug className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Data Sources</CardTitle>
+          </div>
+          <CardDescription>
+            Connect Jira to analyze sprint data
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {/* Jira */}
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className={`rounded-lg p-2 ${jiraConnected ? 'bg-green-100' : 'bg-muted'}`}>
+                <GitBranch className={`h-5 w-5 ${jiraConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Jira</span>
+                  <Badge variant={jiraConnected ? 'outline' : 'secondary'} className={jiraConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
+                    {jiraConnected ? 'Connected' : 'Not Connected'}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">Sprint boards, issues, and stories</p>
+              </div>
+            </div>
+            {!jiraConnected && (
+              <Button asChild size="sm" variant="outline">
+                <Link href="/settings/integrations">Connect</Link>
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Output Preview */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">What You'll Get</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Sprint goal achievement summary</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Completed vs planned work breakdown</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Key accomplishments and highlights</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Carryover items and blockers</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Velocity metrics and trends</span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button asChild variant="outline">
+            <Link href="/agents/sprint-review/history">
+              <Clock className="mr-2 h-4 w-4" />
+              View History
+            </Link>
+          </Button>
+        </div>
+        <Button onClick={handleRun} disabled={isRunning || !canRun}>
+          {isRunning ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Play className="mr-2 h-4 w-4" />
+          )}
+          Generate Review
+        </Button>
+      </div>
+    </div>
+  );
+}

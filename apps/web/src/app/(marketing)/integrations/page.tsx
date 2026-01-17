@@ -80,7 +80,7 @@ const integrations = [
     tagline: 'Email communication',
     description: 'Read email threads for context in daily briefs, search inbox for customer communications.',
     icon: Mail,
-    status: 'coming-soon',
+    status: 'available',
     category: 'google',
   },
   {
@@ -89,7 +89,7 @@ const integrations = [
     tagline: 'Document storage',
     description: 'Access documents, spreadsheets, and presentations for PRD context and reference.',
     icon: FolderOpen,
-    status: 'coming-soon',
+    status: 'available',
     category: 'google',
   },
   {
@@ -98,7 +98,7 @@ const integrations = [
     tagline: 'Meeting scheduling',
     description: 'Pull meeting context for meeting prep packs and daily briefs.',
     icon: Calendar,
-    status: 'coming-soon',
+    status: 'available',
     category: 'google',
   },
   {
@@ -107,7 +107,7 @@ const integrations = [
     tagline: 'Design collaboration',
     description: 'Generate prototypes directly in Figma from PRDs, integrate with design workflows.',
     icon: Palette,
-    status: 'coming-soon',
+    status: 'available',
     category: 'design',
   },
   {

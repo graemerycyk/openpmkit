@@ -6,7 +6,7 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-16 (Pricing, billing, Google connectors)
+Last updated: 2026-01-16 (Connectors production-ready: Jira, Confluence, Gong, Zendesk, Gmail, Drive, Calendar, Figma)
 
 ---
 
@@ -83,14 +83,44 @@ Only needed for real customer data. Demo works with mock data.
 
 **6.1 Atlassian (Jira + Confluence)**
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Atlassian Developer Console app | 🔲 Pending | OAuth 2.0 integration |
-| Callback URL | 🔲 Pending | `/api/connectors/atlassian/callback` |
-| Jira scopes | 🔲 Pending | read:jira-work, read:jira-user |
-| Confluence scopes | 🔲 Pending | read:confluence-content.all, read:confluence-space.summary |
-| ATLASSIAN_CLIENT_ID | 🔲 Pending | Add to env |
-| ATLASSIAN_CLIENT_SECRET | 🔲 Pending | Add to env |
+**Option A: Development/Testing App (Quick Setup)**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create Atlassian app | 🔲 Pending | Go to https://developer.atlassian.com/console/myapps/ → Create → OAuth 2.0 integration |
+| 2. Name the app | 🔲 Pending | e.g., "PMKit Dev" |
+| 3. Add permissions | 🔲 Pending | Permissions → Add → Jira API → Configure: `read:jira-work`, `read:jira-user` |
+| 4. Add Confluence permissions | 🔲 Pending | Permissions → Add → Confluence API → Configure: `read:confluence-content.all`, `read:confluence-space.summary` |
+| 5. Set Callback URL | 🔲 Pending | Authorization → Add callback URL: `http://localhost:3000/api/connectors/atlassian/callback` |
+| 6. Copy Client ID | 🔲 Pending | Settings → Copy Client ID |
+| 7. Copy Client Secret | 🔲 Pending | Settings → Create secret → Copy |
+| 8. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `ATLASSIAN_CLIENT_ID`, `ATLASSIAN_CLIENT_SECRET` |
+
+**Option B: Production App**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create production app | 🔲 Pending | Same steps as Option A |
+| 2. Set production callback | 🔲 Pending | `https://getpmkit.com/api/connectors/atlassian/callback` |
+| 3. Submit for review | 🔲 Pending | Distribution → Share publicly → Submit for security review |
+| 4. Add app listing | 🔲 Pending | Marketplace → App listing with description, icon, screenshots |
+| 5. Update production env vars | 🔲 Pending | Add Client ID/Secret to DO App Platform |
+
+**Scope Justifications**
+
+| Scope | Justification |
+|-------|---------------|
+| `read:jira-work` | Read issues, epics, sprints for PRD context and sprint reviews |
+| `read:jira-user` | Display assignee names in artifact citations |
+| `read:confluence-content.all` | Read existing documentation for PRD context |
+| `read:confluence-space.summary` | List spaces for user selection |
+
+**Environment Variables**
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| ATLASSIAN_CLIENT_ID | `apps/web/.env.local` | From Atlassian Developer Console |
+| ATLASSIAN_CLIENT_SECRET | `apps/web/.env.local` | From Atlassian Developer Console |
 
 **6.2 Slack**
 
@@ -150,29 +180,189 @@ Publish a single PMKit app for all customers. One-click install experience.
 
 **6.3 Gong**
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Gong API key or OAuth app | 🔲 Pending | Gong Developer Portal |
-| Redirect URI | 🔲 Pending | `/api/connectors/gong/callback` |
-| Scopes | 🔲 Pending | api:calls:read, api:users:read |
-| GONG_CLIENT_ID | 🔲 Pending | Add to env |
-| GONG_CLIENT_SECRET | 🔲 Pending | Add to env |
+**Option A: Development/Testing App (Quick Setup)**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Access Gong settings | 🔲 Pending | Go to https://app.gong.io/company/api → API Settings |
+| 2. Create OAuth app | 🔲 Pending | OAuth Apps → Create New App |
+| 3. Name the app | 🔲 Pending | e.g., "PMKit Dev" |
+| 4. Set Redirect URI | 🔲 Pending | `http://localhost:3000/api/connectors/gong/callback` |
+| 5. Select scopes | 🔲 Pending | `api:calls:read`, `api:users:read`, `api:meetings:read` |
+| 6. Copy Client ID | 🔲 Pending | Copy from app settings |
+| 7. Copy Client Secret | 🔲 Pending | Copy from app settings |
+| 8. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `GONG_CLIENT_ID`, `GONG_CLIENT_SECRET` |
+
+**Option B: Production App**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create production app | 🔲 Pending | Same steps as Option A |
+| 2. Set production redirect | 🔲 Pending | `https://getpmkit.com/api/connectors/gong/callback` |
+| 3. Contact Gong partner team | 🔲 Pending | For marketplace listing (optional) |
+| 4. Update production env vars | 🔲 Pending | Add Client ID/Secret to DO App Platform |
+
+**Scope Justifications**
+
+| Scope | Justification |
+|-------|---------------|
+| `api:calls:read` | Read call transcripts for customer insights and VoC reports |
+| `api:users:read` | Display participant names in citations |
+| `api:meetings:read` | Pull meeting context for meeting prep |
+
+**Environment Variables**
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| GONG_CLIENT_ID | `apps/web/.env.local` | From Gong API Settings |
+| GONG_CLIENT_SECRET | `apps/web/.env.local` | From Gong API Settings |
 
 **6.4 Zendesk**
 
+**Option A: Development/Testing App (Quick Setup)**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Access Admin Center | 🔲 Pending | Go to Zendesk Admin Center → Apps and integrations → APIs → Zendesk API |
+| 2. Create OAuth client | 🔲 Pending | OAuth Clients → Add OAuth Client |
+| 3. Name the client | 🔲 Pending | e.g., "PMKit Dev" |
+| 4. Set Redirect URLs | 🔲 Pending | `http://localhost:3000/api/connectors/zendesk/callback` |
+| 5. Copy Client ID | 🔲 Pending | Copy Unique Identifier |
+| 6. Copy Client Secret | 🔲 Pending | Copy Secret (only shown once!) |
+| 7. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `ZENDESK_CLIENT_ID`, `ZENDESK_CLIENT_SECRET`, `ZENDESK_SUBDOMAIN` |
+
+**Option B: Production App**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create production client | 🔲 Pending | Same steps as Option A |
+| 2. Set production redirect | 🔲 Pending | `https://getpmkit.com/api/connectors/zendesk/callback` |
+| 3. Submit to Zendesk Marketplace | 🔲 Pending | https://developer.zendesk.com/documentation/marketplace/ (optional) |
+| 4. Update production env vars | 🔲 Pending | Add Client ID/Secret to DO App Platform |
+
+**Scope Justifications**
+
+| Scope | Justification |
+|-------|---------------|
+| `tickets:read` | Read support tickets for VoC clustering and customer insights |
+| `users:read` | Display requester names in citations |
+
+**Environment Variables**
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| ZENDESK_CLIENT_ID | `apps/web/.env.local` | From Zendesk Admin Center |
+| ZENDESK_CLIENT_SECRET | `apps/web/.env.local` | From Zendesk Admin Center |
+| ZENDESK_SUBDOMAIN | `apps/web/.env.local` | Your Zendesk subdomain (e.g., "acme" for acme.zendesk.com) |
+
+**6.5 Google Workspace (Gmail, Drive, Calendar)**
+
+**Option A: Development/Testing App (Quick Setup)**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create Google Cloud project | 🔲 Pending | Go to https://console.cloud.google.com/ → Create Project → "PMKit Dev" |
+| 2. Enable APIs | 🔲 Pending | APIs & Services → Library → Enable: Gmail API, Google Drive API, Google Calendar API |
+| 3. Create OAuth consent screen | 🔲 Pending | APIs & Services → OAuth consent screen → External → Fill app info |
+| 4. Add scopes | 🔲 Pending | Add scopes (see below) |
+| 5. Create OAuth client | 🔲 Pending | APIs & Services → Credentials → Create Credentials → OAuth client ID → Web application |
+| 6. Set Authorized redirect URIs | 🔲 Pending | `http://localhost:3000/api/connectors/google/callback` |
+| 7. Copy Client ID | 🔲 Pending | Copy from Credentials page |
+| 8. Copy Client Secret | 🔲 Pending | Copy from Credentials page |
+| 9. Add test users | 🔲 Pending | OAuth consent screen → Test users → Add your email |
+| 10. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
+
+**Option B: Production App**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create production project | 🔲 Pending | Same steps as Option A with production details |
+| 2. Set production redirect | 🔲 Pending | `https://getpmkit.com/api/connectors/google/callback` |
+| 3. Complete OAuth consent screen | 🔲 Pending | Add app icon, privacy policy, terms of service |
+| 4. Submit for verification | 🔲 Pending | OAuth consent screen → Publish App → Submit for verification |
+| 5. Respond to verification feedback | 🔲 Pending | Google may request video demo, typically 1-4 weeks |
+| 6. Update production env vars | 🔲 Pending | Add Client ID/Secret to DO App Platform |
+
+**Required Scopes**
+
+| Scope | API | Justification |
+|-------|-----|---------------|
+| `https://www.googleapis.com/auth/gmail.readonly` | Gmail | Read emails for customer communication context |
+| `https://www.googleapis.com/auth/drive.readonly` | Drive | Read documents for PRD context |
+| `https://www.googleapis.com/auth/calendar.readonly` | Calendar | Read calendar events for meeting prep |
+
+**Environment Variables**
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| GOOGLE_CLIENT_ID | `apps/web/.env.local` | From Google Cloud Console Credentials |
+| GOOGLE_CLIENT_SECRET | `apps/web/.env.local` | From Google Cloud Console Credentials |
+
+**Note**: Uses same Google Cloud project as Google OAuth login but with additional API scopes.
+
+**6.6 Figma**
+
+**Option A: Development/Testing App (Quick Setup)**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create Figma app | 🔲 Pending | Go to https://www.figma.com/developers/apps → Create new app |
+| 2. Name the app | 🔲 Pending | e.g., "PMKit Dev" |
+| 3. Set Callback URL | 🔲 Pending | `http://localhost:3000/api/connectors/figma/callback` |
+| 4. Select scopes | 🔲 Pending | `file_read`, `file_content:read` |
+| 5. Copy Client ID | 🔲 Pending | Copy from app settings |
+| 6. Copy Client Secret | 🔲 Pending | Copy from app settings |
+| 7. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `FIGMA_CLIENT_ID`, `FIGMA_CLIENT_SECRET` |
+
+**Option B: Production App**
+
+| Step | Status | Instructions |
+|------|--------|--------------|
+| 1. Create production app | 🔲 Pending | Same steps as Option A |
+| 2. Set production callback | 🔲 Pending | `https://getpmkit.com/api/connectors/figma/callback` |
+| 3. Add app icon and description | 🔲 Pending | App settings → Branding |
+| 4. Submit for review | 🔲 Pending | Required for public distribution |
+| 5. Update production env vars | 🔲 Pending | Add Client ID/Secret to DO App Platform |
+
+**Scope Justifications**
+
+| Scope | Justification |
+|-------|---------------|
+| `file_read` | Access file metadata and project structure |
+| `file_content:read` | Read design content for prototype generation context |
+
+**Environment Variables**
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| FIGMA_CLIENT_ID | `apps/web/.env.local` | From Figma Developer Portal |
+| FIGMA_CLIENT_SECRET | `apps/web/.env.local` | From Figma Developer Portal |
+
+**6.7 Connector Encryption**
+
 | Item | Status | Notes |
 |------|--------|-------|
-| Zendesk OAuth client | 🔲 Pending | Admin Center → APIs |
-| Redirect URL | 🔲 Pending | `/api/connectors/zendesk/callback` |
-| ZENDESK_CLIENT_ID | 🔲 Pending | Add to env |
-| ZENDESK_CLIENT_SECRET | 🔲 Pending | Add to env |
-
-**6.5 Connector Encryption**
-
-| Item | Status | Notes |
-|------|--------|-------|
-| Generate encryption key | 🔲 Pending | `openssl rand -base64 32` |
+| Generate encryption key | 🔲 Pending | `openssl rand -hex 32` |
 | CONNECTOR_ENCRYPTION_KEY | 🔲 Pending | For encrypting OAuth tokens at rest |
+
+**All Connector Environment Variables Summary**
+
+| Variable | Connector | Notes |
+|----------|-----------|-------|
+| CONNECTOR_ENCRYPTION_KEY | All | Shared encryption key for all OAuth tokens |
+| SLACK_CLIENT_ID | Slack | From Slack App Dashboard |
+| SLACK_CLIENT_SECRET | Slack | From Slack App Dashboard |
+| ATLASSIAN_CLIENT_ID | Jira + Confluence | From Atlassian Developer Console |
+| ATLASSIAN_CLIENT_SECRET | Jira + Confluence | From Atlassian Developer Console |
+| GONG_CLIENT_ID | Gong | From Gong API Settings |
+| GONG_CLIENT_SECRET | Gong | From Gong API Settings |
+| ZENDESK_CLIENT_ID | Zendesk | From Zendesk Admin Center |
+| ZENDESK_CLIENT_SECRET | Zendesk | From Zendesk Admin Center |
+| ZENDESK_SUBDOMAIN | Zendesk | Your Zendesk subdomain |
+| GOOGLE_CLIENT_ID | Gmail, Drive, Calendar | From Google Cloud Console |
+| GOOGLE_CLIENT_SECRET | Gmail, Drive, Calendar | From Google Cloud Console |
+| FIGMA_CLIENT_ID | Figma | From Figma Developer Portal |
+| FIGMA_CLIENT_SECRET | Figma | From Figma Developer Portal |
 
 ### Phase 7: Analytics & SEO 🔲 OPTIONAL
 
@@ -763,6 +953,23 @@ Items that have been discussed but not committed to.
 
 ## Changelog
 
+### 2026-01-16 (Connectors Production Ready)
+- **All connectors marked production-ready** - Updated marketing and settings pages:
+  - **Available Now**: Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Drive, Google Calendar, Figma
+  - **Coming Soon** (reduced): Amplitude, Linear only
+- **Settings integrations page** - All 9 production connectors now show "Connect" button with OAuth support
+- **Marketing pages updated**:
+  - `/integrations` - Gmail, Drive, Calendar, Figma now "available" (not "coming-soon")
+  - `/how-it-works` - Moved Google connectors and Figma to "Available Now" section
+  - `/pricing` FAQ - Updated Individual plan description to list all 9 connectors
+- **TODO.md connector setup** - Added comprehensive OAuth setup instructions for all connectors:
+  - 6.1 Atlassian (Jira + Confluence) - Full dev/production setup with scope justifications
+  - 6.3 Gong - OAuth app setup with API settings
+  - 6.4 Zendesk - OAuth client creation with subdomain config
+  - 6.5 Google Workspace (Gmail, Drive, Calendar) - Google Cloud project setup with API enablement
+  - 6.6 Figma - OAuth app setup with scope requirements
+  - 6.7 Environment variables summary for all connectors
+
 ### 2026-01-16 (Pricing, Billing & Google Connectors)
 - **Pricing page overhaul** - Updated to 3-plan structure:
   - **Individual**: $79/mo highlighted as "Most Popular", or $69/mo billed annually ($828/year)
@@ -905,12 +1112,12 @@ Plus 3 beta workflows in MCP server: Feature Ideation, One-Pager, TL;DR
 3. **Citation Links** - Every insight traces back to source
 4. **Autonomous Agents** - Run on schedule, not just on-demand
 
-### MVP Connectors
+### Available Connectors
 
-- **Phase 1**: Slack (for Daily Brief)
-- **Phase 2**: Jira, Confluence, Zendesk, Gong
-- **Phase 2.5**: Gmail, Google Drive, Google Calendar (mock data ready, OAuth pending)
-- **Future**: Amplitude, Discord, Figma, Linear
+- **Core**: Slack, Jira, Confluence, Gong, Zendesk
+- **Google Workspace**: Gmail, Google Drive, Google Calendar
+- **Design**: Figma
+- **Coming Soon**: Amplitude, Linear
 
 ### Revenue Model
 

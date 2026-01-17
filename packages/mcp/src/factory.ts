@@ -1,5 +1,78 @@
 import type { MCPServer, MCPClient, ConnectorKey, OAuthTokens } from './index';
 import { RemoteMCPClient, MCP_SERVER_CONFIGS, decryptTokens } from './remote';
+import type { RestOAuthTokens, TokenRefreshCallback } from './real-rest-server';
+
+// ============================================================================
+// Connector Type Classification
+// ============================================================================
+
+/**
+ * Connectors with vendor MCP servers (use RemoteMCPClient)
+ */
+const VENDOR_MCP_CONNECTORS: Set<ConnectorKey> = new Set([
+  'jira',
+  'confluence',
+  'slack',
+]);
+
+/**
+ * Connectors that use REST API wrappers (use RealRestMCPServer classes)
+ */
+const REST_API_CONNECTORS: Set<ConnectorKey> = new Set([
+  'gmail',
+  'google-drive',
+  'google-calendar',
+  'gong',
+  'zendesk',
+  // 'figma', // TODO: Add when RealFigmaMCPServer is implemented
+]);
+
+/**
+ * All supported connectors
+ */
+const ALL_CONNECTORS: ConnectorKey[] = [
+  'jira',
+  'confluence',
+  'slack',
+  'gong',
+  'zendesk',
+  'gmail',
+  'google-drive',
+  'google-calendar',
+  'figma',
+];
+
+/**
+ * Check if a connector has a vendor MCP server
+ */
+export function hasVendorMCP(connectorKey: ConnectorKey): boolean {
+  return VENDOR_MCP_CONNECTORS.has(connectorKey);
+}
+
+/**
+ * Check if a connector uses REST API wrapper
+ */
+export function hasRestAPIWrapper(connectorKey: ConnectorKey): boolean {
+  return REST_API_CONNECTORS.has(connectorKey);
+}
+
+// ============================================================================
+// Real Server Factory Function Type
+// ============================================================================
+
+/**
+ * Factory function for creating real MCP servers for REST API connectors.
+ * Each connector type has its own RealXxxMCPServer class.
+ */
+export type RealServerFactory = (
+  connectorKey: ConnectorKey,
+  tokens: RestOAuthTokens,
+  options?: {
+    onTokenRefresh?: TokenRefreshCallback;
+    timeout?: number;
+    subdomain?: string; // For Zendesk
+  }
+) => Promise<MCPServer | null>;
 
 // ============================================================================
 // Connector Mode
@@ -20,15 +93,21 @@ export interface ConnectorInstallInfo {
 export interface ConnectorFactoryConfig {
   /** Encryption key for decrypting stored credentials */
   encryptionKey: string;
-  
+
   /** Function to get connector install status for a tenant */
   getConnectorStatus: (tenantId: string, connectorKey: ConnectorKey) => Promise<ConnectorInstallInfo | null>;
-  
+
   /** Function to get stored credentials for a tenant/connector */
   getCredentials: (tenantId: string, connectorKey: ConnectorKey) => Promise<StoredCredentials | null>;
-  
+
   /** Function to save refreshed credentials */
   saveCredentials: (tenantId: string, connectorKey: ConnectorKey, tokens: OAuthTokens) => Promise<void>;
+
+  /** Optional: Factory for creating real REST API servers (for non-vendor MCP connectors) */
+  realServerFactory?: RealServerFactory;
+
+  /** Optional: Get connector-specific metadata (e.g., Zendesk subdomain) */
+  getConnectorMetadata?: (tenantId: string, connectorKey: ConnectorKey) => Promise<Record<string, string> | null>;
 }
 
 // ============================================================================
@@ -113,7 +192,8 @@ export class ConnectorFactory {
   }
 
   /**
-   * Get real MCP connector with stored credentials
+   * Get real MCP connector with stored credentials.
+   * Routes to vendor MCP server or REST API wrapper based on connector type.
    */
   private async getRealConnector(
     tenantId: string,
@@ -130,23 +210,100 @@ export class ConnectorFactory {
     // Decrypt tokens
     const tokens = decryptTokens(stored.encryptedBlob, this.config.encryptionKey);
 
-    // Get connector config
+    // Route based on connector type
+    if (hasVendorMCP(connectorKey)) {
+      // Use RemoteMCPClient for vendor MCP servers (Jira, Confluence, Slack)
+      return this.createVendorMCPClient(tenantId, connectorKey, tokens);
+    } else if (hasRestAPIWrapper(connectorKey)) {
+      // Use RealRestMCPServer classes for REST API connectors
+      return this.createRestAPIServer(tenantId, connectorKey, tokens);
+    }
+
+    // Connector not supported for real mode
+    console.warn(`No real implementation for ${connectorKey}, falling back to mock`);
+    return this.getMockConnector(connectorKey);
+  }
+
+  /**
+   * Create a vendor MCP client (for Jira, Confluence, Slack)
+   */
+  private async createVendorMCPClient(
+    tenantId: string,
+    connectorKey: ConnectorKey,
+    tokens: OAuthTokens
+  ): Promise<MCPServer | null> {
     const connectorConfig = MCP_SERVER_CONFIGS[connectorKey];
 
-    // Create remote MCP client
+    if (!connectorConfig) {
+      console.error(`No MCP server config found for ${connectorKey}`);
+      return this.getMockConnector(connectorKey);
+    }
+
     const client = new RemoteMCPClient({
       connector: connectorConfig,
       tokens,
       onTokenRefresh: async (newTokens) => {
-        // Save refreshed tokens
         await this.config.saveCredentials(tenantId, connectorKey, newTokens);
       },
     });
 
-    // Discover tools
+    // Discover tools from remote MCP server
     await client.discoverTools();
 
     return client;
+  }
+
+  /**
+   * Create a REST API server (for Gmail, Drive, Calendar, Gong, Zendesk)
+   */
+  private async createRestAPIServer(
+    tenantId: string,
+    connectorKey: ConnectorKey,
+    tokens: OAuthTokens
+  ): Promise<MCPServer | null> {
+    if (!this.config.realServerFactory) {
+      console.warn(`No realServerFactory configured, falling back to mock for ${connectorKey}`);
+      return this.getMockConnector(connectorKey);
+    }
+
+    // Convert OAuthTokens to RestOAuthTokens
+    const restTokens: RestOAuthTokens = {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresAt: tokens.expiresAt,
+      tokenType: tokens.tokenType,
+      scope: tokens.scopes?.join(' '),
+    };
+
+    // Get connector-specific metadata (e.g., Zendesk subdomain)
+    const metadata = this.config.getConnectorMetadata
+      ? await this.config.getConnectorMetadata(tenantId, connectorKey)
+      : null;
+
+    // Create token refresh callback
+    const onTokenRefresh: TokenRefreshCallback = async (newTokens) => {
+      const oauthTokens: OAuthTokens = {
+        accessToken: newTokens.accessToken,
+        refreshToken: newTokens.refreshToken,
+        expiresAt: newTokens.expiresAt,
+        tokenType: newTokens.tokenType ?? 'Bearer',
+        scopes: newTokens.scope?.split(' ') ?? [],
+      };
+      await this.config.saveCredentials(tenantId, connectorKey, oauthTokens);
+    };
+
+    // Use factory to create the real server
+    const server = await this.config.realServerFactory(connectorKey, restTokens, {
+      onTokenRefresh,
+      subdomain: metadata?.subdomain,
+    });
+
+    if (!server) {
+      console.warn(`realServerFactory returned null for ${connectorKey}, falling back to mock`);
+      return this.getMockConnector(connectorKey);
+    }
+
+    return server;
   }
 
   /**
@@ -186,9 +343,8 @@ export class ConnectorFactory {
    */
   async getAvailableConnectors(tenantId: string): Promise<ConnectorKey[]> {
     const available: ConnectorKey[] = [];
-    const allConnectors: ConnectorKey[] = ['jira', 'confluence', 'slack', 'gong', 'zendesk'];
 
-    for (const key of allConnectors) {
+    for (const key of ALL_CONNECTORS) {
       if (await this.isConnectorAvailable(tenantId, key)) {
         available.push(key);
       }
@@ -205,16 +361,17 @@ export class ConnectorFactory {
     available: boolean;
     mode: ConnectorMode | null;
     isDemo: boolean;
+    hasRealImplementation: boolean;
   }>> {
-    const allConnectors: ConnectorKey[] = ['jira', 'confluence', 'slack', 'gong', 'zendesk'];
     const isDemo = this.isDemoTenant(tenantId);
 
     return Promise.all(
-      allConnectors.map(async (connectorKey) => ({
+      ALL_CONNECTORS.map(async (connectorKey) => ({
         connectorKey,
         available: await this.isConnectorAvailable(tenantId, connectorKey),
         mode: await this.getConnectorMode(tenantId, connectorKey),
         isDemo,
+        hasRealImplementation: hasVendorMCP(connectorKey) || hasRestAPIWrapper(connectorKey),
       }))
     );
   }
@@ -231,6 +388,8 @@ export function createConnectorFactory(options: {
   getConnectorStatus: ConnectorFactoryConfig['getConnectorStatus'];
   getCredentials: ConnectorFactoryConfig['getCredentials'];
   saveCredentials: ConnectorFactoryConfig['saveCredentials'];
+  realServerFactory?: RealServerFactory;
+  getConnectorMetadata?: ConnectorFactoryConfig['getConnectorMetadata'];
 }): ConnectorFactory {
   const encryptionKey = process.env.CONNECTOR_ENCRYPTION_KEY ?? 'default-dev-key';
 
@@ -239,6 +398,8 @@ export function createConnectorFactory(options: {
     getConnectorStatus: options.getConnectorStatus,
     getCredentials: options.getCredentials,
     saveCredentials: options.saveCredentials,
+    realServerFactory: options.realServerFactory,
+    getConnectorMetadata: options.getConnectorMetadata,
   });
 }
 
@@ -365,4 +526,54 @@ export class TenantMCPClient {
 export function createDemoMCPClient(factory: ConnectorFactory): TenantMCPClient {
   return new TenantMCPClient(factory, DEMO_TENANT_ID);
 }
+
+// ============================================================================
+// Default Real Server Factory
+// ============================================================================
+
+/**
+ * Creates the default real server factory that instantiates the appropriate
+ * RealXxxMCPServer class for each connector type.
+ *
+ * Usage:
+ * ```
+ * import { createDefaultRealServerFactory } from '@pmkit/mcp';
+ * import { RealGmailMCPServer } from '@pmkit/mcp-servers/gmail/real';
+ * // ... other real server imports
+ *
+ * const realServerFactory = createDefaultRealServerFactory({
+ *   gmail: RealGmailMCPServer,
+ *   'google-drive': RealGoogleDriveMCPServer,
+ *   // ...
+ * });
+ * ```
+ */
+export function createDefaultRealServerFactory(
+  serverClasses: Partial<Record<ConnectorKey, new (tokens: RestOAuthTokens, options?: {
+    onTokenRefresh?: TokenRefreshCallback;
+    timeout?: number;
+    subdomain?: string;
+  }) => MCPServer>>
+): RealServerFactory {
+  return async (connectorKey, tokens, options) => {
+    const ServerClass = serverClasses[connectorKey];
+
+    if (!ServerClass) {
+      console.warn(`No real server class registered for ${connectorKey}`);
+      return null;
+    }
+
+    return new ServerClass(tokens, options);
+  };
+}
+
+// ============================================================================
+// Export Constants
+// ============================================================================
+
+export {
+  VENDOR_MCP_CONNECTORS,
+  REST_API_CONNECTORS,
+  ALL_CONNECTORS,
+};
 

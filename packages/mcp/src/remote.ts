@@ -42,7 +42,13 @@ export interface RemoteMCPServerConfig {
 // Official MCP Server Configurations
 // ============================================================================
 
-export const MCP_SERVER_CONFIGS: Record<ConnectorKey, RemoteMCPServerConfig> = {
+/**
+ * Configuration for connectors with vendor MCP servers.
+ * Only includes connectors that have actual MCP server endpoints
+ * (Jira, Confluence, Slack). REST API connectors (Gmail, Drive, etc.)
+ * are not included here - they use RealRestMCPServer classes instead.
+ */
+export const MCP_SERVER_CONFIGS: Partial<Record<ConnectorKey, RemoteMCPServerConfig>> = {
   jira: {
     connectorKey: 'jira',
     name: 'Atlassian Jira',
@@ -361,7 +367,9 @@ export class RemoteMCPClient implements MCPServer {
 // ============================================================================
 
 /**
- * Generate OAuth authorization URL for a connector
+ * Generate OAuth authorization URL for a connector.
+ * Only works for connectors with vendor MCP server configs.
+ * @throws Error if connector does not have a MCP server config
  */
 export function getOAuthAuthorizationUrl(
   connectorKey: ConnectorKey,
@@ -370,7 +378,11 @@ export function getOAuthAuthorizationUrl(
   clientId: string
 ): string {
   const config = MCP_SERVER_CONFIGS[connectorKey];
-  
+
+  if (!config) {
+    throw new Error(`No MCP server config for connector: ${connectorKey}. This connector may use a custom REST API wrapper instead.`);
+  }
+
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -384,7 +396,9 @@ export function getOAuthAuthorizationUrl(
 }
 
 /**
- * Exchange authorization code for tokens
+ * Exchange authorization code for tokens.
+ * Only works for connectors with vendor MCP server configs.
+ * @throws Error if connector does not have a MCP server config
  */
 export async function exchangeCodeForTokens(
   connectorKey: ConnectorKey,
@@ -394,6 +408,10 @@ export async function exchangeCodeForTokens(
   clientSecret: string
 ): Promise<OAuthTokens> {
   const config = MCP_SERVER_CONFIGS[connectorKey];
+
+  if (!config) {
+    throw new Error(`No MCP server config for connector: ${connectorKey}. This connector may use a custom REST API wrapper instead.`);
+  }
 
   const response = await fetch(config.oauth.tokenUrl, {
     method: 'POST',

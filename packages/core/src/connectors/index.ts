@@ -66,15 +66,26 @@ export function decryptCredential(encryptedBase64: string, encryptionKey: string
 
 /**
  * OAuth token structure for storage
+ * Supports common OAuth fields plus connector-specific metadata
  */
 export interface OAuthTokens {
   accessToken: string;
   refreshToken?: string;
   expiresAt?: string; // ISO date string
+  expiresIn?: number; // Seconds until expiry (from OAuth response)
   tokenType?: string;
   scope?: string;
-  teamId?: string; // For Slack workspace ID
-  teamName?: string; // For Slack workspace name
+  // Slack-specific
+  teamId?: string;
+  teamName?: string;
+  // Atlassian-specific (Jira, Confluence)
+  cloudId?: string;
+  siteUrl?: string;
+  siteName?: string;
+  // Zendesk-specific
+  subdomain?: string;
+  // Figma-specific
+  userId?: string;
 }
 
 /**
@@ -102,6 +113,10 @@ export const ConnectorKeySchema = z.enum([
   'slack',
   'gong',
   'zendesk',
+  'gmail',
+  'google-drive',
+  'google-calendar',
+  'figma',
 ]);
 export type ConnectorKey = z.infer<typeof ConnectorKeySchema>;
 

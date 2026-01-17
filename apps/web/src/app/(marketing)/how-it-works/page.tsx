@@ -487,6 +487,10 @@ export default function HowItWorksPage() {
                 { name: 'Confluence', icon: FileText, description: 'Documentation' },
                 { name: 'Gong', icon: Phone, description: 'Call transcripts' },
                 { name: 'Zendesk', icon: Headphones, description: 'Support tickets' },
+                { name: 'Gmail', icon: Mail, description: 'Email threads' },
+                { name: 'Google Drive', icon: FolderOpen, description: 'Documents' },
+                { name: 'Google Calendar', icon: Calendar, description: 'Meetings' },
+                { name: 'Figma', icon: Palette, description: 'Design files' },
               ].map((integration) => (
                 <Card key={integration.name} className="text-center">
                   <CardContent className="pt-6">
@@ -504,12 +508,8 @@ export default function HowItWorksPage() {
           {/* Coming Soon */}
           <div className="mt-12">
             <h3 className="text-lg font-semibold mb-6 text-center">Coming Soon</h3>
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+            <div className="grid gap-4 md:grid-cols-2 max-w-md mx-auto">
               {[
-                { name: 'Gmail', icon: Mail, description: 'Email threads' },
-                { name: 'Google Drive', icon: FolderOpen, description: 'Documents' },
-                { name: 'Google Calendar', icon: Calendar, description: 'Meetings' },
-                { name: 'Figma', icon: Palette, description: 'Design files' },
                 { name: 'Amplitude', icon: BarChart3, description: 'Analytics' },
                 { name: 'Linear', icon: TrendingUp, description: 'Issue tracking' },
               ].map((integration) => (
