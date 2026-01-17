@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, MessageSquare, Layers, Phone, FileText, Headphones, BarChart3, Mail, FolderOpen, Calendar, Palette, TrendingUp, Globe, Search, Newspaper } from 'lucide-react';
+import { ArrowRight, MessageSquare, Layers, Phone, FileText, Headphones, BarChart3, Mail, FolderOpen, Calendar, Palette, TrendingUp, Globe, Search, Newspaper, Video } from 'lucide-react';
 import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -53,6 +53,15 @@ const integrations = [
     tagline: 'Team documentation',
     description: 'Pull context from existing docs, propose new pages with drafted PRDs and specs.',
     icon: FileText,
+    status: 'available',
+    category: 'core',
+  },
+  {
+    slug: 'loom',
+    name: 'Loom',
+    tagline: 'Async video messaging',
+    description: 'Extract insights from video transcripts, cite stakeholder walkthroughs in PRDs and briefs.',
+    icon: Video,
     status: 'available',
     category: 'core',
   },

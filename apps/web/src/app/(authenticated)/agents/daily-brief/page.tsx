@@ -165,8 +165,8 @@ export default function DailyBriefSetupPage() {
           const data = await connectorsRes.json();
           const connectors = data.connectors || [];
           setGmailConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real'));
-          setGdriveConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google_drive' && c.status === 'real'));
-          setGcalConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google_calendar' && c.status === 'real'));
+          setGdriveConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real'));
+          setGcalConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real'));
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);

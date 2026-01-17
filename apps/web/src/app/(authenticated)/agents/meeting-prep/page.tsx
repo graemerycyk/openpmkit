@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -78,18 +78,41 @@ export default function MeetingPrepSetupPage() {
   const [additionalContext, setAdditionalContext] = useState('');
   const [timeframe, setTimeframe] = useState('30');
 
-  // Connection status (would be fetched from API)
-  // In production, this would come from an API call to /api/connectors
-  const connectedSources = [
-    { key: 'google_calendar' as const, connected: false },
+  // Connection status
+  const [connectedSources, setConnectedSources] = useState([
+    { key: 'google-calendar' as const, connected: false },
     { key: 'gong' as const, connected: false },
     { key: 'slack' as const, connected: false },
     { key: 'zendesk' as const, connected: false },
     { key: 'jira' as const, connected: false },
     { key: 'confluence' as const, connected: false },
-  ];
+  ]);
 
-  const calendarConnected = connectedSources.find((s) => s.key === 'google_calendar')?.connected ?? false;
+  useEffect(() => {
+    async function fetchConnectors() {
+      try {
+        const res = await fetch('/api/connectors');
+        if (res.ok) {
+          const data = await res.json();
+          const connectors = data.connectors || [];
+          setConnectedSources((prev) =>
+            prev.map((source) => ({
+              ...source,
+              connected: connectors.some(
+                (c: { connectorKey: string; status: string }) =>
+                  c.connectorKey === source.key && c.status === 'real'
+              ),
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to fetch connectors:', err);
+      }
+    }
+    fetchConnectors();
+  }, []);
+
+  const calendarConnected = connectedSources.find((s) => s.key === 'google-calendar')?.connected ?? false;
 
   const canRun = selectedMeeting !== '' && calendarConnected;
 
@@ -302,7 +325,7 @@ export default function MeetingPrepSetupPage() {
       {/* Data Sources */}
       <DataSourcesCard
         connectedSources={connectedSources}
-        requiredConnectors={['google_calendar']}
+        requiredConnectors={['google-calendar']}
         description="The agent will pull account context from your connected sources"
       />
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,13 +31,36 @@ export default function SprintReviewPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Connection status (would be fetched from API)
-  // In production, this would come from an API call to /api/connectors
-  const connectedSources = [
+  // Connection status
+  const [connectedSources, setConnectedSources] = useState([
     { key: 'jira' as const, connected: false },
     { key: 'confluence' as const, connected: false },
     { key: 'slack' as const, connected: false },
-  ];
+  ]);
+
+  useEffect(() => {
+    async function fetchConnectors() {
+      try {
+        const res = await fetch('/api/connectors');
+        if (res.ok) {
+          const data = await res.json();
+          const connectors = data.connectors || [];
+          setConnectedSources((prev) =>
+            prev.map((source) => ({
+              ...source,
+              connected: connectors.some(
+                (c: { connectorKey: string; status: string }) =>
+                  c.connectorKey === source.key && c.status === 'real'
+              ),
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to fetch connectors:', err);
+      }
+    }
+    fetchConnectors();
+  }, []);
 
   const jiraConnected = connectedSources.find((s) => s.key === 'jira')?.connected ?? false;
   const canRun = jiraConnected && sprintName.trim() !== '';
