@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -18,8 +17,8 @@ import {
 } from '@/components/ui/select';
 import {
   AlertCircle,
-  Building2,
   Calendar,
+  CalendarDays,
   CheckCircle2,
   Clock,
   Headphones,
@@ -29,6 +28,7 @@ import {
   Plug,
   Target,
   Ticket,
+  Users,
 } from 'lucide-react';
 
 // Meeting prep timeframes
@@ -39,24 +39,55 @@ const TIMEFRAMES = [
   { value: '90', label: 'Last 90 days' },
 ];
 
+// Mock upcoming meetings (would come from Google Calendar API)
+const UPCOMING_MEETINGS = [
+  {
+    id: 'meet-1',
+    title: 'Quarterly Business Review - Acme Corp',
+    datetime: '2024-01-22T14:00:00',
+    attendees: ['jane.smith@acme.com', 'john.doe@acme.com'],
+    description: 'Q4 review and Q1 planning discussion',
+  },
+  {
+    id: 'meet-2',
+    title: 'Product Feedback Session with TechStart',
+    datetime: '2024-01-23T10:00:00',
+    attendees: ['sarah@techstart.io'],
+    description: 'Discuss feature requests and roadmap alignment',
+  },
+  {
+    id: 'meet-3',
+    title: 'Renewal Discussion - Global Industries',
+    datetime: '2024-01-24T15:30:00',
+    attendees: ['mike.johnson@globalind.com', 'lisa.chen@globalind.com'],
+    description: 'Annual contract renewal and expansion',
+  },
+  {
+    id: 'meet-4',
+    title: 'Onboarding Kickoff - NewCo',
+    datetime: '2024-01-25T09:00:00',
+    attendees: ['alex@newco.com'],
+    description: 'Implementation planning and timeline',
+  },
+];
+
 export default function MeetingPrepSetupPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   // Form state
-  const [accountName, setAccountName] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [meetingDate, setMeetingDate] = useState('');
-  const [meetingContext, setMeetingContext] = useState('');
+  const [selectedMeeting, setSelectedMeeting] = useState<string>('');
+  const [additionalContext, setAdditionalContext] = useState('');
   const [timeframe, setTimeframe] = useState('30');
 
   // Connection status (would be fetched from API)
+  const calendarConnected = false;
   const gongConnected = false;
   const slackConnected = false;
   const zendeskConnected = false;
 
-  const canRun = accountName.trim() !== '' && (gongConnected || slackConnected || zendeskConnected);
+  const canRun = selectedMeeting !== '' && calendarConnected;
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -65,15 +96,19 @@ export default function MeetingPrepSetupPage() {
     setError(null);
     setSuccess(null);
 
+    const meeting = UPCOMING_MEETINGS.find((m) => m.id === selectedMeeting);
+
     try {
       const res = await fetch('/api/agents/meeting-prep/trigger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          accountName,
-          contactName,
-          meetingDate,
-          meetingContext,
+          meetingId: selectedMeeting,
+          meetingTitle: meeting?.title,
+          meetingDatetime: meeting?.datetime,
+          attendees: meeting?.attendees,
+          meetingDescription: meeting?.description,
+          additionalContext,
           timeframeDays: parseInt(timeframe),
         }),
       });
@@ -91,6 +126,8 @@ export default function MeetingPrepSetupPage() {
       setIsRunning(false);
     }
   };
+
+  const selectedMeetingData = UPCOMING_MEETINGS.find((m) => m.id === selectedMeeting);
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -120,86 +157,138 @@ export default function MeetingPrepSetupPage() {
         </Alert>
       )}
 
-      {/* Account Info */}
+      {/* Select Meeting */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Account Information</CardTitle>
+            <CalendarDays className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Select Meeting</CardTitle>
           </div>
           <CardDescription>
-            Specify the account and contact for the meeting
+            Choose an upcoming meeting from your calendar. The agent will infer account and contact details automatically.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="account-name">Account Name *</Label>
-              <Input
-                id="account-name"
-                placeholder="e.g., Acme Corp"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-              />
+          {!calendarConnected ? (
+            <div className="rounded-lg border border-dashed p-6 text-center">
+              <Calendar className="mx-auto h-10 w-10 text-muted-foreground" />
+              <h3 className="mt-3 font-medium">Connect Google Calendar</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Connect your calendar to see upcoming meetings
+              </p>
+              <Button asChild className="mt-4" size="sm">
+                <Link href="/settings/integrations">Connect Calendar</Link>
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="contact-name">Primary Contact</Label>
-              <Input
-                id="contact-name"
-                placeholder="e.g., Jane Smith"
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-              />
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="meeting">Upcoming Meetings</Label>
+                <Select value={selectedMeeting} onValueChange={setSelectedMeeting}>
+                  <SelectTrigger id="meeting">
+                    <SelectValue placeholder="Select a meeting..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {UPCOMING_MEETINGS.map((meeting) => (
+                      <SelectItem key={meeting.id} value={meeting.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{meeting.title}</span>
+                          <span className="text-muted-foreground">
+                            {new Date(meeting.datetime).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedMeetingData && (
+                <div className="rounded-lg border bg-muted/50 p-4 space-y-3">
+                  <div>
+                    <span className="text-sm font-medium">Meeting</span>
+                    <p className="text-sm text-muted-foreground">{selectedMeetingData.title}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium">Date & Time</span>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(selectedMeetingData.datetime).toLocaleString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium">Attendees</span>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Users className="h-3 w-3" />
+                        <span>{selectedMeetingData.attendees.length} external</span>
+                      </div>
+                    </div>
+                  </div>
+                  {selectedMeetingData.description && (
+                    <div>
+                      <span className="text-sm font-medium">Description</span>
+                      <p className="text-sm text-muted-foreground">{selectedMeetingData.description}</p>
+                    </div>
+                  )}
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground">
+                      The agent will identify the account and contacts from the meeting title, attendees, and your connected data sources.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
 
-      {/* Meeting Details */}
+      {/* Prep Settings */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Meeting Details</CardTitle>
+            <Clock className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Prep Settings</CardTitle>
           </div>
           <CardDescription>
-            Add context about the upcoming meeting
+            Configure how far back to look for account context
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="meeting-date">Meeting Date</Label>
-              <Input
-                id="meeting-date"
-                type="date"
-                value={meetingDate}
-                onChange={(e) => setMeetingDate(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="timeframe">Look Back Period</Label>
-              <Select value={timeframe} onValueChange={setTimeframe}>
-                <SelectTrigger id="timeframe">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMEFRAMES.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="timeframe">Look Back Period</Label>
+            <Select value={timeframe} onValueChange={setTimeframe}>
+              <SelectTrigger id="timeframe" className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TIMEFRAMES.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              How far back to search for calls, messages, and tickets related to this account
+            </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="context">Meeting Context (optional)</Label>
+            <Label htmlFor="context">Additional Context (optional)</Label>
             <Textarea
               id="context"
-              placeholder="e.g., Quarterly business review, focusing on expansion opportunities..."
-              value={meetingContext}
-              onChange={(e) => setMeetingContext(e.target.value)}
+              placeholder="e.g., Focus on their recent feature requests, they mentioned budget concerns last call..."
+              value={additionalContext}
+              onChange={(e) => setAdditionalContext(e.target.value)}
               rows={3}
             />
           </div>
@@ -214,10 +303,34 @@ export default function MeetingPrepSetupPage() {
             <CardTitle className="text-lg">Data Sources</CardTitle>
           </div>
           <CardDescription>
-            The agent will pull data from these connected sources
+            The agent will pull account context from these connected sources
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* Google Calendar */}
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className={`rounded-lg p-2 ${calendarConnected ? 'bg-green-100' : 'bg-muted'}`}>
+                <Calendar className={`h-5 w-5 ${calendarConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Google Calendar</span>
+                  <Badge variant="secondary" className="text-xs">Required</Badge>
+                  <Badge variant={calendarConnected ? 'outline' : 'secondary'} className={calendarConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
+                    {calendarConnected ? 'Connected' : 'Not Connected'}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">Upcoming meetings and attendees</p>
+              </div>
+            </div>
+            {!calendarConnected && (
+              <Button asChild size="sm" variant="outline">
+                <Link href="/settings/integrations">Connect</Link>
+              </Button>
+            )}
+          </div>
+
           {/* Gong */}
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
