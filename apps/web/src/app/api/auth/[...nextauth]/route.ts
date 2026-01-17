@@ -86,7 +86,6 @@ function getAuthOptions(): AuthOptions {
               data: {
                 name: tenantName.charAt(0).toUpperCase() + tenantName.slice(1),
                 slug: emailDomain,
-                plan: 'individual',
               },
             });
           }
