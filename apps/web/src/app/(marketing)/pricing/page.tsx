@@ -70,6 +70,7 @@ const plans: Plan[] = [
       { name: 'Monthly or annual billing', included: true },
       { name: 'All 10 workflow jobs', included: true },
       { name: 'All connectors: Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Calendar and more', included: true },
+      { name: 'Amplitude, Discourse, Linear, Notion', included: true, detail: 'Coming soon' },
       { name: 'AI Crawlers: Social, Web, News', included: true, detail: 'Coming soon' },
       { name: 'Personal workspace', included: true },
       { name: '90-day artifact retention', included: true },
