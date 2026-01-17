@@ -9,7 +9,7 @@ import { siteConfig } from '@/lib/utils';
 export const metadata: Metadata = {
   title: 'Pricing | pmkit - AI PM Workflow Automation',
   description:
-    'pmkit pricing: Individual plan at $79/month for solo PMs, Teams and Enterprise plans for product teams with SSO, governance, and collaboration.',
+    'pmkit pricing: Individual plan at $49/month for solo PMs, Teams and Enterprise plans for product teams with SSO, governance, and collaboration.',
   keywords: [
     'pmkit pricing',
     'AI product management pricing',
@@ -20,13 +20,13 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'pmkit Pricing: Individual, Teams & Enterprise',
-    description: 'Individual at $79/month, Teams and Enterprise custom pricing for product teams.',
+    description: 'Individual at $49/month, Teams and Enterprise custom pricing for product teams.',
     url: `${siteConfig.url}/pricing`,
   },
   twitter: {
     card: 'summary',
     title: 'pmkit Pricing',
-    description: 'Individual at $79/month, Teams and Enterprise custom pricing.',
+    description: 'Individual at $49/month, Teams and Enterprise custom pricing.',
   },
   alternates: {
     canonical: `${siteConfig.url}/pricing`,
@@ -60,17 +60,17 @@ const plans: Plan[] = [
   {
     name: 'Individual',
     description: 'For individual PMs who want to automate their daily workflows',
-    price: '$79',
+    price: '$49',
     priceDetail: 'per month',
-    billingNote: 'Or $69/month billed annually ($828/year)',
+    billingNote: 'Or $39/month billed annually ($468/year)',
     minSeats: null,
     badge: 'Most Popular',
     features: [
       { name: 'Single seat', included: true },
       { name: 'Monthly or annual billing', included: true },
       { name: 'All 10 workflow jobs', included: true },
-      { name: 'All connectors: Slack, Jira, Confluence, Gong, Zendesk', included: true },
-      { name: 'Gmail, Google Drive, Google Calendar', included: true, detail: 'Coming soon' },
+      { name: 'All connectors: Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Calendar and more', included: true },
+      { name: 'AI Crawlers: Social, Web, News', included: true, detail: 'Coming soon' },
       { name: 'Personal workspace', included: true },
       { name: '90-day artifact retention', included: true },
       { name: 'No training on your data', included: true },
