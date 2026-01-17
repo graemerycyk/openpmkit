@@ -272,13 +272,10 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <Plug className="h-5 w-5 text-cobalt-600" />
             <CardTitle className="text-lg">Connect Your Tools</CardTitle>
-            <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
-              Demo Mode
-            </Badge>
           </div>
           <CardDescription>
-            You&apos;re currently using demo data. Connect your real tools to get personalized
-            insights from your actual Jira, Slack, Gong, and more.
+            Connect your tools to power your agents. The more data sources you connect,
+            the more valuable your agents become.
           </CardDescription>
         </CardHeader>
         <CardContent>
