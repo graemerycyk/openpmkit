@@ -3,6 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import MicrosoftProvider from 'next-auth/providers/azure-ad';
 import type { AuthOptions } from 'next-auth';
 import { NextRequest } from 'next/server';
+import { prisma } from '@/lib/db';
 
 // Force dynamic rendering to ensure env vars are read at runtime, not build time
 export const dynamic = 'force-dynamic';
@@ -60,6 +61,49 @@ function getAuthOptions(): AuthOptions {
     },
     session: {
       strategy: 'jwt',
+    },
+    events: {
+      async signIn({ user }) {
+        if (!user.email) return;
+
+        // Check if user exists in database
+        const existingUser = await prisma.user.findFirst({
+          where: { email: user.email },
+        });
+
+        if (!existingUser) {
+          // Create tenant and user on first sign-in
+          const emailDomain = user.email.split('@')[1] || 'default';
+          const tenantName = emailDomain.split('.')[0] || 'My Workspace';
+
+          // Check if tenant exists for this domain
+          let tenant = await prisma.tenant.findFirst({
+            where: { slug: emailDomain },
+          });
+
+          if (!tenant) {
+            tenant = await prisma.tenant.create({
+              data: {
+                name: tenantName.charAt(0).toUpperCase() + tenantName.slice(1),
+                slug: emailDomain,
+                plan: 'individual',
+              },
+            });
+          }
+
+          await prisma.user.create({
+            data: {
+              tenantId: tenant.id,
+              email: user.email,
+              name: user.name || user.email.split('@')[0],
+              avatarUrl: user.image,
+              role: 'admin', // First user is admin
+            },
+          });
+
+          console.log(`[Auth] Created new user: ${user.email} in tenant: ${tenant.name}`);
+        }
+      },
     },
     debug: process.env.NODE_ENV === 'development',
   };
