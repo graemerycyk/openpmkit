@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,42 +25,8 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
+  MessageSquare,
 } from 'lucide-react';
-
-const quickActions = [
-  {
-    title: 'Start Your Daily Brief',
-    description: 'Get your morning PM briefing with updates every day without lifting a finger',
-    icon: FileText,
-    href: '/agents/daily-brief',
-    color: 'bg-blue-100 text-blue-600',
-    enabled: true,
-  },
-  {
-    title: 'Automate Meeting Prep',
-    description: 'Generate a meeting prep pack with account context for all your meetings',
-    icon: Users,
-    href: '/agents/meeting-prep',
-    color: 'bg-green-100 text-green-600',
-    enabled: true,
-  },
-  {
-    title: 'Automate PRD Drafts',
-    description: 'Create product requirements documents with customer evidence on demand',
-    icon: Target,
-    href: '/agents/prd-draft',
-    color: 'bg-purple-100 text-purple-600',
-    enabled: true,
-  },
-  {
-    title: 'Auto-Generate Prototypes',
-    description: 'Turn your PRDs into interactive HTML prototypes automatically',
-    icon: Wand2,
-    href: '/agents/prototype-generation',
-    color: 'bg-amber-100 text-amber-600',
-    enabled: true,
-  },
-];
 
 const agents = [
   {
@@ -168,6 +135,12 @@ const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; href: s
   deck_content: { name: 'Deck Content', icon: Presentation, href: '/agents/deck-content' },
 };
 
+interface AgentStats {
+  activeAgentsCount: number;
+  connectedSourcesCount: number;
+  completedJobsCount: number;
+}
+
 interface RecentJob {
   id: string;
   type: string;
@@ -184,6 +157,8 @@ export default function DashboardPage() {
   const [hasAgentConfigured, setHasAgentConfigured] = useState<boolean | null>(null);
   const [recentJobs, setRecentJobs] = useState<RecentJob[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const [stats, setStats] = useState<AgentStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   useEffect(() => {
     // Check if user has any agent configured
@@ -203,21 +178,31 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    // Fetch recent jobs
-    async function fetchRecentJobs() {
+    // Fetch stats and recent jobs
+    async function fetchData() {
       try {
-        const response = await fetch('/api/jobs/recent');
-        if (response.ok) {
-          const data = await response.json();
-          setRecentJobs(data.jobs || []);
+        const [statsRes, jobsRes] = await Promise.all([
+          fetch('/api/agents/stats'),
+          fetch('/api/jobs/recent'),
+        ]);
+
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setStats(statsData);
+        }
+
+        if (jobsRes.ok) {
+          const jobsData = await jobsRes.json();
+          setRecentJobs(jobsData.jobs || []);
         }
       } catch {
         // Silently fail - just show empty state
       } finally {
         setIsLoadingJobs(false);
+        setIsLoadingStats(false);
       }
     }
-    fetchRecentJobs();
+    fetchData();
   }, []);
 
   return (
@@ -232,46 +217,71 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {quickActions.map((action) => (
-          <Card
-            key={action.title}
-            className={`group transition-all ${
-              action.enabled
-                ? 'cursor-pointer hover:border-cobalt-200 hover:shadow-md'
-                : 'cursor-not-allowed opacity-60'
-            }`}
-          >
-            {action.enabled ? (
-              <Link href={action.href}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className={`rounded-lg p-2 ${action.color}`}>
-                      <action.icon className="h-5 w-5" />
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                  </div>
-                  <CardTitle className="mt-4 text-lg">{action.title}</CardTitle>
-                  <CardDescription>{action.description}</CardDescription>
-                </CardHeader>
-              </Link>
-            ) : (
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <div className={`rounded-lg p-2 ${action.color}`}>
-                    <action.icon className="h-5 w-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs">
-                    Coming Soon
-                  </Badge>
-                </div>
-                <CardTitle className="mt-4 text-lg">{action.title}</CardTitle>
-                <CardDescription>{action.description}</CardDescription>
-              </CardHeader>
+      {/* Tabs */}
+      <div className="border-b">
+        <nav className="-mb-px flex gap-6">
+          <Link
+            href="/dashboard"
+            className={cn(
+              'border-b-2 pb-3 text-sm font-medium transition-colors',
+              'border-cobalt-600 text-cobalt-600'
             )}
-          </Card>
-        ))}
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/agents"
+            className={cn(
+              'border-b-2 pb-3 text-sm font-medium transition-colors',
+              'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'
+            )}
+          >
+            History
+          </Link>
+        </nav>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="rounded-lg bg-green-100 p-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {isLoadingStats ? '-' : stats?.completedJobsCount || 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Jobs Completed</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="rounded-lg bg-cobalt-100 p-2">
+              <MessageSquare className="h-5 w-5 text-cobalt-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {isLoadingStats ? '-' : stats?.connectedSourcesCount || 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Data Sources</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="rounded-lg bg-amber-100 p-2">
+              <Zap className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {isLoadingStats ? '-' : stats?.activeAgentsCount || 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Active Agents</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Your Agents */}

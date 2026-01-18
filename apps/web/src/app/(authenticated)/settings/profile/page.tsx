@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { User, Mail, Shield, Calendar } from 'lucide-react';
+import { User, Mail, Calendar } from 'lucide-react';
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -74,15 +74,6 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                <Shield className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Role</p>
-                <p className="font-medium">Product Manager</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
@@ -90,27 +81,6 @@ export default function ProfilePage() {
                 <p className="font-medium">January 2026</p>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Preferences Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Preferences</CardTitle>
-          <CardDescription>Customize your pmkit experience.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div>
-              <p className="font-medium">Email Notifications</p>
-              <p className="text-sm text-muted-foreground">
-                Receive email updates about your jobs and artifacts
-              </p>
-            </div>
-            <Button variant="outline" disabled>
-              Coming Soon
-            </Button>
           </div>
         </CardContent>
       </Card>

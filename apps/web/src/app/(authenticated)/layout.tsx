@@ -28,6 +28,7 @@ import {
   Sparkles,
   Settings,
   Wrench,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +40,7 @@ const baseSidebarNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Your Agents',
+    title: 'History',
     href: '/agents',
     icon: Clock,
   },
@@ -63,6 +64,11 @@ const settingsNavItems = [
     title: 'Integrations',
     href: '/settings/integrations',
     icon: Plug,
+  },
+  {
+    title: 'Notifications',
+    href: '/settings/notifications',
+    icon: Bell,
   },
   {
     title: 'Billing',

@@ -6,7 +6,7 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-16 (Connectors production-ready: Jira, Confluence, Gong, Zendesk, Gmail, Drive, Calendar, Figma)
+Last updated: 2026-01-18 (UI Navigation Restructure: Dashboard/History tabs, Settings Notifications page)
 
 ---
 
@@ -970,6 +970,29 @@ Items that have been discussed but not committed to.
 ---
 
 ## Changelog
+
+### 2026-01-18 (UI Navigation Restructure)
+- **Dashboard/History tab navigation** - Added consistent tab bar to both `/dashboard` and `/agents` pages:
+  - Dashboard tab links to `/dashboard` (active on dashboard page)
+  - History tab links to `/agents` (active on agents/history page)
+  - Matches existing Settings tab navigation pattern
+- **Metrics cards moved to Dashboard** - The 3 quick stats cards (Jobs Completed, Data Sources, Active Agents) now display on `/dashboard` instead of `/agents`:
+  - Added `stats` state and API fetch from `/api/agents/stats`
+  - Displays counts with loading state
+- **Dashboard simplified** - Removed 4 quick action cards (Daily Brief, Meeting Prep, PRD Drafts, Prototypes)
+- **Agents page renamed to History** - `/agents` now shows only History content:
+  - Header changed from "Agents" to "History"
+  - Subheading: "View your past completed jobs by all of your Agents"
+  - Shows "Browse by Agent" grid and "Recent Activity" list
+- **Sidebar navigation updated** - Renamed "Your Agents" to "History" in authenticated layout
+- **Settings Notifications page** - Created `/settings/notifications`:
+  - Moved Email Notifications section from Profile page
+  - Added Slack and Microsoft Teams notification options (Coming Soon)
+  - Added to settings tab navigation
+- **Profile page cleanup**:
+  - Removed Preferences/Email Notifications section (moved to Notifications page)
+  - Removed "Role / Product Manager" display from Profile Information
+- **History page button fix** - Changed "Back to Settings" to "Back to Overview" on `/agents/daily-brief/history`
 
 ### 2026-01-18 (Gmail Daily Brief Planning)
 - **Daily Brief Gmail validation fix** - Updated trigger route to check if connectors are actually connected (not just configured)

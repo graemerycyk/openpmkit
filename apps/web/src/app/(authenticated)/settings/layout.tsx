@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 const settingsTabs = [
   { name: 'Profile', href: '/settings/profile' },
   { name: 'Integrations', href: '/settings/integrations' },
+  { name: 'Notifications', href: '/settings/notifications' },
   { name: 'Billing', href: '/settings/billing', disabled: true },
 ];
 
