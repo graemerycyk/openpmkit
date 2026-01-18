@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -153,6 +154,24 @@ const agents = [
 export default function DashboardPage() {
   const { data: session } = useSession();
   const firstName = session?.user?.name?.split(' ')[0] || 'there';
+  const [hasAgentConfigured, setHasAgentConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Check if user has any agent configured
+    async function checkAgentConfig() {
+      try {
+        const response = await fetch('/api/agents/daily-brief');
+        if (response.ok) {
+          const data = await response.json();
+          setHasAgentConfigured(data.config !== null);
+        }
+      } catch {
+        // On error, default to showing setup prompt
+        setHasAgentConfigured(false);
+      }
+    }
+    checkAgentConfig();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -297,14 +316,23 @@ export default function DashboardPage() {
               <Clock className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="mt-4 font-medium">No recent activity</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Set up your first agent to see your activity here
-            </p>
-            <Button className="mt-4" asChild>
-              <Link href="/agents/daily-brief">
-                Set Up Daily Brief
-              </Link>
-            </Button>
+            {hasAgentConfigured === false && (
+              <>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Set up your first agent to see your activity here
+                </p>
+                <Button className="mt-4" asChild>
+                  <Link href="/agents/daily-brief">
+                    Set Up Daily Brief
+                  </Link>
+                </Button>
+              </>
+            )}
+            {hasAgentConfigured === true && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your agents haven't run yet. Activity will appear here after your first run.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
