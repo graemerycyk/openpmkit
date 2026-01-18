@@ -4,6 +4,7 @@ import {
   executeDailyBrief,
   getLLMService,
   type DailyBriefConfig,
+  type ConnectorCredentialsMap,
 } from '@pmkit/core';
 import { getScheduler } from './agent-scheduler';
 
@@ -53,21 +54,43 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
     return;
   }
 
-  // Get Slack credentials
-  const slackInstall = await prisma.connectorInstall.findUnique({
+  // Fetch all connector installs for this tenant
+  const connectorInstalls = await prisma.connectorInstall.findMany({
     where: {
-      tenantId_connectorKey: {
-        tenantId,
-        connectorKey: 'slack',
-      },
+      tenantId,
+      status: 'real',
     },
     include: {
       credentials: true,
     },
   });
 
-  if (!slackInstall || slackInstall.status !== 'real' || !slackInstall.credentials[0]) {
-    console.error(`[DailyBriefJob] Slack not connected for tenant ${tenantId}`);
+  // Build a map of connected connectors
+  const connectorMap = new Map(
+    connectorInstalls.map((c) => [c.connectorKey, c])
+  );
+
+  // Check which connectors are connected
+  const slackInstall = connectorMap.get('slack');
+  const gmailInstall = connectorMap.get('gmail');
+  const calendarInstall = connectorMap.get('google-calendar');
+
+  const slackConnected = slackInstall && slackInstall.credentials[0];
+  const gmailConnected = gmailInstall && gmailInstall.credentials[0];
+  const calendarConnected = calendarInstall && calendarInstall.credentials[0];
+
+  // Determine available data sources
+  const wantsSlackData =
+    config.includeSlackMentions ||
+    (config.slackChannels && config.slackChannels.length > 0);
+  const hasSlackData = wantsSlackData && slackConnected;
+  const hasGmailSource = config.includeGmail && gmailConnected;
+
+  // Check if at least one primary data source is available
+  const hasPrimarySource = hasSlackData || hasGmailSource;
+
+  if (!hasPrimarySource) {
+    console.error(`[DailyBriefJob] No primary data source (Slack or Gmail) connected for tenant ${tenantId}`);
 
     // Create failed job record
     await prisma.job.create({
@@ -77,7 +100,7 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
         status: 'failed',
         triggeredBy: userId,
         config: config as object,
-        error: 'Slack not connected',
+        error: 'No primary data source (Slack or Gmail) connected',
         startedAt: new Date(),
         completedAt: new Date(),
       },
@@ -93,6 +116,30 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
     console.error('[DailyBriefJob] Missing CONNECTOR_ENCRYPTION_KEY');
     await scheduleNextRun(agentConfig);
     return;
+  }
+
+  // Build ConnectorCredentialsMap for the orchestrator
+  const credentials: ConnectorCredentialsMap = {};
+
+  if (slackConnected) {
+    credentials.slack = {
+      encryptedBlob: slackInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
+  }
+
+  if (gmailConnected) {
+    credentials.gmail = {
+      encryptedBlob: gmailInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
+  }
+
+  if (calendarConnected) {
+    credentials['google-calendar'] = {
+      encryptedBlob: calendarInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
   }
 
   // Create job record
@@ -115,9 +162,18 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
       action: 'job_started',
       resourceType: 'job',
       resourceId: jobRecord.id,
-      details: { agentType: 'daily_brief', trigger: 'scheduled', scheduledAt },
+      details: {
+        agentType: 'daily_brief',
+        trigger: 'scheduled',
+        scheduledAt,
+        connectors: Object.keys(credentials),
+      },
     },
   });
+
+  console.log(
+    `[DailyBriefJob] Starting job ${jobRecord.id} with connectors: ${Object.keys(credentials).join(', ')}`
+  );
 
   // Get LLM service
   const llmService = getLLMService();
@@ -129,10 +185,7 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
         userId,
         jobId: jobRecord.id,
         config,
-        slackCredentials: {
-          encryptedBlob: slackInstall.credentials[0].encryptedBlob,
-          encryptionKey,
-        },
+        credentials,
       },
       {
         complete: async (params) => {

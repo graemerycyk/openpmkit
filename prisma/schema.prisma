@@ -571,6 +571,11 @@ enum SourceType {
   analytics_event
   competitor_page
   internal_doc
+  // Google connector source types
+  gmail_email
+  gmail_thread
+  calendar_event
+  drive_file
 }
 
 // ============================================================================

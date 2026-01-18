@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
-import { executeDailyBrief, getLLMService, type DailyBriefConfig } from '@pmkit/core';
+import {
+  executeDailyBrief,
+  getLLMService,
+  type DailyBriefConfig,
+  type ConnectorCredentialsMap,
+} from '@pmkit/core';
 
 export async function POST() {
   try {
@@ -37,44 +42,78 @@ export async function POST() {
 
     // Get agent config to check what data sources are enabled
     const configData = agentConfig.config as DailyBriefConfig;
-    const hasSlackData = configData.includeSlackMentions || (configData.slackChannels && configData.slackChannels.length > 0);
-    const hasGoogleData = configData.includeGmail || configData.includeGoogleDrive || configData.includeGoogleCalendar;
+    const wantsSlackData =
+      configData.includeSlackMentions ||
+      (configData.slackChannels && configData.slackChannels.length > 0);
 
-    // Check if at least one data source is configured
-    if (!hasSlackData && !hasGoogleData) {
-      return NextResponse.json(
-        { error: 'No data sources configured. Please enable at least one data source.' },
-        { status: 400 }
-      );
-    }
+    // Fetch all connector installs for this tenant
+    const connectorInstalls = await prisma.connectorInstall.findMany({
+      where: {
+        tenantId: user.tenantId,
+        status: 'real',
+      },
+      include: {
+        credentials: true,
+      },
+    });
 
-    // Get Slack credentials if Slack data is configured
-    let slackInstall = null;
-    if (hasSlackData) {
-      slackInstall = await prisma.connectorInstall.findUnique({
-        where: {
-          tenantId_connectorKey: {
-            tenantId: user.tenantId,
-            connectorKey: 'slack',
-          },
-        },
-        include: {
-          credentials: true,
-        },
-      });
+    // Build a map of connected connectors
+    const connectorMap = new Map(
+      connectorInstalls.map((c) => [c.connectorKey, c])
+    );
 
-      if (!slackInstall || slackInstall.status !== 'real' || !slackInstall.credentials[0]) {
+    // Check which connectors are connected
+    const slackInstall = connectorMap.get('slack');
+    const gmailInstall = connectorMap.get('gmail');
+    const calendarInstall = connectorMap.get('google-calendar');
+
+    const slackConnected = slackInstall && slackInstall.credentials[0];
+    const gmailConnected = gmailInstall && gmailInstall.credentials[0];
+    const calendarConnected = calendarInstall && calendarInstall.credentials[0];
+
+    // Determine what data sources are actually available (configured AND connected)
+    const hasSlackData = wantsSlackData && slackConnected;
+    const hasGmailSource = configData.includeGmail && gmailConnected;
+    // Note: Calendar is a supplementary source, not a primary data source
+    // Calendar credentials are still included in the credentials map if connected
+
+    // Check if at least one primary data source is available (Slack OR Gmail)
+    const hasPrimarySource = hasSlackData || hasGmailSource;
+
+    if (!hasPrimarySource) {
+      // Provide helpful error message based on what's configured vs connected
+      if (wantsSlackData && !slackConnected && configData.includeGmail && !gmailConnected) {
         return NextResponse.json(
-          { error: 'Slack not connected. Please connect Slack in integrations or disable Slack data sources.' },
+          {
+            error:
+              'No primary data source available. Please connect Slack or Gmail in integrations.',
+          },
           { status: 400 }
         );
       }
-    }
-
-    // If only Google data is configured (no Slack), let the user know it's not supported yet
-    if (!hasSlackData && hasGoogleData) {
+      if (wantsSlackData && !slackConnected) {
+        return NextResponse.json(
+          {
+            error:
+              'Slack not connected. Please connect Slack in integrations or enable Gmail.',
+          },
+          { status: 400 }
+        );
+      }
+      if (configData.includeGmail && !gmailConnected) {
+        return NextResponse.json(
+          {
+            error:
+              'Gmail not connected. Please connect Gmail in integrations or enable Slack.',
+          },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: 'Google-only Daily Briefs coming soon. Please also configure Slack data sources for now.' },
+        {
+          error:
+            'No data sources available. Please connect Slack or Gmail to generate a Daily Brief.',
+        },
         { status: 400 }
       );
     }
@@ -83,6 +122,30 @@ export async function POST() {
     if (!encryptionKey) {
       console.error('[Daily Brief Trigger] Missing CONNECTOR_ENCRYPTION_KEY');
       return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
+    }
+
+    // Build ConnectorCredentialsMap for the orchestrator
+    const credentials: ConnectorCredentialsMap = {};
+
+    if (slackConnected) {
+      credentials.slack = {
+        encryptedBlob: slackInstall.credentials[0].encryptedBlob,
+        encryptionKey,
+      };
+    }
+
+    if (gmailConnected) {
+      credentials.gmail = {
+        encryptedBlob: gmailInstall.credentials[0].encryptedBlob,
+        encryptionKey,
+      };
+    }
+
+    if (calendarConnected) {
+      credentials['google-calendar'] = {
+        encryptedBlob: calendarInstall.credentials[0].encryptedBlob,
+        encryptionKey,
+      };
     }
 
     // Create job record
@@ -105,11 +168,17 @@ export async function POST() {
         action: 'job_started',
         resourceType: 'job',
         resourceId: job.id,
-        details: { agentType: 'daily_brief', trigger: 'manual' },
+        details: {
+          agentType: 'daily_brief',
+          trigger: 'manual',
+          connectors: Object.keys(credentials),
+        },
       },
     });
 
-    console.log(`[Daily Brief] Starting job ${job.id} for user ${user.id}`);
+    console.log(
+      `[Daily Brief] Starting job ${job.id} for user ${user.id} with connectors: ${Object.keys(credentials).join(', ')}`
+    );
 
     // Execute agent (non-blocking for now, in production this would be queued)
     const config = agentConfig.config as DailyBriefConfig;
@@ -121,17 +190,13 @@ export async function POST() {
     const toolCallIds: string[] = [];
 
     try {
-      // At this point, slackInstall is guaranteed to be valid (we return early if not)
       const result = await executeDailyBrief(
         {
           tenantId: user.tenantId,
           userId: user.id,
           jobId: job.id,
           config,
-          slackCredentials: {
-            encryptedBlob: slackInstall!.credentials[0].encryptedBlob,
-            encryptionKey,
-          },
+          credentials,
         },
         {
           complete: async (params) => {
@@ -158,7 +223,7 @@ export async function POST() {
                 jobId: job.id,
                 tenantId: user.tenantId,
                 toolName,
-                serverName: 'slack',
+                serverName: toolName.split('.')[0] || 'unknown',
                 input: input as object,
                 status: 'pending',
               },
@@ -173,7 +238,7 @@ export async function POST() {
                 data: {
                   status: 'success',
                   durationMs,
-                  output: output as object || {},
+                  output: (output as object) || {},
                 },
               });
             }
@@ -294,9 +359,6 @@ export async function POST() {
     }
   } catch (error) {
     console.error('[Daily Brief Trigger] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to trigger agent' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to trigger agent' }, { status: 500 });
   }
 }

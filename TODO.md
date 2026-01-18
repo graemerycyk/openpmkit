@@ -581,13 +581,31 @@ Items that back up marketing claims or are needed for credibility.
 | Item | Status | Notes |
 |------|--------|-------|
 | Channel selection | ✅ Done | Multi-select checkbox list of channels |
-| Lookback window | ✅ Done | 24h or 36h (weekend coverage) |
+| Lookback window | ✅ Done | 24h or 36h (1.5 day overlap) |
 | Delivery time | ✅ Done | 6am-10am in user's timezone |
 | Pause/resume schedule | ✅ Done | Active/Paused toggle |
 | **Brief history page** | ✅ Done | `/agents/daily-brief/history` |
 | **Brief detail page** | ✅ Done | `/agents/daily-brief/[jobId]` with download |
 | Skip weekends option | 🔜 Future | Not in MVP |
 | Priority keywords | 💡 Idea | Highlight certain terms |
+
+### Phase 5: Gmail Orchestrator Support 🔜 PLANNED
+
+Enable Daily Brief to work with Gmail as a primary data source (in addition to Slack).
+
+| Item | Status | Notes |
+|------|--------|-------|
+| **GmailFetcher class** | 🔜 Planned | `packages/core/src/agents/daily-brief/gmail-fetcher.ts` - mirrors SlackFetcher pattern |
+| Gmail config in DailyBriefConfig | 🔜 Planned | `includeGmail`, `gmailLabels`, `gmailMaxThreads` options |
+| Orchestrator Gmail support | 🔜 Planned | Accept Gmail credentials, fetch email data, merge into brief |
+| Trigger route Gmail execution | 🔜 Planned | Pass Gmail credentials to orchestrator, remove "coming soon" message |
+| Gmail prompt sections | 🔜 Planned | Email summary, requires-response highlights in `packages/prompts/src/daily-brief.ts` |
+| Gmail citation sources | 🔜 Planned | Track email thread links in citation-tracker.ts |
+| Unit tests with mock data | 🔜 Planned | Use MockGmailMCPServer for testing |
+
+**Current State**: Gmail OAuth works, RealGmailMCPServer exists, but orchestrator only knows Slack. UI shows "Gmail-based Daily Briefs coming soon!" when Gmail is only source.
+
+**Goal**: User can run Daily Brief with Gmail connected (no Slack required). Email summaries appear in brief with citations.
 
 ### Future Enhancements
 
@@ -952,6 +970,24 @@ Items that have been discussed but not committed to.
 ---
 
 ## Changelog
+
+### 2026-01-18 (Gmail Daily Brief Planning)
+- **Daily Brief Gmail validation fix** - Updated trigger route to check if connectors are actually connected (not just configured)
+  - Fixed logic: `hasSlackData` now requires `slackConnected` AND Slack config enabled
+  - Added Gmail as valid primary source (alongside Slack)
+  - Shows "Gmail-based Daily Briefs coming soon!" when Gmail is only source (orchestrator pending)
+- **Updated 36h label** - Changed from "(weekend coverage)" to "(1.5 day overlap)" in Daily Brief setup
+- **Added Loom to integrations** - Shows in /settings/integrations with OAuth support
+- **Fixed homepage integrations** - Added Gmail, Google Drive, Google Calendar, Loom to visible integrations
+- **Fixed "View All Integrations" link** - Now correctly navigates to /integrations
+- **Created Gmail orchestrator plan** - Comprehensive implementation plan for GmailFetcher:
+  - Plan file at `.claude/plans/greedy-noodling-mountain.md`
+  - 6 implementation steps covering fetcher, config, orchestrator, trigger, prompts, citations
+- **Updated AGENTS.md** - Added "End-to-End Connector Development" section:
+  - 4-phase process: OAuth → MCP Server → Agent Integration → UI/Marketing
+  - Checklist for complete connectors (12 items)
+  - Example: Slack connector as reference
+- **Added Phase 5 to Daily Brief** - Gmail Orchestrator Support section with 7 tracked items
 
 ### 2026-01-16 (Connectors Production Ready)
 - **All connectors marked production-ready** - Updated marketing and settings pages:

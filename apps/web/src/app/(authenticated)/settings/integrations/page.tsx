@@ -29,6 +29,7 @@ import {
   FolderOpen,
   Calendar,
   Palette,
+  Play,
 } from 'lucide-react';
 
 type ConnectionStatus = 'connected' | 'not_connected' | 'coming_soon';
@@ -145,6 +146,16 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     supportsOAuth: true,
   },
   {
+    id: 'loom',
+    name: 'Loom',
+    description: 'Extract insights from video transcripts for PRDs and daily briefs',
+    icon: Play,
+    iconBg: 'bg-purple-100 text-purple-600',
+    category: 'tools',
+    docsUrl: '/integrations/loom',
+    supportsOAuth: true,
+  },
+  {
     id: 'amplitude',
     name: 'Amplitude',
     description: 'Pull product analytics for data-driven PRDs',
@@ -209,7 +220,7 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
 ];
 
 // Connectors that support OAuth
-const oauthConnectors = ['slack', 'jira', 'confluence', 'gong', 'zendesk', 'gmail', 'google-drive', 'google-calendar', 'figma'];
+const oauthConnectors = ['slack', 'jira', 'confluence', 'gong', 'zendesk', 'gmail', 'google-drive', 'google-calendar', 'figma', 'loom'];
 
 // Connectors that are coming soon (no OAuth yet)
 const comingSoonConnectors = ['linear', 'notion'];
@@ -429,6 +440,7 @@ function IntegrationsPageContent() {
       'google-drive': '/api/connectors/google/authorize',
       'google-calendar': '/api/connectors/google/authorize',
       figma: '/api/connectors/figma/authorize',
+      loom: '/api/connectors/atlassian/authorize', // Loom is part of Atlassian
     };
 
     const endpoint = oauthEndpoints[connectorId];

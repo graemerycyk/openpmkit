@@ -427,13 +427,38 @@ When adding new pages or components:
 5. **Keep CTAs consistent** - Primary button for main action, outline for secondary
 6. **Use the Badge component** - `variant="cobalt"` for status indicators
 
-## Adding a New Connector
+## Adding a New Connector (End-to-End)
 
-1. **Create the MCP server**
+**IMPORTANT**: Connectors must be built end-to-end as complete features. A connector is not complete until:
+1. OAuth flow works and stores encrypted credentials
+2. MCP server exists with read tools
+3. At least one agent/orchestrator can use the connector's data
+4. UI shows the connector as available (not "coming soon")
+
+### Phase 1: OAuth & Infrastructure
+
+1. **Create OAuth routes**
+   ```typescript
+   // apps/web/src/app/api/connectors/{connector}/authorize/route.ts
+   // apps/web/src/app/api/connectors/{connector}/callback/route.ts
+   ```
+
+2. **Add to integrations page**
+   ```typescript
+   // apps/web/src/app/(authenticated)/settings/integrations/page.tsx
+   // Add to oauthConnectors array and OAuth endpoints mapping
+   ```
+
+3. **Test OAuth flow end-to-end**
+   - Connect in UI → OAuth redirect → callback → credentials stored → UI shows "Connected"
+
+### Phase 2: MCP Server & Mock Data
+
+4. **Create the MCP server**
    ```typescript
    // packages/mcp-servers/src/{connector}/index.ts
    import { BaseMCPServer, createProposalTool } from '@pmkit/mcp';
-   
+
    export class Mock{Connector}MCPServer extends BaseMCPServer {
      constructor() {
        super({
@@ -443,30 +468,30 @@ When adding new pages or components:
        });
        this.registerTools();
      }
-     
+
      private registerTools(): void {
        // Read tools
        this.registerTool({ name: 'get_item', ... });
-       
+
        // Write tools (proposals only)
        this.registerTool(createProposalTool(...));
      }
    }
    ```
 
-2. **Add mock data**
+5. **Add mock data**
    ```typescript
    // packages/mock-tenant/src/data/{connector}.ts
    export const mock{Connector}Data = { ... };
    ```
 
-3. **Export from index**
+6. **Export from index**
    ```typescript
    // packages/mcp-servers/src/index.ts
    export * from './{connector}';
    ```
 
-4. **Add connector key** (if needed)
+7. **Add connector key** (if needed)
    ```typescript
    // packages/mcp/src/index.ts
    export const ConnectorKeySchema = z.enum([
@@ -474,10 +499,65 @@ When adding new pages or components:
    ]);
    ```
 
-5. **Update Prisma schema** (if persisting connector state)
+8. **Update Prisma schema** (if persisting connector state)
    ```prisma
    // prisma/schema.prisma - add to ConnectorStatus enum if needed
    ```
+
+### Phase 3: Agent/Orchestrator Integration
+
+9. **Create a Fetcher class** (for autonomous agents)
+   ```typescript
+   // packages/core/src/agents/{agent-type}/{connector}-fetcher.ts
+   // Example: gmail-fetcher.ts for Daily Brief
+   export class {Connector}Fetcher {
+     constructor(private credentials: EncryptedCredentials) {}
+     async fetchData(since: Date, options: FetchOptions): Promise<FetchResult> {
+       // Decrypt credentials, call API, return structured data
+     }
+   }
+   ```
+
+10. **Update orchestrator to use new connector**
+    ```typescript
+    // packages/core/src/agents/{agent-type}/orchestrator.ts
+    // Accept new connector credentials, initialize fetcher, merge data
+    ```
+
+11. **Update trigger route**
+    ```typescript
+    // apps/web/src/app/api/agents/{agent-type}/trigger/route.ts
+    // Fetch connector credentials, pass to orchestrator
+    ```
+
+### Phase 4: UI & Marketing
+
+12. **Update agent setup UI** to show connector as available source
+13. **Update marketing pages** to list connector as "Available Now" (not "Coming Soon")
+14. **Update TODO.md** to mark connector as complete
+
+### Checklist for Complete Connector
+
+| Item | Required |
+|------|----------|
+| OAuth authorize route | ✅ |
+| OAuth callback route | ✅ |
+| Credentials encryption/storage | ✅ |
+| MCP server with read tools | ✅ |
+| Mock data for testing | ✅ |
+| Real API client (RealXMCPServer) | ✅ |
+| Fetcher class for agents | ✅ |
+| At least one agent uses it | ✅ |
+| Integrations page shows it | ✅ |
+| Agent setup UI shows it | ✅ |
+| Marketing says "Available Now" | ✅ |
+| TODO.md updated | ✅ |
+
+**Example**: See Slack connector for reference:
+- OAuth: `apps/web/src/app/api/connectors/slack/`
+- MCP Server: `packages/mcp-servers/src/slack/`
+- Fetcher: `packages/core/src/agents/daily-brief/slack-fetcher.ts`
+- Agent integration: `packages/core/src/agents/daily-brief/orchestrator.ts`
 
 ## Adding a New Job Type
 

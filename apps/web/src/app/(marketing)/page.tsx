@@ -137,8 +137,13 @@ const integrations = [
   { name: 'Jira', category: 'Project Management' },
   { name: 'Confluence', category: 'Documentation' },
   { name: 'Slack', category: 'Communication' },
+  { name: 'Gmail', category: 'Email' },
+  { name: 'Google Drive', category: 'Documents' },
+  { name: 'Google Calendar', category: 'Meetings' },
   { name: 'Gong', category: 'Call Intelligence' },
+  { name: 'Loom', category: 'Video Transcripts' },
   { name: 'Zendesk', category: 'Support' },
+  { name: 'Figma', category: 'Design' },
   { name: 'Discourse', category: 'Community' },
   { name: 'Amplitude', category: 'Analytics' },
   // AI Crawlers
@@ -675,7 +680,7 @@ export default function HomePage() {
           </p>
           <div className="mt-6 text-center">
             <Button variant="outline" asChild>
-              <Link href="/resources/mcp-connectors-for-enterprise-tools">
+              <Link href="/integrations">
                 View All Integrations
               </Link>
             </Button>
