@@ -26,6 +26,7 @@ import {
   Loader2,
   Play,
   Settings2,
+  Target,
   Zap,
 } from 'lucide-react';
 import {
@@ -602,6 +603,40 @@ export default function DailyBriefSetupPage() {
           return null;
         }}
       />
+
+      {/* Output Preview */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">What You'll Get</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Executive summary of overnight activity</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Key discussions and decisions from selected channels</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Direct mentions and items requiring your attention</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Action items and follow-ups identified</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <span>Links to original messages for context</span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
 
       {/* Agent Status */}
       <Card>

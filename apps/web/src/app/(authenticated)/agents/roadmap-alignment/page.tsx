@@ -152,7 +152,7 @@ export default function RoadmapAlignmentPage() {
             Check if your roadmap aligns with strategic goals
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        <Badge variant="outline">Autonomous</Badge>
       </div>
 
       {/* Alerts */}

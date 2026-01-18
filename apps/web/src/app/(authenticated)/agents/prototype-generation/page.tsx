@@ -179,7 +179,7 @@ export default function PrototypeGenerationPage() {
             Generate low-fidelity prototypes from PRDs
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        <Badge variant="outline">Autonomous</Badge>
       </div>
 
       {/* Alerts */}

@@ -163,7 +163,7 @@ export default function SprintReviewPage() {
             Auto-summarize completed sprints from Jira
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        <Badge variant="outline">Autonomous</Badge>
       </div>
 
       {/* Alerts */}

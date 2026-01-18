@@ -176,7 +176,7 @@ export default function PRDDraftPage() {
             Generate a Product Requirements Document from VoC data
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        <Badge variant="outline">Autonomous</Badge>
       </div>
 
       {/* Alerts */}

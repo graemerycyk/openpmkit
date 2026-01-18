@@ -198,7 +198,7 @@ export default function VoCClusteringPage() {
             Cluster customer feedback into themes and identify top issues
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        <Badge variant="outline">Autonomous</Badge>
       </div>
 
       {/* Alerts */}

@@ -100,7 +100,7 @@ export default function CompetitorResearchPage() {
             Research competitors using web search and news sources
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        <Badge variant="outline">Autonomous</Badge>
       </div>
 
       {/* Alerts */}
