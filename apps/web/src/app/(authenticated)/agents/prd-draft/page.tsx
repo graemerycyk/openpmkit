@@ -21,7 +21,6 @@ import {
   FileText,
   Loader2,
   Play,
-  Power,
   Save,
   Target,
 } from 'lucide-react';
@@ -335,13 +334,6 @@ export default function PRDDraftPage() {
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button
-            disabled={true}
-            title="Autonomous scheduling coming soon"
-          >
-            <Power className="mr-2 h-4 w-4" />
-            Enable Agent
-          </Button>
           {isAdmin && (
             <Button
               variant="outline"
@@ -358,7 +350,6 @@ export default function PRDDraftPage() {
           )}
         </div>
         <Button
-          variant="outline"
           disabled={true}
           title="Agent settings coming soon"
         >

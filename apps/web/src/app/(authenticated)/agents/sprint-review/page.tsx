@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,10 +20,8 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle2,
-  Clock,
   Loader2,
   Play,
-  Power,
   Repeat,
   Save,
   Settings2,
@@ -96,8 +93,6 @@ export default function SprintReviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [configSaved, setConfigSaved] = useState(false);
-  const [isEnabling, setIsEnabling] = useState(false);
 
   // Agent configuration state
   const [isActive, setIsActive] = useState(false);
@@ -167,7 +162,6 @@ export default function SprintReviewPage() {
           const data = await configRes.json();
           if (data.config) {
             setConfig(data.config);
-            setConfigSaved(true);
             setIsActive(data.config.status === 'active');
             setCalendarKeywords(data.config.config.calendarKeywords || DEFAULT_KEYWORDS);
             setLeadTimeMinutes(String(data.config.config.leadTimeMinutes || 240));
@@ -280,7 +274,6 @@ export default function SprintReviewPage() {
       if (res.ok) {
         const data = await res.json();
         setConfig(data.config);
-        setConfigSaved(true);
         setSuccess('Agent settings saved successfully!');
       } else {
         const data = await res.json();
@@ -290,48 +283,6 @@ export default function SprintReviewPage() {
       setError('Failed to save. Please try again.');
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const handleEnableAgent = async () => {
-    if (!configSaved || !canSave) return;
-
-    setIsEnabling(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/agents/sprint-review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'active',
-          config: {
-            calendarKeywords,
-            leadTimeMinutes: parseInt(leadTimeMinutes),
-            timezone,
-            jiraProjectKeys: [],
-            includeVelocity,
-            includeCarryover,
-            includeSlackHighlights: suggestedSources.find(s => s.key === 'slack')?.enabled ?? false,
-            includeConfluence: suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false,
-          },
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setConfig(data.config);
-        setIsActive(true);
-        setSuccess('Agent enabled! It will run automatically before detected sprint review meetings.');
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to enable agent');
-      }
-    } catch {
-      setError('Failed to enable agent. Please try again.');
-    } finally {
-      setIsEnabling(false);
     }
   };
 
@@ -647,39 +598,18 @@ export default function SprintReviewPage() {
 
       {/* Actions */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="outline">
-            <Link href="/agents/sprint-review/history">
-              <Clock className="mr-2 h-4 w-4" />
-              View History
-            </Link>
-          </Button>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleSave}
-            disabled={isSaving || !canSave}
-          >
-            {isSaving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-2 h-4 w-4" />
-            )}
-            Save Agent Settings
-          </Button>
-          <Button
-            onClick={handleEnableAgent}
-            disabled={isEnabling || !configSaved || !canSave || isActive}
-          >
-            {isEnabling ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Power className="mr-2 h-4 w-4" />
-            )}
-            {isActive ? 'Agent Enabled' : 'Enable Agent'}
-          </Button>
-        </div>
+        <div />
+        <Button
+          onClick={handleSave}
+          disabled={isSaving || !canSave}
+        >
+          {isSaving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          Save Agent Settings
+        </Button>
       </div>
 
       {/* Last Run Info */}

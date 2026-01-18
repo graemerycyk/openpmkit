@@ -433,24 +433,51 @@ All 10 agent pages follow a standardized UI pattern with consistent action butto
 
 ### Agent Categories
 
-| Category | Agents | Enable/Save Status |
-|----------|--------|-------------------|
-| **Fully Autonomous** | Daily Brief, Meeting Prep, Sprint Review | Buttons functional |
-| **Coming Soon** | PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation | Buttons disabled with tooltips |
+| Category | Agents | Status |
+|----------|--------|--------|
+| **Fully Autonomous** | Daily Brief, Meeting Prep, Sprint Review | Fully functional with Agent Status toggle |
+| **Coming Soon** | PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation | Save button disabled with tooltip |
+
+### Agent Status Card (Fully Autonomous Only)
+
+Fully autonomous agents have an "Agent Status" card with a toggle switch to enable/disable the agent:
+
+```tsx
+{/* Agent Status */}
+<Card>
+  <CardHeader>
+    <div className="flex items-center gap-2">
+      <Settings2 className="h-5 w-5 text-muted-foreground" />
+      <CardTitle className="text-lg">Agent Status</CardTitle>
+    </div>
+  </CardHeader>
+  <CardContent>
+    <div className="flex items-center justify-between">
+      <div className="space-y-0.5">
+        <Label htmlFor="agent-active">Enable Daily Brief</Label>
+        <p className="text-sm text-muted-foreground">
+          When enabled, the agent will run automatically at your scheduled time
+        </p>
+      </div>
+      <Switch
+        id="agent-active"
+        checked={isActive}
+        onCheckedChange={setIsActive}
+      />
+    </div>
+  </CardContent>
+</Card>
+```
 
 ### Standard Action Buttons
 
-All agent pages have a consistent footer with these buttons:
+All agent pages have a consistent footer:
 
 ```tsx
 {/* Actions - Standard pattern for all agent pages */}
 <div className="flex items-center justify-between">
-  {/* Left side: Enable Agent + Run Now (admin only) */}
+  {/* Left side: Run Now (admin only) */}
   <div className="flex items-center gap-3">
-    <Button disabled={true} title="Autonomous scheduling coming soon">
-      <Power className="mr-2 h-4 w-4" />
-      Enable Agent
-    </Button>
     {isAdmin && (
       <Button variant="outline" onClick={handleRun} disabled={isRunning || !canRun}>
         {isRunning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
@@ -458,12 +485,20 @@ All agent pages have a consistent footer with these buttons:
       </Button>
     )}
   </div>
-  {/* Right side: Save Settings */}
-  <Button variant="outline" disabled={true} title="Agent settings coming soon">
-    <Save className="mr-2 h-4 w-4" />
+  {/* Right side: Save Settings (primary) */}
+  <Button onClick={handleSave} disabled={isSaving || !canRun}>
+    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
     Save Agent Settings
   </Button>
 </div>
+```
+
+For "Coming Soon" agents, the Save button is disabled:
+```tsx
+<Button disabled={true} title="Agent settings coming soon">
+  <Save className="mr-2 h-4 w-4" />
+  Save Agent Settings
+</Button>
 ```
 
 ### Admin Detection Pattern
@@ -495,14 +530,14 @@ The `/api/workbench/run-job` GET endpoint returns `{ isAdmin: boolean }` based o
 
 | Button | Position | Visibility | Enabled When | Action |
 |--------|----------|------------|--------------|--------|
-| Enable Agent | Left | Always | Fully autonomous agents only | Activate autonomous schedule |
-| Run Now | Left (after Enable) | Admin only | Form valid (`canRun`) | Trigger manual agent run |
-| Save Agent Settings | Right | Always | Fully autonomous agents only | Save configuration |
+| Run Now | Left | Admin only | Form valid (`canRun`) | Trigger manual agent run |
+| Save Agent Settings | Right | Always | Fully autonomous agents only | Save config (includes `isActive` state) |
 
 ### Required Imports
 
 ```typescript
-import { Loader2, Play, Power, Save } from 'lucide-react';
+import { Loader2, Play, Save, Settings2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 ```
 
 ### Key Files

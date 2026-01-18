@@ -972,11 +972,11 @@ Items that have been discussed but not committed to.
 ## Changelog
 
 ### 2026-01-18 (Standardized Agent Page UI)
-- **Standardized button UI across all 10 agent pages** - Consistent action buttons:
-  - Left side: "Enable Agent" button (primary action)
+- **Simplified button UI across all 10 agent pages** - Consistent action buttons:
   - Left side: "Run Now" button (admin-only, visible via `isAdmin` state check)
-  - Right side: "Save Agent Settings" button
-  - Removed "View History" button from agent pages (history accessible via navigation)
+  - Right side: "Save Agent Settings" button (primary action)
+  - Removed "Enable Agent" button from footer (redundant with Agent Status card toggle)
+- **Agent Status card** - The inline "Agent Status" card with toggle switch handles enabling/disabling agents in fully autonomous agents (Daily Brief, Meeting Prep, Sprint Review). The toggle state is persisted via "Save Agent Settings".
 - **Admin detection pattern** - All agent pages fetch admin status:
   ```typescript
   useEffect(() => {
@@ -991,10 +991,9 @@ Items that have been discussed but not committed to.
   }, []);
   ```
 - **Agent categories established**:
-  - **Fully Autonomous** (3): Daily Brief, Meeting Prep, Sprint Review - Enable functionality works
-  - **Coming Soon** (7): PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation - buttons disabled with tooltips
-- **History page button fix** - Changed "Back to Agent" text for consistency across all 10 history pages
-- **Removed unused state variables** - Fixed lint errors by removing unused `configSaved`, `isSaving`, `isEnabling` from Coming Soon agents
+  - **Fully Autonomous** (3): Daily Brief, Meeting Prep, Sprint Review - Save/toggle functionality works
+  - **Coming Soon** (7): PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation - Save button disabled with tooltip
+- **Removed redundant code** - Cleaned up `handleEnableAgent`, `configSaved`, `isEnabling` state variables from all agent pages
 
 ### 2026-01-18 (Autonomous Agent Architecture)
 - **Extended AgentTypeSchema** - Added all 10 agent types to core types:

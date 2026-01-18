@@ -21,7 +21,6 @@ import {
   Loader2,
   Megaphone,
   Play,
-  Power,
   Save,
   Target,
 } from 'lucide-react';
@@ -348,13 +347,6 @@ export default function ReleaseNotesPage() {
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button
-            disabled={true}
-            title="Autonomous scheduling coming soon"
-          >
-            <Power className="mr-2 h-4 w-4" />
-            Enable Agent
-          </Button>
           {isAdmin && (
             <Button
               variant="outline"
@@ -371,7 +363,6 @@ export default function ReleaseNotesPage() {
           )}
         </div>
         <Button
-          variant="outline"
           disabled={true}
           title="Agent settings coming soon"
         >

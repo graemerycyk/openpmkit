@@ -142,9 +142,10 @@ Plans are defined in `packages/core/src/billing/index.ts`:
 ### Agent Page UI Pattern
 
 All agent pages have standardized buttons:
-- **Enable Agent** (left) - Primary action, disabled for "coming soon" agents
 - **Run Now** (left, admin-only) - Uses `isAdmin` state
-- **Save Agent Settings** (right) - Disabled for "coming soon" agents
+- **Save Agent Settings** (right, primary) - Disabled for "coming soon" agents
+
+Fully autonomous agents have an **Agent Status** card with a toggle switch to enable/disable the agent. The toggle state is saved via "Save Agent Settings".
 
 Admin check pattern:
 ```typescript
