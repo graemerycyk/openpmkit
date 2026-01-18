@@ -36,6 +36,8 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 // Meeting prep timeframes
 const TIMEFRAMES = [
@@ -78,6 +80,7 @@ interface AgentConfig {
 }
 
 export default function MeetingPrepSetupPage() {
+  const { currentUsage } = useUsage('meeting_prep');
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -337,6 +340,13 @@ export default function MeetingPrepSetupPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Meeting Prep"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Prep Timing */}
       <Card>

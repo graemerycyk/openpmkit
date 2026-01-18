@@ -1,22 +1,29 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowRight,
   BarChart3,
   BookOpen,
   Bot,
   Calendar,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
   FileText,
   Layout,
+  Loader2,
   MessageSquare,
   Presentation,
   Search,
   Target,
   Users,
+  XCircle,
   Zap,
 } from 'lucide-react';
 
@@ -29,6 +36,27 @@ interface AgentCard {
   dataSources: string[];
   outputFormat: string;
   href: string;
+}
+
+interface AgentStats {
+  activeAgentsCount: number;
+  connectedSourcesCount: number;
+  completedJobsCount: number;
+  agentConfigs: Array<{
+    agentType: string;
+    status: string;
+    lastRunAt: string | null;
+  }>;
+}
+
+interface RecentJob {
+  id: string;
+  type: string;
+  status: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  error: string | null;
+  createdAt: string;
 }
 
 const AGENTS: AgentCard[] = [
@@ -134,6 +162,20 @@ const AGENTS: AgentCard[] = [
   },
 ];
 
+// Map job types to display info
+const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; href: string }> = {
+  daily_brief: { name: 'Daily Brief', icon: Zap, href: '/agents/daily-brief' },
+  meeting_prep: { name: 'Meeting Prep', icon: Users, href: '/agents/meeting-prep' },
+  sprint_review: { name: 'Sprint Review', icon: Calendar, href: '/agents/sprint-review' },
+  voc_clustering: { name: 'VoC Clustering', icon: BarChart3, href: '/agents/voc-clustering' },
+  competitor_research: { name: 'Competitor Research', icon: Search, href: '/agents/competitor-research' },
+  roadmap_alignment: { name: 'Roadmap Alignment', icon: Target, href: '/agents/roadmap-alignment' },
+  prd_draft: { name: 'PRD Draft', icon: FileText, href: '/agents/prd-draft' },
+  prototype_generation: { name: 'Prototype', icon: Layout, href: '/agents/prototype-generation' },
+  release_notes: { name: 'Release Notes', icon: BookOpen, href: '/agents/release-notes' },
+  deck_content: { name: 'Deck Content', icon: Presentation, href: '/agents/deck-content' },
+};
+
 function AgentCardComponent({ agent }: { agent: AgentCard }) {
   return (
     <Card className="group relative transition-all hover:shadow-lg hover:border-cobalt-200">
@@ -179,14 +221,123 @@ function AgentCardComponent({ agent }: { agent: AgentCard }) {
   );
 }
 
+function HistoryAgentCard({ title, icon: Icon, href }: { title: string; icon: typeof FileText; href: string }) {
+  return (
+    <Link href={`${href}/history`}>
+      <Card className="group transition-all hover:shadow-md hover:border-cobalt-200">
+        <CardContent className="flex items-center gap-4 p-4">
+          <div className="rounded-lg bg-cobalt-100 p-3">
+            <Icon className="h-5 w-5 text-cobalt-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-medium">{title}</h3>
+            <p className="text-sm text-muted-foreground">View history</p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case 'completed':
+      return (
+        <Badge className="bg-green-600">
+          <CheckCircle2 className="mr-1 h-3 w-3" />
+          Completed
+        </Badge>
+      );
+    case 'failed':
+      return (
+        <Badge variant="destructive">
+          <XCircle className="mr-1 h-3 w-3" />
+          Failed
+        </Badge>
+      );
+    case 'running':
+      return (
+        <Badge variant="secondary">
+          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+          Running
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="outline">
+          <Clock className="mr-1 h-3 w-3" />
+          {status}
+        </Badge>
+      );
+  }
+}
+
+function RecentJobCard({ job }: { job: RecentJob }) {
+  const info = jobTypeInfo[job.type] || { name: job.type, icon: Bot, href: '/agents' };
+  const Icon = info.icon;
+  const timestamp = job.completedAt || job.startedAt || job.createdAt;
+  const formattedTime = new Date(timestamp).toLocaleString();
+
+  return (
+    <Link href={`${info.href}/${job.id}`}>
+      <Card className="transition-all hover:shadow-md hover:border-cobalt-200">
+        <CardContent className="flex items-center gap-4 p-4">
+          <div className="rounded-lg bg-cobalt-100 p-3">
+            <Icon className="h-5 w-5 text-cobalt-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium">{info.name}</h3>
+              <StatusBadge status={job.status} />
+            </div>
+            <p className="text-sm text-muted-foreground">{formattedTime}</p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
 export default function AgentsPage() {
+  const [stats, setStats] = useState<AgentStats | null>(null);
+  const [recentJobs, setRecentJobs] = useState<RecentJob[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [statsRes, jobsRes] = await Promise.all([
+          fetch('/api/agents/stats'),
+          fetch('/api/jobs/recent'),
+        ]);
+
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setStats(statsData);
+        }
+
+        if (jobsRes.ok) {
+          const jobsData = await jobsRes.json();
+          setRecentJobs(jobsData.jobs || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
           <Bot className="h-8 w-8 text-cobalt-600" />
-          <h1 className="font-heading text-3xl font-bold">Your Agents</h1>
+          <h1 className="font-heading text-3xl font-bold">Agents</h1>
         </div>
         <p className="mt-2 text-muted-foreground">
           Configure once, they work for you automatically. Each agent monitors your tools and
@@ -198,12 +349,14 @@ export default function AgentsPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="flex items-center gap-4 p-4">
-            <div className="rounded-lg bg-amber-100 p-2">
-              <Zap className="h-5 w-5 text-amber-600" />
+            <div className="rounded-lg bg-green-100 p-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">10</p>
-              <p className="text-sm text-muted-foreground">Autonomous Agents</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? '-' : stats?.completedJobsCount || 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Jobs Completed</p>
             </div>
           </CardContent>
         </Card>
@@ -213,33 +366,91 @@ export default function AgentsPage() {
               <MessageSquare className="h-5 w-5 text-cobalt-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">8</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? '-' : stats?.connectedSourcesCount || 0}
+              </p>
               <p className="text-sm text-muted-foreground">Data Sources</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-4">
-            <div className="rounded-lg bg-green-100 p-2">
-              <Bot className="h-5 w-5 text-green-600" />
+            <div className="rounded-lg bg-amber-100 p-2">
+              <Zap className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">0</p>
-              <p className="text-sm text-muted-foreground">Active Now</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? '-' : stats?.activeAgentsCount || 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Active Agents</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Agent Grid */}
-      <div>
-        <h2 className="mb-4 font-heading text-xl font-semibold">All Agents</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {AGENTS.map((agent) => (
-            <AgentCardComponent key={agent.id} agent={agent} />
-          ))}
-        </div>
-      </div>
+      {/* Tabs */}
+      <Tabs defaultValue="agents" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="agents">Your Agents</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
+        </TabsList>
+
+        {/* Your Agents Tab */}
+        <TabsContent value="agents" className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {AGENTS.map((agent) => (
+              <AgentCardComponent key={agent.id} agent={agent} />
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* History Tab */}
+        <TabsContent value="history" className="space-y-6">
+          {/* Agent History Links */}
+          <div>
+            <h3 className="mb-4 font-medium text-muted-foreground">Browse by Agent</h3>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {AGENTS.map((agent) => {
+                const info = jobTypeInfo[agent.id];
+                return (
+                  <HistoryAgentCard
+                    key={agent.id}
+                    title={agent.title}
+                    icon={info?.icon || Bot}
+                    href={agent.href}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div>
+            <h3 className="mb-4 font-medium text-muted-foreground">Recent Activity</h3>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : recentJobs.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                  <Clock className="h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-4 font-medium">No recent activity</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Your agent runs will appear here once they start running.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {recentJobs.map((job) => (
+                  <RecentJobCard key={job.id} job={job} />
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -34,6 +34,8 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 interface SlackChannel {
   id: string;
@@ -87,6 +89,7 @@ const DELIVERY_TIMES = [
 ];
 
 export default function DailyBriefSetupPage() {
+  const { currentUsage } = useUsage('daily_brief');
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const [channels, setChannels] = useState<SlackChannel[]>([]);
   const [slackConnected, setSlackConnected] = useState<boolean>(false);
@@ -402,6 +405,13 @@ export default function DailyBriefSetupPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Daily Brief"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Data Timeframe */}
       <Card>

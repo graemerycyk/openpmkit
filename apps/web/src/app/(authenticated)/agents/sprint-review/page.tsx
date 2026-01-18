@@ -24,8 +24,11 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 export default function SprintReviewPage() {
+  const { currentUsage } = useUsage('sprint_review');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -177,6 +180,13 @@ export default function SprintReviewPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Sprint Review"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Sprint Information */}
       <Card>

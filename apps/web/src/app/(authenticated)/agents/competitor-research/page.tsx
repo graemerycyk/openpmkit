@@ -24,8 +24,11 @@ import {
   Plus,
   X,
 } from 'lucide-react';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 export default function CompetitorResearchPage() {
+  const { currentUsage } = useUsage('competitor_research');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -114,6 +117,13 @@ export default function CompetitorResearchPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Competitor Research"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Competitors */}
       <Card>

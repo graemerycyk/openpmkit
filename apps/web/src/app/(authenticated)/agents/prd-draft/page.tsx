@@ -31,6 +31,8 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 const PRIORITY_LEVELS = [
   { value: 'critical', label: 'Critical' },
@@ -40,6 +42,7 @@ const PRIORITY_LEVELS = [
 ];
 
 export default function PRDDraftPage() {
+  const { currentUsage } = useUsage('prd_draft');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -190,6 +193,13 @@ export default function PRDDraftPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="PRD Draft"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Feature Information */}
       <Card>

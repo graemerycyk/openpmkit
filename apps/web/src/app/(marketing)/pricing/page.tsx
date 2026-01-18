@@ -292,9 +292,9 @@ export default function PricingPage() {
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
                 <Zap className="h-6 w-6 text-cobalt-600" />
               </div>
-              <h2 className="font-heading text-3xl font-bold">Job Runs & Limits</h2>
+              <h2 className="font-heading text-3xl font-bold">Agent Workflow Limits</h2>
               <p className="mt-4 text-muted-foreground">
-                Individual plan has unlimited on-demand runs. Teams plans have fair-use limits per seat.
+                Generous monthly limits designed to cover real PM workflows. Enterprise plans offer 5× capacity.
               </p>
             </div>
 

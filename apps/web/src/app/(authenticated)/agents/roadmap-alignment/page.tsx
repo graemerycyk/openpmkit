@@ -23,8 +23,11 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 export default function RoadmapAlignmentPage() {
+  const { currentUsage } = useUsage('roadmap_alignment');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -166,6 +169,13 @@ export default function RoadmapAlignmentPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Roadmap Alignment"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Strategic Goals */}
       <Card>

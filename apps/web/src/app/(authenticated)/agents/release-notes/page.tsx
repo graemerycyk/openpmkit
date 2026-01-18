@@ -31,6 +31,8 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 const AUDIENCES = [
   { value: 'all', label: 'All Users' },
@@ -40,6 +42,7 @@ const AUDIENCES = [
 ];
 
 export default function ReleaseNotesPage() {
+  const { currentUsage } = useUsage('release_notes');
   const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -201,6 +204,13 @@ export default function ReleaseNotesPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Release Notes"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Release Information */}
       <Card>

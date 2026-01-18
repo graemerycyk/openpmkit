@@ -31,6 +31,8 @@ import {
   DEFAULT_CONNECTOR_CONFIGS,
   AnyConnectorConfig,
 } from '@/components/agents/data-sources-card';
+import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import { useUsage } from '@/hooks/use-usage';
 
 const PROTOTYPE_TYPES = [
   { value: 'wireframe', label: 'Wireframe (Low-fi)' },
@@ -47,6 +49,7 @@ const PLATFORMS = [
 ];
 
 export default function PrototypeGenerationPage() {
+  const { currentUsage } = useUsage('prototype_generation');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -193,6 +196,13 @@ export default function PrototypeGenerationPage() {
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
+
+      {/* Usage Limit Banner */}
+      <UsageLimitBanner
+        workflowName="Prototype Generation"
+        used={currentUsage?.used || 0}
+        limit={currentUsage?.limit || 0}
+      />
 
       {/* Feature Information */}
       <Card>
