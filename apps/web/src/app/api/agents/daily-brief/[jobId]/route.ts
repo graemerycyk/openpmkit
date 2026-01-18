@@ -61,6 +61,152 @@ export async function GET(
       fetchedAt: source.fetchedAt,
     }));
 
+    // Get the agent config for this user to know which data sources were used
+    const agentConfig = await prisma.agentConfig.findUnique({
+      where: {
+        userId_agentType: {
+          userId: user.id,
+          agentType: 'daily_brief',
+        },
+      },
+    });
+
+    // Get connected data sources for this tenant
+    const connectedSources = await prisma.connectorInstall.findMany({
+      where: {
+        tenantId: user.tenantId,
+        status: { in: ['mock', 'real'] },
+      },
+      select: {
+        connectorKey: true,
+        status: true,
+      },
+    });
+
+    // Build data sources info from job result stats and config
+    const jobResult = job.result as Record<string, unknown> | null;
+    const jobStats = (jobResult?.stats as Record<string, unknown>) || {};
+    const configData = (agentConfig?.config as Record<string, unknown>) || {};
+
+    // Map of data source keys to their display info and stats
+    const dataSourcesUsed: Array<{
+      key: string;
+      name: string;
+      stats: Array<{ label: string; value: number }>;
+    }> = [];
+
+    // Check which data sources were configured/used
+    // Slack
+    if (configData.slackChannels || jobStats.channelsProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'slack',
+        name: 'Slack',
+        stats: [
+          { label: 'Channels', value: (jobStats.channelsProcessed as number) || 0 },
+          { label: 'Messages', value: (jobStats.messagesProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Gmail
+    if (configData.includeGmail || jobStats.emailsProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'gmail',
+        name: 'Gmail',
+        stats: [
+          { label: 'Emails', value: (jobStats.emailsProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Google Calendar
+    if (configData.includeGoogleCalendar || jobStats.eventsProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'google-calendar',
+        name: 'Google Calendar',
+        stats: [
+          { label: 'Events', value: (jobStats.eventsProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Google Drive
+    if (configData.includeGoogleDrive || jobStats.filesProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'google-drive',
+        name: 'Google Drive',
+        stats: [
+          { label: 'Files', value: (jobStats.filesProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Jira
+    if (configData.includeJira || jobStats.issuesProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'jira',
+        name: 'Jira',
+        stats: [
+          { label: 'Issues', value: (jobStats.issuesProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Confluence
+    if (configData.includeConfluence || jobStats.pagesProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'confluence',
+        name: 'Confluence',
+        stats: [
+          { label: 'Pages', value: (jobStats.pagesProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Gong
+    if (configData.includeGong || jobStats.callsProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'gong',
+        name: 'Gong',
+        stats: [
+          { label: 'Calls', value: (jobStats.callsProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Zendesk
+    if (configData.includeZendesk || jobStats.ticketsProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'zendesk',
+        name: 'Zendesk',
+        stats: [
+          { label: 'Tickets', value: (jobStats.ticketsProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Loom
+    if (configData.includeLoom || jobStats.videosProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'loom',
+        name: 'Loom',
+        stats: [
+          { label: 'Videos', value: (jobStats.videosProcessed as number) || 0 },
+        ],
+      });
+    }
+
+    // Figma
+    if (configData.includeFigma || jobStats.framesProcessed !== undefined) {
+      dataSourcesUsed.push({
+        key: 'figma',
+        name: 'Figma',
+        stats: [
+          { label: 'Frames', value: (jobStats.framesProcessed as number) || 0 },
+        ],
+      });
+    }
+
     const brief = {
       id: job.id,
       status: job.status,
@@ -68,6 +214,9 @@ export async function GET(
       completedAt: job.completedAt,
       error: job.error,
       result: job.result,
+      config: agentConfig?.config || null,
+      dataSourcesUsed,
+      connectedSources: connectedSources.map(s => s.connectorKey),
       artifact: job.artifacts[0]
         ? {
             id: job.artifacts[0].id,

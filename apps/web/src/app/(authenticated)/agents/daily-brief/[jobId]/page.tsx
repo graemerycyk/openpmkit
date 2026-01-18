@@ -12,14 +12,41 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Database,
   Download,
   ExternalLink,
+  FileText,
+  FolderOpen,
   Hash,
+  HelpCircle,
   Loader2,
+  Mail,
   MessageSquare,
+  Palette,
+  Phone,
+  Play,
   RefreshCw,
+  Shield,
   XCircle,
+  type LucideIcon,
 } from 'lucide-react';
+
+interface DataSourceStat {
+  label: string;
+  value: number;
+}
+
+interface DataSourceUsed {
+  key: string;
+  name: string;
+  stats: DataSourceStat[];
+}
+
+interface BriefStats {
+  tokensUsed?: number;
+  latencyMs?: number;
+  [key: string]: number | undefined;
+}
 
 interface BriefDetail {
   id: string;
@@ -28,13 +55,10 @@ interface BriefDetail {
   completedAt: string | null;
   error: string | null;
   result: {
-    stats?: {
-      channelsProcessed: number;
-      messagesProcessed: number;
-      tokensUsed?: number;
-      latencyMs: number;
-    };
+    stats?: BriefStats;
   } | null;
+  dataSourcesUsed: DataSourceUsed[];
+  connectedSources: string[];
   artifact: {
     id: string;
     title: string;
@@ -50,6 +74,20 @@ interface BriefDetail {
     fetchedAt: string;
   }>;
 }
+
+// Map data source keys to icons
+const dataSourceIcons: Record<string, LucideIcon> = {
+  slack: MessageSquare,
+  gmail: Mail,
+  'google-calendar': Calendar,
+  'google-drive': FolderOpen,
+  jira: FileText,
+  confluence: Database,
+  gong: Phone,
+  zendesk: HelpCircle,
+  loom: Play,
+  figma: Palette,
+};
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
@@ -141,6 +179,83 @@ export default function BriefDetailPage() {
     URL.revokeObjectURL(url);
   };
 
+  const handleSIEMExport = () => {
+    if (!brief) return;
+
+    // Build dynamic data sources from the API response
+    const dataSources: Record<string, Record<string, number>> = {};
+    for (const ds of brief.dataSourcesUsed) {
+      dataSources[ds.key] = {};
+      for (const stat of ds.stats) {
+        dataSources[ds.key][stat.label.toLowerCase().replace(/\s+/g, '_')] = stat.value;
+      }
+    }
+
+    // Create CEF-formatted SIEM event
+    const siemEvent = {
+      version: 'CEF:0',
+      deviceVendor: 'pmkit',
+      deviceProduct: 'agent-platform',
+      deviceVersion: '1.0.0',
+      signatureId: brief.status === 'completed' ? 'PMKIT-JOB-002' : 'PMKIT-JOB-003',
+      name: brief.status === 'completed' ? 'Job Completed' : 'Job Failed',
+      severity: brief.status === 'completed' ? 1 : 6,
+      src: 'tenant',
+      act: brief.status === 'completed' ? 'job.complete' : 'job.fail',
+      outcome: brief.status === 'completed' ? 'success' : 'failure',
+      reason: brief.error || undefined,
+      cs1: brief.id,
+      cs1Label: 'runId',
+      cs3: 'daily_brief',
+      cs3Label: 'jobType',
+      cn1: brief.result?.stats?.latencyMs,
+      cn1Label: 'latencyMs',
+      cn2: brief.result?.stats?.tokensUsed,
+      cn2Label: 'tokenCount',
+      rt: brief.startedAt ? new Date(brief.startedAt).getTime() : Date.now(),
+      start: brief.startedAt ? new Date(brief.startedAt).getTime() : undefined,
+      end: brief.completedAt ? new Date(brief.completedAt).getTime() : undefined,
+      // Include all data sources that were used
+      dataSources,
+      // Include list of connected sources
+      connectedSources: brief.connectedSources,
+    };
+
+    // Format as CEF string
+    const cefHeader = `${siemEvent.version}|${siemEvent.deviceVendor}|${siemEvent.deviceProduct}|${siemEvent.deviceVersion}|${siemEvent.signatureId}|${siemEvent.name}|${siemEvent.severity}`;
+    const extensions = [
+      `src=${siemEvent.src}`,
+      `act=${siemEvent.act}`,
+      `outcome=${siemEvent.outcome}`,
+      siemEvent.reason ? `reason=${siemEvent.reason}` : null,
+      `cs1=${siemEvent.cs1} cs1Label=${siemEvent.cs1Label}`,
+      `cs3=${siemEvent.cs3} cs3Label=${siemEvent.cs3Label}`,
+      siemEvent.cn1 !== undefined ? `cn1=${siemEvent.cn1} cn1Label=${siemEvent.cn1Label}` : null,
+      siemEvent.cn2 !== undefined ? `cn2=${siemEvent.cn2} cn2Label=${siemEvent.cn2Label}` : null,
+      `rt=${siemEvent.rt}`,
+      siemEvent.start ? `start=${siemEvent.start}` : null,
+      siemEvent.end ? `end=${siemEvent.end}` : null,
+    ].filter(Boolean).join(' ');
+
+    const cefString = `${cefHeader}|${extensions}`;
+
+    // Also include JSON format for full data
+    const exportData = {
+      cef: cefString,
+      json: siemEvent,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `daily-brief-${brief.id}-siem.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -216,6 +331,10 @@ export default function BriefDetailPage() {
               Re-run
             </Button>
           )}
+          <Button variant="outline" onClick={handleSIEMExport}>
+            <Shield className="mr-2 h-4 w-4" />
+            SIEM Export
+          </Button>
           {brief.artifact && (
             <Button variant="outline" onClick={handleDownload}>
               <Download className="mr-2 h-4 w-4" />
@@ -226,52 +345,59 @@ export default function BriefDetailPage() {
       </div>
 
       {/* Stats */}
-      {brief.result?.stats && (
-        <div className="grid grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Hash className="h-4 w-4" />
-                <span className="text-sm">Channels</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {brief.result.stats.channelsProcessed}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MessageSquare className="h-4 w-4" />
-                <span className="text-sm">Messages</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {brief.result.stats.messagesProcessed}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">Duration</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {(brief.result.stats.latencyMs / 1000).toFixed(1)}s
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm">Tokens</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {brief.result.stats.tokensUsed?.toLocaleString() || '-'}
-              </p>
-            </CardContent>
-          </Card>
+      {(brief.dataSourcesUsed.length > 0 || brief.result?.stats) && (
+        <div className="space-y-4">
+          {/* Data Source Stats - Dynamic based on what was used */}
+          {brief.dataSourcesUsed.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {brief.dataSourcesUsed.map((dataSource) => {
+                const Icon = dataSourceIcons[dataSource.key] || Hash;
+                return dataSource.stats.map((stat) => (
+                  <Card key={`${dataSource.key}-${stat.label}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Icon className="h-4 w-4" />
+                        <span className="text-sm">{dataSource.name} {stat.label}</span>
+                      </div>
+                      <p className="mt-1 text-2xl font-bold">
+                        {stat.value.toLocaleString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ));
+              })}
+            </div>
+          )}
+
+          {/* Processing Stats */}
+          {brief.result?.stats && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">Duration</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {brief.result.stats.latencyMs
+                      ? `${(brief.result.stats.latencyMs / 1000).toFixed(1)}s`
+                      : '-'}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <FileText className="h-4 w-4" />
+                    <span className="text-sm">Tokens Used</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {brief.result.stats.tokensUsed?.toLocaleString() || '-'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       )}
 
