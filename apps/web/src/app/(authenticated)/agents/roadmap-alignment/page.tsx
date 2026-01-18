@@ -28,12 +28,17 @@ export default function RoadmapAlignmentPage() {
   const [strategicGoals, setStrategicGoals] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
 
-  // Connection status
-  const [connectedSources, setConnectedSources] = useState([
+  // Suggested sources for this agent
+  const [suggestedSources, setSuggestedSources] = useState([
     { key: 'jira' as const, connected: false },
     { key: 'confluence' as const, connected: false },
     { key: 'slack' as const, connected: false },
   ]);
+
+  // All connected sources from API (for showing additional connected integrations)
+  const [allConnectedSources, setAllConnectedSources] = useState<
+    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
+  >([]);
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -42,7 +47,8 @@ export default function RoadmapAlignmentPage() {
         if (res.ok) {
           const data = await res.json();
           const connectors = data.connectors || [];
-          setConnectedSources((prev) =>
+          // Update suggested sources with connection status
+          setSuggestedSources((prev) =>
             prev.map((source) => ({
               ...source,
               connected: connectors.some(
@@ -51,6 +57,14 @@ export default function RoadmapAlignmentPage() {
               ),
             }))
           );
+          // Build list of all connected sources
+          const allConnected = connectors
+            .filter((c: { status: string }) => c.status === 'real')
+            .map((c: { connectorKey: string }) => ({
+              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
+              connected: true,
+            }));
+          setAllConnectedSources(allConnected);
         }
       } catch (err) {
         console.error('Failed to fetch connectors:', err);
@@ -59,7 +73,7 @@ export default function RoadmapAlignmentPage() {
     fetchConnectors();
   }, []);
 
-  const hasAnyConnected = connectedSources.some((s) => s.connected);
+  const hasAnyConnected = suggestedSources.some((s) => s.connected);
   const canRun = hasAnyConnected && strategicGoals.trim() !== '';
 
   const handleRun = async () => {
@@ -162,7 +176,8 @@ export default function RoadmapAlignmentPage() {
 
       {/* Data Sources */}
       <DataSourcesCard
-        connectedSources={connectedSources}
+        suggestedSources={suggestedSources}
+        allConnectedSources={allConnectedSources}
         description="The agent will analyze your roadmap from these sources"
       />
 

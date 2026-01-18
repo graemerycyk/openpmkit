@@ -31,12 +31,17 @@ export default function SprintReviewPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Connection status
-  const [connectedSources, setConnectedSources] = useState([
+  // Suggested sources for this agent
+  const [suggestedSources, setSuggestedSources] = useState([
     { key: 'jira' as const, connected: false },
     { key: 'confluence' as const, connected: false },
     { key: 'slack' as const, connected: false },
   ]);
+
+  // All connected sources from API (for showing additional connected integrations)
+  const [allConnectedSources, setAllConnectedSources] = useState<
+    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
+  >([]);
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -45,7 +50,8 @@ export default function SprintReviewPage() {
         if (res.ok) {
           const data = await res.json();
           const connectors = data.connectors || [];
-          setConnectedSources((prev) =>
+          // Update suggested sources with connection status
+          setSuggestedSources((prev) =>
             prev.map((source) => ({
               ...source,
               connected: connectors.some(
@@ -54,6 +60,14 @@ export default function SprintReviewPage() {
               ),
             }))
           );
+          // Build list of all connected sources
+          const allConnected = connectors
+            .filter((c: { status: string }) => c.status === 'real')
+            .map((c: { connectorKey: string }) => ({
+              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
+              connected: true,
+            }));
+          setAllConnectedSources(allConnected);
         }
       } catch (err) {
         console.error('Failed to fetch connectors:', err);
@@ -62,7 +76,7 @@ export default function SprintReviewPage() {
     fetchConnectors();
   }, []);
 
-  const jiraConnected = connectedSources.find((s) => s.key === 'jira')?.connected ?? false;
+  const jiraConnected = suggestedSources.find((s) => s.key === 'jira')?.connected ?? false;
   const canRun = jiraConnected && sprintName.trim() !== '';
 
   const handleRun = async () => {
@@ -182,7 +196,8 @@ export default function SprintReviewPage() {
 
       {/* Data Sources */}
       <DataSourcesCard
-        connectedSources={connectedSources}
+        suggestedSources={suggestedSources}
+        allConnectedSources={allConnectedSources}
         requiredConnectors={['jira']}
         description="Connect Jira to analyze sprint data"
       />

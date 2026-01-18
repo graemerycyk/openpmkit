@@ -46,14 +46,19 @@ export default function PRDDraftPage() {
   const [priority, setPriority] = useState('medium');
   const [additionalContext, setAdditionalContext] = useState('');
 
-  // Connection status
-  const [connectedSources, setConnectedSources] = useState([
+  // Suggested sources for this agent
+  const [suggestedSources, setSuggestedSources] = useState([
     { key: 'jira' as const, connected: false },
     { key: 'confluence' as const, connected: false },
     { key: 'slack' as const, connected: false },
     { key: 'gong' as const, connected: false },
     { key: 'zendesk' as const, connected: false },
   ]);
+
+  // All connected sources from API (for showing additional connected integrations)
+  const [allConnectedSources, setAllConnectedSources] = useState<
+    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
+  >([]);
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -62,7 +67,8 @@ export default function PRDDraftPage() {
         if (res.ok) {
           const data = await res.json();
           const connectors = data.connectors || [];
-          setConnectedSources((prev) =>
+          // Update suggested sources with connection status
+          setSuggestedSources((prev) =>
             prev.map((source) => ({
               ...source,
               connected: connectors.some(
@@ -71,6 +77,14 @@ export default function PRDDraftPage() {
               ),
             }))
           );
+          // Build list of all connected sources
+          const allConnected = connectors
+            .filter((c: { status: string }) => c.status === 'real')
+            .map((c: { connectorKey: string }) => ({
+              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
+              connected: true,
+            }));
+          setAllConnectedSources(allConnected);
         }
       } catch (err) {
         console.error('Failed to fetch connectors:', err);
@@ -215,7 +229,8 @@ export default function PRDDraftPage() {
 
       {/* Data Sources */}
       <DataSourcesCard
-        connectedSources={connectedSources}
+        suggestedSources={suggestedSources}
+        allConnectedSources={allConnectedSources}
         description="Connect sources to enrich the PRD with existing context"
       />
 

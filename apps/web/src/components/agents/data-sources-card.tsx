@@ -73,17 +73,27 @@ interface ConnectorStatus {
 }
 
 interface DataSourcesCardProps {
-  connectedSources: ConnectorStatus[];
+  /** Suggested integrations for this agent (shown regardless of connection status) */
+  suggestedSources: ConnectorStatus[];
+  /** All connected integrations from the API (used to show additional connected sources) */
+  allConnectedSources?: ConnectorStatus[];
   requiredConnectors?: ConnectorKey[];
   description?: string;
 }
 
 export function DataSourcesCard({
-  connectedSources,
+  suggestedSources,
+  allConnectedSources = [],
   requiredConnectors = [],
   description = 'The agent will pull data from your connected sources',
 }: DataSourcesCardProps) {
-  // Always show all suggested integrations, regardless of connection status
+  // Merge suggested sources with any additional connected sources not in suggested list
+  const suggestedKeys = new Set(suggestedSources.map((s) => s.key));
+  const additionalConnectedSources = allConnectedSources.filter(
+    (s) => s.connected && !suggestedKeys.has(s.key)
+  );
+  const allSources = [...suggestedSources, ...additionalConnectedSources];
+
   return (
     <Card>
       <CardHeader>
@@ -94,7 +104,7 @@ export function DataSourcesCard({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        {connectedSources.map((source) => {
+        {allSources.map((source) => {
           const connector = CONNECTORS[source.key];
           if (!connector) return null;
 

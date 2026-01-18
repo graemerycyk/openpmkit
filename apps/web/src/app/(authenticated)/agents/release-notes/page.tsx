@@ -47,11 +47,16 @@ export default function ReleaseNotesPage() {
   const [audience, setAudience] = useState('all');
   const [highlights, setHighlights] = useState('');
 
-  // Connection status
-  const [connectedSources, setConnectedSources] = useState([
+  // Suggested sources for this agent
+  const [suggestedSources, setSuggestedSources] = useState([
     { key: 'jira' as const, connected: false },
     { key: 'confluence' as const, connected: false },
   ]);
+
+  // All connected sources from API (for showing additional connected integrations)
+  const [allConnectedSources, setAllConnectedSources] = useState<
+    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
+  >([]);
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -60,7 +65,8 @@ export default function ReleaseNotesPage() {
         if (res.ok) {
           const data = await res.json();
           const connectors = data.connectors || [];
-          setConnectedSources((prev) =>
+          // Update suggested sources with connection status
+          setSuggestedSources((prev) =>
             prev.map((source) => ({
               ...source,
               connected: connectors.some(
@@ -69,6 +75,14 @@ export default function ReleaseNotesPage() {
               ),
             }))
           );
+          // Build list of all connected sources
+          const allConnected = connectors
+            .filter((c: { status: string }) => c.status === 'real')
+            .map((c: { connectorKey: string }) => ({
+              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
+              connected: true,
+            }));
+          setAllConnectedSources(allConnected);
         }
       } catch (err) {
         console.error('Failed to fetch connectors:', err);
@@ -88,7 +102,7 @@ export default function ReleaseNotesPage() {
     setError(null);
     setSuccess(null);
 
-    const jiraConnected = connectedSources.find((s) => s.key === 'jira')?.connected ?? false;
+    const jiraConnected = suggestedSources.find((s) => s.key === 'jira')?.connected ?? false;
 
     try {
       const res = await fetch('/api/agents/release-notes/trigger', {
@@ -227,7 +241,8 @@ export default function ReleaseNotesPage() {
 
       {/* Data Sources */}
       <DataSourcesCard
-        connectedSources={connectedSources}
+        suggestedSources={suggestedSources}
+        allConnectedSources={allConnectedSources}
         requiredConnectors={['jira']}
         description="Pull release information from connected tools"
       />
