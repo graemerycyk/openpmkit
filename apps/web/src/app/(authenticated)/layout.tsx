@@ -19,7 +19,7 @@ import { SessionMigration } from '@/components/auth/session-migration';
 import {
   LayoutDashboard,
   Play,
-  FileText,
+  Clock,
   User,
   Plug,
   CreditCard,
@@ -39,11 +39,9 @@ const baseSidebarNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Artifacts',
-    href: '/dashboard/artifacts',
-    icon: FileText,
-    disabled: true,
-    badge: 'Soon',
+    title: 'History',
+    href: '/agents',
+    icon: Clock,
   },
 ];
 
@@ -205,33 +203,37 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
               {/* Main Navigation */}
               <div className="space-y-1">
                 {/* Show demo nav item only for non-admin users */}
-                {[...baseSidebarNavItems, ...(isAdmin ? [] : [demoNavItem])].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={'disabled' in item && item.disabled ? '#' : item.href}
-                    className={cn(
-                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                      pathname === item.href
-                        ? 'bg-cobalt-100 text-cobalt-700 font-medium'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                      'disabled' in item && item.disabled && 'cursor-not-allowed opacity-50'
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.title}
-                    {item.badge && (
-                      <Badge
-                        variant={item.badge === 'Demo' ? 'outline' : 'secondary'}
-                        className={cn(
-                          'ml-auto text-xs',
-                          item.badge === 'Demo' && 'border-amber-200 bg-amber-50 text-amber-700'
-                        )}
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </Link>
-                ))}
+                {[...baseSidebarNavItems, ...(isAdmin ? [] : [demoNavItem])].map((item) => {
+                  const isDisabled = 'disabled' in item && (item as { disabled?: boolean }).disabled;
+                  const badge = 'badge' in item ? (item as { badge?: string }).badge : undefined;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={isDisabled ? '#' : item.href}
+                      className={cn(
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                        pathname === item.href || pathname.startsWith(item.href + '/')
+                          ? 'bg-cobalt-100 text-cobalt-700 font-medium'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        isDisabled && 'cursor-not-allowed opacity-50'
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.title}
+                      {badge && (
+                        <Badge
+                          variant={badge === 'Demo' ? 'outline' : 'secondary'}
+                          className={cn(
+                            'ml-auto text-xs',
+                            badge === 'Demo' && 'border-amber-200 bg-amber-50 text-amber-700'
+                          )}
+                        >
+                          {badge}
+                        </Badge>
+                      )}
+                    </Link>
+                  );
+                })}
 
                 {/* Show Workbench link for admin users */}
                 {isAdmin && (

@@ -122,8 +122,8 @@ export const INDIVIDUAL_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // On-demand limits per month (same as Teams per-seat limits)
-    maxOnDemandDailyBriefPerMonth: 4,
-    maxOnDemandMeetingPrepPerMonth: 30,
+    maxOnDemandDailyBriefPerMonth: 31,
+    maxOnDemandMeetingPrepPerMonth: 40,
     maxOnDemandPrdPackPerMonth: 12,
     maxOnDemandRoadmapMemoPerMonth: 12,
     maxOnDemandSprintReviewPerMonth: 8,
@@ -178,8 +178,8 @@ export const TEAMS_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // On-demand limits per seat per month (generous fair use)
-    maxOnDemandDailyBriefPerMonth: 4,
-    maxOnDemandMeetingPrepPerMonth: 30,
+    maxOnDemandDailyBriefPerMonth: 31,
+    maxOnDemandMeetingPrepPerMonth: 40,
     maxOnDemandPrdPackPerMonth: 12,
     maxOnDemandRoadmapMemoPerMonth: 12,
     maxOnDemandSprintReviewPerMonth: 8,
@@ -234,8 +234,8 @@ export const ENTERPRISE_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // 5× higher on-demand limits (can be overridden per customer via entitlements)
-    maxOnDemandDailyBriefPerMonth: 20,
-    maxOnDemandMeetingPrepPerMonth: 150,
+    maxOnDemandDailyBriefPerMonth: 155,
+    maxOnDemandMeetingPrepPerMonth: 200,
     maxOnDemandPrdPackPerMonth: 60,
     maxOnDemandRoadmapMemoPerMonth: 60,
     maxOnDemandSprintReviewPerMonth: 40,

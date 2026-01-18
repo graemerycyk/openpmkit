@@ -132,10 +132,10 @@ const plans: Plan[] = [
 ];
 
 const jobTypes = [
-  { name: 'Daily Brief', individual: '4/month', teams: '4/month/seat', enterprise: '20/month/seat' },
+  { name: 'Daily Brief', individual: '31/month', teams: '31/month/seat', enterprise: '155/month/seat' },
   { name: 'Weekly Themes (VoC)', individual: '4/month', teams: '4/month/seat', enterprise: '20/month/seat' },
   { name: 'Competitor Research', individual: '4/month', teams: '4/month/seat', enterprise: '20/month/seat' },
-  { name: 'Meeting Prep Pack', individual: '30/month', teams: '30/month/seat', enterprise: '150/month/seat' },
+  { name: 'Meeting Prep Pack', individual: '40/month', teams: '40/month/seat', enterprise: '200/month/seat' },
   { name: 'PRD Pack', individual: '12/month', teams: '12/month/seat', enterprise: '60/month/seat' },
   { name: 'Roadmap Alignment Memo', individual: '12/month', teams: '12/month/seat', enterprise: '60/month/seat' },
   { name: 'Sprint Review Pack', individual: '8/month', teams: '8/month/seat', enterprise: '40/month/seat' },
