@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -20,15 +19,12 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  Headphones,
   Loader2,
-  MessageSquare,
   Play,
-  Plug,
   Target,
-  Ticket,
   TrendingUp,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 const TIMEFRAMES = [
   { value: '7', label: 'Last 7 days' },
@@ -45,6 +41,7 @@ const CLUSTER_COUNTS = [
 ];
 
 export default function VoCClusteringPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -53,16 +50,41 @@ export default function VoCClusteringPage() {
   const [timeframe, setTimeframe] = useState('30');
   const [clusterCount, setClusterCount] = useState('5');
   const [minFeedbackCount, setMinFeedbackCount] = useState('10');
-  const [includeGong, setIncludeGong] = useState(true);
-  const [includeZendesk, setIncludeZendesk] = useState(true);
-  const [includeSlack, setIncludeSlack] = useState(true);
 
-  // Connection status (would be fetched from API)
-  const gongConnected = false;
-  const slackConnected = false;
-  const zendeskConnected = false;
+  // Connection status
+  const [connectedSources, setConnectedSources] = useState([
+    { key: 'gong' as const, connected: false },
+    { key: 'zendesk' as const, connected: false },
+    { key: 'slack' as const, connected: false },
+  ]);
 
-  const hasDataSource = gongConnected || slackConnected || zendeskConnected;
+  useEffect(() => {
+    async function fetchConnectors() {
+      try {
+        const res = await fetch('/api/connectors');
+        if (res.ok) {
+          const data = await res.json();
+          const connectors = data.connectors || [];
+          setConnectedSources((prev) =>
+            prev.map((source) => ({
+              ...source,
+              connected: connectors.some(
+                (c: { connectorKey: string; status: string }) =>
+                  c.connectorKey === source.key && c.status === 'real'
+              ),
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to fetch connectors:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchConnectors();
+  }, []);
+
+  const hasDataSource = connectedSources.some((s) => s.connected);
   const canRun = hasDataSource;
 
   const handleRun = async () => {
@@ -71,6 +93,10 @@ export default function VoCClusteringPage() {
     setIsRunning(true);
     setError(null);
     setSuccess(null);
+
+    const gongConnected = connectedSources.find((s) => s.key === 'gong')?.connected ?? false;
+    const zendeskConnected = connectedSources.find((s) => s.key === 'zendesk')?.connected ?? false;
+    const slackConnected = connectedSources.find((s) => s.key === 'slack')?.connected ?? false;
 
     try {
       const res = await fetch('/api/agents/voc-clustering/trigger', {
@@ -81,9 +107,9 @@ export default function VoCClusteringPage() {
           clusterCount: parseInt(clusterCount),
           minFeedbackCount: parseInt(minFeedbackCount),
           sources: {
-            gong: includeGong && gongConnected,
-            zendesk: includeZendesk && zendeskConnected,
-            slack: includeSlack && slackConnected,
+            gong: gongConnected,
+            zendesk: zendeskConnected,
+            slack: slackConnected,
           },
         }),
       });
@@ -101,6 +127,14 @@ export default function VoCClusteringPage() {
       setIsRunning(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -189,105 +223,10 @@ export default function VoCClusteringPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources</CardTitle>
-          </div>
-          <CardDescription>
-            Select which sources to include in the analysis
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Gong */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="include-gong"
-                checked={includeGong}
-                onCheckedChange={(checked) => setIncludeGong(!!checked)}
-                disabled={!gongConnected}
-              />
-              <div className={`rounded-lg p-2 ${gongConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Headphones className={`h-5 w-5 ${gongConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="include-gong" className="font-medium">Gong</Label>
-                  <Badge variant={gongConnected ? 'outline' : 'secondary'} className={gongConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {gongConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Call recordings and customer feedback</p>
-              </div>
-            </div>
-            {!gongConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Zendesk */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="include-zendesk"
-                checked={includeZendesk}
-                onCheckedChange={(checked) => setIncludeZendesk(!!checked)}
-                disabled={!zendeskConnected}
-              />
-              <div className={`rounded-lg p-2 ${zendeskConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <Ticket className={`h-5 w-5 ${zendeskConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="include-zendesk" className="font-medium">Zendesk</Label>
-                  <Badge variant={zendeskConnected ? 'outline' : 'secondary'} className={zendeskConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {zendeskConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Support tickets and customer issues</p>
-              </div>
-            </div>
-            {!zendeskConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Slack */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="include-slack"
-                checked={includeSlack}
-                onCheckedChange={(checked) => setIncludeSlack(!!checked)}
-                disabled={!slackConnected}
-              />
-              <div className={`rounded-lg p-2 ${slackConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <MessageSquare className={`h-5 w-5 ${slackConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="include-slack" className="font-medium">Slack</Label>
-                  <Badge variant={slackConnected ? 'outline' : 'secondary'} className={slackConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {slackConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Customer feedback channels</p>
-              </div>
-            </div>
-            {!slackConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <DataSourcesCard
+        connectedSources={connectedSources}
+        description="Select which sources to include in the analysis"
+      />
 
       {/* Output Preview */}
       <Card>

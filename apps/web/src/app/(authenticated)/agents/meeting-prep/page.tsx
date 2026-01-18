@@ -49,45 +49,15 @@ const PREP_TIMINGS = [
   { value: '1440', label: '1 day before' },
 ];
 
-// Mock upcoming meetings that match criteria (would come from Google Calendar API)
-const UPCOMING_MEETINGS = [
-  {
-    id: 'meet-1',
-    title: 'Quarterly Business Review - Acme Corp',
-    datetime: '2024-01-22T14:00:00',
-    attendees: ['jane.smith@acme.com', 'john.doe@acme.com'],
-    description: 'Q4 review and Q1 planning discussion',
-    domain: 'acme.com',
-    prepScheduledFor: '2024-01-22T13:30:00',
-  },
-  {
-    id: 'meet-2',
-    title: 'Product Feedback Session with TechStart',
-    datetime: '2024-01-23T10:00:00',
-    attendees: ['sarah@techstart.io'],
-    description: 'Discuss feature requests and roadmap alignment',
-    domain: 'techstart.io',
-    prepScheduledFor: '2024-01-23T09:30:00',
-  },
-  {
-    id: 'meet-3',
-    title: 'Renewal Discussion - Global Industries',
-    datetime: '2024-01-24T15:30:00',
-    attendees: ['mike.johnson@globalind.com', 'lisa.chen@globalind.com'],
-    description: 'Annual contract renewal and expansion',
-    domain: 'globalind.com',
-    prepScheduledFor: '2024-01-24T15:00:00',
-  },
-  {
-    id: 'meet-4',
-    title: 'Onboarding Kickoff - NewCo',
-    datetime: '2024-01-25T09:00:00',
-    attendees: ['alex@newco.com'],
-    description: 'Implementation planning and timeline',
-    domain: 'newco.com',
-    prepScheduledFor: '2024-01-25T08:30:00',
-  },
-];
+interface UpcomingMeeting {
+  id: string;
+  title: string;
+  datetime: string;
+  attendees: string[];
+  description?: string;
+  domain: string;
+  prepScheduledFor: string;
+}
 
 interface AgentConfig {
   id: string;
@@ -117,6 +87,10 @@ export default function MeetingPrepSetupPage() {
   const [filterDomains, setFilterDomains] = useState('');
   const [includeAllExternalMeetings, setIncludeAllExternalMeetings] = useState(true);
 
+  // Upcoming meetings from calendar
+  const [upcomingMeetings, setUpcomingMeetings] = useState<UpcomingMeeting[]>([]);
+  const [isLoadingMeetings, setIsLoadingMeetings] = useState(false);
+
   // Connection status
   const [connectedSources, setConnectedSources] = useState([
     { key: 'google-calendar' as const, connected: false },
@@ -132,9 +106,14 @@ export default function MeetingPrepSetupPage() {
       try {
         // Fetch connectors
         const connectorsRes = await fetch('/api/connectors');
+        let calendarIsConnected = false;
         if (connectorsRes.ok) {
           const data = await connectorsRes.json();
           const connectors = data.connectors || [];
+          calendarIsConnected = connectors.some(
+            (c: { connectorKey: string; status: string }) =>
+              c.connectorKey === 'google-calendar' && c.status === 'real'
+          );
           setConnectedSources((prev) =>
             prev.map((source) => ({
               ...source,
@@ -157,6 +136,22 @@ export default function MeetingPrepSetupPage() {
             setFilterDomains((data.config.config.filterDomains || []).join(', '));
             setIncludeAllExternalMeetings(data.config.config.includeAllExternalMeetings ?? true);
             setIsActive(data.config.status === 'active');
+          }
+        }
+
+        // Fetch upcoming meetings if calendar is connected
+        if (calendarIsConnected) {
+          setIsLoadingMeetings(true);
+          try {
+            const meetingsRes = await fetch('/api/agents/meeting-prep/meetings');
+            if (meetingsRes.ok) {
+              const data = await meetingsRes.json();
+              setUpcomingMeetings(data.meetings || []);
+            }
+          } catch (err) {
+            console.error('Failed to fetch meetings:', err);
+          } finally {
+            setIsLoadingMeetings(false);
           }
         }
       } catch (err) {
@@ -239,7 +234,7 @@ export default function MeetingPrepSetupPage() {
   };
 
   // Calculate matching meetings based on filter criteria
-  const matchingMeetings = UPCOMING_MEETINGS.filter((meeting) => {
+  const matchingMeetings = upcomingMeetings.filter((meeting) => {
     if (includeAllExternalMeetings) return true;
     const domains = filterDomains
       .split(',')
@@ -416,13 +411,22 @@ export default function MeetingPrepSetupPage() {
               <CardTitle className="text-lg">Upcoming Meetings</CardTitle>
             </div>
             <CardDescription>
-              {matchingMeetings.length} meetings in the next 7 days will receive prep packs
+              {isLoadingMeetings
+                ? 'Loading upcoming meetings...'
+                : matchingMeetings.length === 0
+                  ? 'No upcoming external meetings found'
+                  : `${matchingMeetings.length} meeting${matchingMeetings.length === 1 ? '' : 's'} in the next 7 days will receive prep packs`}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {matchingMeetings.length === 0 ? (
+            {isLoadingMeetings ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : matchingMeetings.length === 0 ? (
               <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-                No upcoming meetings match your criteria
+                No upcoming meetings with external attendees found in your calendar.
+                Meetings will appear here once they are scheduled.
               </p>
             ) : (
               <div className="space-y-3">

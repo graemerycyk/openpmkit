@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -21,14 +20,12 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  FileText,
-  GitBranch,
   Loader2,
   Megaphone,
   Play,
-  Plug,
   Target,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 const AUDIENCES = [
   { value: 'all', label: 'All Users' },
@@ -38,6 +35,7 @@ const AUDIENCES = [
 ];
 
 export default function ReleaseNotesPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -48,11 +46,38 @@ export default function ReleaseNotesPage() {
   const [releaseDate, setReleaseDate] = useState('');
   const [audience, setAudience] = useState('all');
   const [highlights, setHighlights] = useState('');
-  const [includeJira, setIncludeJira] = useState(true);
 
-  // Connection status (would be fetched from API)
-  const jiraConnected = false;
-  const confluenceConnected = false;
+  // Connection status
+  const [connectedSources, setConnectedSources] = useState([
+    { key: 'jira' as const, connected: false },
+    { key: 'confluence' as const, connected: false },
+  ]);
+
+  useEffect(() => {
+    async function fetchConnectors() {
+      try {
+        const res = await fetch('/api/connectors');
+        if (res.ok) {
+          const data = await res.json();
+          const connectors = data.connectors || [];
+          setConnectedSources((prev) =>
+            prev.map((source) => ({
+              ...source,
+              connected: connectors.some(
+                (c: { connectorKey: string; status: string }) =>
+                  c.connectorKey === source.key && c.status === 'real'
+              ),
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to fetch connectors:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchConnectors();
+  }, []);
 
   const canRun = version.trim() !== '';
 
@@ -62,6 +87,8 @@ export default function ReleaseNotesPage() {
     setIsRunning(true);
     setError(null);
     setSuccess(null);
+
+    const jiraConnected = connectedSources.find((s) => s.key === 'jira')?.connected ?? false;
 
     try {
       const res = await fetch('/api/agents/release-notes/trigger', {
@@ -73,7 +100,7 @@ export default function ReleaseNotesPage() {
           releaseDate: releaseDate || undefined,
           audience,
           highlights: highlights.trim() || undefined,
-          includeJira: includeJira && jiraConnected,
+          includeJira: jiraConnected,
         }),
       });
 
@@ -90,6 +117,14 @@ export default function ReleaseNotesPage() {
       setIsRunning(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -191,70 +226,11 @@ export default function ReleaseNotesPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources</CardTitle>
-          </div>
-          <CardDescription>
-            Pull release information from connected tools
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Jira */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="include-jira"
-                checked={includeJira}
-                onCheckedChange={(checked) => setIncludeJira(!!checked)}
-                disabled={!jiraConnected}
-              />
-              <div className={`rounded-lg p-2 ${jiraConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <GitBranch className={`h-5 w-5 ${jiraConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="include-jira" className="font-medium">Jira</Label>
-                  <Badge variant={jiraConnected ? 'outline' : 'secondary'} className={jiraConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {jiraConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Fix versions, epics, and issues</p>
-              </div>
-            </div>
-            {!jiraConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Confluence */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-lg p-2 ${confluenceConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                <FileText className={`h-5 w-5 ${confluenceConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Confluence</span>
-                  <Badge variant={confluenceConnected ? 'outline' : 'secondary'} className={confluenceConnected ? 'border-green-200 bg-green-50 text-green-700 text-xs' : 'text-xs'}>
-                    {confluenceConnected ? 'Connected' : 'Not Connected'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Feature documentation and specs</p>
-              </div>
-            </div>
-            {!confluenceConnected && (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/settings/integrations">Connect</Link>
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <DataSourcesCard
+        connectedSources={connectedSources}
+        requiredConnectors={['jira']}
+        description="Pull release information from connected tools"
+      />
 
       {/* Output Preview */}
       <Card>
