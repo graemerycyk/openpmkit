@@ -161,7 +161,7 @@ export default function SprintHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/sprint-review">New Review</Link>
+          <Link href="/agents/sprint-review">Back to Agent</Link>
         </Button>
       </div>
 

@@ -80,8 +80,28 @@ export type Job = z.infer<typeof JobSchema>;
 // Agent Config Types
 // ============================================================================
 
-export const AgentTypeSchema = z.enum(['daily_brief']);
+export const AgentTypeSchema = z.enum([
+  'daily_brief',
+  'meeting_prep',
+  'sprint_review',
+  'voc_clustering',
+  'competitor_research',
+  'roadmap_alignment',
+  'deck_content',
+  'release_notes',
+  'prd_draft',
+  'prototype_generation',
+]);
 export type AgentType = z.infer<typeof AgentTypeSchema>;
+
+// Trigger types for autonomous agents
+export const AgentTriggerTypeSchema = z.enum([
+  'schedule',    // Runs on a schedule (daily, weekly, monthly)
+  'calendar',    // Triggered by calendar events
+  'jira',        // Triggered by Jira webhooks (release, epic status)
+  'artifact',    // Triggered when another agent produces an artifact
+]);
+export type AgentTriggerType = z.infer<typeof AgentTriggerTypeSchema>;
 
 export const AgentStatusSchema = z.enum(['active', 'paused']);
 export type AgentStatus = z.infer<typeof AgentStatusSchema>;
@@ -101,9 +121,128 @@ export const DailyBriefConfigSchema = z.object({
 });
 export type DailyBriefConfig = z.infer<typeof DailyBriefConfigSchema>;
 
-// Union of all agent config types (will grow as we add more agents)
+// Meeting Prep config (calendar-triggered)
+export const MeetingPrepConfigSchema = z.object({
+  leadTimeMinutes: z.number().min(30).max(1440).default(240), // 4 hours default
+  timezone: z.string(),
+  // Data sources
+  includeJira: z.boolean().default(true),
+  includeSlack: z.boolean().default(true),
+  includeGong: z.boolean().default(false),
+  includeConfluence: z.boolean().default(false),
+});
+export type MeetingPrepConfig = z.infer<typeof MeetingPrepConfigSchema>;
+
+// Sprint Review config (calendar-triggered)
+export const SprintReviewConfigSchema = z.object({
+  calendarKeywords: z.array(z.string()).default(['Sprint Demo', 'Sprint Review', 'Department Sprint Review']),
+  leadTimeMinutes: z.number().min(60).max(1440).default(240), // 4 hours default
+  timezone: z.string(),
+  // Jira configuration
+  jiraProjectKeys: z.array(z.string()).default([]), // Project keys to pull sprint data from
+  includeVelocity: z.boolean().default(true),
+  includeCarryover: z.boolean().default(true), // Include items carried from previous sprint
+  // Additional data sources
+  includeSlackHighlights: z.boolean().default(true),
+  includeConfluence: z.boolean().default(false),
+});
+export type SprintReviewConfig = z.infer<typeof SprintReviewConfigSchema>;
+
+// VoC Clustering config (schedule-triggered)
+export const VocClusteringConfigSchema = z.object({
+  scheduleDay: z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).default('monday'),
+  scheduleTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format'),
+  timezone: z.string(),
+  lookbackDays: z.number().min(7).max(90).default(7),
+  // Data sources
+  includeZendesk: z.boolean().default(true),
+  includeGong: z.boolean().default(true),
+  includeSlack: z.boolean().default(false),
+  includeCommunity: z.boolean().default(true),
+});
+export type VocClusteringConfig = z.infer<typeof VocClusteringConfigSchema>;
+
+// Competitor Research config (schedule-triggered)
+export const CompetitorResearchConfigSchema = z.object({
+  scheduleDay: z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).default('friday'),
+  scheduleTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format'),
+  timezone: z.string(),
+  competitors: z.array(z.string()).default([]), // Company names to track
+  trackPricing: z.boolean().default(true),
+  trackFeatures: z.boolean().default(true),
+  trackNews: z.boolean().default(true),
+});
+export type CompetitorResearchConfig = z.infer<typeof CompetitorResearchConfigSchema>;
+
+// Roadmap Alignment config (schedule-triggered)
+export const RoadmapAlignmentConfigSchema = z.object({
+  scheduleFrequency: z.enum(['weekly', 'biweekly', 'monthly']).default('monthly'),
+  scheduleDay: z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']).default('monday'),
+  scheduleTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format'),
+  timezone: z.string(),
+  // Data sources
+  includeJira: z.boolean().default(true),
+  includeConfluence: z.boolean().default(true),
+  includeSlackFeedback: z.boolean().default(true),
+});
+export type RoadmapAlignmentConfig = z.infer<typeof RoadmapAlignmentConfigSchema>;
+
+// Deck Content config (calendar-triggered)
+export const DeckContentConfigSchema = z.object({
+  calendarKeywords: z.array(z.string()).default(['QBR', 'Board Meeting', 'All Hands', 'Presentation']),
+  leadTimeMinutes: z.number().min(60).max(2880).default(480), // 8 hours default
+  timezone: z.string(),
+  // Data sources
+  includeMetrics: z.boolean().default(true),
+  includeJira: z.boolean().default(true),
+  includeCompetitorInsights: z.boolean().default(false),
+});
+export type DeckContentConfig = z.infer<typeof DeckContentConfigSchema>;
+
+// Release Notes config (jira-triggered)
+export const ReleaseNotesConfigSchema = z.object({
+  jiraProjectKeys: z.array(z.string()).default([]),
+  autoTriggerOnRelease: z.boolean().default(true), // Trigger when Jira version is released
+  includeBreakingChanges: z.boolean().default(true),
+  includeDeprecations: z.boolean().default(true),
+  audienceTypes: z.array(z.enum(['technical', 'end-user', 'internal'])).default(['end-user']),
+  timezone: z.string(),
+});
+export type ReleaseNotesConfig = z.infer<typeof ReleaseNotesConfigSchema>;
+
+// PRD Draft config (jira-triggered)
+export const PrdDraftConfigSchema = z.object({
+  jiraProjectKeys: z.array(z.string()).default([]),
+  triggerOnEpicStatus: z.array(z.string()).default(['Ready for PRD', 'Needs PRD']), // Epic status values
+  includeMarketResearch: z.boolean().default(true),
+  includeCompetitorAnalysis: z.boolean().default(false),
+  includeVocInsights: z.boolean().default(true),
+  timezone: z.string(),
+});
+export type PrdDraftConfig = z.infer<typeof PrdDraftConfigSchema>;
+
+// Prototype Generation config (artifact-triggered)
+export const PrototypeGenerationConfigSchema = z.object({
+  triggerOnArtifactTypes: z.array(z.enum(['prd', 'brief'])).default(['prd']),
+  autoGenerate: z.boolean().default(false), // When true, auto-generate after PRD
+  includeInteractions: z.boolean().default(true),
+  includeResponsive: z.boolean().default(true),
+  timezone: z.string(),
+});
+export type PrototypeGenerationConfig = z.infer<typeof PrototypeGenerationConfigSchema>;
+
+// Union of all agent config types
 export const AgentConfigDataSchema = z.discriminatedUnion('agentType', [
   z.object({ agentType: z.literal('daily_brief'), ...DailyBriefConfigSchema.shape }),
+  z.object({ agentType: z.literal('meeting_prep'), ...MeetingPrepConfigSchema.shape }),
+  z.object({ agentType: z.literal('sprint_review'), ...SprintReviewConfigSchema.shape }),
+  z.object({ agentType: z.literal('voc_clustering'), ...VocClusteringConfigSchema.shape }),
+  z.object({ agentType: z.literal('competitor_research'), ...CompetitorResearchConfigSchema.shape }),
+  z.object({ agentType: z.literal('roadmap_alignment'), ...RoadmapAlignmentConfigSchema.shape }),
+  z.object({ agentType: z.literal('deck_content'), ...DeckContentConfigSchema.shape }),
+  z.object({ agentType: z.literal('release_notes'), ...ReleaseNotesConfigSchema.shape }),
+  z.object({ agentType: z.literal('prd_draft'), ...PrdDraftConfigSchema.shape }),
+  z.object({ agentType: z.literal('prototype_generation'), ...PrototypeGenerationConfigSchema.shape }),
 ]);
 export type AgentConfigData = z.infer<typeof AgentConfigDataSchema>;
 

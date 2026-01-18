@@ -122,13 +122,39 @@ Plans are defined in `packages/core/src/billing/index.ts`:
 
 ## Autonomous Agents
 
-The Daily Brief agent is the first autonomous agent, running on a schedule.
+10 agent types with standardized UI. 3 are fully autonomous, 7 are "coming soon".
 
-Key files:
-- `apps/web/src/app/(authenticated)/agents/daily-brief/` - Setup UI
-- `packages/core/src/agents/daily-brief/` - Orchestrator, fetcher
+### Agent Categories
+
+| Category | Agents |
+|----------|--------|
+| **Fully Autonomous** | Daily Brief, Meeting Prep, Sprint Review |
+| **Coming Soon** | PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation |
+
+### Key Files
+
+- `apps/web/src/app/(authenticated)/agents/{agent}/page.tsx` - Agent setup pages
+- `apps/web/src/app/(authenticated)/agents/{agent}/history/page.tsx` - History pages
+- `apps/web/src/app/api/agents/{agent}/trigger/route.ts` - Manual trigger endpoints
+- `packages/core/src/agents/daily-brief/` - Orchestrator, fetcher (reference)
 - `apps/worker/src/agent-scheduler.ts` - BullMQ scheduler
-- `apps/web/src/app/api/agents/daily-brief/` - API routes
+
+### Agent Page UI Pattern
+
+All agent pages have standardized buttons:
+- **Enable Agent** (left) - Primary action, disabled for "coming soon" agents
+- **Run Now** (left, admin-only) - Uses `isAdmin` state
+- **Save Agent Settings** (right) - Disabled for "coming soon" agents
+
+Admin check pattern:
+```typescript
+const [isAdmin, setIsAdmin] = useState(false);
+useEffect(() => {
+  fetch('/api/workbench/run-job')
+    .then(res => res.json())
+    .then(data => setIsAdmin(data.isAdmin === true));
+}, []);
+```
 
 ## When Making Changes
 

@@ -174,7 +174,7 @@ export default function PRDHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/prd-draft">New PRD</Link>
+          <Link href="/agents/prd-draft">Back to Agent</Link>
         </Button>
       </div>
 

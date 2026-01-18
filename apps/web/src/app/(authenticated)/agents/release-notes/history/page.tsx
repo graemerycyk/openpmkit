@@ -165,7 +165,7 @@ export default function ReleaseHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/release-notes">New Release</Link>
+          <Link href="/agents/release-notes">Back to Agent</Link>
         </Button>
       </div>
 

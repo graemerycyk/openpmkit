@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,11 +11,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   AlertCircle,
   CheckCircle2,
-  Clock,
   Globe,
   Loader2,
   Newspaper,
   Play,
+  Power,
+  Save,
   Search,
   Sword,
   Target,
@@ -32,6 +32,23 @@ export default function CompetitorResearchPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   // Form state
   const [competitors, setCompetitors] = useState<string[]>(['']);
@@ -283,20 +300,35 @@ export default function CompetitorResearchPage() {
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button asChild variant="outline">
-            <Link href="/agents/competitor-research/history">
-              <Clock className="mr-2 h-4 w-4" />
-              View History
-            </Link>
+          <Button
+            disabled={true}
+            title="Autonomous scheduling coming soon"
+          >
+            <Power className="mr-2 h-4 w-4" />
+            Enable Agent
           </Button>
-        </div>
-        <Button onClick={handleRun} disabled={isRunning || !canRun}>
-          {isRunning ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Play className="mr-2 h-4 w-4" />
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={handleRun}
+              disabled={isRunning || !canRun}
+            >
+              {isRunning ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Run Now
+            </Button>
           )}
-          Start Research
+        </div>
+        <Button
+          variant="outline"
+          disabled={true}
+          title="Agent settings coming soon"
+        >
+          <Save className="mr-2 h-4 w-4" />
+          Save Agent Settings
         </Button>
       </div>
     </div>

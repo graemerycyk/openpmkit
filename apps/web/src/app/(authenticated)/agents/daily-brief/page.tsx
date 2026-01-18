@@ -25,6 +25,8 @@ import {
   Hash,
   Loader2,
   Play,
+  Power,
+  Save,
   Settings2,
   Target,
   Zap,
@@ -99,6 +101,9 @@ export default function DailyBriefSetupPage() {
   const [isTriggering, setIsTriggering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [configSaved, setConfigSaved] = useState(false);
+  const [isEnabling, setIsEnabling] = useState(false);
 
   // Form state
   const [dataTimeframe, setDataTimeframe] = useState<'24' | '36'>('24');
@@ -166,6 +171,22 @@ export default function DailyBriefSetupPage() {
     }));
   };
 
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
+
   // Detect user's timezone
   useEffect(() => {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -185,6 +206,7 @@ export default function DailyBriefSetupPage() {
           const data = await configRes.json();
           if (data.config) {
             setConfig(data.config);
+            setConfigSaved(true); // Config exists, so it's been saved
             setDataTimeframe(data.config.config.dataTimeframeHours === 36 ? '36' : '24');
             setDeliveryTime(data.config.config.deliveryTimeLocal);
             setTimezone(data.config.config.timezone);
@@ -302,7 +324,8 @@ export default function DailyBriefSetupPage() {
       if (res.ok) {
         const data = await res.json();
         setConfig(data.config);
-        setSuccess('Configuration saved successfully!');
+        setConfigSaved(true);
+        setSuccess('Agent settings saved successfully!');
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to save configuration');
@@ -311,6 +334,53 @@ export default function DailyBriefSetupPage() {
       setError('Failed to save. Please try again.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleEnableAgent = async () => {
+    if (!configSaved || !canRun) return;
+
+    setIsEnabling(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetch('/api/agents/daily-brief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'active',
+          config: {
+            dataTimeframeHours: parseInt(dataTimeframe),
+            deliveryTimeLocal: deliveryTime,
+            timezone,
+            slackChannels: selectedChannels,
+            includeSlackMentions,
+            includeGmail,
+            includeGoogleDrive,
+            includeGoogleCalendar,
+            connectorConfigs: {
+              gmail: isGmailEnabled ? connectorConfigs.gmail : undefined,
+              'google-drive': isGdriveEnabled ? connectorConfigs['google-drive'] : undefined,
+              'google-calendar': isGcalEnabled ? connectorConfigs['google-calendar'] : undefined,
+            },
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setConfig(data.config);
+        setIsActive(true);
+        setSuccess('Agent enabled! It will run automatically at your scheduled time.');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to enable agent');
+      }
+    } catch {
+      setError('Failed to enable agent. Please try again.');
+    } finally {
+      setIsEnabling(false);
     }
   };
 
@@ -666,45 +736,58 @@ export default function DailyBriefSetupPage() {
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleTrigger}
-            disabled={isTriggering || !canRun}
-          >
-            {isTriggering ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="mr-2 h-4 w-4" />
-            )}
-            Run Now
+          <Button asChild variant="outline">
+            <Link href="/agents/daily-brief/history">
+              <Clock className="mr-2 h-4 w-4" />
+              View History
+            </Link>
           </Button>
-          {!canRun && (
-            <span className="text-sm text-muted-foreground">
-              Configure at least one data source to run
-            </span>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={handleTrigger}
+              disabled={isTriggering || !canRun}
+            >
+              {isTriggering ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Run Now
+            </Button>
           )}
         </div>
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-          )}
-          Save Configuration
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={handleSave}
+            disabled={isSaving || !canRun}
+          >
+            {isSaving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Save Agent Settings
+          </Button>
+          <Button
+            onClick={handleEnableAgent}
+            disabled={isEnabling || !configSaved || !canRun || isActive}
+          >
+            {isEnabling ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Power className="mr-2 h-4 w-4" />
+            )}
+            {isActive ? 'Agent Enabled' : 'Enable Agent'}
+          </Button>
+        </div>
       </div>
 
       {/* Last Run Info */}
       {config?.lastRunAt && (
         <p className="text-center text-sm text-muted-foreground">
           Last run: {new Date(config.lastRunAt).toLocaleString()}
-          {' · '}
-          <Link
-            href="/agents/daily-brief/history"
-            className="text-cobalt-600 hover:underline"
-          >
-            View History
-          </Link>
         </p>
       )}
     </div>

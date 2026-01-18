@@ -9,14 +9,27 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   AlertCircle,
+  Calendar,
   CheckCircle2,
   Clock,
   Loader2,
   Play,
+  Power,
   Repeat,
+  Save,
+  Settings2,
   Target,
+  X,
 } from 'lucide-react';
 import {
   DataSourcesCard,
@@ -27,13 +40,75 @@ import {
 import { UsageLimitBanner } from '@/components/usage-limit-banner';
 import { useUsage } from '@/hooks/use-usage';
 
+interface AgentConfig {
+  id: string;
+  status: string;
+  config: {
+    calendarKeywords: string[];
+    leadTimeMinutes: number;
+    timezone: string;
+    jiraProjectKeys: string[];
+    includeVelocity: boolean;
+    includeCarryover: boolean;
+    includeSlackHighlights: boolean;
+    includeConfluence: boolean;
+  };
+  nextRunAt: string | null;
+  lastRunAt: string | null;
+}
+
+// Common timezones
+const TIMEZONES = [
+  { value: 'America/New_York', label: 'Eastern Time (ET)' },
+  { value: 'America/Chicago', label: 'Central Time (CT)' },
+  { value: 'America/Denver', label: 'Mountain Time (MT)' },
+  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+  { value: 'America/Phoenix', label: 'Arizona (MST)' },
+  { value: 'America/Anchorage', label: 'Alaska Time (AKT)' },
+  { value: 'Pacific/Honolulu', label: 'Hawaii Time (HST)' },
+  { value: 'Europe/London', label: 'London (GMT/BST)' },
+  { value: 'Europe/Paris', label: 'Central European (CET)' },
+  { value: 'Europe/Berlin', label: 'Berlin (CET)' },
+  { value: 'Asia/Tokyo', label: 'Japan (JST)' },
+  { value: 'Asia/Shanghai', label: 'China (CST)' },
+  { value: 'Asia/Singapore', label: 'Singapore (SGT)' },
+  { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
+];
+
+// Lead time options (minutes before meeting)
+const LEAD_TIME_OPTIONS = [
+  { value: '60', label: '1 hour before' },
+  { value: '120', label: '2 hours before' },
+  { value: '240', label: '4 hours before' },
+  { value: '480', label: '8 hours before' },
+  { value: '1440', label: '24 hours before' },
+];
+
+// Default calendar keywords for sprint meetings
+const DEFAULT_KEYWORDS = ['Sprint Demo', 'Sprint Review', 'Department Sprint Review'];
+
 export default function SprintReviewPage() {
   const { currentUsage } = useUsage('sprint_review');
+  const [config, setConfig] = useState<AgentConfig | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [configSaved, setConfigSaved] = useState(false);
+  const [isEnabling, setIsEnabling] = useState(false);
 
-  // Form state
+  // Agent configuration state
+  const [isActive, setIsActive] = useState(false);
+  const [calendarKeywords, setCalendarKeywords] = useState<string[]>(DEFAULT_KEYWORDS);
+  const [newKeyword, setNewKeyword] = useState('');
+  const [leadTimeMinutes, setLeadTimeMinutes] = useState('240');
+  const [timezone, setTimezone] = useState('America/New_York');
+  const [includeVelocity, setIncludeVelocity] = useState(true);
+  const [includeCarryover, setIncludeCarryover] = useState(true);
+
+  // Manual run form state (for on-demand runs)
   const [sprintName, setSprintName] = useState('');
   const [sprintGoal, setSprintGoal] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -57,9 +132,52 @@ export default function SprintReviewPage() {
     confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
   });
 
+  // Check if user is admin
   useEffect(() => {
-    async function fetchConnectors() {
+    async function checkAdmin() {
       try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
+
+  // Detect user's timezone
+  useEffect(() => {
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const matchingTz = TIMEZONES.find((tz) => tz.value === detected);
+    if (matchingTz) {
+      setTimezone(detected);
+    }
+  }, []);
+
+  // Fetch agent config and connectors
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch agent config
+        const configRes = await fetch('/api/agents/sprint-review');
+        if (configRes.ok) {
+          const data = await configRes.json();
+          if (data.config) {
+            setConfig(data.config);
+            setConfigSaved(true);
+            setIsActive(data.config.status === 'active');
+            setCalendarKeywords(data.config.config.calendarKeywords || DEFAULT_KEYWORDS);
+            setLeadTimeMinutes(String(data.config.config.leadTimeMinutes || 240));
+            setTimezone(data.config.config.timezone || 'America/New_York');
+            setIncludeVelocity(data.config.config.includeVelocity ?? true);
+            setIncludeCarryover(data.config.config.includeCarryover ?? true);
+          }
+        }
+
+        // Fetch connectors
         const res = await fetch('/api/connectors');
         if (res.ok) {
           const data = await res.json();
@@ -88,15 +206,20 @@ export default function SprintReviewPage() {
           setAllConnectedSources(allConnected);
         }
       } catch (err) {
-        console.error('Failed to fetch connectors:', err);
+        console.error('Failed to fetch data:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
-    fetchConnectors();
+    fetchData();
   }, []);
 
   const jiraSource = suggestedSources.find((s) => s.key === 'jira');
   const jiraConnected = jiraSource?.connected ?? false;
   const jiraEnabled = jiraSource?.enabled ?? false;
+  // canSave: can save settings when Jira is connected and keywords exist
+  const canSave = jiraConnected && jiraEnabled && calendarKeywords.length > 0;
+  // canRun: can manually run when Jira connected and sprint name provided (admin only)
   const canRun = jiraConnected && jiraEnabled && sprintName.trim() !== '';
 
   // Handle toggling a source on/off
@@ -114,6 +237,102 @@ export default function SprintReviewPage() {
       ...prev,
       [key]: config,
     }));
+  };
+
+  // Keyword management
+  const addKeyword = () => {
+    const keyword = newKeyword.trim();
+    if (keyword && !calendarKeywords.includes(keyword)) {
+      setCalendarKeywords([...calendarKeywords, keyword]);
+      setNewKeyword('');
+    }
+  };
+
+  const removeKeyword = (keyword: string) => {
+    setCalendarKeywords(calendarKeywords.filter((k) => k !== keyword));
+  };
+
+  // Save configuration
+  const handleSave = async () => {
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetch('/api/agents/sprint-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: isActive ? 'active' : 'paused',
+          config: {
+            calendarKeywords,
+            leadTimeMinutes: parseInt(leadTimeMinutes),
+            timezone,
+            jiraProjectKeys: [], // Will be populated from connector config
+            includeVelocity,
+            includeCarryover,
+            includeSlackHighlights: suggestedSources.find(s => s.key === 'slack')?.enabled ?? false,
+            includeConfluence: suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setConfig(data.config);
+        setConfigSaved(true);
+        setSuccess('Agent settings saved successfully!');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to save configuration');
+      }
+    } catch {
+      setError('Failed to save. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEnableAgent = async () => {
+    if (!configSaved || !canSave) return;
+
+    setIsEnabling(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetch('/api/agents/sprint-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'active',
+          config: {
+            calendarKeywords,
+            leadTimeMinutes: parseInt(leadTimeMinutes),
+            timezone,
+            jiraProjectKeys: [],
+            includeVelocity,
+            includeCarryover,
+            includeSlackHighlights: suggestedSources.find(s => s.key === 'slack')?.enabled ?? false,
+            includeConfluence: suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setConfig(data.config);
+        setIsActive(true);
+        setSuccess('Agent enabled! It will run automatically before detected sprint review meetings.');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to enable agent');
+      }
+    } catch {
+      setError('Failed to enable agent. Please try again.');
+    } finally {
+      setIsEnabling(false);
+    }
   };
 
   const handleRun = async () => {
@@ -153,6 +372,14 @@ export default function SprintReviewPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Header */}
@@ -160,10 +387,17 @@ export default function SprintReviewPage() {
         <div>
           <h1 className="font-heading text-2xl font-bold">Sprint Review Agent</h1>
           <p className="text-muted-foreground">
-            Auto-summarize completed sprints from Jira
+            Automatically prepare sprint reviews when meetings are detected
           </p>
         </div>
-        <Badge variant="outline">Autonomous</Badge>
+        {config && (
+          <Badge
+            variant={config.status === 'active' ? 'default' : 'secondary'}
+            className={config.status === 'active' ? 'bg-green-600' : ''}
+          >
+            {config.status === 'active' ? 'Active' : 'Paused'}
+          </Badge>
+        )}
       </div>
 
       {/* Alerts */}
@@ -188,57 +422,92 @@ export default function SprintReviewPage() {
         limit={currentUsage?.limit || 0}
       />
 
-      {/* Sprint Information */}
+      {/* Calendar Trigger Configuration */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Repeat className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Sprint Information</CardTitle>
+            <Calendar className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Calendar Trigger</CardTitle>
           </div>
           <CardDescription>
-            Identify the sprint to review
+            The agent will automatically run when meetings matching these keywords are detected
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="sprint-name">Sprint Name or ID *</Label>
-            <Input
-              id="sprint-name"
-              placeholder="e.g., Sprint 24, or board/sprint ID from Jira"
-              value={sprintName}
-              onChange={(e) => setSprintName(e.target.value)}
-            />
+          {/* Keywords */}
+          <div className="space-y-3">
+            <Label>Meeting Keywords</Label>
+            <div className="flex flex-wrap gap-2">
+              {calendarKeywords.map((keyword) => (
+                <Badge key={keyword} variant="secondary" className="gap-1 py-1">
+                  {keyword}
+                  <button
+                    onClick={() => removeKeyword(keyword)}
+                    className="ml-1 rounded-full hover:bg-muted-foreground/20"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add a keyword..."
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
+              />
+              <Button variant="outline" onClick={addKeyword}>
+                Add
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The agent will prepare a sprint review when a calendar event contains any of these keywords
+            </p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="sprint-goal">Sprint Goal (optional)</Label>
-            <Textarea
-              id="sprint-goal"
-              placeholder="e.g., Complete user authentication flow and deploy to staging"
-              value={sprintGoal}
-              onChange={(e) => setSprintGoal(e.target.value)}
-              rows={2}
-            />
-          </div>
+
+          {/* Lead Time */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="start-date">Sprint Start Date (optional)</Label>
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Label htmlFor="lead-time">Preparation Lead Time</Label>
+              <Select value={leadTimeMinutes} onValueChange={setLeadTimeMinutes}>
+                <SelectTrigger id="lead-time">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEAD_TIME_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="end-date">Sprint End Date (optional)</Label>
-              <Input
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
+              <Label htmlFor="timezone">Timezone</Label>
+              <Select value={timezone} onValueChange={setTimezone}>
+                <SelectTrigger id="timezone">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIMEZONES.map((tz) => (
+                    <SelectItem key={tz.value} value={tz.value}>
+                      {tz.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {config?.nextRunAt && isActive && (
+            <p className="text-sm text-muted-foreground">
+              Next scheduled run:{' '}
+              <span className="font-medium">
+                {new Date(config.nextRunAt).toLocaleString()}
+              </span>
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -247,7 +516,7 @@ export default function SprintReviewPage() {
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
         requiredConnectors={['jira']}
-        description="Connect Jira to analyze sprint data"
+        description="Connect Jira to analyze sprint data. Google Calendar is required for automatic triggers."
         onToggle={handleSourceToggle}
         connectorConfigs={connectorConfigs}
         onConfigChange={handleConfigChange}
@@ -287,6 +556,95 @@ export default function SprintReviewPage() {
         </CardContent>
       </Card>
 
+      {/* Agent Status */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Agent Status</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="agent-active">Enable Sprint Review Agent</Label>
+              <p className="text-sm text-muted-foreground">
+                When enabled, the agent will automatically run before detected sprint review meetings
+              </p>
+            </div>
+            <Switch
+              id="agent-active"
+              checked={isActive}
+              onCheckedChange={setIsActive}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Manual Run Section - Admin Only */}
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Repeat className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Manual Run</CardTitle>
+            </div>
+            <CardDescription>
+              Run a one-off sprint review for a specific sprint
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="sprint-name">Sprint Name or ID</Label>
+              <Input
+                id="sprint-name"
+                placeholder="e.g., Sprint 24, or board/sprint ID from Jira"
+                value={sprintName}
+                onChange={(e) => setSprintName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sprint-goal">Sprint Goal (optional)</Label>
+              <Textarea
+                id="sprint-goal"
+                placeholder="e.g., Complete user authentication flow and deploy to staging"
+                value={sprintGoal}
+                onChange={(e) => setSprintGoal(e.target.value)}
+                rows={2}
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="start-date">Sprint Start Date (optional)</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="end-date">Sprint End Date (optional)</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <Button onClick={handleRun} disabled={isRunning || !canRun} className="w-full">
+              {isRunning ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Generate Review Now
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -297,15 +655,39 @@ export default function SprintReviewPage() {
             </Link>
           </Button>
         </div>
-        <Button onClick={handleRun} disabled={isRunning || !canRun}>
-          {isRunning ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Play className="mr-2 h-4 w-4" />
-          )}
-          Generate Review
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={handleSave}
+            disabled={isSaving || !canSave}
+          >
+            {isSaving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Save Agent Settings
+          </Button>
+          <Button
+            onClick={handleEnableAgent}
+            disabled={isEnabling || !configSaved || !canSave || isActive}
+          >
+            {isEnabling ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Power className="mr-2 h-4 w-4" />
+            )}
+            {isActive ? 'Agent Enabled' : 'Enable Agent'}
+          </Button>
+        </div>
       </div>
+
+      {/* Last Run Info */}
+      {config?.lastRunAt && (
+        <p className="text-center text-sm text-muted-foreground">
+          Last run: {new Date(config.lastRunAt).toLocaleString()}
+        </p>
+      )}
     </div>
   );
 }

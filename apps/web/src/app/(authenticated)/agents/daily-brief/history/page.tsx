@@ -167,7 +167,7 @@ export default function BriefHistoryPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/agents/daily-brief">
-            Back to Overview
+            Back to Agent
           </Link>
         </Button>
       </div>

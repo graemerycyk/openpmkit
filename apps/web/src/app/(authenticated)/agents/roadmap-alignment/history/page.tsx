@@ -160,7 +160,7 @@ export default function AlignmentHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/roadmap-alignment">New Check</Link>
+          <Link href="/agents/roadmap-alignment">Back to Agent</Link>
         </Button>
       </div>
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,9 +17,10 @@ import {
 import {
   AlertCircle,
   CheckCircle2,
-  Clock,
   Loader2,
   Play,
+  Power,
+  Save,
   Target,
   TrendingUp,
 } from 'lucide-react';
@@ -53,6 +53,7 @@ export default function VoCClusteringPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Form state
   const [timeframe, setTimeframe] = useState('30');
@@ -76,6 +77,22 @@ export default function VoCClusteringPage() {
     gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
     zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
   });
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -328,20 +345,35 @@ export default function VoCClusteringPage() {
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button asChild variant="outline">
-            <Link href="/agents/voc-clustering/history">
-              <Clock className="mr-2 h-4 w-4" />
-              View History
-            </Link>
+          <Button
+            disabled={true}
+            title="Autonomous scheduling coming soon"
+          >
+            <Power className="mr-2 h-4 w-4" />
+            Enable Agent
           </Button>
-        </div>
-        <Button onClick={handleRun} disabled={isRunning || !canRun}>
-          {isRunning ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Play className="mr-2 h-4 w-4" />
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={handleRun}
+              disabled={isRunning || !canRun}
+            >
+              {isRunning ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Run Now
+            </Button>
           )}
-          Run Clustering
+        </div>
+        <Button
+          variant="outline"
+          disabled={true}
+          title="Agent settings coming soon"
+        >
+          <Save className="mr-2 h-4 w-4" />
+          Save Agent Settings
         </Button>
       </div>
     </div>

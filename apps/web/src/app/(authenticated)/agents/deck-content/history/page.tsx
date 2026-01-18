@@ -163,7 +163,7 @@ export default function DeckHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/deck-content">New Deck</Link>
+          <Link href="/agents/deck-content">Back to Agent</Link>
         </Button>
       </div>
 

@@ -427,6 +427,90 @@ When adding new pages or components:
 5. **Keep CTAs consistent** - Primary button for main action, outline for secondary
 6. **Use the Badge component** - `variant="cobalt"` for status indicators
 
+## Agent Page UI Pattern
+
+All 10 agent pages follow a standardized UI pattern with consistent action buttons.
+
+### Agent Categories
+
+| Category | Agents | Enable/Save Status |
+|----------|--------|-------------------|
+| **Fully Autonomous** | Daily Brief, Meeting Prep, Sprint Review | Buttons functional |
+| **Coming Soon** | PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation | Buttons disabled with tooltips |
+
+### Standard Action Buttons
+
+All agent pages have a consistent footer with these buttons:
+
+```tsx
+{/* Actions - Standard pattern for all agent pages */}
+<div className="flex items-center justify-between">
+  {/* Left side: Enable Agent + Run Now (admin only) */}
+  <div className="flex items-center gap-3">
+    <Button disabled={true} title="Autonomous scheduling coming soon">
+      <Power className="mr-2 h-4 w-4" />
+      Enable Agent
+    </Button>
+    {isAdmin && (
+      <Button variant="outline" onClick={handleRun} disabled={isRunning || !canRun}>
+        {isRunning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+        Run Now
+      </Button>
+    )}
+  </div>
+  {/* Right side: Save Settings */}
+  <Button variant="outline" disabled={true} title="Agent settings coming soon">
+    <Save className="mr-2 h-4 w-4" />
+    Save Agent Settings
+  </Button>
+</div>
+```
+
+### Admin Detection Pattern
+
+All agent pages check admin status via the workbench API:
+
+```typescript
+const [isAdmin, setIsAdmin] = useState(false);
+
+useEffect(() => {
+  async function checkAdmin() {
+    try {
+      const res = await fetch('/api/workbench/run-job');
+      if (res.ok) {
+        const data = await res.json();
+        setIsAdmin(data.isAdmin === true);
+      }
+    } catch {
+      setIsAdmin(false);
+    }
+  }
+  checkAdmin();
+}, []);
+```
+
+The `/api/workbench/run-job` GET endpoint returns `{ isAdmin: boolean }` based on `ADMIN_EMAILS` environment variable.
+
+### Button Behavior
+
+| Button | Position | Visibility | Enabled When | Action |
+|--------|----------|------------|--------------|--------|
+| Enable Agent | Left | Always | Fully autonomous agents only | Activate autonomous schedule |
+| Run Now | Left (after Enable) | Admin only | Form valid (`canRun`) | Trigger manual agent run |
+| Save Agent Settings | Right | Always | Fully autonomous agents only | Save configuration |
+
+### Required Imports
+
+```typescript
+import { Loader2, Play, Power, Save } from 'lucide-react';
+```
+
+### Key Files
+
+- `apps/web/src/app/(authenticated)/agents/{agent}/page.tsx` - Agent setup pages
+- `apps/web/src/app/(authenticated)/agents/{agent}/history/page.tsx` - History pages
+- `apps/web/src/app/api/agents/{agent}/trigger/route.ts` - Manual trigger endpoints
+
 ## Adding a New Connector (End-to-End)
 
 **IMPORTANT**: Connectors must be built end-to-end as complete features. A connector is not complete until:

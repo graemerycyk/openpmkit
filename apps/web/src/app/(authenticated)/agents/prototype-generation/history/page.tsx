@@ -162,7 +162,7 @@ export default function PrototypeHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/prototype-generation">New Prototype</Link>
+          <Link href="/agents/prototype-generation">Back to Agent</Link>
         </Button>
       </div>
 

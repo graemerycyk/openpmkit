@@ -163,7 +163,7 @@ export default function ResearchHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/competitor-research">New Research</Link>
+          <Link href="/agents/competitor-research">Back to Agent</Link>
         </Button>
       </div>
 

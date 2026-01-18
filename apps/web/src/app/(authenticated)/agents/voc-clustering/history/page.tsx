@@ -166,7 +166,7 @@ export default function ClusterHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/voc-clustering">New Analysis</Link>
+          <Link href="/agents/voc-clustering">Back to Agent</Link>
         </Button>
       </div>
 

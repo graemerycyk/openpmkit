@@ -173,7 +173,7 @@ export default function PrepHistoryPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/meeting-prep">New Prep Pack</Link>
+          <Link href="/agents/meeting-prep">Back to Agent</Link>
         </Button>
       </div>
 

@@ -6,7 +6,7 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-18 (UI Navigation Restructure: Dashboard/History tabs, Settings Notifications page)
+Last updated: 2026-01-18 (Standardized Agent Page UI)
 
 ---
 
@@ -970,6 +970,64 @@ Items that have been discussed but not committed to.
 ---
 
 ## Changelog
+
+### 2026-01-18 (Standardized Agent Page UI)
+- **Standardized button UI across all 10 agent pages** - Consistent action buttons:
+  - Left side: "Enable Agent" button (primary action)
+  - Left side: "Run Now" button (admin-only, visible via `isAdmin` state check)
+  - Right side: "Save Agent Settings" button
+  - Removed "View History" button from agent pages (history accessible via navigation)
+- **Admin detection pattern** - All agent pages fetch admin status:
+  ```typescript
+  useEffect(() => {
+    async function checkAdmin() {
+      const res = await fetch('/api/workbench/run-job');
+      if (res.ok) {
+        const data = await res.json();
+        setIsAdmin(data.isAdmin === true);
+      }
+    }
+    checkAdmin();
+  }, []);
+  ```
+- **Agent categories established**:
+  - **Fully Autonomous** (3): Daily Brief, Meeting Prep, Sprint Review - Enable functionality works
+  - **Coming Soon** (7): PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation - buttons disabled with tooltips
+- **History page button fix** - Changed "Back to Agent" text for consistency across all 10 history pages
+- **Removed unused state variables** - Fixed lint errors by removing unused `configSaved`, `isSaving`, `isEnabling` from Coming Soon agents
+
+### 2026-01-18 (Autonomous Agent Architecture)
+- **Extended AgentTypeSchema** - Added all 10 agent types to core types:
+  - `daily_brief`, `meeting_prep`, `sprint_review`, `voc_clustering`, `competitor_research`
+  - `roadmap_alignment`, `deck_content`, `release_notes`, `prd_draft`, `prototype_generation`
+- **Added AgentTriggerTypeSchema** - New trigger types for autonomous agents:
+  - `schedule` - Daily/weekly/monthly schedules (Daily Brief)
+  - `calendar` - Calendar event triggers (Meeting Prep, Sprint Review, Deck Content)
+  - `jira` - Jira webhook triggers (Release Notes, PRD Draft)
+  - `artifact` - Artifact chain triggers (Prototype Generation)
+- **Config schemas for all agents** - Created typed config schemas:
+  - `MeetingPrepConfigSchema` - Lead time, timezone, data sources
+  - `SprintReviewConfigSchema` - Calendar keywords, lead time, Jira projects, velocity/carryover options
+  - `VocClusteringConfigSchema` - Weekly schedule, lookback days, data sources
+  - `CompetitorResearchConfigSchema` - Weekly schedule, competitor list, tracking options
+  - `RoadmapAlignmentConfigSchema` - Monthly schedule, data sources
+  - `DeckContentConfigSchema` - Calendar keywords for presentations, lead time
+  - `ReleaseNotesConfigSchema` - Jira projects, auto-trigger, audience types
+  - `PrdDraftConfigSchema` - Jira projects, epic status triggers
+  - `PrototypeGenerationConfigSchema` - Artifact triggers, auto-generate option
+- **Sprint Review autonomous UI** - Transformed page to full autonomous agent:
+  - Dynamic Active/Paused badge (replaces static "Autonomous")
+  - Calendar Trigger card with keyword management (add/remove keywords)
+  - Lead time selector (1h to 24h before meeting)
+  - Timezone configuration
+  - Agent Status toggle card
+  - Manual Run section for one-off sprint reviews
+  - Save Configuration button
+- **Sprint Review API route** - Created `/api/agents/sprint-review`:
+  - GET - Fetch user's sprint review config
+  - POST - Create/update config with validation
+  - DELETE - Remove config
+- **Changed 8 agents from On-Demand to Autonomous** - Updated badge text on agent pages
 
 ### 2026-01-18 (UI Navigation Restructure)
 - **Dashboard/History tab navigation** - Added consistent tab bar to both `/dashboard` and `/agents` pages:

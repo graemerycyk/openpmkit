@@ -25,6 +25,8 @@ import {
   Filter,
   Loader2,
   Play,
+  Power,
+  Save,
   Settings2,
   Target,
   Users,
@@ -87,6 +89,9 @@ export default function MeetingPrepSetupPage() {
   const [isTriggering, setIsTriggering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [configSaved, setConfigSaved] = useState(false);
+  const [isEnabling, setIsEnabling] = useState(false);
 
   // Form state
   const [isActive, setIsActive] = useState(true);
@@ -122,6 +127,22 @@ export default function MeetingPrepSetupPage() {
     gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
     zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
   });
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -166,6 +187,7 @@ export default function MeetingPrepSetupPage() {
           const data = await configRes.json();
           if (data.config) {
             setConfig(data.config);
+            setConfigSaved(true);
             setTimeframe(String(data.config.config.lookbackDays || 30));
             setPrepTiming(String(data.config.config.prepTimingMinutes || 30));
             setFilterDomains((data.config.config.filterDomains || []).join(', '));
@@ -249,7 +271,8 @@ export default function MeetingPrepSetupPage() {
       if (res.ok) {
         const data = await res.json();
         setConfig(data.config);
-        setSuccess('Configuration saved successfully!');
+        setConfigSaved(true);
+        setSuccess('Agent settings saved successfully!');
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to save configuration');
@@ -258,6 +281,49 @@ export default function MeetingPrepSetupPage() {
       setError('Failed to save. Please try again.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleEnableAgent = async () => {
+    if (!configSaved || !canRun) return;
+
+    setIsEnabling(true);
+    setError(null);
+    setSuccess(null);
+
+    const domains = filterDomains
+      .split(',')
+      .map((d) => d.trim().toLowerCase())
+      .filter((d) => d.length > 0);
+
+    try {
+      const res = await fetch('/api/agents/meeting-prep', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'active',
+          config: {
+            lookbackDays: parseInt(timeframe),
+            prepTimingMinutes: parseInt(prepTiming),
+            filterDomains: domains,
+            includeAllExternalMeetings,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setConfig(data.config);
+        setIsActive(true);
+        setSuccess('Agent enabled! It will automatically generate prep packs before your meetings.');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to enable agent');
+      }
+    } catch {
+      setError('Failed to enable agent. Please try again.');
+    } finally {
+      setIsEnabling(false);
     }
   };
 
@@ -610,32 +676,57 @@ export default function MeetingPrepSetupPage() {
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleTrigger}
-            disabled={isTriggering || !canRun}
-          >
-            {isTriggering ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="mr-2 h-4 w-4" />
-            )}
-            Run Now
+          <Button asChild variant="outline">
+            <Link href="/agents/meeting-prep/history">
+              <Clock className="mr-2 h-4 w-4" />
+              View History
+            </Link>
           </Button>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={handleTrigger}
+              disabled={isTriggering || !canRun}
+            >
+              {isTriggering ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Run Now
+            </Button>
+          )}
           {!canRun && (
             <span className="text-sm text-muted-foreground">
               Connect Google Calendar to run
             </span>
           )}
         </div>
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-          )}
-          Save Configuration
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={handleSave}
+            disabled={isSaving || !canRun}
+          >
+            {isSaving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Save Agent Settings
+          </Button>
+          <Button
+            onClick={handleEnableAgent}
+            disabled={isEnabling || !configSaved || !canRun || isActive}
+          >
+            {isEnabling ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Power className="mr-2 h-4 w-4" />
+            )}
+            {isActive ? 'Agent Enabled' : 'Enable Agent'}
+          </Button>
+        </div>
       </div>
 
       {/* Last Run Info */}
