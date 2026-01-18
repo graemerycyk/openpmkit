@@ -21,6 +21,9 @@ import {
   Presentation,
   Bot,
   Zap,
+  CheckCircle2,
+  XCircle,
+  Loader2,
 } from 'lucide-react';
 
 const quickActions = [
@@ -151,10 +154,36 @@ const agents = [
   },
 ];
 
+// Map job types to display names and icons
+const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; href: string }> = {
+  daily_brief: { name: 'Daily Brief', icon: FileText, href: '/agents/daily-brief' },
+  meeting_prep: { name: 'Meeting Prep', icon: Users, href: '/agents/meeting-prep' },
+  sprint_review: { name: 'Sprint Review', icon: Clock, href: '/agents/sprint-review' },
+  voc_clustering: { name: 'VoC Clustering', icon: BarChart3, href: '/agents/voc-clustering' },
+  competitor_research: { name: 'Competitor Research', icon: Target, href: '/agents/competitor-research' },
+  roadmap_alignment: { name: 'Roadmap Alignment', icon: GitBranch, href: '/agents/roadmap-alignment' },
+  prd_draft: { name: 'PRD Draft', icon: FileText, href: '/agents/prd-draft' },
+  prototype_generation: { name: 'Prototype', icon: Wand2, href: '/agents/prototype-generation' },
+  release_notes: { name: 'Release Notes', icon: Megaphone, href: '/agents/release-notes' },
+  deck_content: { name: 'Deck Content', icon: Presentation, href: '/agents/deck-content' },
+};
+
+interface RecentJob {
+  id: string;
+  type: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  startedAt: string | null;
+  completedAt: string | null;
+  error: string | null;
+  createdAt: string;
+}
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const firstName = session?.user?.name?.split(' ')[0] || 'there';
   const [hasAgentConfigured, setHasAgentConfigured] = useState<boolean | null>(null);
+  const [recentJobs, setRecentJobs] = useState<RecentJob[]>([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
 
   useEffect(() => {
     // Check if user has any agent configured
@@ -171,6 +200,24 @@ export default function DashboardPage() {
       }
     }
     checkAgentConfig();
+  }, []);
+
+  useEffect(() => {
+    // Fetch recent jobs
+    async function fetchRecentJobs() {
+      try {
+        const response = await fetch('/api/jobs/recent');
+        if (response.ok) {
+          const data = await response.json();
+          setRecentJobs(data.jobs || []);
+        }
+      } catch {
+        // Silently fail - just show empty state
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    }
+    fetchRecentJobs();
   }, []);
 
   return (
@@ -307,33 +354,99 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Recent Activity Placeholder */}
+      {/* Recent Activity */}
       <div>
         <h2 className="mb-4 font-heading text-xl font-semibold">Recent Activity</h2>
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="rounded-full bg-muted p-4">
-              <Clock className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="mt-4 font-medium">No recent activity</h3>
-            {hasAgentConfigured === false && (
-              <>
+          {isLoadingJobs ? (
+            <CardContent className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+          ) : recentJobs.length === 0 ? (
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="rounded-full bg-muted p-4">
+                <Clock className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="mt-4 font-medium">No recent activity</h3>
+              {hasAgentConfigured === false && (
+                <>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Set up your first agent to see your activity here
+                  </p>
+                  <Button className="mt-4" asChild>
+                    <Link href="/agents/daily-brief">
+                      Set Up Daily Brief
+                    </Link>
+                  </Button>
+                </>
+              )}
+              {hasAgentConfigured === true && (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Set up your first agent to see your activity here
+                  Your agents haven't run yet. Activity will appear here after your first run.
                 </p>
-                <Button className="mt-4" asChild>
-                  <Link href="/agents/daily-brief">
-                    Set Up Daily Brief
-                  </Link>
-                </Button>
-              </>
-            )}
-            {hasAgentConfigured === true && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                Your agents haven't run yet. Activity will appear here after your first run.
-              </p>
-            )}
-          </CardContent>
+              )}
+            </CardContent>
+          ) : (
+            <CardContent className="p-0">
+              <div className="divide-y">
+                {recentJobs.map((job) => {
+                  const info = jobTypeInfo[job.type] || {
+                    name: job.type,
+                    icon: Bot,
+                    href: '/agents',
+                  };
+                  const Icon = info.icon;
+                  const timestamp = job.completedAt || job.startedAt || job.createdAt;
+                  const formattedTime = new Date(timestamp).toLocaleString();
+
+                  return (
+                    <Link
+                      key={job.id}
+                      href={`${info.href}/history`}
+                      className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cobalt-100">
+                        <Icon className="h-5 w-5 text-cobalt-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{info.name}</span>
+                          {job.status === 'completed' && (
+                            <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
+                              <CheckCircle2 className="mr-1 h-3 w-3" />
+                              Completed
+                            </Badge>
+                          )}
+                          {job.status === 'failed' && (
+                            <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
+                              <XCircle className="mr-1 h-3 w-3" />
+                              Failed
+                            </Badge>
+                          )}
+                          {job.status === 'running' && (
+                            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
+                              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                              Running
+                            </Badge>
+                          )}
+                          {job.status === 'pending' && (
+                            <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
+                              <Clock className="mr-1 h-3 w-3" />
+                              Pending
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {formattedTime}
+                        </p>
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </CardContent>
+          )}
         </Card>
       </div>
     </div>
