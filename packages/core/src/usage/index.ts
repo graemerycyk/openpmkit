@@ -475,6 +475,7 @@ export class LimitsEnforcer {
       'prototype_generation',
       'voc_clustering',
       'competitor_research',
+      'deck_content',
     ];
     
     if (onDemandJobs.includes(jobType)) {
@@ -511,16 +512,17 @@ export class LimitsEnforcer {
   private async checkOnDemandLimit(
     ctx: LimitsContext,
     jobType: JobType,
-    features: { 
-      maxOnDemandDailyBriefPerSeatPerMonth: number;
-      maxOnDemandMeetingPrepPerSeatPerMonth: number;
-      maxOnDemandPrdPackPerSeatPerMonth: number;
-      maxOnDemandRoadmapMemoPerSeatPerMonth: number;
-      maxOnDemandSprintReviewPerSeatPerMonth: number;
-      maxOnDemandReleaseNotesPerSeatPerMonth: number;
-      maxOnDemandPrototypeGenPerSeatPerMonth: number;
-      maxOnDemandVocClusteringPerSeatPerMonth: number;
-      maxOnDemandCompetitorResearchPerSeatPerMonth: number;
+    features: {
+      maxOnDemandDailyBriefPerMonth: number;
+      maxOnDemandMeetingPrepPerMonth: number;
+      maxOnDemandPrdPackPerMonth: number;
+      maxOnDemandRoadmapMemoPerMonth: number;
+      maxOnDemandSprintReviewPerMonth: number;
+      maxOnDemandReleaseNotesPerMonth: number;
+      maxOnDemandPrototypeGenPerMonth: number;
+      maxOnDemandVocClusteringPerMonth: number;
+      maxOnDemandCompetitorResearchPerMonth: number;
+      maxOnDemandDeckContentPerMonth: number;
     }
   ): Promise<LimitCheckResult> {
     const now = new Date();
@@ -537,40 +539,48 @@ export class LimitsEnforcer {
     let limit: number;
     switch (jobType) {
       case 'daily_brief':
-        limit = features.maxOnDemandDailyBriefPerSeatPerMonth;
+        limit = features.maxOnDemandDailyBriefPerMonth;
         break;
       case 'meeting_prep':
-        limit = features.maxOnDemandMeetingPrepPerSeatPerMonth;
+        limit = features.maxOnDemandMeetingPrepPerMonth;
         break;
       case 'prd_draft':
-        limit = features.maxOnDemandPrdPackPerSeatPerMonth;
+        limit = features.maxOnDemandPrdPackPerMonth;
         break;
       case 'roadmap_alignment':
-        limit = features.maxOnDemandRoadmapMemoPerSeatPerMonth;
+        limit = features.maxOnDemandRoadmapMemoPerMonth;
         break;
       case 'sprint_review':
-        limit = features.maxOnDemandSprintReviewPerSeatPerMonth;
+        limit = features.maxOnDemandSprintReviewPerMonth;
         break;
       case 'release_notes':
-        limit = features.maxOnDemandReleaseNotesPerSeatPerMonth;
+        limit = features.maxOnDemandReleaseNotesPerMonth;
         break;
       case 'prototype_generation':
-        limit = features.maxOnDemandPrototypeGenPerSeatPerMonth;
+        limit = features.maxOnDemandPrototypeGenPerMonth;
         break;
       case 'voc_clustering':
-        limit = features.maxOnDemandVocClusteringPerSeatPerMonth;
+        limit = features.maxOnDemandVocClusteringPerMonth;
         break;
       case 'competitor_research':
-        limit = features.maxOnDemandCompetitorResearchPerSeatPerMonth;
+        limit = features.maxOnDemandCompetitorResearchPerMonth;
+        break;
+      case 'deck_content':
+        limit = features.maxOnDemandDeckContentPerMonth;
         break;
       default:
         return { allowed: true };
     }
 
+    // -1 means unlimited
+    if (limit === -1) {
+      return { allowed: true };
+    }
+
     if (currentCount >= limit) {
       return {
         allowed: false,
-        reason: `Monthly limit for ${jobType} reached (${limit}/month per seat)`,
+        reason: `Monthly limit for ${jobType} reached (${limit}/month)`,
         limit,
         current: currentCount,
       };

@@ -62,16 +62,17 @@ export interface PlanFeatures {
   scheduledWeeklyThemes: boolean;
   scheduledCompetitorResearch: boolean;
 
-  // Jobs - On-demand limits per seat per month
-  maxOnDemandDailyBriefPerSeatPerMonth: number;
-  maxOnDemandMeetingPrepPerSeatPerMonth: number;
-  maxOnDemandPrdPackPerSeatPerMonth: number;
-  maxOnDemandRoadmapMemoPerSeatPerMonth: number;
-  maxOnDemandSprintReviewPerSeatPerMonth: number;
-  maxOnDemandReleaseNotesPerSeatPerMonth: number;
-  maxOnDemandPrototypeGenPerSeatPerMonth: number;
-  maxOnDemandVocClusteringPerSeatPerMonth: number;
-  maxOnDemandCompetitorResearchPerSeatPerMonth: number;
+  // Jobs - On-demand limits per month (Individual) or per seat per month (Teams)
+  maxOnDemandDailyBriefPerMonth: number;
+  maxOnDemandMeetingPrepPerMonth: number;
+  maxOnDemandPrdPackPerMonth: number;
+  maxOnDemandRoadmapMemoPerMonth: number;
+  maxOnDemandSprintReviewPerMonth: number;
+  maxOnDemandReleaseNotesPerMonth: number;
+  maxOnDemandPrototypeGenPerMonth: number;
+  maxOnDemandVocClusteringPerMonth: number;
+  maxOnDemandCompetitorResearchPerMonth: number;
+  maxOnDemandDeckContentPerMonth: number;
 
   // Concurrency
   maxConcurrentRunsPer10Seats: number;
@@ -120,16 +121,17 @@ export const INDIVIDUAL_PLAN: PlanConfig = {
     scheduledWeeklyThemes: true,
     scheduledCompetitorResearch: true,
 
-    // Unlimited on-demand for Individual (-1 = unlimited)
-    maxOnDemandDailyBriefPerSeatPerMonth: -1,
-    maxOnDemandMeetingPrepPerSeatPerMonth: -1,
-    maxOnDemandPrdPackPerSeatPerMonth: -1,
-    maxOnDemandRoadmapMemoPerSeatPerMonth: -1,
-    maxOnDemandSprintReviewPerSeatPerMonth: -1,
-    maxOnDemandReleaseNotesPerSeatPerMonth: -1,
-    maxOnDemandPrototypeGenPerSeatPerMonth: -1,
-    maxOnDemandVocClusteringPerSeatPerMonth: -1,
-    maxOnDemandCompetitorResearchPerSeatPerMonth: -1,
+    // On-demand limits per month (same as Teams per-seat limits)
+    maxOnDemandDailyBriefPerMonth: 4,
+    maxOnDemandMeetingPrepPerMonth: 30,
+    maxOnDemandPrdPackPerMonth: 12,
+    maxOnDemandRoadmapMemoPerMonth: 12,
+    maxOnDemandSprintReviewPerMonth: 8,
+    maxOnDemandReleaseNotesPerMonth: 16,
+    maxOnDemandPrototypeGenPerMonth: 8,
+    maxOnDemandVocClusteringPerMonth: 4,
+    maxOnDemandCompetitorResearchPerMonth: 4,
+    maxOnDemandDeckContentPerMonth: 12,
 
     // Concurrency: 2 concurrent runs (single user)
     maxConcurrentRunsPer10Seats: 2,
@@ -176,15 +178,16 @@ export const TEAMS_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // On-demand limits per seat per month (generous fair use)
-    maxOnDemandDailyBriefPerSeatPerMonth: 4,
-    maxOnDemandMeetingPrepPerSeatPerMonth: 30,
-    maxOnDemandPrdPackPerSeatPerMonth: 12,
-    maxOnDemandRoadmapMemoPerSeatPerMonth: 12,
-    maxOnDemandSprintReviewPerSeatPerMonth: 8,
-    maxOnDemandReleaseNotesPerSeatPerMonth: 16,
-    maxOnDemandPrototypeGenPerSeatPerMonth: 8,
-    maxOnDemandVocClusteringPerSeatPerMonth: 4,
-    maxOnDemandCompetitorResearchPerSeatPerMonth: 4,
+    maxOnDemandDailyBriefPerMonth: 4,
+    maxOnDemandMeetingPrepPerMonth: 30,
+    maxOnDemandPrdPackPerMonth: 12,
+    maxOnDemandRoadmapMemoPerMonth: 12,
+    maxOnDemandSprintReviewPerMonth: 8,
+    maxOnDemandReleaseNotesPerMonth: 16,
+    maxOnDemandPrototypeGenPerMonth: 8,
+    maxOnDemandVocClusteringPerMonth: 4,
+    maxOnDemandCompetitorResearchPerMonth: 4,
+    maxOnDemandDeckContentPerMonth: 12,
 
     // Concurrency: 2 concurrent runs per 10 seats
     maxConcurrentRunsPer10Seats: 2,
@@ -231,15 +234,16 @@ export const ENTERPRISE_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // 5× higher on-demand limits (can be overridden per customer via entitlements)
-    maxOnDemandDailyBriefPerSeatPerMonth: 20,
-    maxOnDemandMeetingPrepPerSeatPerMonth: 150,
-    maxOnDemandPrdPackPerSeatPerMonth: 60,
-    maxOnDemandRoadmapMemoPerSeatPerMonth: 60,
-    maxOnDemandSprintReviewPerSeatPerMonth: 40,
-    maxOnDemandReleaseNotesPerSeatPerMonth: 80,
-    maxOnDemandPrototypeGenPerSeatPerMonth: 40,
-    maxOnDemandVocClusteringPerSeatPerMonth: 20,
-    maxOnDemandCompetitorResearchPerSeatPerMonth: 20,
+    maxOnDemandDailyBriefPerMonth: 20,
+    maxOnDemandMeetingPrepPerMonth: 150,
+    maxOnDemandPrdPackPerMonth: 60,
+    maxOnDemandRoadmapMemoPerMonth: 60,
+    maxOnDemandSprintReviewPerMonth: 40,
+    maxOnDemandReleaseNotesPerMonth: 80,
+    maxOnDemandPrototypeGenPerMonth: 40,
+    maxOnDemandVocClusteringPerMonth: 20,
+    maxOnDemandCompetitorResearchPerMonth: 20,
+    maxOnDemandDeckContentPerMonth: 60,
 
     // Higher concurrency
     maxConcurrentRunsPer10Seats: 5,
@@ -288,15 +292,16 @@ export const INTERNAL_PLAN: PlanConfig = {
     scheduledCompetitorResearch: true,
 
     // Unlimited on-demand (-1 = unlimited)
-    maxOnDemandDailyBriefPerSeatPerMonth: -1,
-    maxOnDemandMeetingPrepPerSeatPerMonth: -1,
-    maxOnDemandPrdPackPerSeatPerMonth: -1,
-    maxOnDemandRoadmapMemoPerSeatPerMonth: -1,
-    maxOnDemandSprintReviewPerSeatPerMonth: -1,
-    maxOnDemandReleaseNotesPerSeatPerMonth: -1,
-    maxOnDemandPrototypeGenPerSeatPerMonth: -1,
-    maxOnDemandVocClusteringPerSeatPerMonth: -1,
-    maxOnDemandCompetitorResearchPerSeatPerMonth: -1,
+    maxOnDemandDailyBriefPerMonth: -1,
+    maxOnDemandMeetingPrepPerMonth: -1,
+    maxOnDemandPrdPackPerMonth: -1,
+    maxOnDemandRoadmapMemoPerMonth: -1,
+    maxOnDemandSprintReviewPerMonth: -1,
+    maxOnDemandReleaseNotesPerMonth: -1,
+    maxOnDemandPrototypeGenPerMonth: -1,
+    maxOnDemandVocClusteringPerMonth: -1,
+    maxOnDemandCompetitorResearchPerMonth: -1,
+    maxOnDemandDeckContentPerMonth: -1,
 
     // Unlimited concurrency
     maxConcurrentRunsPer10Seats: 100,
@@ -369,17 +374,18 @@ export const EntitlementKeySchema = z.enum([
   // Connector entitlements
   'connectors.allowed',
   'connectors.customEnabled',
-  
-  // Job run limits (on-demand per seat per month)
-  'jobs.maxOnDemandDailyBriefPerSeatPerMonth',
-  'jobs.maxOnDemandMeetingPrepPerSeatPerMonth',
-  'jobs.maxOnDemandPrdPackPerSeatPerMonth',
-  'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth',
-  'jobs.maxOnDemandSprintReviewPerSeatPerMonth',
-  'jobs.maxOnDemandReleaseNotesPerSeatPerMonth',
-  'jobs.maxOnDemandPrototypeGenPerSeatPerMonth',
-  'jobs.maxOnDemandVocClusteringPerSeatPerMonth',
-  'jobs.maxOnDemandCompetitorResearchPerSeatPerMonth',
+
+  // Job run limits (on-demand per month for Individual, per seat per month for Teams)
+  'jobs.maxOnDemandDailyBriefPerMonth',
+  'jobs.maxOnDemandMeetingPrepPerMonth',
+  'jobs.maxOnDemandPrdPackPerMonth',
+  'jobs.maxOnDemandRoadmapMemoPerMonth',
+  'jobs.maxOnDemandSprintReviewPerMonth',
+  'jobs.maxOnDemandReleaseNotesPerMonth',
+  'jobs.maxOnDemandPrototypeGenPerMonth',
+  'jobs.maxOnDemandVocClusteringPerMonth',
+  'jobs.maxOnDemandCompetitorResearchPerMonth',
+  'jobs.maxOnDemandDeckContentPerMonth',
   'jobs.maxConcurrentRunsPer10Seats',
   
   // Scheduled job toggles
@@ -492,15 +498,16 @@ export class EntitlementService {
 
     await this.store.upsert(tenantId, 'connectors.allowed', features.allowedConnectors);
     await this.store.upsert(tenantId, 'connectors.customEnabled', features.customConnectorsEnabled);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandDailyBriefPerSeatPerMonth', features.maxOnDemandDailyBriefPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandMeetingPrepPerSeatPerMonth', features.maxOnDemandMeetingPrepPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandPrdPackPerSeatPerMonth', features.maxOnDemandPrdPackPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth', features.maxOnDemandRoadmapMemoPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandSprintReviewPerSeatPerMonth', features.maxOnDemandSprintReviewPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandReleaseNotesPerSeatPerMonth', features.maxOnDemandReleaseNotesPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandPrototypeGenPerSeatPerMonth', features.maxOnDemandPrototypeGenPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandVocClusteringPerSeatPerMonth', features.maxOnDemandVocClusteringPerSeatPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandCompetitorResearchPerSeatPerMonth', features.maxOnDemandCompetitorResearchPerSeatPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandDailyBriefPerMonth', features.maxOnDemandDailyBriefPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandMeetingPrepPerMonth', features.maxOnDemandMeetingPrepPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandPrdPackPerMonth', features.maxOnDemandPrdPackPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandRoadmapMemoPerMonth', features.maxOnDemandRoadmapMemoPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandSprintReviewPerMonth', features.maxOnDemandSprintReviewPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandReleaseNotesPerMonth', features.maxOnDemandReleaseNotesPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandPrototypeGenPerMonth', features.maxOnDemandPrototypeGenPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandVocClusteringPerMonth', features.maxOnDemandVocClusteringPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandCompetitorResearchPerMonth', features.maxOnDemandCompetitorResearchPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandDeckContentPerMonth', features.maxOnDemandDeckContentPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxConcurrentRunsPer10Seats', features.maxConcurrentRunsPer10Seats);
     await this.store.upsert(tenantId, 'jobs.scheduledDailyBrief', features.scheduledDailyBrief);
     await this.store.upsert(tenantId, 'jobs.scheduledWeeklyThemes', features.scheduledWeeklyThemes);
@@ -519,30 +526,32 @@ export class EntitlementService {
 
   private getPlanDefault(plan: PlanConfig, key: EntitlementKey): unknown {
     const features = plan.features;
-    
+
     switch (key) {
       case 'connectors.allowed':
         return features.allowedConnectors;
       case 'connectors.customEnabled':
         return features.customConnectorsEnabled;
-      case 'jobs.maxOnDemandDailyBriefPerSeatPerMonth':
-        return features.maxOnDemandDailyBriefPerSeatPerMonth;
-      case 'jobs.maxOnDemandMeetingPrepPerSeatPerMonth':
-        return features.maxOnDemandMeetingPrepPerSeatPerMonth;
-      case 'jobs.maxOnDemandPrdPackPerSeatPerMonth':
-        return features.maxOnDemandPrdPackPerSeatPerMonth;
-      case 'jobs.maxOnDemandRoadmapMemoPerSeatPerMonth':
-        return features.maxOnDemandRoadmapMemoPerSeatPerMonth;
-      case 'jobs.maxOnDemandSprintReviewPerSeatPerMonth':
-        return features.maxOnDemandSprintReviewPerSeatPerMonth;
-      case 'jobs.maxOnDemandReleaseNotesPerSeatPerMonth':
-        return features.maxOnDemandReleaseNotesPerSeatPerMonth;
-      case 'jobs.maxOnDemandPrototypeGenPerSeatPerMonth':
-        return features.maxOnDemandPrototypeGenPerSeatPerMonth;
-      case 'jobs.maxOnDemandVocClusteringPerSeatPerMonth':
-        return features.maxOnDemandVocClusteringPerSeatPerMonth;
-      case 'jobs.maxOnDemandCompetitorResearchPerSeatPerMonth':
-        return features.maxOnDemandCompetitorResearchPerSeatPerMonth;
+      case 'jobs.maxOnDemandDailyBriefPerMonth':
+        return features.maxOnDemandDailyBriefPerMonth;
+      case 'jobs.maxOnDemandMeetingPrepPerMonth':
+        return features.maxOnDemandMeetingPrepPerMonth;
+      case 'jobs.maxOnDemandPrdPackPerMonth':
+        return features.maxOnDemandPrdPackPerMonth;
+      case 'jobs.maxOnDemandRoadmapMemoPerMonth':
+        return features.maxOnDemandRoadmapMemoPerMonth;
+      case 'jobs.maxOnDemandSprintReviewPerMonth':
+        return features.maxOnDemandSprintReviewPerMonth;
+      case 'jobs.maxOnDemandReleaseNotesPerMonth':
+        return features.maxOnDemandReleaseNotesPerMonth;
+      case 'jobs.maxOnDemandPrototypeGenPerMonth':
+        return features.maxOnDemandPrototypeGenPerMonth;
+      case 'jobs.maxOnDemandVocClusteringPerMonth':
+        return features.maxOnDemandVocClusteringPerMonth;
+      case 'jobs.maxOnDemandCompetitorResearchPerMonth':
+        return features.maxOnDemandCompetitorResearchPerMonth;
+      case 'jobs.maxOnDemandDeckContentPerMonth':
+        return features.maxOnDemandDeckContentPerMonth;
       case 'jobs.maxConcurrentRunsPer10Seats':
         return features.maxConcurrentRunsPer10Seats;
       case 'jobs.scheduledDailyBrief':

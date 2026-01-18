@@ -132,23 +132,23 @@ const plans: Plan[] = [
 ];
 
 const jobTypes = [
-  { name: 'Daily Brief', schedule: '1/day/workspace', onDemand: 'Unlimited', onDemandTeams: '4/month/seat' },
-  { name: 'Weekly Themes (VoC)', schedule: '1/week/workspace', onDemand: 'Unlimited', onDemandTeams: '4/month/seat' },
-  { name: 'Competitor Research', schedule: '1/week/workspace', onDemand: 'Unlimited', onDemandTeams: '4/month/seat' },
-  { name: 'Meeting Prep Pack', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '30/month/seat' },
-  { name: 'PRD Pack', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '12/month/seat' },
-  { name: 'Roadmap Alignment Memo', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '12/month/seat' },
-  { name: 'Sprint Review Pack', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '8/month/seat' },
-  { name: 'Release Notes', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '16/month/seat' },
-  { name: 'Prototype Generation', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '8/month/seat' },
-  { name: 'Deck Content', schedule: 'On-demand', onDemand: 'Unlimited', onDemandTeams: '12/month/seat' },
+  { name: 'Daily Brief', individual: '4/month', teams: '4/month/seat', enterprise: '20/month/seat' },
+  { name: 'Weekly Themes (VoC)', individual: '4/month', teams: '4/month/seat', enterprise: '20/month/seat' },
+  { name: 'Competitor Research', individual: '4/month', teams: '4/month/seat', enterprise: '20/month/seat' },
+  { name: 'Meeting Prep Pack', individual: '30/month', teams: '30/month/seat', enterprise: '150/month/seat' },
+  { name: 'PRD Pack', individual: '12/month', teams: '12/month/seat', enterprise: '60/month/seat' },
+  { name: 'Roadmap Alignment Memo', individual: '12/month', teams: '12/month/seat', enterprise: '60/month/seat' },
+  { name: 'Sprint Review Pack', individual: '8/month', teams: '8/month/seat', enterprise: '40/month/seat' },
+  { name: 'Release Notes', individual: '16/month', teams: '16/month/seat', enterprise: '80/month/seat' },
+  { name: 'Prototype Generation', individual: '8/month', teams: '8/month/seat', enterprise: '40/month/seat' },
+  { name: 'Deck Content', individual: '12/month', teams: '12/month/seat', enterprise: '60/month/seat' },
 ];
 
 const faqs = [
   {
     question: 'What\'s included in the Individual plan?',
     answer:
-      'Everything you need to automate your PM workflows: all 10 job types, all connectors (Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Drive, Google Calendar, Figma), and unlimited on-demand runs.',
+      'Everything you need to automate your PM workflows: all 10 job types, all connectors (Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Drive, Google Calendar, Figma), and generous monthly run limits.',
   },
   {
     question: 'Can I upgrade from Individual to Teams later?',
@@ -303,33 +303,29 @@ export default function PricingPage() {
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="px-4 py-3 text-left text-sm font-medium">Job Type</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Scheduled</th>
                     <th className="px-4 py-3 text-left text-sm font-medium">Individual</th>
                     <th className="px-4 py-3 text-left text-sm font-medium">Teams</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">Enterprise</th>
                   </tr>
                 </thead>
                 <tbody>
                   {jobTypes.map((job, idx) => (
                     <tr key={job.name} className={idx % 2 === 0 ? '' : 'bg-muted/20'}>
                       <td className="px-4 py-3 text-sm font-medium">{job.name}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {job.schedule}
-                      </td>
                       <td className="px-4 py-3 text-sm text-cobalt-600 font-medium">
-                        {job.onDemand}
+                        {job.individual}
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {job.onDemandTeams}
+                        {job.teams}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {job.enterprise}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              Enterprise customers get 5× higher limits and can purchase additional capacity packs.
-            </p>
           </div>
         </div>
       </section>
