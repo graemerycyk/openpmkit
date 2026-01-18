@@ -324,7 +324,7 @@ export default function DailyBriefSetupPage() {
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="36" id="tf-36" />
-              <Label htmlFor="tf-36">Last 36 hours (weekend coverage)</Label>
+              <Label htmlFor="tf-36">Last 36 hours (1.5 day overlap)</Label>
             </div>
           </RadioGroup>
         </CardContent>

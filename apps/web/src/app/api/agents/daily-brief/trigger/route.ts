@@ -35,22 +35,46 @@ export async function POST() {
       );
     }
 
-    // Get Slack credentials
-    const slackInstall = await prisma.connectorInstall.findUnique({
-      where: {
-        tenantId_connectorKey: {
-          tenantId: user.tenantId,
-          connectorKey: 'slack',
-        },
-      },
-      include: {
-        credentials: true,
-      },
-    });
+    // Get agent config to check what data sources are enabled
+    const configData = agentConfig.config as DailyBriefConfig;
+    const hasSlackData = configData.includeSlackMentions || (configData.slackChannels && configData.slackChannels.length > 0);
+    const hasGoogleData = configData.includeGmail || configData.includeGoogleDrive || configData.includeGoogleCalendar;
 
-    if (!slackInstall || slackInstall.status !== 'real' || !slackInstall.credentials[0]) {
+    // Check if at least one data source is configured
+    if (!hasSlackData && !hasGoogleData) {
       return NextResponse.json(
-        { error: 'Slack not connected. Please connect Slack in integrations.' },
+        { error: 'No data sources configured. Please enable at least one data source.' },
+        { status: 400 }
+      );
+    }
+
+    // Get Slack credentials if Slack data is configured
+    let slackInstall = null;
+    if (hasSlackData) {
+      slackInstall = await prisma.connectorInstall.findUnique({
+        where: {
+          tenantId_connectorKey: {
+            tenantId: user.tenantId,
+            connectorKey: 'slack',
+          },
+        },
+        include: {
+          credentials: true,
+        },
+      });
+
+      if (!slackInstall || slackInstall.status !== 'real' || !slackInstall.credentials[0]) {
+        return NextResponse.json(
+          { error: 'Slack not connected. Please connect Slack in integrations or disable Slack data sources.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // If only Google data is configured (no Slack), let the user know it's not supported yet
+    if (!hasSlackData && hasGoogleData) {
+      return NextResponse.json(
+        { error: 'Google-only Daily Briefs coming soon. Please also configure Slack data sources for now.' },
         { status: 400 }
       );
     }
@@ -97,6 +121,7 @@ export async function POST() {
     const toolCallIds: string[] = [];
 
     try {
+      // At this point, slackInstall is guaranteed to be valid (we return early if not)
       const result = await executeDailyBrief(
         {
           tenantId: user.tenantId,
@@ -104,7 +129,7 @@ export async function POST() {
           jobId: job.id,
           config,
           slackCredentials: {
-            encryptedBlob: slackInstall.credentials[0].encryptedBlob,
+            encryptedBlob: slackInstall!.credentials[0].encryptedBlob,
             encryptionKey,
           },
         },
