@@ -24,7 +24,12 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 const TIMEFRAMES = [
   { value: '7', label: 'Last 7 days' },
@@ -62,6 +67,12 @@ export default function VoCClusteringPage() {
   const [allConnectedSources, setAllConnectedSources] = useState<
     { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
   >([]);
+
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
+    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
+  });
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -112,6 +123,14 @@ export default function VoCClusteringPage() {
         source.key === key ? { ...source, enabled } : source
       )
     );
+  };
+
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
   };
 
   const handleRun = async () => {
@@ -258,6 +277,8 @@ export default function VoCClusteringPage() {
         allConnectedSources={allConnectedSources}
         description="Select which sources to include in the analysis"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
       />
 
       {/* Output Preview */}

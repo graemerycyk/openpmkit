@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import {
   Calendar,
   CheckCircle2,
@@ -15,6 +16,7 @@ import {
   MessageSquare,
   Palette,
   Plug,
+  Star,
   Target,
   Ticket,
 } from 'lucide-react';
@@ -70,6 +72,89 @@ const CONNECTORS = {
 
 type ConnectorKey = keyof typeof CONNECTORS;
 
+// Connector-specific configuration types
+export interface GmailConfig {
+  unreadOnly: boolean;
+  includeStarred: boolean;
+}
+
+export interface GoogleDriveConfig {
+  sharedWithMe: boolean;
+  recentEdits: boolean;
+  includeComments: boolean;
+}
+
+export interface GoogleCalendarConfig {
+  todayOnly: boolean;
+  includeDescriptions: boolean;
+}
+
+export interface GongConfig {
+  recentCallsOnly: boolean;
+  includeTranscripts: boolean;
+}
+
+export interface ZendeskConfig {
+  openTicketsOnly: boolean;
+  includeComments: boolean;
+}
+
+export interface JiraConfig {
+  assignedToMe: boolean;
+  recentlyUpdated: boolean;
+}
+
+export interface ConfluenceConfig {
+  recentlyEdited: boolean;
+  sharedWithMe: boolean;
+}
+
+export interface ConnectorConfigs {
+  gmail?: GmailConfig;
+  'google-drive'?: GoogleDriveConfig;
+  'google-calendar'?: GoogleCalendarConfig;
+  gong?: GongConfig;
+  zendesk?: ZendeskConfig;
+  jira?: JiraConfig;
+  confluence?: ConfluenceConfig;
+}
+
+// Union type for all connector config types
+export type AnyConnectorConfig = GmailConfig | GoogleDriveConfig | GoogleCalendarConfig | GongConfig | ZendeskConfig | JiraConfig | ConfluenceConfig;
+
+// Default configurations for each connector
+export const DEFAULT_CONNECTOR_CONFIGS: ConnectorConfigs = {
+  gmail: {
+    unreadOnly: false,
+    includeStarred: true,
+  },
+  'google-drive': {
+    sharedWithMe: true,
+    recentEdits: true,
+    includeComments: true,
+  },
+  'google-calendar': {
+    todayOnly: false,
+    includeDescriptions: true,
+  },
+  gong: {
+    recentCallsOnly: true,
+    includeTranscripts: false,
+  },
+  zendesk: {
+    openTicketsOnly: true,
+    includeComments: true,
+  },
+  jira: {
+    assignedToMe: false,
+    recentlyUpdated: true,
+  },
+  confluence: {
+    recentlyEdited: true,
+    sharedWithMe: true,
+  },
+};
+
 interface ConnectorStatus {
   key: ConnectorKey;
   connected: boolean;
@@ -88,8 +173,215 @@ interface DataSourcesCardProps {
   description?: string;
   /** Callback when a source is toggled on/off */
   onToggle?: (key: ConnectorKey, enabled: boolean) => void;
-  /** Render configuration UI for a specific connector when it's enabled */
+  /** Render configuration UI for a specific connector when it's enabled (overrides default config UI) */
   renderConfig?: (key: ConnectorKey) => ReactNode;
+  /** Current connector configurations */
+  connectorConfigs?: ConnectorConfigs;
+  /** Callback when connector configuration changes */
+  onConfigChange?: (key: ConnectorKey, config: AnyConnectorConfig) => void;
+}
+
+// Default configuration UI components for each connector
+function GmailConfigUI({
+  config,
+  onChange,
+}: {
+  config: GmailConfig;
+  onChange: (config: GmailConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <Label className="text-sm font-normal">Unread emails only</Label>
+        </div>
+        <Switch
+          checked={config.unreadOnly}
+          onCheckedChange={(checked) => onChange({ ...config, unreadOnly: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Star className="h-4 w-4 text-muted-foreground" />
+          <Label className="text-sm font-normal">Include starred emails</Label>
+        </div>
+        <Switch
+          checked={config.includeStarred}
+          onCheckedChange={(checked) => onChange({ ...config, includeStarred: checked })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function GoogleDriveConfigUI({
+  config,
+  onChange,
+}: {
+  config: GoogleDriveConfig;
+  onChange: (config: GoogleDriveConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Include shared files</Label>
+        <Switch
+          checked={config.sharedWithMe}
+          onCheckedChange={(checked) => onChange({ ...config, sharedWithMe: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Recent edits only</Label>
+        <Switch
+          checked={config.recentEdits}
+          onCheckedChange={(checked) => onChange({ ...config, recentEdits: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Include comments & suggestions</Label>
+        <Switch
+          checked={config.includeComments}
+          onCheckedChange={(checked) => onChange({ ...config, includeComments: checked })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function GoogleCalendarConfigUI({
+  config,
+  onChange,
+}: {
+  config: GoogleCalendarConfig;
+  onChange: (config: GoogleCalendarConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Today&apos;s events only</Label>
+        <Switch
+          checked={config.todayOnly}
+          onCheckedChange={(checked) => onChange({ ...config, todayOnly: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Include meeting descriptions</Label>
+        <Switch
+          checked={config.includeDescriptions}
+          onCheckedChange={(checked) => onChange({ ...config, includeDescriptions: checked })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function GongConfigUI({
+  config,
+  onChange,
+}: {
+  config: GongConfig;
+  onChange: (config: GongConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Recent calls only (last 7 days)</Label>
+        <Switch
+          checked={config.recentCallsOnly}
+          onCheckedChange={(checked) => onChange({ ...config, recentCallsOnly: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Include transcripts</Label>
+        <Switch
+          checked={config.includeTranscripts}
+          onCheckedChange={(checked) => onChange({ ...config, includeTranscripts: checked })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ZendeskConfigUI({
+  config,
+  onChange,
+}: {
+  config: ZendeskConfig;
+  onChange: (config: ZendeskConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Open tickets only</Label>
+        <Switch
+          checked={config.openTicketsOnly}
+          onCheckedChange={(checked) => onChange({ ...config, openTicketsOnly: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Include ticket comments</Label>
+        <Switch
+          checked={config.includeComments}
+          onCheckedChange={(checked) => onChange({ ...config, includeComments: checked })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function JiraConfigUI({
+  config,
+  onChange,
+}: {
+  config: JiraConfig;
+  onChange: (config: JiraConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Assigned to me only</Label>
+        <Switch
+          checked={config.assignedToMe}
+          onCheckedChange={(checked) => onChange({ ...config, assignedToMe: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Recently updated (last 7 days)</Label>
+        <Switch
+          checked={config.recentlyUpdated}
+          onCheckedChange={(checked) => onChange({ ...config, recentlyUpdated: checked })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ConfluenceConfigUI({
+  config,
+  onChange,
+}: {
+  config: ConfluenceConfig;
+  onChange: (config: ConfluenceConfig) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Recently edited pages</Label>
+        <Switch
+          checked={config.recentlyEdited}
+          onCheckedChange={(checked) => onChange({ ...config, recentlyEdited: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-normal">Shared with me</Label>
+        <Switch
+          checked={config.sharedWithMe}
+          onCheckedChange={(checked) => onChange({ ...config, sharedWithMe: checked })}
+        />
+      </div>
+    </div>
+  );
 }
 
 export function DataSourcesCard({
@@ -99,6 +391,8 @@ export function DataSourcesCard({
   description = 'The agent will pull data from your connected sources',
   onToggle,
   renderConfig,
+  connectorConfigs,
+  onConfigChange,
 }: DataSourcesCardProps) {
   // Merge suggested sources with any additional connected sources not in suggested list
   const suggestedKeys = new Set(suggestedSources.map((s) => s.key));
@@ -106,6 +400,81 @@ export function DataSourcesCard({
     (s) => s.connected && !suggestedKeys.has(s.key)
   );
   const allSources = [...suggestedSources, ...additionalConnectedSources];
+
+  // Render default configuration UI for a connector
+  const renderDefaultConfig = (key: ConnectorKey): ReactNode => {
+    if (!onConfigChange) return null;
+
+    const configs = connectorConfigs || DEFAULT_CONNECTOR_CONFIGS;
+
+    switch (key) {
+      case 'gmail': {
+        const config = configs.gmail || DEFAULT_CONNECTOR_CONFIGS.gmail!;
+        return (
+          <GmailConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'google-drive': {
+        const config = configs['google-drive'] || DEFAULT_CONNECTOR_CONFIGS['google-drive']!;
+        return (
+          <GoogleDriveConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'google-calendar': {
+        const config = configs['google-calendar'] || DEFAULT_CONNECTOR_CONFIGS['google-calendar']!;
+        return (
+          <GoogleCalendarConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'gong': {
+        const config = configs.gong || DEFAULT_CONNECTOR_CONFIGS.gong!;
+        return (
+          <GongConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'zendesk': {
+        const config = configs.zendesk || DEFAULT_CONNECTOR_CONFIGS.zendesk!;
+        return (
+          <ZendeskConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'jira': {
+        const config = configs.jira || DEFAULT_CONNECTOR_CONFIGS.jira!;
+        return (
+          <JiraConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'confluence': {
+        const config = configs.confluence || DEFAULT_CONNECTOR_CONFIGS.confluence!;
+        return (
+          <ConfluenceConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      default:
+        return null;
+    }
+  };
 
   return (
     <Card>
@@ -123,7 +492,11 @@ export function DataSourcesCard({
 
           const Icon = connector.icon;
           const isRequired = requiredConnectors.includes(source.key);
-          const configContent = source.enabled && renderConfig ? renderConfig(source.key) : null;
+
+          // Use custom renderConfig if provided, otherwise use default config UI
+          const customConfig = source.enabled && renderConfig ? renderConfig(source.key) : null;
+          const defaultConfig = source.enabled && !customConfig ? renderDefaultConfig(source.key) : null;
+          const configContent = customConfig || defaultConfig;
 
           return (
             <div key={source.key} className="space-y-3">

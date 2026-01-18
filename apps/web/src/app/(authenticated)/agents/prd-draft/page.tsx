@@ -25,7 +25,12 @@ import {
   Play,
   Target,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 const PRIORITY_LEVELS = [
   { value: 'critical', label: 'Critical' },
@@ -59,6 +64,14 @@ export default function PRDDraftPage() {
   const [allConnectedSources, setAllConnectedSources] = useState<
     { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
   >([]);
+
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
+    gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
+    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
+  });
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -106,6 +119,14 @@ export default function PRDDraftPage() {
         source.key === key ? { ...source, enabled } : source
       )
     );
+  };
+
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
   };
 
   const handleRun = async () => {
@@ -246,6 +267,8 @@ export default function PRDDraftPage() {
         allConnectedSources={allConnectedSources}
         description="Connect sources to enrich the PRD with existing context"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
       />
 
       {/* Output Preview */}

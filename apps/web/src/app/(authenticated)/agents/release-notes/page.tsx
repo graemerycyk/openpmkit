@@ -25,7 +25,12 @@ import {
   Play,
   Target,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 const AUDIENCES = [
   { value: 'all', label: 'All Users' },
@@ -57,6 +62,12 @@ export default function ReleaseNotesPage() {
   const [allConnectedSources, setAllConnectedSources] = useState<
     { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
   >([]);
+
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
+  });
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -107,6 +118,14 @@ export default function ReleaseNotesPage() {
         source.key === key ? { ...source, enabled } : source
       )
     );
+  };
+
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
   };
 
   const handleRun = async () => {
@@ -261,6 +280,8 @@ export default function ReleaseNotesPage() {
         requiredConnectors={['jira']}
         description="Pull release information from connected tools"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
       />
 
       {/* Output Preview */}

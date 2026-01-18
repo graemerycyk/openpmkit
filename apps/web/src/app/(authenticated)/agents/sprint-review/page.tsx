@@ -18,7 +18,12 @@ import {
   Repeat,
   Target,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 export default function SprintReviewPage() {
   const [isRunning, setIsRunning] = useState(false);
@@ -42,6 +47,12 @@ export default function SprintReviewPage() {
   const [allConnectedSources, setAllConnectedSources] = useState<
     { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
   >([]);
+
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
+  });
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -94,6 +105,14 @@ export default function SprintReviewPage() {
     );
   };
 
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
+  };
+
   const handleRun = async () => {
     if (!canRun) return;
 
@@ -110,6 +129,10 @@ export default function SprintReviewPage() {
           sprintGoal: sprintGoal.trim() || undefined,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
+          connectorConfigs: {
+            jira: jiraEnabled ? connectorConfigs.jira : undefined,
+            confluence: suggestedSources.find(s => s.key === 'confluence')?.enabled ? connectorConfigs.confluence : undefined,
+          },
         }),
       });
 
@@ -216,6 +239,8 @@ export default function SprintReviewPage() {
         requiredConnectors={['jira']}
         description="Connect Jira to analyze sprint data"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
       />
 
       {/* Output Preview */}

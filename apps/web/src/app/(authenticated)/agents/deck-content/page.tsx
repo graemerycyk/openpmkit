@@ -25,7 +25,12 @@ import {
   Presentation,
   Target,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 const DECK_TYPES = [
   { value: 'qbr', label: 'Quarterly Business Review' },
@@ -69,6 +74,14 @@ export default function DeckContentPage() {
   const [allConnectedSources, setAllConnectedSources] = useState<
     { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
   >([]);
+
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
+    gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
+    'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
+  });
 
   useEffect(() => {
     async function fetchConnectors() {
@@ -116,6 +129,14 @@ export default function DeckContentPage() {
         source.key === key ? { ...source, enabled } : source
       )
     );
+  };
+
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
   };
 
   const handleRun = async () => {
@@ -265,6 +286,8 @@ export default function DeckContentPage() {
         allConnectedSources={allConnectedSources}
         description="Pull data from connected tools to enrich the deck"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
       />
 
       {/* Output Preview */}

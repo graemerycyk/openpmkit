@@ -28,7 +28,12 @@ import {
   Settings2,
   Zap,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 interface SlackChannel {
   id: string;
@@ -107,6 +112,13 @@ export default function DailyBriefSetupPage() {
   const [includeGoogleDrive, setIncludeGoogleDrive] = useState(false);
   const [includeGoogleCalendar, setIncludeGoogleCalendar] = useState(false);
 
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
+    'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
+    'google-calendar': { ...DEFAULT_CONNECTOR_CONFIGS['google-calendar']! },
+  });
+
   // Recommended sources for this agent (for DataSourcesCard display)
   const [suggestedSources, setSuggestedSources] = useState([
     { key: 'slack' as const, connected: false, enabled: false },
@@ -140,6 +152,14 @@ export default function DailyBriefSetupPage() {
         source.key === key ? { ...source, enabled } : source
       )
     );
+  };
+
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
   };
 
   // Detect user's timezone
@@ -265,6 +285,12 @@ export default function DailyBriefSetupPage() {
             includeGmail,
             includeGoogleDrive,
             includeGoogleCalendar,
+            // Connector-specific configs
+            connectorConfigs: {
+              gmail: isGmailEnabled ? connectorConfigs.gmail : undefined,
+              'google-drive': isGdriveEnabled ? connectorConfigs['google-drive'] : undefined,
+              'google-calendar': isGcalEnabled ? connectorConfigs['google-calendar'] : undefined,
+            },
           },
         }),
       });
@@ -294,6 +320,14 @@ export default function DailyBriefSetupPage() {
     try {
       const res = await fetch('/api/agents/daily-brief/trigger', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          connectorConfigs: {
+            gmail: isGmailEnabled ? connectorConfigs.gmail : undefined,
+            'google-drive': isGdriveEnabled ? connectorConfigs['google-drive'] : undefined,
+            'google-calendar': isGcalEnabled ? connectorConfigs['google-calendar'] : undefined,
+          },
+        }),
       });
 
       if (res.ok) {
@@ -459,8 +493,10 @@ export default function DailyBriefSetupPage() {
         allConnectedSources={allConnectedSources}
         description="Connect and configure data sources for your Daily Brief"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
         renderConfig={(key) => {
-          // Slack configuration UI
+          // Only Slack has custom configuration UI - others use the default config UI
           if (key === 'slack' && slackConnected) {
             return (
               <div className="space-y-6">
@@ -551,33 +587,8 @@ export default function DailyBriefSetupPage() {
             );
           }
 
-          // Gmail configuration - simple, no extra UI needed
-          if (key === 'gmail' && gmailConnected) {
-            return (
-              <p className="text-sm text-muted-foreground">
-                Email threads and important messages will be included in your Daily Brief.
-              </p>
-            );
-          }
-
-          // Google Drive configuration - simple, no extra UI needed
-          if (key === 'google-drive' && gdriveConnected) {
-            return (
-              <p className="text-sm text-muted-foreground">
-                Recent documents and file activity will be included in your Daily Brief.
-              </p>
-            );
-          }
-
-          // Google Calendar configuration - simple, no extra UI needed
-          if (key === 'google-calendar' && gcalConnected) {
-            return (
-              <p className="text-sm text-muted-foreground">
-                Upcoming meetings and events will be included in your Daily Brief.
-              </p>
-            );
-          }
-
+          // Return null for other connectors - they will use the default config UI
+          // provided by DataSourcesCard
           return null;
         }}
       />

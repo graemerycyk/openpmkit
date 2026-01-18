@@ -30,7 +30,12 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { DataSourcesCard } from '@/components/agents/data-sources-card';
+import {
+  DataSourcesCard,
+  ConnectorConfigs,
+  DEFAULT_CONNECTOR_CONFIGS,
+  AnyConnectorConfig,
+} from '@/components/agents/data-sources-card';
 
 // Meeting prep timeframes
 const TIMEFRAMES = [
@@ -105,6 +110,15 @@ export default function MeetingPrepSetupPage() {
   const [allConnectedSources, setAllConnectedSources] = useState<
     { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
   >([]);
+
+  // Connector-specific configurations
+  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
+    'google-calendar': { ...DEFAULT_CONNECTOR_CONFIGS['google-calendar']! },
+    gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
+    'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
+    gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
+    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -194,6 +208,14 @@ export default function MeetingPrepSetupPage() {
         source.key === key ? { ...source, enabled } : source
       )
     );
+  };
+
+  // Handle connector config changes
+  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
+    setConnectorConfigs((prev) => ({
+      ...prev,
+      [key]: config,
+    }));
   };
 
   const handleSave = async () => {
@@ -512,6 +534,8 @@ export default function MeetingPrepSetupPage() {
         requiredConnectors={['google-calendar']}
         description="The agent will pull account context from your connected sources"
         onToggle={handleSourceToggle}
+        connectorConfigs={connectorConfigs}
+        onConfigChange={handleConfigChange}
       />
 
       {/* Output Preview */}
