@@ -39,7 +39,7 @@ const baseSidebarNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: 'History',
+    title: 'Your Agents',
     href: '/agents',
     icon: Clock,
   },
