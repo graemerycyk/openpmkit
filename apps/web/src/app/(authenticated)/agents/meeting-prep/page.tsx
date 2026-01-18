@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Select,
@@ -21,10 +22,13 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock,
+  Filter,
   Loader2,
   Play,
+  Settings2,
   Target,
   Users,
+  Zap,
 } from 'lucide-react';
 import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
@@ -36,7 +40,16 @@ const TIMEFRAMES = [
   { value: '90', label: 'Last 90 days' },
 ];
 
-// Mock upcoming meetings (would come from Google Calendar API)
+// Prep timing options (how long before meeting to generate prep)
+const PREP_TIMINGS = [
+  { value: '15', label: '15 minutes before' },
+  { value: '30', label: '30 minutes before' },
+  { value: '60', label: '1 hour before' },
+  { value: '120', label: '2 hours before' },
+  { value: '1440', label: '1 day before' },
+];
+
+// Mock upcoming meetings that match criteria (would come from Google Calendar API)
 const UPCOMING_MEETINGS = [
   {
     id: 'meet-1',
@@ -44,6 +57,8 @@ const UPCOMING_MEETINGS = [
     datetime: '2024-01-22T14:00:00',
     attendees: ['jane.smith@acme.com', 'john.doe@acme.com'],
     description: 'Q4 review and Q1 planning discussion',
+    domain: 'acme.com',
+    prepScheduledFor: '2024-01-22T13:30:00',
   },
   {
     id: 'meet-2',
@@ -51,6 +66,8 @@ const UPCOMING_MEETINGS = [
     datetime: '2024-01-23T10:00:00',
     attendees: ['sarah@techstart.io'],
     description: 'Discuss feature requests and roadmap alignment',
+    domain: 'techstart.io',
+    prepScheduledFor: '2024-01-23T09:30:00',
   },
   {
     id: 'meet-3',
@@ -58,6 +75,8 @@ const UPCOMING_MEETINGS = [
     datetime: '2024-01-24T15:30:00',
     attendees: ['mike.johnson@globalind.com', 'lisa.chen@globalind.com'],
     description: 'Annual contract renewal and expansion',
+    domain: 'globalind.com',
+    prepScheduledFor: '2024-01-24T15:00:00',
   },
   {
     id: 'meet-4',
@@ -65,18 +84,38 @@ const UPCOMING_MEETINGS = [
     datetime: '2024-01-25T09:00:00',
     attendees: ['alex@newco.com'],
     description: 'Implementation planning and timeline',
+    domain: 'newco.com',
+    prepScheduledFor: '2024-01-25T08:30:00',
   },
 ];
 
+interface AgentConfig {
+  id: string;
+  status: string;
+  config: {
+    lookbackDays: number;
+    prepTimingMinutes: number;
+    filterDomains: string[];
+    includeAllExternalMeetings: boolean;
+  };
+  nextRunAt: string | null;
+  lastRunAt: string | null;
+}
+
 export default function MeetingPrepSetupPage() {
-  const [isRunning, setIsRunning] = useState(false);
+  const [config, setConfig] = useState<AgentConfig | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTriggering, setIsTriggering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   // Form state
-  const [selectedMeeting, setSelectedMeeting] = useState<string>('');
-  const [additionalContext, setAdditionalContext] = useState('');
+  const [isActive, setIsActive] = useState(true);
   const [timeframe, setTimeframe] = useState('30');
+  const [prepTiming, setPrepTiming] = useState('30');
+  const [filterDomains, setFilterDomains] = useState('');
+  const [includeAllExternalMeetings, setIncludeAllExternalMeetings] = useState(true);
 
   // Connection status
   const [connectedSources, setConnectedSources] = useState([
@@ -89,11 +128,12 @@ export default function MeetingPrepSetupPage() {
   ]);
 
   useEffect(() => {
-    async function fetchConnectors() {
+    async function fetchData() {
       try {
-        const res = await fetch('/api/connectors');
-        if (res.ok) {
-          const data = await res.json();
+        // Fetch connectors
+        const connectorsRes = await fetch('/api/connectors');
+        if (connectorsRes.ok) {
+          const data = await connectorsRes.json();
           const connectors = data.connectors || [];
           setConnectedSources((prev) =>
             prev.map((source) => ({
@@ -105,56 +145,117 @@ export default function MeetingPrepSetupPage() {
             }))
           );
         }
+
+        // Fetch existing config
+        const configRes = await fetch('/api/agents/meeting-prep');
+        if (configRes.ok) {
+          const data = await configRes.json();
+          if (data.config) {
+            setConfig(data.config);
+            setTimeframe(String(data.config.config.lookbackDays || 30));
+            setPrepTiming(String(data.config.config.prepTimingMinutes || 30));
+            setFilterDomains((data.config.config.filterDomains || []).join(', '));
+            setIncludeAllExternalMeetings(data.config.config.includeAllExternalMeetings ?? true);
+            setIsActive(data.config.status === 'active');
+          }
+        }
       } catch (err) {
-        console.error('Failed to fetch connectors:', err);
+        console.error('Failed to fetch data:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
-    fetchConnectors();
+    fetchData();
   }, []);
 
   const calendarConnected = connectedSources.find((s) => s.key === 'google-calendar')?.connected ?? false;
 
-  const canRun = selectedMeeting !== '' && calendarConnected;
+  const canRun = calendarConnected;
 
-  const handleRun = async () => {
-    if (!canRun) return;
-
-    setIsRunning(true);
+  const handleSave = async () => {
+    setIsSaving(true);
     setError(null);
     setSuccess(null);
 
-    const meeting = UPCOMING_MEETINGS.find((m) => m.id === selectedMeeting);
+    const domains = filterDomains
+      .split(',')
+      .map((d) => d.trim().toLowerCase())
+      .filter((d) => d.length > 0);
 
     try {
-      const res = await fetch('/api/agents/meeting-prep/trigger', {
+      const res = await fetch('/api/agents/meeting-prep', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          meetingId: selectedMeeting,
-          meetingTitle: meeting?.title,
-          meetingDatetime: meeting?.datetime,
-          attendees: meeting?.attendees,
-          meetingDescription: meeting?.description,
-          additionalContext,
-          timeframeDays: parseInt(timeframe),
+          status: isActive ? 'active' : 'paused',
+          config: {
+            lookbackDays: parseInt(timeframe),
+            prepTimingMinutes: parseInt(prepTiming),
+            filterDomains: domains,
+            includeAllExternalMeetings,
+          },
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        setSuccess(`Meeting Prep started! Job ID: ${data.jobId}`);
+        setConfig(data.config);
+        setSuccess('Configuration saved successfully!');
       } else {
         const data = await res.json();
-        setError(data.error || 'Failed to start meeting prep');
+        setError(data.error || 'Failed to save configuration');
       }
     } catch {
-      setError('Failed to start. Please try again.');
+      setError('Failed to save. Please try again.');
     } finally {
-      setIsRunning(false);
+      setIsSaving(false);
     }
   };
 
-  const selectedMeetingData = UPCOMING_MEETINGS.find((m) => m.id === selectedMeeting);
+  const handleTrigger = async () => {
+    if (!canRun) return;
+
+    setIsTriggering(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetch('/api/agents/meeting-prep/trigger', {
+        method: 'POST',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSuccess(`Meeting Prep started for next meeting! Job ID: ${data.jobId}`);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to trigger meeting prep');
+      }
+    } catch {
+      setError('Failed to trigger. Please try again.');
+    } finally {
+      setIsTriggering(false);
+    }
+  };
+
+  // Calculate matching meetings based on filter criteria
+  const matchingMeetings = UPCOMING_MEETINGS.filter((meeting) => {
+    if (includeAllExternalMeetings) return true;
+    const domains = filterDomains
+      .split(',')
+      .map((d) => d.trim().toLowerCase())
+      .filter((d) => d.length > 0);
+    if (domains.length === 0) return true;
+    return domains.some((domain) => meeting.domain.includes(domain));
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -163,10 +264,17 @@ export default function MeetingPrepSetupPage() {
         <div>
           <h1 className="font-heading text-2xl font-bold">Meeting Prep Agent</h1>
           <p className="text-muted-foreground">
-            Generate a comprehensive prep pack for customer meetings
+            Automatically generate prep packs before customer meetings
           </p>
         </div>
-        <Badge variant="outline">On-Demand</Badge>
+        {config && (
+          <Badge
+            variant={config.status === 'active' ? 'default' : 'secondary'}
+            className={config.status === 'active' ? 'bg-green-600' : ''}
+          >
+            {config.status === 'active' ? 'Active' : 'Paused'}
+          </Badge>
+        )}
       </div>
 
       {/* Alerts */}
@@ -184,113 +292,33 @@ export default function MeetingPrepSetupPage() {
         </Alert>
       )}
 
-      {/* Select Meeting */}
+      {/* Prep Timing */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Select Meeting</CardTitle>
+            <Zap className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Prep Timing</CardTitle>
           </div>
           <CardDescription>
-            Choose an upcoming meeting from your calendar. The agent will infer account and contact details automatically.
+            When should the agent generate prep packs before each meeting?
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!calendarConnected ? (
-            <div className="rounded-lg border border-dashed p-6 text-center">
-              <Calendar className="mx-auto h-10 w-10 text-muted-foreground" />
-              <h3 className="mt-3 font-medium">Connect Google Calendar</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Connect your calendar to see upcoming meetings
-              </p>
-              <Button asChild className="mt-4" size="sm">
-                <Link href="/settings/integrations">Connect Calendar</Link>
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="meeting">Upcoming Meetings</Label>
-                <Select value={selectedMeeting} onValueChange={setSelectedMeeting}>
-                  <SelectTrigger id="meeting">
-                    <SelectValue placeholder="Select a meeting..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UPCOMING_MEETINGS.map((meeting) => (
-                      <SelectItem key={meeting.id} value={meeting.id}>
-                        <div className="flex items-center gap-2">
-                          <span>{meeting.title}</span>
-                          <span className="text-muted-foreground">
-                            {new Date(meeting.datetime).toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedMeetingData && (
-                <div className="rounded-lg border bg-muted/50 p-4 space-y-3">
-                  <div>
-                    <span className="text-sm font-medium">Meeting</span>
-                    <p className="text-sm text-muted-foreground">{selectedMeetingData.title}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-sm font-medium">Date & Time</span>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(selectedMeetingData.datetime).toLocaleString('en-US', {
-                          weekday: 'long',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium">Attendees</span>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Users className="h-3 w-3" />
-                        <span>{selectedMeetingData.attendees.length} external</span>
-                      </div>
-                    </div>
-                  </div>
-                  {selectedMeetingData.description && (
-                    <div>
-                      <span className="text-sm font-medium">Description</span>
-                      <p className="text-sm text-muted-foreground">{selectedMeetingData.description}</p>
-                    </div>
-                  )}
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground">
-                      The agent will identify the account and contacts from the meeting title, attendees, and your connected data sources.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Prep Settings */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Prep Settings</CardTitle>
+          <div className="space-y-2">
+            <Label htmlFor="prep-timing">Generate Prep Pack</Label>
+            <Select value={prepTiming} onValueChange={setPrepTiming}>
+              <SelectTrigger id="prep-timing" className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PREP_TIMINGS.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <CardDescription>
-            Configure how far back to look for account context
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="timeframe">Look Back Period</Label>
             <Select value={timeframe} onValueChange={setTimeframe}>
@@ -306,21 +334,143 @@ export default function MeetingPrepSetupPage() {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              How far back to search for calls, messages, and tickets related to this account
+              How far back to search for calls, messages, and tickets related to each account
             </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="context">Additional Context (optional)</Label>
-            <Textarea
-              id="context"
-              placeholder="e.g., Focus on their recent feature requests, they mentioned budget concerns last call..."
-              value={additionalContext}
-              onChange={(e) => setAdditionalContext(e.target.value)}
-              rows={3}
-            />
           </div>
         </CardContent>
       </Card>
+
+      {/* Meeting Filters */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Meeting Selection</CardTitle>
+          </div>
+          <CardDescription>
+            Choose which meetings should automatically receive prep packs
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label htmlFor="all-external">All external meetings</Label>
+              <p className="text-sm text-muted-foreground">
+                Prepare for any meeting with attendees outside your organization
+              </p>
+            </div>
+            <Switch
+              id="all-external"
+              checked={includeAllExternalMeetings}
+              onCheckedChange={setIncludeAllExternalMeetings}
+            />
+          </div>
+
+          {!includeAllExternalMeetings && (
+            <div className="space-y-2">
+              <Label htmlFor="domains">Filter by Domains</Label>
+              <Input
+                id="domains"
+                placeholder="e.g., acme.com, techstart.io"
+                value={filterDomains}
+                onChange={(e) => setFilterDomains(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Comma-separated list of email domains. Only meetings with attendees from these domains will get prep packs.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Calendar Connection */}
+      {!calendarConnected && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Connect Calendar</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-lg border border-dashed p-6 text-center">
+              <Calendar className="mx-auto h-10 w-10 text-muted-foreground" />
+              <h3 className="mt-3 font-medium">Connect Google Calendar</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Connect your calendar to automatically detect upcoming meetings
+              </p>
+              <Button asChild className="mt-4" size="sm">
+                <Link href="/settings/integrations">Connect Calendar</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Upcoming Meetings Preview */}
+      {calendarConnected && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Upcoming Meetings</CardTitle>
+            </div>
+            <CardDescription>
+              {matchingMeetings.length} meetings in the next 7 days will receive prep packs
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {matchingMeetings.length === 0 ? (
+              <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
+                No upcoming meetings match your criteria
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {matchingMeetings.slice(0, 4).map((meeting) => (
+                  <div
+                    key={meeting.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm">{meeting.title}</p>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(meeting.datetime).toLocaleString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          {meeting.attendees.length} external
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant="outline" className="text-xs">
+                        Prep at{' '}
+                        {new Date(meeting.prepScheduledFor).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+                {matchingMeetings.length > 4 && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    +{matchingMeetings.length - 4} more meetings
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Data Sources */}
       <DataSourcesCard
@@ -363,25 +513,75 @@ export default function MeetingPrepSetupPage() {
         </CardContent>
       </Card>
 
+      {/* Agent Status */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Agent Status</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="agent-active">Enable Meeting Prep</Label>
+              <p className="text-sm text-muted-foreground">
+                When enabled, the agent will automatically generate prep packs before your meetings
+              </p>
+            </div>
+            <Switch
+              id="agent-active"
+              checked={isActive}
+              onCheckedChange={setIsActive}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button asChild variant="outline">
-            <Link href="/agents/meeting-prep/history">
-              <Clock className="mr-2 h-4 w-4" />
-              View History
-            </Link>
+          <Button
+            variant="outline"
+            onClick={handleTrigger}
+            disabled={isTriggering || !canRun}
+          >
+            {isTriggering ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="mr-2 h-4 w-4" />
+            )}
+            Run Now
           </Button>
+          {!canRun && (
+            <span className="text-sm text-muted-foreground">
+              Connect Google Calendar to run
+            </span>
+          )}
         </div>
-        <Button onClick={handleRun} disabled={isRunning || !canRun}>
-          {isRunning ? (
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
-            <Play className="mr-2 h-4 w-4" />
+            <CheckCircle2 className="mr-2 h-4 w-4" />
           )}
-          Generate Prep Pack
+          Save Configuration
         </Button>
       </div>
+
+      {/* Last Run Info */}
+      {config?.lastRunAt && (
+        <p className="text-center text-sm text-muted-foreground">
+          Last run: {new Date(config.lastRunAt).toLocaleString()}
+          {' · '}
+          <Link
+            href="/agents/meeting-prep/history"
+            className="text-cobalt-600 hover:underline"
+          >
+            View History
+          </Link>
+        </p>
+      )}
     </div>
   );
 }
