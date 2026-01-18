@@ -47,10 +47,10 @@ export default function ReleaseNotesPage() {
   const [audience, setAudience] = useState('all');
   const [highlights, setHighlights] = useState('');
 
-  // Suggested sources for this agent
+  // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'jira' as const, connected: false },
-    { key: 'confluence' as const, connected: false },
+    { key: 'jira' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -67,13 +67,17 @@ export default function ReleaseNotesPage() {
           const connectors = data.connectors || [];
           // Update suggested sources with connection status
           setSuggestedSources((prev) =>
-            prev.map((source) => ({
-              ...source,
-              connected: connectors.some(
+            prev.map((source) => {
+              const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
-              ),
-            }))
+              );
+              return {
+                ...source,
+                connected: isConnected,
+                enabled: isConnected, // Auto-enable connected sources
+              };
+            })
           );
           // Build list of all connected sources
           const allConnected = connectors
@@ -93,7 +97,17 @@ export default function ReleaseNotesPage() {
     fetchConnectors();
   }, []);
 
-  const canRun = version.trim() !== '';
+  const jiraEnabled = suggestedSources.find((s) => s.key === 'jira')?.enabled ?? false;
+  const canRun = version.trim() !== '' && jiraEnabled;
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -102,7 +116,8 @@ export default function ReleaseNotesPage() {
     setError(null);
     setSuccess(null);
 
-    const jiraConnected = suggestedSources.find((s) => s.key === 'jira')?.connected ?? false;
+    const jiraSource = suggestedSources.find((s) => s.key === 'jira');
+    const includeJira = jiraSource?.connected && jiraSource?.enabled;
 
     try {
       const res = await fetch('/api/agents/release-notes/trigger', {
@@ -114,7 +129,7 @@ export default function ReleaseNotesPage() {
           releaseDate: releaseDate || undefined,
           audience,
           highlights: highlights.trim() || undefined,
-          includeJira: jiraConnected,
+          includeJira,
         }),
       });
 
@@ -245,6 +260,7 @@ export default function ReleaseNotesPage() {
         allConnectedSources={allConnectedSources}
         requiredConnectors={['jira']}
         description="Pull release information from connected tools"
+        onToggle={handleSourceToggle}
       />
 
       {/* Output Preview */}

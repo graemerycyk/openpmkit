@@ -28,11 +28,11 @@ export default function RoadmapAlignmentPage() {
   const [strategicGoals, setStrategicGoals] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
 
-  // Suggested sources for this agent
+  // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'jira' as const, connected: false },
-    { key: 'confluence' as const, connected: false },
-    { key: 'slack' as const, connected: false },
+    { key: 'jira' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
+    { key: 'slack' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -49,13 +49,17 @@ export default function RoadmapAlignmentPage() {
           const connectors = data.connectors || [];
           // Update suggested sources with connection status
           setSuggestedSources((prev) =>
-            prev.map((source) => ({
-              ...source,
-              connected: connectors.some(
+            prev.map((source) => {
+              const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
-              ),
-            }))
+              );
+              return {
+                ...source,
+                connected: isConnected,
+                enabled: isConnected, // Auto-enable connected sources
+              };
+            })
           );
           // Build list of all connected sources
           const allConnected = connectors
@@ -73,8 +77,17 @@ export default function RoadmapAlignmentPage() {
     fetchConnectors();
   }, []);
 
-  const hasAnyConnected = suggestedSources.some((s) => s.connected);
-  const canRun = hasAnyConnected && strategicGoals.trim() !== '';
+  const hasAnyEnabled = suggestedSources.some((s) => s.connected && s.enabled);
+  const canRun = hasAnyEnabled && strategicGoals.trim() !== '';
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -179,6 +192,7 @@ export default function RoadmapAlignmentPage() {
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
         description="The agent will analyze your roadmap from these sources"
+        onToggle={handleSourceToggle}
       />
 
       {/* Output Preview */}

@@ -56,13 +56,13 @@ export default function DeckContentPage() {
   const [keyMessages, setKeyMessages] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
 
-  // Suggested sources for this agent
+  // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'jira' as const, connected: false },
-    { key: 'confluence' as const, connected: false },
-    { key: 'slack' as const, connected: false },
-    { key: 'gong' as const, connected: false },
-    { key: 'google-drive' as const, connected: false },
+    { key: 'jira' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
+    { key: 'slack' as const, connected: false, enabled: false },
+    { key: 'gong' as const, connected: false, enabled: false },
+    { key: 'google-drive' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -79,13 +79,17 @@ export default function DeckContentPage() {
           const connectors = data.connectors || [];
           // Update suggested sources with connection status
           setSuggestedSources((prev) =>
-            prev.map((source) => ({
-              ...source,
-              connected: connectors.some(
+            prev.map((source) => {
+              const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
-              ),
-            }))
+              );
+              return {
+                ...source,
+                connected: isConnected,
+                enabled: isConnected, // Auto-enable connected sources
+              };
+            })
           );
           // Build list of all connected sources
           const allConnected = connectors
@@ -104,6 +108,15 @@ export default function DeckContentPage() {
   }, []);
 
   const canRun = title.trim() !== '';
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -251,6 +264,7 @@ export default function DeckContentPage() {
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
         description="Pull data from connected tools to enrich the deck"
+        onToggle={handleSourceToggle}
       />
 
       {/* Output Preview */}

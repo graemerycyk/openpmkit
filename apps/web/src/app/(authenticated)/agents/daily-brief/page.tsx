@@ -20,19 +20,15 @@ import {
 import {
   AlertCircle,
   AtSign,
-  Calendar,
   CheckCircle2,
   Clock,
-  FileText,
   Hash,
   Loader2,
-  Mail,
-  MessageSquare,
   Play,
-  Plug,
   Settings2,
   Zap,
 } from 'lucide-react';
+import { DataSourcesCard } from '@/components/agents/data-sources-card';
 
 interface SlackChannel {
   id: string;
@@ -111,12 +107,40 @@ export default function DailyBriefSetupPage() {
   const [includeGoogleDrive, setIncludeGoogleDrive] = useState(false);
   const [includeGoogleCalendar, setIncludeGoogleCalendar] = useState(false);
 
-  // Check if agent can run (has at least one data source configured)
-  const hasSlackData = slackConnected && (includeSlackMentions || selectedChannels.length > 0);
-  const hasGoogleData = (gmailConnected && includeGmail) ||
-                        (gdriveConnected && includeGoogleDrive) ||
-                        (gcalConnected && includeGoogleCalendar);
+  // Recommended sources for this agent (for DataSourcesCard display)
+  const [suggestedSources, setSuggestedSources] = useState([
+    { key: 'slack' as const, connected: false, enabled: false },
+    { key: 'gmail' as const, connected: false, enabled: false },
+    { key: 'google-drive' as const, connected: false, enabled: false },
+    { key: 'google-calendar' as const, connected: false, enabled: false },
+  ]);
+
+  // All connected sources from API (for showing additional connected integrations)
+  const [allConnectedSources, setAllConnectedSources] = useState<
+    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
+  >([]);
+
+  // Check if source is enabled in DataSourcesCard
+  const isSlackEnabled = suggestedSources.find((s) => s.key === 'slack')?.enabled ?? false;
+  const isGmailEnabled = suggestedSources.find((s) => s.key === 'gmail')?.enabled ?? false;
+  const isGdriveEnabled = suggestedSources.find((s) => s.key === 'google-drive')?.enabled ?? false;
+  const isGcalEnabled = suggestedSources.find((s) => s.key === 'google-calendar')?.enabled ?? false;
+
+  // Check if agent can run (has at least one data source enabled and configured)
+  const hasSlackData = slackConnected && isSlackEnabled && (includeSlackMentions || selectedChannels.length > 0);
+  const hasGoogleData = (gmailConnected && isGmailEnabled) ||
+                        (gdriveConnected && isGdriveEnabled) ||
+                        (gcalConnected && isGcalEnabled);
   const canRun = hasSlackData || hasGoogleData;
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   // Detect user's timezone
   useEffect(() => {
@@ -150,23 +174,67 @@ export default function DailyBriefSetupPage() {
         }
 
         // Check Slack connection and fetch channels
+        let isSlackConnected = false;
         const channelsRes = await fetch('/api/agents/daily-brief/channels');
         if (channelsRes.ok) {
           const data = await channelsRes.json();
           setChannels(data.channels || []);
           setSlackConnected(true);
+          isSlackConnected = true;
         } else {
           setSlackConnected(false);
         }
 
-        // Check Google connector statuses
+        // Check connector statuses
         const connectorsRes = await fetch('/api/connectors');
         if (connectorsRes.ok) {
           const data = await connectorsRes.json();
           const connectors = data.connectors || [];
+
+          // Update Google connector states
           setGmailConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real'));
           setGdriveConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real'));
           setGcalConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real'));
+
+          // Update suggested sources for DataSourcesCard display
+          setSuggestedSources((prev) =>
+            prev.map((source) => {
+              if (source.key === 'slack') {
+                return { ...source, connected: isSlackConnected };
+              }
+              const isConnected = connectors.some(
+                (c: { connectorKey: string; status: string }) =>
+                  c.connectorKey === source.key && c.status === 'real'
+              );
+              return { ...source, connected: isConnected };
+            })
+          );
+
+          // Update enabled states based on loaded config
+          setSuggestedSources((prev) =>
+            prev.map((source) => {
+              let isEnabled = false;
+              if (source.key === 'slack') {
+                isEnabled = isSlackConnected;  // Auto-enable if connected for backward compat
+              } else if (source.key === 'gmail') {
+                isEnabled = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real');
+              } else if (source.key === 'google-drive') {
+                isEnabled = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real');
+              } else if (source.key === 'google-calendar') {
+                isEnabled = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real');
+              }
+              return { ...source, enabled: isEnabled };
+            })
+          );
+
+          // Build list of all connected sources
+          const allConnected = connectors
+            .filter((c: { status: string }) => c.status === 'real')
+            .map((c: { connectorKey: string }) => ({
+              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
+              connected: true,
+            }));
+          setAllConnectedSources(allConnected);
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -386,269 +454,133 @@ export default function DailyBriefSetupPage() {
       </Card>
 
       {/* Data Sources */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Data Sources</CardTitle>
-          </div>
-          <CardDescription>
-            Connect and configure data sources for your Daily Brief
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Slack Connector */}
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 ${slackConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                  <MessageSquare className={`h-5 w-5 ${slackConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Slack</span>
-                    {slackConnected ? (
-                      <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 text-xs">
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Connected
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        Not Connected
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Messages and discussions
-                  </p>
-                </div>
-              </div>
-              {!slackConnected && (
-                <Button asChild size="sm">
-                  <Link href="/settings/integrations">Connect</Link>
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Gmail Connector */}
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 ${gmailConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                  <Mail className={`h-5 w-5 ${gmailConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Gmail</span>
-                    {gmailConnected ? (
-                      <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 text-xs">
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Connected
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        Not Connected
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Email threads and important messages
-                  </p>
-                </div>
-              </div>
-              {gmailConnected ? (
-                <Switch
-                  checked={includeGmail}
-                  onCheckedChange={setIncludeGmail}
-                />
-              ) : (
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/settings/integrations">Connect</Link>
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Google Drive Connector */}
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 ${gdriveConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                  <FileText className={`h-5 w-5 ${gdriveConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Google Drive</span>
-                    {gdriveConnected ? (
-                      <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 text-xs">
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Connected
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        Not Connected
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Recent documents and file activity
-                  </p>
-                </div>
-              </div>
-              {gdriveConnected ? (
-                <Switch
-                  checked={includeGoogleDrive}
-                  onCheckedChange={setIncludeGoogleDrive}
-                />
-              ) : (
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/settings/integrations">Connect</Link>
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Google Calendar Connector */}
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 ${gcalConnected ? 'bg-green-100' : 'bg-muted'}`}>
-                  <Calendar className={`h-5 w-5 ${gcalConnected ? 'text-green-600' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Google Calendar</span>
-                    {gcalConnected ? (
-                      <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 text-xs">
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Connected
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        Not Connected
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Upcoming meetings and events
-                  </p>
-                </div>
-              </div>
-              {gcalConnected ? (
-                <Switch
-                  checked={includeGoogleCalendar}
-                  onCheckedChange={setIncludeGoogleCalendar}
-                />
-              ) : (
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/settings/integrations">Connect</Link>
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Slack Configuration - Only show if Slack is connected */}
-      {slackConnected && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-lg">Slack Configuration</CardTitle>
-            </div>
-            <CardDescription>
-              Configure how Slack messages are included in your Daily Brief
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* @mentions toggle */}
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-blue-100 p-2">
-                  <AtSign className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <span className="font-medium">Include @mentions</span>
-                  <p className="text-sm text-muted-foreground">
-                    Messages where you are directly mentioned across all channels
-                  </p>
-                </div>
-              </div>
-              <Switch
-                checked={includeSlackMentions}
-                onCheckedChange={setIncludeSlackMentions}
-              />
-            </div>
-
-            {/* Channel Selection */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Hash className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Additional Channels</span>
-                </div>
-                {channels.length > 0 && (
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={selectAllChannels}>
-                      Select All
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={deselectAllChannels}>
-                      Deselect All
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Select channels to include all messages from, regardless of @mentions
-              </p>
-
-              {channels.length === 0 ? (
-                <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-                  No channels found. Make sure the pmkit Slack app is added to the channels you
-                  want to monitor.
-                </p>
-              ) : (
-                <div className="max-h-64 space-y-2 overflow-y-auto">
-                  {channels.map((channel) => (
-                    <div
-                      key={channel.id}
-                      className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-muted/50"
-                    >
-                      <Checkbox
-                        id={channel.id}
-                        checked={selectedChannels.includes(channel.id)}
-                        onCheckedChange={() => toggleChannel(channel.id)}
-                      />
-                      <Label
-                        htmlFor={channel.id}
-                        className="flex flex-1 cursor-pointer items-center gap-2"
-                      >
-                        <span className="text-muted-foreground">#</span>
-                        <span>{channel.name}</span>
-                        {channel.isPrivate && (
-                          <Badge variant="outline" className="text-xs">
-                            Private
-                          </Badge>
-                        )}
-                      </Label>
-                      {channel.memberCount && (
-                        <span className="text-xs text-muted-foreground">
-                          {channel.memberCount} members
-                        </span>
-                      )}
+      <DataSourcesCard
+        suggestedSources={suggestedSources}
+        allConnectedSources={allConnectedSources}
+        description="Connect and configure data sources for your Daily Brief"
+        onToggle={handleSourceToggle}
+        renderConfig={(key) => {
+          // Slack configuration UI
+          if (key === 'slack' && slackConnected) {
+            return (
+              <div className="space-y-6">
+                {/* @mentions toggle */}
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-blue-100 p-2">
+                      <AtSign className="h-5 w-5 text-blue-600" />
                     </div>
-                  ))}
+                    <div>
+                      <span className="font-medium">Include @mentions</span>
+                      <p className="text-sm text-muted-foreground">
+                        Messages where you are directly mentioned across all channels
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={includeSlackMentions}
+                    onCheckedChange={setIncludeSlackMentions}
+                  />
                 </div>
-              )}
+
+                {/* Channel Selection */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Hash className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Additional Channels</span>
+                    </div>
+                    {channels.length > 0 && (
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={selectAllChannels}>
+                          Select All
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={deselectAllChannels}>
+                          Deselect All
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Select channels to include all messages from, regardless of @mentions
+                  </p>
+
+                  {channels.length === 0 ? (
+                    <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
+                      No channels found. Make sure the pmkit Slack app is added to the channels you
+                      want to monitor.
+                    </p>
+                  ) : (
+                    <div className="max-h-64 space-y-2 overflow-y-auto">
+                      {channels.map((channel) => (
+                        <div
+                          key={channel.id}
+                          className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-muted/50"
+                        >
+                          <Checkbox
+                            id={channel.id}
+                            checked={selectedChannels.includes(channel.id)}
+                            onCheckedChange={() => toggleChannel(channel.id)}
+                          />
+                          <Label
+                            htmlFor={channel.id}
+                            className="flex flex-1 cursor-pointer items-center gap-2"
+                          >
+                            <span className="text-muted-foreground">#</span>
+                            <span>{channel.name}</span>
+                            {channel.isPrivate && (
+                              <Badge variant="outline" className="text-xs">
+                                Private
+                              </Badge>
+                            )}
+                          </Label>
+                          {channel.memberCount && (
+                            <span className="text-xs text-muted-foreground">
+                              {channel.memberCount} members
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    {selectedChannels.length} of {channels.length} channels selected
+                  </p>
+                </div>
+              </div>
+            );
+          }
+
+          // Gmail configuration - simple, no extra UI needed
+          if (key === 'gmail' && gmailConnected) {
+            return (
               <p className="text-sm text-muted-foreground">
-                {selectedChannels.length} of {channels.length} channels selected
+                Email threads and important messages will be included in your Daily Brief.
               </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            );
+          }
+
+          // Google Drive configuration - simple, no extra UI needed
+          if (key === 'google-drive' && gdriveConnected) {
+            return (
+              <p className="text-sm text-muted-foreground">
+                Recent documents and file activity will be included in your Daily Brief.
+              </p>
+            );
+          }
+
+          // Google Calendar configuration - simple, no extra UI needed
+          if (key === 'google-calendar' && gcalConnected) {
+            return (
+              <p className="text-sm text-muted-foreground">
+                Upcoming meetings and events will be included in your Daily Brief.
+              </p>
+            );
+          }
+
+          return null;
+        }}
+      />
 
       {/* Agent Status */}
       <Card>

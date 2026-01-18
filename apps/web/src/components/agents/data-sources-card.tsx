@@ -1,13 +1,17 @@
 'use client';
 
+import { ReactNode } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import {
   Calendar,
+  CheckCircle2,
   FileText,
   Headphones,
+  Mail,
   MessageSquare,
   Palette,
   Plug,
@@ -55,7 +59,7 @@ const CONNECTORS = {
   gmail: {
     name: 'Gmail',
     description: 'Email threads',
-    icon: MessageSquare,
+    icon: Mail,
   },
   figma: {
     name: 'Figma',
@@ -69,16 +73,23 @@ type ConnectorKey = keyof typeof CONNECTORS;
 interface ConnectorStatus {
   key: ConnectorKey;
   connected: boolean;
+  enabled?: boolean;
   workspaceName?: string;
 }
 
 interface DataSourcesCardProps {
-  /** Suggested integrations for this agent (shown regardless of connection status) */
+  /** Recommended integrations for this agent (shown regardless of connection status) */
   suggestedSources: ConnectorStatus[];
   /** All connected integrations from the API (used to show additional connected sources) */
   allConnectedSources?: ConnectorStatus[];
+  /** Connectors that are required for the agent to run */
   requiredConnectors?: ConnectorKey[];
+  /** Description shown below the card title */
   description?: string;
+  /** Callback when a source is toggled on/off */
+  onToggle?: (key: ConnectorKey, enabled: boolean) => void;
+  /** Render configuration UI for a specific connector when it's enabled */
+  renderConfig?: (key: ConnectorKey) => ReactNode;
 }
 
 export function DataSourcesCard({
@@ -86,6 +97,8 @@ export function DataSourcesCard({
   allConnectedSources = [],
   requiredConnectors = [],
   description = 'The agent will pull data from your connected sources',
+  onToggle,
+  renderConfig,
 }: DataSourcesCardProps) {
   // Merge suggested sources with any additional connected sources not in suggested list
   const suggestedKeys = new Set(suggestedSources.map((s) => s.key));
@@ -110,52 +123,66 @@ export function DataSourcesCard({
 
           const Icon = connector.icon;
           const isRequired = requiredConnectors.includes(source.key);
+          const configContent = source.enabled && renderConfig ? renderConfig(source.key) : null;
 
           return (
-            <div
-              key={source.key}
-              className="flex items-center justify-between rounded-lg border p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`rounded-lg p-2 ${
-                    source.connected ? 'bg-green-100' : 'bg-muted'
-                  }`}
-                >
-                  <Icon
-                    className={`h-5 w-5 ${
-                      source.connected ? 'text-green-600' : 'text-muted-foreground'
+            <div key={source.key} className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`rounded-lg p-2 ${
+                      source.connected ? 'bg-green-100' : 'bg-muted'
                     }`}
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{connector.name}</span>
-                    {isRequired && (
-                      <Badge variant="secondary" className="text-xs">
-                        Required
-                      </Badge>
-                    )}
-                    <Badge
-                      variant={source.connected ? 'outline' : 'secondary'}
-                      className={
-                        source.connected
-                          ? 'border-green-200 bg-green-50 text-green-700 text-xs'
-                          : 'text-xs'
-                      }
-                    >
-                      {source.connected ? 'Connected' : 'Not Connected'}
-                    </Badge>
+                  >
+                    <Icon
+                      className={`h-5 w-5 ${
+                        source.connected ? 'text-green-600' : 'text-muted-foreground'
+                      }`}
+                    />
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {source.workspaceName || connector.description}
-                  </p>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{connector.name}</span>
+                      {isRequired && (
+                        <Badge variant="secondary" className="text-xs">
+                          Required
+                        </Badge>
+                      )}
+                      {source.connected ? (
+                        <Badge
+                          variant="outline"
+                          className="border-green-200 bg-green-50 text-green-700 text-xs"
+                        >
+                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                          Connected
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs">
+                          Not Connected
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {source.workspaceName || connector.description}
+                    </p>
+                  </div>
                 </div>
+                {source.connected ? (
+                  <Switch
+                    checked={source.enabled ?? false}
+                    onCheckedChange={(checked) => onToggle?.(source.key, checked)}
+                  />
+                ) : (
+                  <Button asChild size="sm">
+                    <Link href="/settings/integrations">Connect</Link>
+                  </Button>
+                )}
               </div>
-              {!source.connected && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/settings/integrations">Connect</Link>
-                </Button>
+              {/* Configuration UI shown when source is enabled */}
+              {configContent && (
+                <div className="ml-4 rounded-lg border border-dashed p-4">
+                  {configContent}
+                </div>
               )}
             </div>
           );

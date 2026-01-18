@@ -53,11 +53,11 @@ export default function PrototypeGenerationPage() {
   const [platform, setPlatform] = useState('web');
   const [designNotes, setDesignNotes] = useState('');
 
-  // Suggested sources for this agent
+  // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'figma' as const, connected: false },
-    { key: 'confluence' as const, connected: false },
-    { key: 'jira' as const, connected: false },
+    { key: 'figma' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
+    { key: 'jira' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -74,13 +74,17 @@ export default function PrototypeGenerationPage() {
           const connectors = data.connectors || [];
           // Update suggested sources with connection status
           setSuggestedSources((prev) =>
-            prev.map((source) => ({
-              ...source,
-              connected: connectors.some(
+            prev.map((source) => {
+              const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
-              ),
-            }))
+              );
+              return {
+                ...source,
+                connected: isConnected,
+                enabled: isConnected, // Auto-enable connected sources
+              };
+            })
           );
           // Build list of all connected sources
           const allConnected = connectors
@@ -99,6 +103,15 @@ export default function PrototypeGenerationPage() {
   }, []);
 
   const canRun = featureName.trim() !== '' && description.trim() !== '';
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -243,6 +256,7 @@ export default function PrototypeGenerationPage() {
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
         description="Connect to pull existing design context"
+        onToggle={handleSourceToggle}
       />
 
       {/* Output Preview */}

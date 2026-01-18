@@ -51,11 +51,11 @@ export default function VoCClusteringPage() {
   const [clusterCount, setClusterCount] = useState('5');
   const [minFeedbackCount, setMinFeedbackCount] = useState('10');
 
-  // Suggested sources for this agent
+  // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'gong' as const, connected: false },
-    { key: 'zendesk' as const, connected: false },
-    { key: 'slack' as const, connected: false },
+    { key: 'gong' as const, connected: false, enabled: false },
+    { key: 'zendesk' as const, connected: false, enabled: false },
+    { key: 'slack' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -72,13 +72,17 @@ export default function VoCClusteringPage() {
           const connectors = data.connectors || [];
           // Update suggested sources with connection status
           setSuggestedSources((prev) =>
-            prev.map((source) => ({
-              ...source,
-              connected: connectors.some(
+            prev.map((source) => {
+              const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
-              ),
-            }))
+              );
+              return {
+                ...source,
+                connected: isConnected,
+                enabled: isConnected, // Auto-enable connected sources
+              };
+            })
           );
           // Build list of all connected sources
           const allConnected = connectors
@@ -98,8 +102,17 @@ export default function VoCClusteringPage() {
     fetchConnectors();
   }, []);
 
-  const hasDataSource = suggestedSources.some((s) => s.connected);
+  const hasDataSource = suggestedSources.some((s) => s.connected && s.enabled);
   const canRun = hasDataSource;
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   const handleRun = async () => {
     if (!canRun) return;
@@ -108,9 +121,12 @@ export default function VoCClusteringPage() {
     setError(null);
     setSuccess(null);
 
-    const gongConnected = suggestedSources.find((s) => s.key === 'gong')?.connected ?? false;
-    const zendeskConnected = suggestedSources.find((s) => s.key === 'zendesk')?.connected ?? false;
-    const slackConnected = suggestedSources.find((s) => s.key === 'slack')?.connected ?? false;
+    const gongSource = suggestedSources.find((s) => s.key === 'gong');
+    const zendeskSource = suggestedSources.find((s) => s.key === 'zendesk');
+    const slackSource = suggestedSources.find((s) => s.key === 'slack');
+    const gongEnabled = gongSource?.connected && gongSource?.enabled;
+    const zendeskEnabled = zendeskSource?.connected && zendeskSource?.enabled;
+    const slackEnabled = slackSource?.connected && slackSource?.enabled;
 
     try {
       const res = await fetch('/api/agents/voc-clustering/trigger', {
@@ -121,9 +137,9 @@ export default function VoCClusteringPage() {
           clusterCount: parseInt(clusterCount),
           minFeedbackCount: parseInt(minFeedbackCount),
           sources: {
-            gong: gongConnected,
-            zendesk: zendeskConnected,
-            slack: slackConnected,
+            gong: gongEnabled,
+            zendesk: zendeskEnabled,
+            slack: slackEnabled,
           },
         }),
       });
@@ -241,6 +257,7 @@ export default function VoCClusteringPage() {
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
         description="Select which sources to include in the analysis"
+        onToggle={handleSourceToggle}
       />
 
       {/* Output Preview */}

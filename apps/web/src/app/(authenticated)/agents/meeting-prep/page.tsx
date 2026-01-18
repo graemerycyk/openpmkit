@@ -91,14 +91,14 @@ export default function MeetingPrepSetupPage() {
   const [upcomingMeetings, setUpcomingMeetings] = useState<UpcomingMeeting[]>([]);
   const [isLoadingMeetings, setIsLoadingMeetings] = useState(false);
 
-  // Suggested sources for this agent
+  // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'google-calendar' as const, connected: false },
-    { key: 'gmail' as const, connected: false },
-    { key: 'google-drive' as const, connected: false },
-    { key: 'gong' as const, connected: false },
-    { key: 'slack' as const, connected: false },
-    { key: 'zendesk' as const, connected: false },
+    { key: 'google-calendar' as const, connected: false, enabled: false },
+    { key: 'gmail' as const, connected: false, enabled: false },
+    { key: 'google-drive' as const, connected: false, enabled: false },
+    { key: 'gong' as const, connected: false, enabled: false },
+    { key: 'slack' as const, connected: false, enabled: false },
+    { key: 'zendesk' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -121,13 +121,17 @@ export default function MeetingPrepSetupPage() {
           );
           // Update suggested sources with connection status
           setSuggestedSources((prev) =>
-            prev.map((source) => ({
-              ...source,
-              connected: connectors.some(
+            prev.map((source) => {
+              const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
-              ),
-            }))
+              );
+              return {
+                ...source,
+                connected: isConnected,
+                enabled: isConnected, // Auto-enable connected sources
+              };
+            })
           );
           // Build list of all connected sources
           const allConnected = connectors
@@ -177,9 +181,20 @@ export default function MeetingPrepSetupPage() {
     fetchData();
   }, []);
 
-  const calendarConnected = suggestedSources.find((s) => s.key === 'google-calendar')?.connected ?? false;
+  const calendarSource = suggestedSources.find((s) => s.key === 'google-calendar');
+  const calendarConnected = calendarSource?.connected ?? false;
+  const calendarEnabled = calendarSource?.enabled ?? false;
 
-  const canRun = calendarConnected;
+  const canRun = calendarConnected && calendarEnabled;
+
+  // Handle toggling a source on/off
+  const handleSourceToggle = (key: string, enabled: boolean) => {
+    setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -496,6 +511,7 @@ export default function MeetingPrepSetupPage() {
         allConnectedSources={allConnectedSources}
         requiredConnectors={['google-calendar']}
         description="The agent will pull account context from your connected sources"
+        onToggle={handleSourceToggle}
       />
 
       {/* Output Preview */}
