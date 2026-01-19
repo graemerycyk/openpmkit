@@ -26,6 +26,7 @@ import {
   XCircle,
   Loader2,
   MessageSquare,
+  Wrench,
 } from 'lucide-react';
 
 const agents = [
@@ -159,6 +160,23 @@ export default function DashboardPage() {
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
   const [stats, setStats] = useState<AgentStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/workbench/run-job');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin === true);
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   useEffect(() => {
     // Check if user has any agent configured
@@ -238,37 +256,53 @@ export default function DashboardPage() {
           >
             History
           </Link>
+          {isAdmin && (
+            <Link
+              href="/workbench"
+              className={cn(
+                'flex items-center gap-1.5 border-b-2 pb-3 text-sm font-medium transition-colors',
+                'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'
+              )}
+            >
+              <Wrench className="h-3.5 w-3.5" />
+              Workbench
+            </Link>
+          )}
         </nav>
       </div>
 
       {/* Quick Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="rounded-lg bg-green-100 p-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">
-                {isLoadingStats ? '-' : stats?.completedJobsCount || 0}
-              </p>
-              <p className="text-sm text-muted-foreground">Jobs Completed</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="rounded-lg bg-cobalt-100 p-2">
-              <MessageSquare className="h-5 w-5 text-cobalt-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">
-                {isLoadingStats ? '-' : stats?.connectedSourcesCount || 0}
-              </p>
-              <p className="text-sm text-muted-foreground">Data Sources</p>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/analytics">
+          <Card className="cursor-pointer transition-colors hover:border-green-200 hover:bg-green-50/30">
+            <CardContent className="flex items-center gap-4 p-4">
+              <div className="rounded-lg bg-green-100 p-2">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">
+                  {isLoadingStats ? '-' : stats?.completedJobsCount || 0}
+                </p>
+                <p className="text-sm text-muted-foreground">Jobs Completed</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/settings/integrations">
+          <Card className="cursor-pointer transition-colors hover:border-cobalt-200 hover:bg-cobalt-50/30">
+            <CardContent className="flex items-center gap-4 p-4">
+              <div className="rounded-lg bg-cobalt-100 p-2">
+                <MessageSquare className="h-5 w-5 text-cobalt-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">
+                  {isLoadingStats ? '-' : stats?.connectedSourcesCount || 0}
+                </p>
+                <p className="text-sm text-muted-foreground">Data Sources</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
         <Card>
           <CardContent className="flex items-center gap-4 p-4">
             <div className="rounded-lg bg-amber-100 p-2">
