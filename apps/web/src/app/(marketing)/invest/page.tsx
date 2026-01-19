@@ -22,7 +22,7 @@ import {
 export const metadata: Metadata = {
   title: 'Invest in pmkit | Pre-Seed Round',
   description:
-    'pmkit is raising €2M pre-seed at €10M post-money valuation. Join us in building the AI-powered PM toolkit for enterprise teams.',
+    'pmkit is raising €600K pre-seed at €3M post-money valuation. Join us in building the AI-powered PM toolkit for enterprise teams.',
   robots: {
     index: false,
     follow: false,
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
 };
 
 const metrics = [
-  { label: 'Raising', value: '€2M', sublabel: 'Pre-Seed' },
-  { label: 'Valuation', value: '€10M', sublabel: 'Post-Money' },
+  { label: 'Raising', value: '€600K', sublabel: 'Pre-Seed' },
+  { label: 'Valuation', value: '€3M', sublabel: 'Post-Money' },
   { label: 'Equity', value: '20%', sublabel: 'For Round' },
 ];
 
@@ -241,8 +241,8 @@ export default function InvestPage() {
 
             {/* What This Funds */}
             <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4 text-slate-300">
-              <span className="font-medium text-white">What this funds:</span> 18 months to ship
-              enterprise-ready Teams plan + paid pilots → repeatable GTM motion.
+              <span className="font-medium text-white">What this funds:</span> 12 months to validate
+              product-market fit with paid pilots → repeatable GTM motion.
             </div>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -754,10 +754,10 @@ export default function InvestPage() {
                 Use of Funds
               </Badge>
               <h2 className="font-heading text-3xl font-bold">
-                18-month runway
+                12-month runway
               </h2>
               <p className="mt-4 text-muted-foreground">
-                €2M to build the team, ship enterprise features, and establish repeatable GTM.
+                €600K to validate product-market fit, close paid pilots, and establish repeatable GTM.
               </p>
 
               <div className="mt-8 space-y-6">
@@ -877,17 +877,17 @@ export default function InvestPage() {
               Join us in building the future of PM
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-cobalt-100 text-lg">
-              We're raising €2M at a €10M post-money valuation to build the definitive AI toolkit
+              We're raising €600K at a €3M post-money valuation to build the definitive AI toolkit
               for Product Managers.
             </p>
 
             <div className="mt-12 grid gap-6 sm:grid-cols-2 text-center max-w-lg mx-auto">
               <div className="rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm">
-                <div className="text-3xl font-bold">€2M</div>
+                <div className="text-3xl font-bold">€600K</div>
                 <div className="mt-1 text-sm text-cobalt-200">Raising</div>
               </div>
               <div className="rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm">
-                <div className="text-3xl font-bold">€10M</div>
+                <div className="text-3xl font-bold">€3M</div>
                 <div className="mt-1 text-sm text-cobalt-200">Post-Money</div>
               </div>
             </div>
