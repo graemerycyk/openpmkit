@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
 import { DailyBriefConfigSchema } from '@pmkit/core';
+import { notifySchedulerToReload, notifySchedulerToCancel } from '@/lib/scheduler-client';
 
 // GET - Fetch user's daily brief config
 export async function GET() {
@@ -129,6 +130,10 @@ export async function POST(request: NextRequest) {
       `[Daily Brief Config] Saved for user ${user.id}, next run at ${nextRunAt?.toISOString()}`
     );
 
+    // Notify the worker scheduler to update the scheduled job
+    // This allows the worker to pick up changes without restart
+    await notifySchedulerToReload(config.id);
+
     return NextResponse.json({
       success: true,
       config: {
@@ -161,12 +166,27 @@ export async function DELETE() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Find the config first so we can notify scheduler
+    const existingConfig = await prisma.agentConfig.findUnique({
+      where: {
+        userId_agentType: {
+          userId: user.id,
+          agentType: 'daily_brief',
+        },
+      },
+    });
+
     await prisma.agentConfig.deleteMany({
       where: {
         userId: user.id,
         agentType: 'daily_brief',
       },
     });
+
+    // Notify scheduler to cancel any pending jobs for this config
+    if (existingConfig) {
+      await notifySchedulerToCancel(existingConfig.id);
+    }
 
     console.log(`[Daily Brief Config] Deleted for user ${user.id}`);
 

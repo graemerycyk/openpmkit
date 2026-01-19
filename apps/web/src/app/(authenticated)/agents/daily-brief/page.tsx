@@ -195,6 +195,15 @@ export default function DailyBriefSetupPage() {
   // Fetch existing config, Slack status, and Google connector status
   useEffect(() => {
     async function fetchData() {
+      // Track saved config to restore enabled states
+      let savedConfig: {
+        includeSlackMentions?: boolean;
+        slackChannels?: string[];
+        includeGmail?: boolean;
+        includeGoogleDrive?: boolean;
+        includeGoogleCalendar?: boolean;
+      } | null = null;
+
       try {
         // Fetch config
         const configRes = await fetch('/api/agents/daily-brief');
@@ -202,6 +211,7 @@ export default function DailyBriefSetupPage() {
           const data = await configRes.json();
           if (data.config) {
             setConfig(data.config);
+            savedConfig = data.config.config; // Store for use when setting enabled states
             setDataTimeframe(data.config.config.dataTimeframeHours === 36 ? '36' : '24');
             setDeliveryTime(data.config.config.deliveryTimeLocal);
             setTimezone(data.config.config.timezone);
@@ -233,38 +243,40 @@ export default function DailyBriefSetupPage() {
           const connectors = data.connectors || [];
 
           // Update Google connector states
-          setGmailConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real'));
-          setGdriveConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real'));
-          setGcalConnected(connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real'));
+          const isGmailConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real');
+          const isGdriveConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real');
+          const isGcalConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real');
+          setGmailConnected(isGmailConnected);
+          setGdriveConnected(isGdriveConnected);
+          setGcalConnected(isGcalConnected);
 
-          // Update suggested sources for DataSourcesCard display
+          // Update suggested sources - restore enabled state from saved config if available
           setSuggestedSources((prev) =>
             prev.map((source) => {
-              if (source.key === 'slack') {
-                return { ...source, connected: isSlackConnected };
-              }
-              const isConnected = connectors.some(
-                (c: { connectorKey: string; status: string }) =>
-                  c.connectorKey === source.key && c.status === 'real'
-              );
-              return { ...source, connected: isConnected };
-            })
-          );
+              const isConnected = source.key === 'slack'
+                ? isSlackConnected
+                : connectors.some(
+                    (c: { connectorKey: string; status: string }) =>
+                      c.connectorKey === source.key && c.status === 'real'
+                  );
 
-          // Update enabled states based on loaded config
-          setSuggestedSources((prev) =>
-            prev.map((source) => {
-              let isEnabled = false;
-              if (source.key === 'slack') {
-                isEnabled = isSlackConnected;  // Auto-enable if connected for backward compat
-              } else if (source.key === 'gmail') {
-                isEnabled = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real');
-              } else if (source.key === 'google-drive') {
-                isEnabled = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real');
-              } else if (source.key === 'google-calendar') {
-                isEnabled = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real');
+              // Determine enabled state: use saved config if available, otherwise default to connected state
+              let isEnabled = isConnected; // Default for new users or sources without saved preference
+              if (savedConfig) {
+                // Restore enabled state from saved config
+                if (source.key === 'slack') {
+                  // Slack is enabled if user has selected channels or mentions
+                  isEnabled = isSlackConnected && (savedConfig.includeSlackMentions || ((savedConfig.slackChannels?.length ?? 0) > 0));
+                } else if (source.key === 'gmail') {
+                  isEnabled = savedConfig.includeGmail ?? isGmailConnected;
+                } else if (source.key === 'google-drive') {
+                  isEnabled = savedConfig.includeGoogleDrive ?? isGdriveConnected;
+                } else if (source.key === 'google-calendar') {
+                  isEnabled = savedConfig.includeGoogleCalendar ?? isGcalConnected;
+                }
               }
-              return { ...source, enabled: isEnabled };
+
+              return { ...source, connected: isConnected, enabled: isEnabled };
             })
           );
 
@@ -303,9 +315,10 @@ export default function DailyBriefSetupPage() {
             timezone,
             slackChannels: selectedChannels,
             includeSlackMentions,
-            includeGmail,
-            includeGoogleDrive,
-            includeGoogleCalendar,
+            // Save enabled state from DataSourcesCard toggles
+            includeGmail: isGmailEnabled,
+            includeGoogleDrive: isGdriveEnabled,
+            includeGoogleCalendar: isGcalEnabled,
             // Connector-specific configs
             connectorConfigs: {
               gmail: isGmailEnabled ? connectorConfigs.gmail : undefined,

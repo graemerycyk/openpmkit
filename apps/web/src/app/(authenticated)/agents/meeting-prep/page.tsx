@@ -75,6 +75,15 @@ interface AgentConfig {
     prepTimingMinutes: number;
     filterDomains: string[];
     includeAllExternalMeetings: boolean;
+    // Data source enabled states
+    enabledSources?: {
+      'google-calendar'?: boolean;
+      gmail?: boolean;
+      'google-drive'?: boolean;
+      gong?: boolean;
+      slack?: boolean;
+      zendesk?: boolean;
+    };
   };
   nextRunAt: string | null;
   lastRunAt: string | null;
@@ -143,7 +152,25 @@ export default function MeetingPrepSetupPage() {
 
   useEffect(() => {
     async function fetchData() {
+      // Track saved config to restore enabled states
+      let savedConfig: AgentConfig['config'] | null = null;
+
       try {
+        // Fetch existing config first so we can use it when setting enabled states
+        const configRes = await fetch('/api/agents/meeting-prep');
+        if (configRes.ok) {
+          const data = await configRes.json();
+          if (data.config) {
+            setConfig(data.config);
+            savedConfig = data.config.config;
+            setTimeframe(String(data.config.config.lookbackDays || 30));
+            setPrepTiming(String(data.config.config.prepTimingMinutes || 30));
+            setFilterDomains((data.config.config.filterDomains || []).join(', '));
+            setIncludeAllExternalMeetings(data.config.config.includeAllExternalMeetings ?? true);
+            setIsActive(data.config.status === 'active');
+          }
+        }
+
         // Fetch connectors
         const connectorsRes = await fetch('/api/connectors');
         let calendarIsConnected = false;
@@ -154,17 +181,27 @@ export default function MeetingPrepSetupPage() {
             (c: { connectorKey: string; status: string }) =>
               c.connectorKey === 'google-calendar' && c.status === 'real'
           );
-          // Update suggested sources with connection status
+          // Update suggested sources with connection status and restore enabled state from saved config
           setSuggestedSources((prev) =>
             prev.map((source) => {
               const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
               );
+
+              // Determine enabled state: use saved config if available, otherwise default to connected state
+              let isEnabled = isConnected; // Default for new users
+              if (savedConfig?.enabledSources) {
+                const savedEnabled = savedConfig.enabledSources[source.key as keyof typeof savedConfig.enabledSources];
+                if (savedEnabled !== undefined) {
+                  isEnabled = savedEnabled;
+                }
+              }
+
               return {
                 ...source,
                 connected: isConnected,
-                enabled: isConnected, // Auto-enable connected sources
+                enabled: isEnabled,
               };
             })
           );
@@ -176,20 +213,6 @@ export default function MeetingPrepSetupPage() {
               connected: true,
             }));
           setAllConnectedSources(allConnected);
-        }
-
-        // Fetch existing config
-        const configRes = await fetch('/api/agents/meeting-prep');
-        if (configRes.ok) {
-          const data = await configRes.json();
-          if (data.config) {
-            setConfig(data.config);
-            setTimeframe(String(data.config.config.lookbackDays || 30));
-            setPrepTiming(String(data.config.config.prepTimingMinutes || 30));
-            setFilterDomains((data.config.config.filterDomains || []).join(', '));
-            setIncludeAllExternalMeetings(data.config.config.includeAllExternalMeetings ?? true);
-            setIsActive(data.config.status === 'active');
-          }
         }
 
         // Fetch upcoming meetings if calendar is connected
@@ -249,6 +272,12 @@ export default function MeetingPrepSetupPage() {
       .map((d) => d.trim().toLowerCase())
       .filter((d) => d.length > 0);
 
+    // Build enabled sources map from current suggestedSources state
+    const enabledSources: Record<string, boolean> = {};
+    suggestedSources.forEach((source) => {
+      enabledSources[source.key] = source.enabled;
+    });
+
     try {
       const res = await fetch('/api/agents/meeting-prep', {
         method: 'POST',
@@ -260,6 +289,7 @@ export default function MeetingPrepSetupPage() {
             prepTimingMinutes: parseInt(prepTiming),
             filterDomains: domains,
             includeAllExternalMeetings,
+            enabledSources,
           },
         }),
       });

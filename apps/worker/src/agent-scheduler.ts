@@ -1,5 +1,6 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
+import { PrismaClient } from '@prisma/client';
 import type { DailyBriefConfig } from '@pmkit/core';
 
 // ============================================================================
@@ -8,6 +9,7 @@ import type { DailyBriefConfig } from '@pmkit/core';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const AGENT_QUEUE_NAME = 'pmkit-agents';
+const SCHEDULER_COMMAND_QUEUE = 'pmkit-scheduler-commands';
 
 // ============================================================================
 // Types
@@ -33,18 +35,113 @@ interface AgentJobPayload {
   scheduledAt: string;
 }
 
+// Command types for scheduler sync
+type SchedulerCommand =
+  | { type: 'schedule'; agentConfigId: string }
+  | { type: 'cancel'; agentConfigId: string }
+  | { type: 'reload'; agentConfigId: string };
+
 // ============================================================================
 // Scheduler Class
 // ============================================================================
 
 export class AgentScheduler {
   private queue: Queue<AgentJobPayload>;
+  private commandQueue: Queue<SchedulerCommand>;
+  private commandWorker: Worker<SchedulerCommand> | null = null;
   private connection: Redis;
+  private prisma: PrismaClient;
   private isInitialized = false;
 
   constructor(connection: Redis) {
     this.connection = connection;
     this.queue = new Queue<AgentJobPayload>(AGENT_QUEUE_NAME, { connection });
+    this.commandQueue = new Queue<SchedulerCommand>(SCHEDULER_COMMAND_QUEUE, { connection });
+    this.prisma = new PrismaClient();
+  }
+
+  /**
+   * Start the command worker that listens for schedule/cancel requests from the web app
+   */
+  async startCommandWorker(): Promise<void> {
+    if (this.commandWorker) {
+      return;
+    }
+
+    this.commandWorker = new Worker<SchedulerCommand>(
+      SCHEDULER_COMMAND_QUEUE,
+      async (job) => {
+        const command = job.data;
+        console.log(`[Scheduler] Processing command: ${command.type} for ${command.agentConfigId}`);
+
+        try {
+          switch (command.type) {
+            case 'schedule':
+            case 'reload': {
+              // Fetch the latest config from DB and schedule it
+              const agentConfig = await this.prisma.agentConfig.findUnique({
+                where: { id: command.agentConfigId },
+              });
+
+              if (!agentConfig) {
+                console.warn(`[Scheduler] Config not found: ${command.agentConfigId}`);
+                return;
+              }
+
+              if (agentConfig.status !== 'active') {
+                // If paused, cancel any existing job
+                await this.cancelAgent(command.agentConfigId);
+                console.log(`[Scheduler] Agent ${command.agentConfigId} is paused, cancelled any scheduled jobs`);
+                return;
+              }
+
+              // Schedule the agent
+              await this.scheduleAgent({
+                ...agentConfig,
+                config: agentConfig.config as DailyBriefConfig,
+              });
+              break;
+            }
+
+            case 'cancel': {
+              await this.cancelAgent(command.agentConfigId);
+              break;
+            }
+
+            default:
+              console.warn(`[Scheduler] Unknown command type`);
+          }
+        } catch (error) {
+          console.error(`[Scheduler] Command failed:`, error);
+          throw error;
+        }
+      },
+      {
+        connection: this.connection,
+        concurrency: 5,
+      }
+    );
+
+    this.commandWorker.on('completed', (job) => {
+      console.log(`[Scheduler] Command ${job.id} completed`);
+    });
+
+    this.commandWorker.on('failed', (job, error) => {
+      console.error(`[Scheduler] Command ${job?.id} failed:`, error.message);
+    });
+
+    console.log('[Scheduler] Command worker started');
+  }
+
+  /**
+   * Stop the command worker gracefully
+   */
+  async stopCommandWorker(): Promise<void> {
+    if (this.commandWorker) {
+      await this.commandWorker.close();
+      this.commandWorker = null;
+    }
+    await this.prisma.$disconnect();
   }
 
   /**

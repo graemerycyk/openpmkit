@@ -556,6 +556,7 @@ Items that back up marketing claims or are needed for credibility.
 | Timezone selector | ✅ Done | Auto-detect with manual override, 14 timezones |
 | **BullMQ scheduled jobs** | ✅ Done | `apps/worker/src/agent-scheduler.ts` |
 | Schedule sync on startup | ✅ Done | Worker loads active configs on boot |
+| **Dynamic schedule sync** | ✅ Done | Web app notifies worker via scheduler-commands queue when config changes |
 | Agent config CRUD API | ✅ Done | `POST/GET/DELETE /api/agents/daily-brief` |
 
 ### Phase 3: Autonomous Execution ✅ COMPLETE
@@ -918,7 +919,8 @@ Items where documentation claims features that aren't fully implemented.
 
 | Issue | Status | Notes |
 |-------|--------|-------|
-| None currently tracked | - | - |
+| ~~Agent scheduler not syncing on config changes~~ | ✅ Fixed | Web app now notifies worker via BullMQ command queue |
+| ~~Data sources settings not persisting~~ | ✅ Fixed | Enabled state now restored from saved config on page load |
 
 ---
 
@@ -970,6 +972,18 @@ Items that have been discussed but not committed to.
 ---
 
 ## Changelog
+
+### 2026-01-19 (Scheduler Sync & Data Source Persistence)
+- **Fixed Daily Brief scheduler sync** - Agent now properly schedules when config is saved:
+  - Added `scheduler-client.ts` in web app to send commands to worker via BullMQ
+  - Added `startCommandWorker()` in agent-scheduler to process schedule/cancel/reload commands
+  - Web app notifies worker when config is saved (active → schedule, paused → cancel)
+  - Worker reloads config from DB and updates BullMQ scheduled job
+- **Fixed data sources settings persistence** - All 3 autonomous agents now persist enabled states:
+  - **Daily Brief**: `includeGmail`, `includeGoogleDrive`, `includeGoogleCalendar` restored on page load
+  - **Sprint Review**: `includeSlackHighlights`, `includeConfluence` restored on page load
+  - **Meeting Prep**: Added `enabledSources` map to config, restored on page load
+- **Root cause**: Previously, enabled states were set to `isConnected` on load, ignoring saved preferences
 
 ### 2026-01-18 (Standardized Agent Page UI)
 - **Simplified button UI across all 10 agent pages** - Consistent action buttons:

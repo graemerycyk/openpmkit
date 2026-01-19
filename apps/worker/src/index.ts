@@ -194,6 +194,10 @@ async function startWorker(): Promise<void> {
   try {
     const scheduler = await initializeScheduler(REDIS_URL);
 
+    // Start the command worker to listen for schedule/cancel requests from web app
+    await scheduler.startCommandWorker();
+    console.log('[Worker] Scheduler command worker started');
+
     // Create agent worker
     const agentWorker = await createAgentWorker(connection, processDailyBriefJob);
     console.log('[Worker] Agent worker started');
@@ -218,11 +222,12 @@ async function startWorker(): Promise<void> {
 
     await prisma.$disconnect();
 
-    // Handle shutdown - include agent worker
+    // Handle shutdown - include agent worker and scheduler
     process.on('SIGTERM', async () => {
       console.log('[Worker] Received SIGTERM, shutting down...');
       await worker.close();
       await agentWorker.close();
+      await scheduler.stopCommandWorker();
       await connection.quit();
       process.exit(0);
     });
@@ -231,6 +236,7 @@ async function startWorker(): Promise<void> {
       console.log('[Worker] Received SIGINT, shutting down...');
       await worker.close();
       await agentWorker.close();
+      await scheduler.stopCommandWorker();
       await connection.quit();
       process.exit(0);
     });

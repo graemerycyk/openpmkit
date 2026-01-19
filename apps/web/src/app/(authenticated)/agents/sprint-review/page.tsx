@@ -155,6 +155,12 @@ export default function SprintReviewPage() {
   // Fetch agent config and connectors
   useEffect(() => {
     async function fetchData() {
+      // Track saved config to restore enabled states
+      let savedConfig: {
+        includeSlackHighlights?: boolean;
+        includeConfluence?: boolean;
+      } | null = null;
+
       try {
         // Fetch agent config
         const configRes = await fetch('/api/agents/sprint-review');
@@ -162,6 +168,7 @@ export default function SprintReviewPage() {
           const data = await configRes.json();
           if (data.config) {
             setConfig(data.config);
+            savedConfig = data.config.config; // Store for use when setting enabled states
             setIsActive(data.config.status === 'active');
             setCalendarKeywords(data.config.config.calendarKeywords || DEFAULT_KEYWORDS);
             setLeadTimeMinutes(String(data.config.config.leadTimeMinutes || 240));
@@ -176,17 +183,31 @@ export default function SprintReviewPage() {
         if (res.ok) {
           const data = await res.json();
           const connectors = data.connectors || [];
-          // Update suggested sources with connection status
+          // Update suggested sources with connection status and restore enabled state from saved config
           setSuggestedSources((prev) =>
             prev.map((source) => {
               const isConnected = connectors.some(
                 (c: { connectorKey: string; status: string }) =>
                   c.connectorKey === source.key && c.status === 'real'
               );
+
+              // Determine enabled state: use saved config if available, otherwise default to connected state
+              let isEnabled = isConnected; // Default for new users
+              if (savedConfig) {
+                if (source.key === 'jira') {
+                  // Jira is required, always enable if connected
+                  isEnabled = isConnected;
+                } else if (source.key === 'slack') {
+                  isEnabled = savedConfig.includeSlackHighlights ?? isConnected;
+                } else if (source.key === 'confluence') {
+                  isEnabled = savedConfig.includeConfluence ?? isConnected;
+                }
+              }
+
               return {
                 ...source,
                 connected: isConnected,
-                enabled: isConnected, // Auto-enable connected sources
+                enabled: isEnabled,
               };
             })
           );
