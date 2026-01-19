@@ -20,16 +20,13 @@ import {
   AlertCircle,
   ArrowLeft,
   Calendar,
-  CalendarDays,
   CheckCircle2,
-  Clock,
   Filter,
   Loader2,
   Play,
   Save,
   Settings2,
   Target,
-  Users,
   Zap,
 } from 'lucide-react';
 import {
@@ -57,16 +54,6 @@ const PREP_TIMINGS = [
   { value: '120', label: '2 hours before' },
   { value: '1440', label: '1 day before' },
 ];
-
-interface UpcomingMeeting {
-  id: string;
-  title: string;
-  datetime: string;
-  attendees: string[];
-  description?: string;
-  domain: string;
-  prepScheduledFor: string;
-}
 
 interface AgentConfig {
   id: string;
@@ -106,10 +93,6 @@ export default function MeetingPrepSetupPage() {
   const [prepTiming, setPrepTiming] = useState('30');
   const [filterDomains, setFilterDomains] = useState('');
   const [includeAllExternalMeetings, setIncludeAllExternalMeetings] = useState(true);
-
-  // Upcoming meetings from calendar
-  const [upcomingMeetings, setUpcomingMeetings] = useState<UpcomingMeeting[]>([]);
-  const [isLoadingMeetings, setIsLoadingMeetings] = useState(false);
 
   // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
@@ -242,21 +225,6 @@ export default function MeetingPrepSetupPage() {
           }
         }
 
-        // Fetch upcoming meetings if calendar is connected
-        if (calendarIsConnected) {
-          setIsLoadingMeetings(true);
-          try {
-            const meetingsRes = await fetch('/api/agents/meeting-prep/meetings');
-            if (meetingsRes.ok) {
-              const data = await meetingsRes.json();
-              setUpcomingMeetings(data.meetings || []);
-            }
-          } catch (err) {
-            console.error('Failed to fetch meetings:', err);
-          } finally {
-            setIsLoadingMeetings(false);
-          }
-        }
       } catch (err) {
         console.error('Failed to fetch data:', err);
       } finally {
@@ -361,17 +329,6 @@ export default function MeetingPrepSetupPage() {
       setIsTriggering(false);
     }
   };
-
-  // Calculate matching meetings based on filter criteria
-  const matchingMeetings = upcomingMeetings.filter((meeting) => {
-    if (includeAllExternalMeetings) return true;
-    const domains = filterDomains
-      .split(',')
-      .map((d) => d.trim().toLowerCase())
-      .filter((d) => d.length > 0);
-    if (domains.length === 0) return true;
-    return domains.some((domain) => meeting.domain.includes(domain));
-  });
 
   if (isLoading) {
     return (
@@ -541,80 +498,6 @@ export default function MeetingPrepSetupPage() {
                 <Link href="/settings/integrations">Connect Calendar</Link>
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Upcoming Meetings Preview */}
-      {calendarConnected && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-lg">Upcoming Meetings</CardTitle>
-            </div>
-            <CardDescription>
-              {isLoadingMeetings
-                ? 'Loading upcoming meetings...'
-                : matchingMeetings.length === 0
-                  ? 'No upcoming external meetings found'
-                  : `${matchingMeetings.length} meeting${matchingMeetings.length === 1 ? '' : 's'} in the next 7 days will receive prep packs`}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingMeetings ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : matchingMeetings.length === 0 ? (
-              <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-                No upcoming meetings with external attendees found in your calendar.
-                Meetings will appear here once they are scheduled.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {matchingMeetings.slice(0, 4).map((meeting) => (
-                  <div
-                    key={meeting.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-medium text-sm">{meeting.title}</p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {new Date(meeting.datetime).toLocaleString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {meeting.attendees.length} external
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant="outline" className="text-xs">
-                        Prep at{' '}
-                        {new Date(meeting.prepScheduledFor).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit',
-                        })}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-                {matchingMeetings.length > 4 && (
-                  <p className="text-center text-sm text-muted-foreground">
-                    +{matchingMeetings.length - 4} more meetings
-                  </p>
-                )}
-              </div>
-            )}
           </CardContent>
         </Card>
       )}
