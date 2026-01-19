@@ -6,7 +6,7 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-18 (Standardized Agent Page UI)
+Last updated: 2026-01-19 (Slack & Google OAuth Production Setup)
 
 ---
 
@@ -122,7 +122,7 @@ Only needed for real customer data. Demo works with mock data.
 | ATLASSIAN_CLIENT_ID | `apps/web/.env.local` | From Atlassian Developer Console |
 | ATLASSIAN_CLIENT_SECRET | `apps/web/.env.local` | From Atlassian Developer Console |
 
-**6.2 Slack**
+**6.2 Slack** ✅ PRODUCTION READY
 
 **Option A: Development/Testing App (Quick Setup)**
 
@@ -130,16 +130,16 @@ Create your own Slack app for testing. Each developer needs their own app.
 
 | Step | Status | Instructions |
 |------|--------|--------------|
-| 1. Create Slack app | 🔲 Pending | Go to https://api.slack.com/apps → Create New App → From scratch |
-| 2. Name the app | 🔲 Pending | e.g., "PMKit Dev" and select your test workspace |
-| 3. Add Bot Token Scopes | 🔲 Pending | OAuth & Permissions → Bot Token Scopes → Add: `channels:history`, `channels:read`, `groups:history`, `groups:read`, `users:read` |
-| 4. Set Redirect URL | 🔲 Pending | OAuth & Permissions → Redirect URLs → Add: `http://localhost:3000/api/connectors/slack/callback` |
-| 5. Copy Client ID | 🔲 Pending | Basic Information → App Credentials → Client ID |
-| 6. Copy Client Secret | 🔲 Pending | Basic Information → App Credentials → Client Secret (click Show) |
-| 7. Install to workspace | 🔲 Pending | OAuth & Permissions → Install to Workspace → Allow |
-| 8. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET` |
-| 9. Generate encryption key | 🔲 Pending | Run: `openssl rand -hex 32` → Add as `CONNECTOR_ENCRYPTION_KEY` |
-| 10. Invite bot to channels | 🔲 Pending | In Slack: `/invite @YourBotName` in channels you want to read |
+| 1. Create Slack app | ✅ Done | Go to https://api.slack.com/apps → Create New App → From scratch |
+| 2. Name the app | ✅ Done | e.g., "PMKit Dev" and select your test workspace |
+| 3. Add Bot Token Scopes | ✅ Done | OAuth & Permissions → Bot Token Scopes → Add: `channels:history`, `channels:read`, `groups:history`, `groups:read`, `users:read` |
+| 4. Set Redirect URL | ✅ Done | OAuth & Permissions → Redirect URLs → Add: `http://localhost:3000/api/connectors/slack/callback` |
+| 5. Copy Client ID | ✅ Done | Basic Information → App Credentials → Client ID |
+| 6. Copy Client Secret | ✅ Done | Basic Information → App Credentials → Client Secret (click Show) |
+| 7. Install to workspace | ✅ Done | OAuth & Permissions → Install to Workspace → Allow |
+| 8. Add env vars | ✅ Done | Add to `apps/web/.env.local`: `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET` |
+| 9. Generate encryption key | ✅ Done | Run: `openssl rand -hex 32` → Add as `CONNECTOR_ENCRYPTION_KEY` |
+| 10. Invite bot to channels | ✅ Done | In Slack: `/invite @YourBotName` in channels you want to read |
 
 **Option B: Production App (Slack App Directory)**
 
@@ -147,18 +147,18 @@ Publish a single PMKit app for all customers. One-click install experience.
 
 | Step | Status | Instructions |
 |------|--------|--------------|
-| 1. Create production app | 🔲 Pending | https://api.slack.com/apps → Create New App → From scratch → "PMKit" |
-| 2. Add Bot Token Scopes | 🔲 Pending | Same scopes as Option A |
-| 3. Set production redirect | 🔲 Pending | `https://getpmkit.com/api/connectors/slack/callback` |
-| 4. Add app icon | 🔲 Pending | Basic Information → Display Information → App Icon (512x512 PNG) |
-| 5. Write short description | 🔲 Pending | Basic Information → Short description (80 chars max) |
-| 6. Write long description | 🔲 Pending | Basic Information → Long description (what the app does) |
-| 7. Add privacy policy URL | 🔲 Pending | `https://getpmkit.com/privacy` |
-| 8. Add support URL | 🔲 Pending | `https://getpmkit.com/contact` or support email |
-| 9. Request scopes justification | 🔲 Pending | Explain why each scope is needed for App Directory review |
-| 10. Submit to App Directory | 🔲 Pending | Manage Distribution → Submit to Slack App Directory |
+| 1. Create production app | ✅ Done | https://api.slack.com/apps → Create New App → From scratch → "PMKit" |
+| 2. Add Bot Token Scopes | ✅ Done | Same scopes as Option A |
+| 3. Set production redirect | ✅ Done | `https://getpmkit.com/api/connectors/slack/callback` |
+| 4. Add app icon | ✅ Done | Basic Information → Display Information → App Icon (512x512 PNG) |
+| 5. Write short description | ✅ Done | Basic Information → Short description (80 chars max) |
+| 6. Write long description | ✅ Done | Basic Information → Long description (what the app does) |
+| 7. Add privacy policy URL | ✅ Done | `https://getpmkit.com/privacy` |
+| 8. Add support URL | ✅ Done | `https://getpmkit.com/contact` or support email |
+| 9. Request scopes justification | ✅ Done | Explain why each scope is needed for App Directory review |
+| 10. Submit to App Directory | 🔄 In Progress | Manage Distribution → Submit to Slack App Directory |
 | 11. Respond to review feedback | 🔲 Pending | Typically 1-2 weeks, may require changes |
-| 12. Update production env vars | 🔲 Pending | Once approved, add production Client ID/Secret to DO |
+| 12. Update production env vars | ✅ Done | Production Client ID/Secret added to DO |
 
 **Scope Justifications for App Directory**
 
@@ -255,33 +255,43 @@ Publish a single PMKit app for all customers. One-click install experience.
 | ZENDESK_CLIENT_SECRET | `apps/web/.env.local` | From Zendesk Admin Center |
 | ZENDESK_SUBDOMAIN | `apps/web/.env.local` | Your Zendesk subdomain (e.g., "acme" for acme.zendesk.com) |
 
-**6.5 Google Workspace (Gmail, Drive, Calendar)**
+**6.5 Google Workspace (Gmail, Drive, Calendar)** ✅ OAUTH COMPLETE, VERIFICATION IN PROGRESS
 
 **Option A: Development/Testing App (Quick Setup)**
 
 | Step | Status | Instructions |
 |------|--------|--------------|
-| 1. Create Google Cloud project | 🔲 Pending | Go to https://console.cloud.google.com/ → Create Project → "PMKit Dev" |
-| 2. Enable APIs | 🔲 Pending | APIs & Services → Library → Enable: Gmail API, Google Drive API, Google Calendar API |
-| 3. Create OAuth consent screen | 🔲 Pending | APIs & Services → OAuth consent screen → External → Fill app info |
-| 4. Add scopes | 🔲 Pending | Add scopes (see below) |
-| 5. Create OAuth client | 🔲 Pending | APIs & Services → Credentials → Create Credentials → OAuth client ID → Web application |
-| 6. Set Authorized redirect URIs | 🔲 Pending | `http://localhost:3000/api/connectors/google/callback` |
-| 7. Copy Client ID | 🔲 Pending | Copy from Credentials page |
-| 8. Copy Client Secret | 🔲 Pending | Copy from Credentials page |
-| 9. Add test users | 🔲 Pending | OAuth consent screen → Test users → Add your email |
-| 10. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
+| 1. Create Google Cloud project | ✅ Done | Go to https://console.cloud.google.com/ → Create Project → "PMKit Dev" |
+| 2. Enable APIs | ✅ Done | APIs & Services → Library → Enable: Gmail API, Google Drive API, Google Calendar API |
+| 3. Create OAuth consent screen | ✅ Done | APIs & Services → OAuth consent screen → External → Fill app info |
+| 4. Add scopes | ✅ Done | Add scopes (see below) |
+| 5. Create OAuth client | ✅ Done | APIs & Services → Credentials → Create Credentials → OAuth client ID → Web application |
+| 6. Set Authorized redirect URIs | ✅ Done | `http://localhost:3000/api/connectors/google/callback` |
+| 7. Copy Client ID | ✅ Done | Copy from Credentials page |
+| 8. Copy Client Secret | ✅ Done | Copy from Credentials page |
+| 9. Add test users | ✅ Done | OAuth consent screen → Test users → Add your email |
+| 10. Add env vars | ✅ Done | Add to `apps/web/.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
 
 **Option B: Production App**
 
 | Step | Status | Instructions |
 |------|--------|--------------|
-| 1. Create production project | 🔲 Pending | Same steps as Option A with production details |
-| 2. Set production redirect | 🔲 Pending | `https://getpmkit.com/api/connectors/google/callback` |
-| 3. Complete OAuth consent screen | 🔲 Pending | Add app icon, privacy policy, terms of service |
-| 4. Submit for verification | 🔲 Pending | OAuth consent screen → Publish App → Submit for verification |
+| 1. Create production project | ✅ Done | Same steps as Option A with production details |
+| 2. Set production redirect | ✅ Done | `https://getpmkit.com/api/connectors/google/callback` |
+| 3. Complete OAuth consent screen | ✅ Done | Add app icon, privacy policy, terms of service |
+| 4. Submit for verification | 🔄 In Progress | OAuth consent screen → Publish App → Submit for verification |
 | 5. Respond to verification feedback | 🔲 Pending | Google may request video demo, typically 1-4 weeks |
-| 6. Update production env vars | 🔲 Pending | Add Client ID/Secret to DO App Platform |
+| 6. Update production env vars | ✅ Done | Add Client ID/Secret to DO App Platform |
+
+**Verification Details**
+
+| Item | Status |
+|------|--------|
+| Trust center with subprocessors | ✅ Done (`/trust` page) |
+| Privacy policy | ✅ Done (`/privacy` page) |
+| Data retention policy | ✅ Done |
+| LLM data handling policy | ✅ Done |
+| Demo video | 🔲 Pending |
 
 **Required Scopes**
 
@@ -706,22 +716,34 @@ Output:
 
 **Goal**: Get the Daily Brief agent working with real Slack data in production.
 
-### Slack App Setup
+### Slack App Setup ✅ COMPLETE
 
 | Item | Status | Notes |
 |------|--------|-------|
-| Create Slack app | 🔲 Pending | https://api.slack.com/apps |
-| Add bot scopes | 🔲 Pending | channels:history, channels:read, groups:history, groups:read, users:read |
-| Add redirect URL | 🔲 Pending | https://getpmkit.com/api/connectors/slack/callback |
-| Generate encryption key | 🔲 Pending | `openssl rand -hex 32` → CONNECTOR_ENCRYPTION_KEY |
-| Add env vars to production | 🔲 Pending | SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, CONNECTOR_ENCRYPTION_KEY |
+| Create Slack app | ✅ Done | https://api.slack.com/apps |
+| Add bot scopes | ✅ Done | channels:history, channels:read, groups:history, groups:read, users:read |
+| Add redirect URL | ✅ Done | https://getpmkit.com/api/connectors/slack/callback |
+| Generate encryption key | ✅ Done | `openssl rand -hex 32` → CONNECTOR_ENCRYPTION_KEY |
+| Add env vars to production | ✅ Done | SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, CONNECTOR_ENCRYPTION_KEY |
+| Submit to Slack App Directory | 🔄 In Progress | Pending Slack review |
+
+### Google Workspace Setup ✅ OAUTH COMPLETE
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Create Google Cloud project | ✅ Done | APIs enabled: Gmail, Drive, Calendar |
+| Configure OAuth consent screen | ✅ Done | External app with all required info |
+| Add production redirect URIs | ✅ Done | https://getpmkit.com/api/connectors/google/callback |
+| Add env vars to production | ✅ Done | GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET |
+| Submit for Google verification | 🔄 In Progress | Pending Google review (sensitive/restricted scopes) |
+| Create demo video for Google | 🔲 Pending | Required for verification |
 
 ### Production Testing
 
 | Item | Status | Notes |
 |------|--------|-------|
-| Test OAuth flow | 🔲 Pending | Connect real Slack workspace |
-| Test channel listing | 🔲 Pending | Verify channels appear in setup UI |
+| Test Slack OAuth flow | ✅ Done | Connect real Slack workspace |
+| Test channel listing | ✅ Done | Verify channels appear in setup UI |
 | Test brief generation | 🔲 Pending | Run with real messages |
 | Test scheduler | 🔲 Pending | Verify daily execution |
 | Monitor first week | 🔲 Pending | Watch for errors, rate limits |
@@ -972,6 +994,24 @@ Items that have been discussed but not committed to.
 ---
 
 ## Changelog
+
+### 2026-01-19 (Slack & Google OAuth Production Setup)
+- **Slack App Directory submission** - Production Slack app ready for customer installs:
+  - OAuth flow working with production redirect URI
+  - All scopes configured and justified (channels:history, channels:read, groups:history, groups:read, users:read)
+  - App submitted to Slack App Directory for review
+  - Customers can install via "Add to Slack" button even before marketplace approval
+- **Google OAuth verification in progress** - Gmail, Drive, Calendar integration:
+  - All three APIs enabled and configured
+  - OAuth consent screen completed with sensitive/restricted scopes
+  - Production redirect URIs configured
+  - Verification submitted (pending Google review)
+  - Scope justifications provided for calendar.readonly, drive.readonly, gmail.readonly
+- **Trust center updated** - Subprocessors section available at `/trust`
+- **Environment variables** - All connector secrets configured in DigitalOcean:
+  - SLACK_CLIENT_ID, SLACK_CLIENT_SECRET
+  - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+  - CONNECTOR_ENCRYPTION_KEY (encrypted)
 
 ### 2026-01-19 (Scheduler Sync & Data Source Persistence)
 - **Fixed Daily Brief scheduler sync** - Agent now properly schedules when config is saved:
