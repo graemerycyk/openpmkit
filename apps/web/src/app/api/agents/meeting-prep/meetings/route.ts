@@ -60,7 +60,7 @@ export async function GET() {
     }
 
     // Check if Google Calendar is connected
-    const calendarConnector = await prisma.connector.findFirst({
+    const calendarConnector = await prisma.connectorInstall.findFirst({
       where: {
         tenantId: user.tenantId,
         connectorKey: 'google-calendar',
