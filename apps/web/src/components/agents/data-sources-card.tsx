@@ -72,6 +72,23 @@ const CONNECTORS = {
 
 type ConnectorKey = keyof typeof CONNECTORS;
 
+// Map connector IDs to OAuth endpoints
+const OAUTH_ENDPOINTS: Record<string, string> = {
+  slack: '/api/connectors/slack/authorize',
+  jira: '/api/connectors/atlassian/authorize',
+  confluence: '/api/connectors/atlassian/authorize',
+  gong: '/api/connectors/gong/authorize',
+  zendesk: '/api/connectors/zendesk/authorize',
+  gmail: '/api/connectors/google/authorize',
+  'google-drive': '/api/connectors/google/authorize',
+  'google-calendar': '/api/connectors/google/authorize',
+  figma: '/api/connectors/figma/authorize',
+};
+
+function getOAuthEndpoint(connectorKey: string): string {
+  return OAUTH_ENDPOINTS[connectorKey] || '/settings/integrations';
+}
+
 // Connector-specific configuration types
 export interface GmailConfig {
   unreadOnly: boolean;
@@ -545,9 +562,19 @@ export function DataSourcesCard({
                     checked={source.enabled ?? false}
                     onCheckedChange={(checked) => onToggle?.(source.key, checked)}
                   />
+                ) : source.key === 'slack' ? (
+                  <a href="/api/connectors/slack/authorize">
+                    <img
+                      alt="Add to Slack"
+                      height="40"
+                      width="139"
+                      src="https://platform.slack-edge.com/img/add_to_slack.png"
+                      srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"
+                    />
+                  </a>
                 ) : (
                   <Button asChild size="sm">
-                    <Link href="/settings/integrations">Connect</Link>
+                    <Link href={getOAuthEndpoint(source.key)}>Connect</Link>
                   </Button>
                 )}
               </div>
