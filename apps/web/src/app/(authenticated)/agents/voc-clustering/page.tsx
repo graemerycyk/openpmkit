@@ -75,6 +75,7 @@ export default function VoCClusteringPage() {
   const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
     gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
     zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
+    slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
   });
 
   // Check if user is admin
@@ -122,6 +123,31 @@ export default function VoCClusteringPage() {
               connected: true,
             }));
           setAllConnectedSources(allConnected);
+
+          // Fetch Slack channels if Slack is connected
+          const slackIsConnected = connectors.some(
+            (c: { connectorKey: string; status: string }) =>
+              c.connectorKey === 'slack' && c.status === 'real'
+          );
+          if (slackIsConnected) {
+            try {
+              const channelsRes = await fetch('/api/connectors/slack/channels');
+              if (channelsRes.ok) {
+                const channelsData = await channelsRes.json();
+                const fetchedChannels = channelsData.channels || [];
+                // Update connector configs with fetched channels
+                setConnectorConfigs((prev) => ({
+                  ...prev,
+                  slack: {
+                    ...prev.slack!,
+                    channels: fetchedChannels,
+                  },
+                }));
+              }
+            } catch (err) {
+              console.error('Failed to fetch Slack channels:', err);
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to fetch connectors:', err);

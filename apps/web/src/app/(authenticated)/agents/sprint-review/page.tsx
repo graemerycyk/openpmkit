@@ -125,6 +125,7 @@ export default function SprintReviewPage() {
   const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
     jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
     confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
+    slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
   });
 
   // Check if user is admin
@@ -219,6 +220,31 @@ export default function SprintReviewPage() {
               connected: true,
             }));
           setAllConnectedSources(allConnected);
+
+          // Fetch Slack channels if Slack is connected
+          const slackIsConnected = connectors.some(
+            (c: { connectorKey: string; status: string }) =>
+              c.connectorKey === 'slack' && c.status === 'real'
+          );
+          if (slackIsConnected) {
+            try {
+              const channelsRes = await fetch('/api/connectors/slack/channels');
+              if (channelsRes.ok) {
+                const channelsData = await channelsRes.json();
+                const fetchedChannels = channelsData.channels || [];
+                // Update connector configs with fetched channels
+                setConnectorConfigs((prev) => ({
+                  ...prev,
+                  slack: {
+                    ...prev.slack!,
+                    channels: fetchedChannels,
+                  },
+                }));
+              }
+            } catch (err) {
+              console.error('Failed to fetch Slack channels:', err);
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);

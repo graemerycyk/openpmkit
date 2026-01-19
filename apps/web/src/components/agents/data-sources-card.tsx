@@ -7,10 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
+  AtSign,
   Calendar,
   CheckCircle2,
   FileText,
+  Hash,
   Headphones,
   Mail,
   MessageSquare,
@@ -126,6 +129,19 @@ export interface ConfluenceConfig {
   sharedWithMe: boolean;
 }
 
+export interface SlackChannel {
+  id: string;
+  name: string;
+  isPrivate: boolean;
+  memberCount?: number;
+}
+
+export interface SlackConfig {
+  includeMentions: boolean;
+  selectedChannels: string[];
+  channels?: SlackChannel[]; // Available channels (populated from API)
+}
+
 export interface ConnectorConfigs {
   gmail?: GmailConfig;
   'google-drive'?: GoogleDriveConfig;
@@ -134,10 +150,11 @@ export interface ConnectorConfigs {
   zendesk?: ZendeskConfig;
   jira?: JiraConfig;
   confluence?: ConfluenceConfig;
+  slack?: SlackConfig;
 }
 
 // Union type for all connector config types
-export type AnyConnectorConfig = GmailConfig | GoogleDriveConfig | GoogleCalendarConfig | GongConfig | ZendeskConfig | JiraConfig | ConfluenceConfig;
+export type AnyConnectorConfig = GmailConfig | GoogleDriveConfig | GoogleCalendarConfig | GongConfig | ZendeskConfig | JiraConfig | ConfluenceConfig | SlackConfig;
 
 // Default configurations for each connector
 export const DEFAULT_CONNECTOR_CONFIGS: ConnectorConfigs = {
@@ -169,6 +186,11 @@ export const DEFAULT_CONNECTOR_CONFIGS: ConnectorConfigs = {
   confluence: {
     recentlyEdited: true,
     sharedWithMe: true,
+  },
+  slack: {
+    includeMentions: true,
+    selectedChannels: [],
+    channels: [],
   },
 };
 
@@ -401,6 +423,120 @@ function ConfluenceConfigUI({
   );
 }
 
+function SlackConfigUI({
+  config,
+  onChange,
+}: {
+  config: SlackConfig;
+  onChange: (config: SlackConfig) => void;
+}) {
+  const channels = config.channels || [];
+  const selectedChannels = config.selectedChannels || [];
+
+  const toggleChannel = (channelId: string) => {
+    const newSelected = selectedChannels.includes(channelId)
+      ? selectedChannels.filter((id) => id !== channelId)
+      : [...selectedChannels, channelId];
+    onChange({ ...config, selectedChannels: newSelected });
+  };
+
+  const selectAllChannels = () => {
+    onChange({ ...config, selectedChannels: channels.map((c) => c.id) });
+  };
+
+  const deselectAllChannels = () => {
+    onChange({ ...config, selectedChannels: [] });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* @mentions toggle */}
+      <div className="flex items-center justify-between rounded-lg border p-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-blue-100 p-2">
+            <AtSign className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <span className="font-medium">Include @mentions</span>
+            <p className="text-sm text-muted-foreground">
+              Messages where you are directly mentioned across all channels
+            </p>
+          </div>
+        </div>
+        <Switch
+          checked={config.includeMentions}
+          onCheckedChange={(checked) => onChange({ ...config, includeMentions: checked })}
+        />
+      </div>
+
+      {/* Channel Selection */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Hash className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium">Additional Channels</span>
+          </div>
+          {channels.length > 0 && (
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={selectAllChannels}>
+                Select All
+              </Button>
+              <Button variant="outline" size="sm" onClick={deselectAllChannels}>
+                Deselect All
+              </Button>
+            </div>
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Select channels to include all messages from, regardless of @mentions
+        </p>
+
+        {channels.length === 0 ? (
+          <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
+            No channels found. Make sure the pmkit Slack app is added to the channels you
+            want to monitor.
+          </p>
+        ) : (
+          <div className="max-h-64 space-y-2 overflow-y-auto">
+            {channels.map((channel) => (
+              <div
+                key={channel.id}
+                className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-muted/50"
+              >
+                <Checkbox
+                  id={channel.id}
+                  checked={selectedChannels.includes(channel.id)}
+                  onCheckedChange={() => toggleChannel(channel.id)}
+                />
+                <Label
+                  htmlFor={channel.id}
+                  className="flex flex-1 cursor-pointer items-center gap-2"
+                >
+                  <span className="text-muted-foreground">#</span>
+                  <span>{channel.name}</span>
+                  {channel.isPrivate && (
+                    <Badge variant="outline" className="text-xs">
+                      Private
+                    </Badge>
+                  )}
+                </Label>
+                {channel.memberCount && (
+                  <span className="text-xs text-muted-foreground">
+                    {channel.memberCount} members
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-sm text-muted-foreground">
+          {selectedChannels.length} of {channels.length} channels selected
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function DataSourcesCard({
   suggestedSources,
   allConnectedSources = [],
@@ -483,6 +619,15 @@ export function DataSourcesCard({
         const config = configs.confluence || DEFAULT_CONNECTOR_CONFIGS.confluence!;
         return (
           <ConfluenceConfigUI
+            config={config}
+            onChange={(newConfig) => onConfigChange(key, newConfig)}
+          />
+        );
+      }
+      case 'slack': {
+        const config = configs.slack || DEFAULT_CONNECTOR_CONFIGS.slack!;
+        return (
+          <SlackConfigUI
             config={config}
             onChange={(newConfig) => onConfigChange(key, newConfig)}
           />

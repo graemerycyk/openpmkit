@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -18,10 +17,8 @@ import {
 } from '@/components/ui/select';
 import {
   AlertCircle,
-  AtSign,
   CheckCircle2,
   Clock,
-  Hash,
   Loader2,
   Play,
   Save,
@@ -37,13 +34,6 @@ import {
 } from '@/components/agents/data-sources-card';
 import { UsageLimitBanner } from '@/components/usage-limit-banner';
 import { useUsage } from '@/hooks/use-usage';
-
-interface SlackChannel {
-  id: string;
-  name: string;
-  isPrivate: boolean;
-  memberCount?: number;
-}
 
 interface AgentConfig {
   id: string;
@@ -92,7 +82,6 @@ const DELIVERY_TIMES = [
 export default function DailyBriefSetupPage() {
   const { currentUsage } = useUsage('daily_brief');
   const [config, setConfig] = useState<AgentConfig | null>(null);
-  const [channels, setChannels] = useState<SlackChannel[]>([]);
   const [slackConnected, setSlackConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -105,8 +94,6 @@ export default function DailyBriefSetupPage() {
   const [dataTimeframe, setDataTimeframe] = useState<'24' | '36'>('24');
   const [deliveryTime, setDeliveryTime] = useState('08:00');
   const [timezone, setTimezone] = useState('America/New_York');
-  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
-  const [includeSlackMentions, setIncludeSlackMentions] = useState(true);
   const [isActive, setIsActive] = useState(true);
 
   // Google connector states
@@ -119,6 +106,7 @@ export default function DailyBriefSetupPage() {
     gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
     'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
     'google-calendar': { ...DEFAULT_CONNECTOR_CONFIGS['google-calendar']! },
+    slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
   });
 
   // Recommended sources for this agent (for DataSourcesCard display)
@@ -141,7 +129,8 @@ export default function DailyBriefSetupPage() {
   const isGcalEnabled = suggestedSources.find((s) => s.key === 'google-calendar')?.enabled ?? false;
 
   // Check if agent can run (has at least one data source enabled and configured)
-  const hasSlackData = slackConnected && isSlackEnabled && (includeSlackMentions || selectedChannels.length > 0);
+  const slackConfig = connectorConfigs.slack;
+  const hasSlackData = slackConnected && isSlackEnabled && (slackConfig?.includeMentions || (slackConfig?.selectedChannels?.length ?? 0) > 0);
   const hasGoogleData = (gmailConnected && isGmailEnabled) ||
                         (gdriveConnected && isGdriveEnabled) ||
                         (gcalConnected && isGcalEnabled);
@@ -212,9 +201,16 @@ export default function DailyBriefSetupPage() {
             setDataTimeframe(data.config.config.dataTimeframeHours === 36 ? '36' : '24');
             setDeliveryTime(data.config.config.deliveryTimeLocal);
             setTimezone(data.config.config.timezone);
-            setSelectedChannels(data.config.config.slackChannels || []);
-            setIncludeSlackMentions(data.config.config.includeSlackMentions ?? true);
             setIsActive(data.config.status === 'active');
+            // Restore Slack config from saved data
+            setConnectorConfigs((prev) => ({
+              ...prev,
+              slack: {
+                ...prev.slack!,
+                selectedChannels: data.config.config.slackChannels || [],
+                includeMentions: data.config.config.includeSlackMentions ?? true,
+              },
+            }));
           }
         }
 
@@ -223,9 +219,17 @@ export default function DailyBriefSetupPage() {
         const channelsRes = await fetch('/api/agents/daily-brief/channels');
         if (channelsRes.ok) {
           const data = await channelsRes.json();
-          setChannels(data.channels || []);
+          const fetchedChannels = data.channels || [];
           setSlackConnected(true);
           isSlackConnected = true;
+          // Update connector configs with fetched channels
+          setConnectorConfigs((prev) => ({
+            ...prev,
+            slack: {
+              ...prev.slack!,
+              channels: fetchedChannels,
+            },
+          }));
         } else {
           setSlackConnected(false);
         }
@@ -259,8 +263,9 @@ export default function DailyBriefSetupPage() {
               if (savedConfig) {
                 // Restore enabled state from saved config
                 if (source.key === 'slack') {
-                  // Slack is enabled if user has selected channels or mentions
-                  isEnabled = isSlackConnected && (savedConfig.includeSlackMentions || ((savedConfig.slackChannels?.length ?? 0) > 0));
+                  // Slack is enabled if user has selected channels or mentions - read from connectorConfigs which was already populated
+                  const slackConf = connectorConfigs.slack;
+                  isEnabled = isSlackConnected && (slackConf?.includeMentions || ((slackConf?.selectedChannels?.length ?? 0) > 0));
                 } else if (source.key === 'gmail') {
                   isEnabled = savedConfig.includeGmail ?? isGmailConnected;
                 } else if (source.key === 'google-drive') {
@@ -307,8 +312,8 @@ export default function DailyBriefSetupPage() {
             dataTimeframeHours: parseInt(dataTimeframe),
             deliveryTimeLocal: deliveryTime,
             timezone,
-            slackChannels: selectedChannels,
-            includeSlackMentions,
+            slackChannels: connectorConfigs.slack?.selectedChannels || [],
+            includeSlackMentions: connectorConfigs.slack?.includeMentions ?? true,
             // Save enabled state from DataSourcesCard toggles
             includeGmail: isGmailEnabled,
             includeGoogleDrive: isGdriveEnabled,
@@ -370,22 +375,6 @@ export default function DailyBriefSetupPage() {
     } finally {
       setIsTriggering(false);
     }
-  };
-
-  const toggleChannel = (channelId: string) => {
-    setSelectedChannels((prev) =>
-      prev.includes(channelId)
-        ? prev.filter((id) => id !== channelId)
-        : [...prev, channelId]
-    );
-  };
-
-  const selectAllChannels = () => {
-    setSelectedChannels(channels.map((c) => c.id));
-  };
-
-  const deselectAllChannels = () => {
-    setSelectedChannels([]);
   };
 
   if (isLoading) {
@@ -530,102 +519,7 @@ export default function DailyBriefSetupPage() {
         onToggle={handleSourceToggle}
         connectorConfigs={connectorConfigs}
         onConfigChange={handleConfigChange}
-        renderConfig={(key) => {
-          // Only Slack has custom configuration UI - others use the default config UI
-          if (key === 'slack' && slackConnected) {
-            return (
-              <div className="space-y-6">
-                {/* @mentions toggle */}
-                <div className="flex items-center justify-between rounded-lg border p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-blue-100 p-2">
-                      <AtSign className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <span className="font-medium">Include @mentions</span>
-                      <p className="text-sm text-muted-foreground">
-                        Messages where you are directly mentioned across all channels
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={includeSlackMentions}
-                    onCheckedChange={setIncludeSlackMentions}
-                  />
-                </div>
-
-                {/* Channel Selection */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Hash className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Additional Channels</span>
-                    </div>
-                    {channels.length > 0 && (
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={selectAllChannels}>
-                          Select All
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={deselectAllChannels}>
-                          Deselect All
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Select channels to include all messages from, regardless of @mentions
-                  </p>
-
-                  {channels.length === 0 ? (
-                    <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-                      No channels found. Make sure the pmkit Slack app is added to the channels you
-                      want to monitor.
-                    </p>
-                  ) : (
-                    <div className="max-h-64 space-y-2 overflow-y-auto">
-                      {channels.map((channel) => (
-                        <div
-                          key={channel.id}
-                          className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-muted/50"
-                        >
-                          <Checkbox
-                            id={channel.id}
-                            checked={selectedChannels.includes(channel.id)}
-                            onCheckedChange={() => toggleChannel(channel.id)}
-                          />
-                          <Label
-                            htmlFor={channel.id}
-                            className="flex flex-1 cursor-pointer items-center gap-2"
-                          >
-                            <span className="text-muted-foreground">#</span>
-                            <span>{channel.name}</span>
-                            {channel.isPrivate && (
-                              <Badge variant="outline" className="text-xs">
-                                Private
-                              </Badge>
-                            )}
-                          </Label>
-                          {channel.memberCount && (
-                            <span className="text-xs text-muted-foreground">
-                              {channel.memberCount} members
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-sm text-muted-foreground">
-                    {selectedChannels.length} of {channels.length} channels selected
-                  </p>
-                </div>
-              </div>
-            );
-          }
-
-          // Return null for other connectors - they will use the default config UI
-          // provided by DataSourcesCard
-          return null;
-        }}
+        /* All connectors use the built-in config UI from DataSourcesCard */
       />
 
       {/* Output Preview */}
