@@ -26,10 +26,7 @@ import {
   Phone,
   Play,
   RefreshCw,
-  Repeat,
   Shield,
-  Target,
-  TrendingUp,
   XCircle,
   type LucideIcon,
 } from 'lucide-react';
