@@ -216,7 +216,7 @@ export default function DailyBriefSetupPage() {
 
         // Check Slack connection and fetch channels
         let isSlackConnected = false;
-        const channelsRes = await fetch('/api/agents/daily-brief/channels');
+        const channelsRes = await fetch('/api/connectors/slack/channels');
         if (channelsRes.ok) {
           const data = await channelsRes.json();
           const fetchedChannels = data.channels || [];
