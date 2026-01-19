@@ -113,9 +113,6 @@ export default function DailyBriefSetupPage() {
   const [gmailConnected, setGmailConnected] = useState(false);
   const [gdriveConnected, setGdriveConnected] = useState(false);
   const [gcalConnected, setGcalConnected] = useState(false);
-  const [includeGmail, setIncludeGmail] = useState(false);
-  const [includeGoogleDrive, setIncludeGoogleDrive] = useState(false);
-  const [includeGoogleCalendar, setIncludeGoogleCalendar] = useState(false);
 
   // Connector-specific configurations
   const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
@@ -217,9 +214,6 @@ export default function DailyBriefSetupPage() {
             setTimezone(data.config.config.timezone);
             setSelectedChannels(data.config.config.slackChannels || []);
             setIncludeSlackMentions(data.config.config.includeSlackMentions ?? true);
-            setIncludeGmail(data.config.config.includeGmail ?? false);
-            setIncludeGoogleDrive(data.config.config.includeGoogleDrive ?? false);
-            setIncludeGoogleCalendar(data.config.config.includeGoogleCalendar ?? false);
             setIsActive(data.config.status === 'active');
           }
         }
