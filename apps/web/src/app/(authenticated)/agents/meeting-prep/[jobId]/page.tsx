@@ -12,15 +12,38 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Database,
   Download,
   ExternalLink,
+  FileText,
+  FolderOpen,
+  Hash,
   Headphones,
+  HelpCircle,
   Loader2,
+  Mail,
   MessageSquare,
+  Palette,
+  Phone,
+  Play,
+  RefreshCw,
+  Shield,
   Ticket,
   User,
   XCircle,
+  type LucideIcon,
 } from 'lucide-react';
+
+interface DataSourceStat {
+  label: string;
+  value: number;
+}
+
+interface DataSourceUsed {
+  key: string;
+  name: string;
+  stats: DataSourceStat[];
+}
 
 interface PrepDetail {
   id: string;
@@ -34,8 +57,11 @@ interface PrepDetail {
       callsAnalyzed?: number;
       ticketsFound?: number;
       latencyMs: number;
+      tokensUsed?: number;
     };
   } | null;
+  dataSourcesUsed?: DataSourceUsed[];
+  connectedSources?: string[];
   config: {
     accountName?: string;
     contactName?: string;
@@ -58,6 +84,20 @@ interface PrepDetail {
     fetchedAt: string;
   }>;
 }
+
+// Map data source keys to icons
+const dataSourceIcons: Record<string, LucideIcon> = {
+  slack: MessageSquare,
+  gmail: Mail,
+  'google-calendar': Calendar,
+  'google-drive': FolderOpen,
+  jira: FileText,
+  confluence: Database,
+  gong: Phone,
+  zendesk: HelpCircle,
+  loom: Play,
+  figma: Palette,
+};
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
@@ -112,6 +152,7 @@ export default function PrepDetailPage() {
 
   const [prep, setPrep] = useState<PrepDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRerunning, setIsRerunning] = useState(false);
 
   useEffect(() => {
     async function fetchPrep() {
@@ -130,6 +171,25 @@ export default function PrepDetailPage() {
     fetchPrep();
   }, [jobId]);
 
+  const handleRerun = async () => {
+    setIsRerunning(true);
+    try {
+      const res = await fetch('/api/agents/meeting-prep/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(prep?.config || {}),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        window.location.href = `/agents/meeting-prep/${data.jobId}`;
+      }
+    } catch (err) {
+      console.error('Failed to rerun:', err);
+    } finally {
+      setIsRerunning(false);
+    }
+  };
+
   const handleDownload = () => {
     if (!prep?.artifact) return;
 
@@ -138,6 +198,82 @@ export default function PrepDetailPage() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `${prep.artifact.title.replace(/\s+/g, '-')}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSIEMExport = () => {
+    if (!prep) return;
+
+    // Build dynamic data sources from the API response
+    const dataSources: Record<string, Record<string, number>> = {};
+    if (prep.dataSourcesUsed) {
+      for (const ds of prep.dataSourcesUsed) {
+        dataSources[ds.key] = {};
+        for (const stat of ds.stats) {
+          dataSources[ds.key][stat.label.toLowerCase().replace(/\s+/g, '_')] = stat.value;
+        }
+      }
+    }
+
+    // Create CEF-formatted SIEM event
+    const siemEvent = {
+      version: 'CEF:0',
+      deviceVendor: 'pmkit',
+      deviceProduct: 'agent-platform',
+      deviceVersion: '1.0.0',
+      signatureId: prep.status === 'completed' ? 'PMKIT-JOB-002' : 'PMKIT-JOB-003',
+      name: prep.status === 'completed' ? 'Job Completed' : 'Job Failed',
+      severity: prep.status === 'completed' ? 1 : 6,
+      src: 'tenant',
+      act: prep.status === 'completed' ? 'job.complete' : 'job.fail',
+      outcome: prep.status === 'completed' ? 'success' : 'failure',
+      reason: prep.error || undefined,
+      cs1: prep.id,
+      cs1Label: 'runId',
+      cs3: 'meeting_prep',
+      cs3Label: 'jobType',
+      cn1: prep.result?.stats?.latencyMs,
+      cn1Label: 'latencyMs',
+      cn2: prep.result?.stats?.tokensUsed,
+      cn2Label: 'tokenCount',
+      rt: prep.startedAt ? new Date(prep.startedAt).getTime() : Date.now(),
+      start: prep.startedAt ? new Date(prep.startedAt).getTime() : undefined,
+      end: prep.completedAt ? new Date(prep.completedAt).getTime() : undefined,
+      dataSources,
+      connectedSources: prep.connectedSources || [],
+    };
+
+    // Format as CEF string
+    const cefHeader = `${siemEvent.version}|${siemEvent.deviceVendor}|${siemEvent.deviceProduct}|${siemEvent.deviceVersion}|${siemEvent.signatureId}|${siemEvent.name}|${siemEvent.severity}`;
+    const extensions = [
+      `src=${siemEvent.src}`,
+      `act=${siemEvent.act}`,
+      `outcome=${siemEvent.outcome}`,
+      siemEvent.reason ? `reason=${siemEvent.reason}` : null,
+      `cs1=${siemEvent.cs1} cs1Label=${siemEvent.cs1Label}`,
+      `cs3=${siemEvent.cs3} cs3Label=${siemEvent.cs3Label}`,
+      siemEvent.cn1 !== undefined ? `cn1=${siemEvent.cn1} cn1Label=${siemEvent.cn1Label}` : null,
+      siemEvent.cn2 !== undefined ? `cn2=${siemEvent.cn2} cn2Label=${siemEvent.cn2Label}` : null,
+      `rt=${siemEvent.rt}`,
+      siemEvent.start ? `start=${siemEvent.start}` : null,
+      siemEvent.end ? `end=${siemEvent.end}` : null,
+    ].filter(Boolean).join(' ');
+
+    const cefString = `${cefHeader}|${extensions}`;
+
+    const exportData = {
+      cef: cefString,
+      json: siemEvent,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `meeting-prep-${prep.id}-siem.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -207,6 +343,20 @@ export default function PrepDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          {prep.status === 'failed' && (
+            <Button variant="outline" onClick={handleRerun} disabled={isRerunning}>
+              {isRerunning ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Re-run
+            </Button>
+          )}
+          <Button variant="outline" onClick={handleSIEMExport}>
+            <Shield className="mr-2 h-4 w-4" />
+            SIEM Export
+          </Button>
           {prep.artifact && (
             <Button variant="outline" onClick={handleDownload}>
               <Download className="mr-2 h-4 w-4" />
@@ -231,58 +381,61 @@ export default function PrepDetailPage() {
       )}
 
       {/* Stats */}
-      {prep.result?.stats && (
-        <div className="grid grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Building2 className="h-4 w-4" />
-                <span className="text-sm">Sources</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {prep.result.stats.sourcesProcessed}
-              </p>
-            </CardContent>
-          </Card>
-          {prep.result.stats.callsAnalyzed !== undefined && (
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Headphones className="h-4 w-4" />
-                  <span className="text-sm">Calls</span>
-                </div>
-                <p className="mt-1 text-2xl font-bold">
-                  {prep.result.stats.callsAnalyzed}
-                </p>
-              </CardContent>
-            </Card>
+      {(prep.dataSourcesUsed && prep.dataSourcesUsed.length > 0) || prep.result?.stats ? (
+        <div className="space-y-4">
+          {/* Data Source Stats - Dynamic based on what was used */}
+          {prep.dataSourcesUsed && prep.dataSourcesUsed.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {prep.dataSourcesUsed.map((dataSource) => {
+                const Icon = dataSourceIcons[dataSource.key] || Hash;
+                return dataSource.stats.map((stat) => (
+                  <Card key={`${dataSource.key}-${stat.label}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Icon className="h-4 w-4" />
+                        <span className="text-sm">{dataSource.name} {stat.label}</span>
+                      </div>
+                      <p className="mt-1 text-2xl font-bold">
+                        {stat.value.toLocaleString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ));
+              })}
+            </div>
           )}
-          {prep.result.stats.ticketsFound !== undefined && (
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Ticket className="h-4 w-4" />
-                  <span className="text-sm">Tickets</span>
-                </div>
-                <p className="mt-1 text-2xl font-bold">
-                  {prep.result.stats.ticketsFound}
-                </p>
-              </CardContent>
-            </Card>
+
+          {/* Processing Stats */}
+          {prep.result?.stats && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">Duration</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {prep.result.stats.latencyMs
+                      ? `${(prep.result.stats.latencyMs / 1000).toFixed(1)}s`
+                      : '-'}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <FileText className="h-4 w-4" />
+                    <span className="text-sm">Tokens Used</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {prep.result.stats.tokensUsed?.toLocaleString() || '-'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           )}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">Duration</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {(prep.result.stats.latencyMs / 1000).toFixed(1)}s
-              </p>
-            </CardContent>
-          </Card>
         </div>
-      )}
+      ) : null}
 
       {/* Error */}
       {prep.error && (

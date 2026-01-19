@@ -186,6 +186,11 @@ export default function SprintReviewPage() {
       let savedConfig: {
         includeSlackHighlights?: boolean;
         includeConfluence?: boolean;
+        connectorConfigs?: {
+          gmail?: object;
+          'google-drive'?: object;
+          'google-calendar'?: object;
+        };
       } | null = null;
 
       try {
@@ -254,13 +259,29 @@ export default function SprintReviewPage() {
               };
             })
           );
-          // Build list of all connected sources
+          // Build list of all connected sources, restoring enabled state from saved config
+          const savedConnectorConfigs = savedConfig?.connectorConfigs;
           const allConnected = connectors
             .filter((c: { status: string }) => c.status === 'real')
-            .map((c: { connectorKey: string }) => ({
-              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
-              connected: true,
-            }));
+            .map((c: { connectorKey: string }) => {
+              const key = c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma';
+              // Restore enabled state from saved config - if connector config was saved, it was enabled
+              let enabled = false;
+              if (savedConnectorConfigs) {
+                if (key === 'gmail') {
+                  enabled = savedConnectorConfigs.gmail !== undefined;
+                } else if (key === 'google-drive') {
+                  enabled = savedConnectorConfigs['google-drive'] !== undefined;
+                } else if (key === 'google-calendar') {
+                  enabled = savedConnectorConfigs['google-calendar'] !== undefined;
+                }
+              }
+              return {
+                key,
+                connected: true,
+                enabled,
+              };
+            });
           setAllConnectedSources(allConnected);
 
           // Fetch Slack channels if Slack is connected
