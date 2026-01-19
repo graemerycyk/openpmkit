@@ -249,12 +249,14 @@ export default function MeetingPrepSetupPage() {
               if (channelsRes.ok) {
                 const channelsData = await channelsRes.json();
                 const fetchedChannels = channelsData.channels || [];
-                // Update connector configs with fetched channels
+                // Update connector configs with fetched channels (preserve selectedChannels)
                 setConnectorConfigs((prev) => ({
                   ...prev,
                   slack: {
                     ...prev.slack!,
                     channels: fetchedChannels,
+                    // Preserve selectedChannels that were restored from saved config
+                    selectedChannels: prev.slack?.selectedChannels || [],
                   },
                 }));
               }

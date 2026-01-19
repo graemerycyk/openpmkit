@@ -4,7 +4,6 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,6 @@ import {
 import { SessionMigration } from '@/components/auth/session-migration';
 import {
   LayoutDashboard,
-  Play,
   User,
   LogOut,
   ChevronDown,
@@ -65,17 +63,6 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          {/* Hide Demo button for admin users on internal plan */}
-          {!isAdmin && (
-            <>
-              <Button size="sm" asChild className="bg-cobalt-600 hover:bg-cobalt-700 text-white">
-                <Link href="/demo/console">
-                  Try Demo
-                </Link>
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-            </>
-          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
@@ -104,14 +91,6 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                   Dashboard
                 </Link>
               </DropdownMenuItem>
-              {!isAdmin && (
-                <DropdownMenuItem asChild>
-                  <Link href="/demo/console" className="flex items-center gap-2 cursor-pointer">
-                    <Play className="h-4 w-4" />
-                    Try Demo
-                  </Link>
-                </DropdownMenuItem>
-              )}
               {isAdmin && (
                 <>
                   <DropdownMenuSeparator />

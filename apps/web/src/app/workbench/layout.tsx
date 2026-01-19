@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Loader2, Lock, ChevronDown, LayoutDashboard, Play, Wrench, LogOut, Settings, ArrowLeft } from 'lucide-react';
+import { User, Loader2, Lock, ChevronDown, LayoutDashboard, LogOut, Settings, ArrowLeft } from 'lucide-react';
 
 export default function WorkbenchLayout({
   children,
@@ -112,12 +111,6 @@ export default function WorkbenchLayout({
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Button size="sm" asChild className="bg-cobalt-600 hover:bg-cobalt-700 text-white">
-            <Link href="/demo/console">
-              Try Demo
-            </Link>
-          </Button>
-          <Separator orientation="vertical" className="h-6" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
@@ -146,20 +139,6 @@ export default function WorkbenchLayout({
                 <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/demo/console" className="flex items-center gap-2 cursor-pointer">
-                  <Play className="h-4 w-4" />
-                  Run Jobs
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/workbench" className="flex items-center gap-2 cursor-pointer">
-                  <Wrench className="h-4 w-4" />
-                  Workbench
-                  <span className="ml-auto text-xs text-cobalt-600">Admin</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
