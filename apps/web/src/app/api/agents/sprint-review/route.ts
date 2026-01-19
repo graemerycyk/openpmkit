@@ -1,7 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
-import { SprintReviewConfigSchema } from '@pmkit/core';
+import { z } from 'zod';
+
+// Schema for connector-specific configuration
+const ConnectorConfigSchema = z.object({
+  slack: z.object({
+    includeMentions: z.boolean().optional(),
+    selectedChannels: z.array(z.string()).optional(),
+  }).optional(),
+  jira: z.object({
+    assignedToMe: z.boolean().optional(),
+    recentlyUpdated: z.boolean().optional(),
+  }).optional(),
+  confluence: z.object({
+    recentlyEdited: z.boolean().optional(),
+    sharedWithMe: z.boolean().optional(),
+  }).optional(),
+}).optional();
+
+// Extended schema that includes UI-specific fields like connectorConfigs
+const SprintReviewPageConfigSchema = z.object({
+  calendarKeywords: z.array(z.string()).default(['Sprint Demo', 'Sprint Review', 'Department Sprint Review']),
+  leadTimeMinutes: z.number().min(60).max(1440).default(240),
+  timezone: z.string(),
+  jiraProjectKeys: z.array(z.string()).default([]),
+  includeVelocity: z.boolean().default(true),
+  includeCarryover: z.boolean().default(true),
+  includeSlackHighlights: z.boolean().default(false),
+  includeConfluence: z.boolean().default(false),
+  connectorConfigs: ConnectorConfigSchema,
+});
 
 // GET - Fetch user's sprint review config
 export async function GET() {
@@ -66,7 +95,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate config
-    const parseResult = SprintReviewConfigSchema.safeParse(body.config);
+    const parseResult = SprintReviewPageConfigSchema.safeParse(body.config);
     if (!parseResult.success) {
       return NextResponse.json(
         { error: 'Invalid config', details: parseResult.error.errors },

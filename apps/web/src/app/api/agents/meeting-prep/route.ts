@@ -3,6 +3,35 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
+// Schema for connector-specific configuration
+const ConnectorConfigSchema = z.object({
+  slack: z.object({
+    includeMentions: z.boolean().optional(),
+    selectedChannels: z.array(z.string()).optional(),
+  }).optional(),
+  gmail: z.object({
+    unreadOnly: z.boolean().optional(),
+    includeStarred: z.boolean().optional(),
+  }).optional(),
+  'google-drive': z.object({
+    sharedWithMe: z.boolean().optional(),
+    recentEdits: z.boolean().optional(),
+    includeComments: z.boolean().optional(),
+  }).optional(),
+  'google-calendar': z.object({
+    todayOnly: z.boolean().optional(),
+    includeDescriptions: z.boolean().optional(),
+  }).optional(),
+  gong: z.object({
+    recentCallsOnly: z.boolean().optional(),
+    includeTranscripts: z.boolean().optional(),
+  }).optional(),
+  zendesk: z.object({
+    openTicketsOnly: z.boolean().optional(),
+    includeComments: z.boolean().optional(),
+  }).optional(),
+}).optional();
+
 // Schema matching what the page sends - different from core MeetingPrepConfigSchema
 // This allows more flexibility for the UI while we can transform to the canonical format
 const MeetingPrepPageConfigSchema = z.object({
@@ -11,6 +40,7 @@ const MeetingPrepPageConfigSchema = z.object({
   filterDomains: z.array(z.string()).default([]),
   includeAllExternalMeetings: z.boolean().default(true),
   enabledSources: z.record(z.boolean()).optional(),
+  connectorConfigs: ConnectorConfigSchema,
 });
 
 // GET - Fetch user's meeting prep config
