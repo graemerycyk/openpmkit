@@ -1,4 +1,4 @@
-import { decryptTokens, type OAuthTokens } from '../connectors';
+import { decryptTokens, encryptTokens, type OAuthTokens } from '../connectors';
 import type {
   EncryptedCredentials,
   FetchedItem,
@@ -7,6 +7,9 @@ import type {
   CalendarFetchOptions,
   CalendarEventMetadata,
 } from './types';
+
+// Google OAuth token refresh endpoint
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 // ============================================================================
 // Internal Types for Google Calendar API Responses
@@ -95,10 +98,16 @@ export class CalendarFetcher implements IFetcher<CalendarEventMetadata, Calendar
   readonly sourceTypes = ['calendar_event'] as const;
 
   private tokens: OAuthTokens;
+  private encryptionKey?: string;
+  private googleClientId?: string;
+  private googleClientSecret?: string;
   private calendarNameCache: Map<string, string> = new Map();
 
-  constructor(tokens: OAuthTokens) {
+  constructor(tokens: OAuthTokens, encryptionKey?: string) {
     this.tokens = tokens;
+    this.encryptionKey = encryptionKey;
+    this.googleClientId = process.env.GOOGLE_CLIENT_ID;
+    this.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
   }
 
   /**
@@ -106,7 +115,15 @@ export class CalendarFetcher implements IFetcher<CalendarEventMetadata, Calendar
    */
   static fromEncrypted(credentials: EncryptedCredentials): CalendarFetcher {
     const tokens = decryptTokens(credentials.encryptedBlob, credentials.encryptionKey);
-    return new CalendarFetcher(tokens);
+    return new CalendarFetcher(tokens, credentials.encryptionKey);
+  }
+
+  /**
+   * Get the current (possibly refreshed) encrypted blob for credential updates.
+   */
+  getUpdatedEncryptedBlob(): string | null {
+    if (!this.encryptionKey) return null;
+    return encryptTokens(this.tokens, this.encryptionKey);
   }
 
   /**
@@ -240,13 +257,24 @@ export class CalendarFetcher implements IFetcher<CalendarEventMetadata, Calendar
 
   /**
    * Make an authenticated request to the Calendar API.
+   * Handles token refresh on 401 errors.
    */
-  private async makeRequest<T>(url: string): Promise<T> {
+  private async makeRequest<T>(url: string, retryAfterRefresh = true): Promise<T> {
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.tokens.accessToken}`,
       },
     });
+
+    // Handle token expiration - try to refresh
+    if (response.status === 401 && retryAfterRefresh && this.tokens.refreshToken) {
+      console.log('[CalendarFetcher] Access token expired, attempting refresh...');
+      const refreshed = await this.refreshAccessToken();
+      if (refreshed) {
+        // Retry the request with the new token
+        return this.makeRequest<T>(url, false);
+      }
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -254,6 +282,58 @@ export class CalendarFetcher implements IFetcher<CalendarEventMetadata, Calendar
     }
 
     return response.json() as Promise<T>;
+  }
+
+  /**
+   * Refresh the access token using the refresh token.
+   */
+  private async refreshAccessToken(): Promise<boolean> {
+    if (!this.tokens.refreshToken) {
+      console.warn('[CalendarFetcher] No refresh token available');
+      return false;
+    }
+
+    if (!this.googleClientId || !this.googleClientSecret) {
+      console.warn('[CalendarFetcher] Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET for token refresh');
+      return false;
+    }
+
+    try {
+      const response = await fetch(GOOGLE_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: this.googleClientId,
+          client_secret: this.googleClientSecret,
+          refresh_token: this.tokens.refreshToken,
+          grant_type: 'refresh_token',
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[CalendarFetcher] Token refresh failed:', errorText);
+        return false;
+      }
+
+      const data = await response.json();
+
+      // Update tokens (refresh token stays the same, access token is new)
+      this.tokens = {
+        ...this.tokens,
+        accessToken: data.access_token,
+        expiresIn: data.expires_in,
+        expiresAt: new Date(Date.now() + data.expires_in * 1000).toISOString(),
+      };
+
+      console.log('[CalendarFetcher] Access token refreshed successfully');
+      return true;
+    } catch (error) {
+      console.error('[CalendarFetcher] Token refresh error:', error);
+      return false;
+    }
   }
 
   /**
