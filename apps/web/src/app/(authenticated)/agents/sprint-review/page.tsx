@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -24,7 +23,6 @@ import {
   CheckCircle2,
   Loader2,
   Play,
-  Repeat,
   Save,
   Settings2,
   Target,
@@ -104,12 +102,6 @@ export default function SprintReviewPage() {
   const [timezone, setTimezone] = useState('America/New_York');
   const [includeVelocity, setIncludeVelocity] = useState(true);
   const [includeCarryover, setIncludeCarryover] = useState(true);
-
-  // Manual run form state (for on-demand runs)
-  const [sprintName, setSprintName] = useState('');
-  const [sprintGoal, setSprintGoal] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
 
   // Recommended sources for this agent
   const [suggestedSources, setSuggestedSources] = useState([
@@ -262,8 +254,8 @@ export default function SprintReviewPage() {
   const jiraEnabled = jiraSource?.enabled ?? false;
   // canSave: can save settings when keywords exist (Jira is recommended but not strictly required for saving)
   const canSave = calendarKeywords.length > 0;
-  // canRun: can manually run when Jira connected and sprint name provided (admin only)
-  const canRun = jiraConnected && jiraEnabled && sprintName.trim() !== '';
+  // canRun: can run when Jira is connected and enabled (admin only)
+  const canRun = jiraConnected && jiraEnabled;
 
   // Handle toggling a source on/off
   const handleSourceToggle = (key: string, enabled: boolean) => {
@@ -354,10 +346,6 @@ export default function SprintReviewPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sprintName: sprintName.trim(),
-          sprintGoal: sprintGoal.trim() || undefined,
-          startDate: startDate || undefined,
-          endDate: endDate || undefined,
           connectorConfigs: {
             jira: jiraEnabled ? connectorConfigs.jira : undefined,
             confluence: suggestedSources.find(s => s.key === 'confluence')?.enabled ? connectorConfigs.confluence : undefined,
@@ -370,10 +358,10 @@ export default function SprintReviewPage() {
         setSuccess(`Sprint Review started! Job ID: ${data.jobId}`);
       } else {
         const data = await res.json();
-        setError(data.error || 'Failed to start sprint review');
+        setError(data.error || 'Failed to trigger agent');
       }
     } catch {
-      setError('Failed to start. Please try again.');
+      setError('Failed to trigger. Please try again.');
     } finally {
       setIsRunning(false);
     }
@@ -595,73 +583,24 @@ export default function SprintReviewPage() {
         </CardContent>
       </Card>
 
-      {/* Manual Run Section - Admin Only */}
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Repeat className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-lg">Manual Run</CardTitle>
-            </div>
-            <CardDescription>
-              Run a one-off sprint review for a specific sprint
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="sprint-name">Sprint Name or ID</Label>
-              <Input
-                id="sprint-name"
-                placeholder="e.g., Sprint 24, or board/sprint ID from Jira"
-                value={sprintName}
-                onChange={(e) => setSprintName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="sprint-goal">Sprint Goal (optional)</Label>
-              <Textarea
-                id="sprint-goal"
-                placeholder="e.g., Complete user authentication flow and deploy to staging"
-                value={sprintGoal}
-                onChange={(e) => setSprintGoal(e.target.value)}
-                rows={2}
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="start-date">Sprint Start Date (optional)</Label>
-                <Input
-                  id="start-date"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="end-date">Sprint End Date (optional)</Label>
-                <Input
-                  id="end-date"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-            </div>
-            <Button onClick={handleRun} disabled={isRunning || !canRun} className="w-full">
+      {/* Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={handleRun}
+              disabled={isRunning || !canRun}
+            >
               {isRunning ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Play className="mr-2 h-4 w-4" />
               )}
-              Generate Review Now
+              Run Now
             </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center justify-between">
-        <div />
+          )}
+        </div>
         <Button
           onClick={handleSave}
           disabled={isSaving || !canSave}
