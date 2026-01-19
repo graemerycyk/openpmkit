@@ -49,6 +49,21 @@ interface AgentConfig {
     includeCarryover: boolean;
     includeSlackHighlights: boolean;
     includeConfluence: boolean;
+    // Connector-specific configurations
+    connectorConfigs?: {
+      slack?: {
+        includeMentions?: boolean;
+        selectedChannels?: string[];
+      };
+      jira?: {
+        assignedToMe?: boolean;
+        recentlyUpdated?: boolean;
+      };
+      confluence?: {
+        recentlyEdited?: boolean;
+        sharedWithMe?: boolean;
+      };
+    };
   };
   nextRunAt: string | null;
   lastRunAt: string | null;
@@ -170,6 +185,19 @@ export default function SprintReviewPage() {
             setTimezone(data.config.config.timezone || 'America/New_York');
             setIncludeVelocity(data.config.config.includeVelocity ?? true);
             setIncludeCarryover(data.config.config.includeCarryover ?? true);
+            // Restore saved connector configs (Slack channels, etc.)
+            if (data.config.config.connectorConfigs) {
+              setConnectorConfigs((prev) => ({
+                ...prev,
+                slack: {
+                  ...prev.slack!,
+                  includeMentions: data.config.config.connectorConfigs?.slack?.includeMentions ?? prev.slack!.includeMentions,
+                  selectedChannels: data.config.config.connectorConfigs?.slack?.selectedChannels || [],
+                },
+                jira: data.config.config.connectorConfigs?.jira || prev.jira,
+                confluence: data.config.config.connectorConfigs?.confluence || prev.confluence,
+              }));
+            }
           }
         }
 
@@ -300,6 +328,11 @@ export default function SprintReviewPage() {
     setError(null);
     setSuccess(null);
 
+    // Get enabled states for connectors
+    const slackEnabled = suggestedSources.find(s => s.key === 'slack')?.enabled ?? false;
+    const confluenceEnabled = suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false;
+    const jiraEnabled = suggestedSources.find(s => s.key === 'jira')?.enabled ?? false;
+
     try {
       const res = await fetch('/api/agents/sprint-review', {
         method: 'POST',
@@ -313,8 +346,17 @@ export default function SprintReviewPage() {
             jiraProjectKeys: [], // Will be populated from connector config
             includeVelocity,
             includeCarryover,
-            includeSlackHighlights: suggestedSources.find(s => s.key === 'slack')?.enabled ?? false,
-            includeConfluence: suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false,
+            includeSlackHighlights: slackEnabled,
+            includeConfluence: confluenceEnabled,
+            // Save connector-specific configs (Slack channels, etc.)
+            connectorConfigs: {
+              slack: slackEnabled ? {
+                includeMentions: connectorConfigs.slack?.includeMentions,
+                selectedChannels: connectorConfigs.slack?.selectedChannels || [],
+              } : undefined,
+              jira: jiraEnabled ? connectorConfigs.jira : undefined,
+              confluence: confluenceEnabled ? connectorConfigs.confluence : undefined,
+            },
           },
         }),
       });

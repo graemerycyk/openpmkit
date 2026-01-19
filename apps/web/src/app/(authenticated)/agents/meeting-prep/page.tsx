@@ -72,6 +72,34 @@ interface AgentConfig {
       slack?: boolean;
       zendesk?: boolean;
     };
+    // Connector-specific configurations
+    connectorConfigs?: {
+      slack?: {
+        includeMentions?: boolean;
+        selectedChannels?: string[];
+      };
+      gmail?: {
+        unreadOnly?: boolean;
+        includeStarred?: boolean;
+      };
+      'google-drive'?: {
+        sharedWithMe?: boolean;
+        recentEdits?: boolean;
+        includeComments?: boolean;
+      };
+      'google-calendar'?: {
+        todayOnly?: boolean;
+        includeDescriptions?: boolean;
+      };
+      gong?: {
+        recentCallsOnly?: boolean;
+        includeTranscripts?: boolean;
+      };
+      zendesk?: {
+        openTicketsOnly?: boolean;
+        includeComments?: boolean;
+      };
+    };
   };
   nextRunAt: string | null;
   lastRunAt: string | null;
@@ -153,6 +181,22 @@ export default function MeetingPrepSetupPage() {
             setFilterDomains((data.config.config.filterDomains || []).join(', '));
             setIncludeAllExternalMeetings(data.config.config.includeAllExternalMeetings ?? true);
             setIsActive(data.config.status === 'active');
+            // Restore saved connector configs (Slack channels, etc.)
+            if (data.config.config.connectorConfigs) {
+              setConnectorConfigs((prev) => ({
+                ...prev,
+                slack: {
+                  ...prev.slack!,
+                  includeMentions: data.config.config.connectorConfigs?.slack?.includeMentions ?? prev.slack!.includeMentions,
+                  selectedChannels: data.config.config.connectorConfigs?.slack?.selectedChannels || [],
+                },
+                gmail: data.config.config.connectorConfigs?.gmail || prev.gmail,
+                'google-drive': data.config.config.connectorConfigs?.['google-drive'] || prev['google-drive'],
+                'google-calendar': data.config.config.connectorConfigs?.['google-calendar'] || prev['google-calendar'],
+                gong: data.config.config.connectorConfigs?.gong || prev.gong,
+                zendesk: data.config.config.connectorConfigs?.zendesk || prev.zendesk,
+              }));
+            }
           }
         }
 
@@ -280,6 +324,18 @@ export default function MeetingPrepSetupPage() {
             filterDomains: domains,
             includeAllExternalMeetings,
             enabledSources,
+            // Save connector-specific configs (Slack channels, etc.)
+            connectorConfigs: {
+              slack: enabledSources.slack ? {
+                includeMentions: connectorConfigs.slack?.includeMentions,
+                selectedChannels: connectorConfigs.slack?.selectedChannels || [],
+              } : undefined,
+              gmail: enabledSources.gmail ? connectorConfigs.gmail : undefined,
+              'google-drive': enabledSources['google-drive'] ? connectorConfigs['google-drive'] : undefined,
+              'google-calendar': enabledSources['google-calendar'] ? connectorConfigs['google-calendar'] : undefined,
+              gong: enabledSources.gong ? connectorConfigs.gong : undefined,
+              zendesk: enabledSources.zendesk ? connectorConfigs.zendesk : undefined,
+            },
           },
         }),
       });
