@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import {
   AlertCircle,
+  ArrowLeft,
   CheckCircle2,
   Loader2,
   Play,
@@ -196,11 +198,18 @@ export default function DeckContentPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-bold">Deck Content Agent</h1>
-          <p className="text-muted-foreground">
-            Generate content for presentations and decks
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/agents">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="font-heading text-2xl font-bold">Deck Content Agent</h1>
+            <p className="text-muted-foreground">
+              Generate content for presentations and decks
+            </p>
+          </div>
         </div>
         <Badge variant="outline">Autonomous</Badge>
       </div>

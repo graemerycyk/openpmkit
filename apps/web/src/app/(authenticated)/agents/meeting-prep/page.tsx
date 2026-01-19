@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import {
   AlertCircle,
+  ArrowLeft,
   Calendar,
   CalendarDays,
   CheckCircle2,
@@ -384,11 +385,18 @@ export default function MeetingPrepSetupPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-bold">Meeting Prep Agent</h1>
-          <p className="text-muted-foreground">
-            Automatically generate prep packs before customer meetings
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/agents">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="font-heading text-2xl font-bold">Meeting Prep Agent</h1>
+            <p className="text-muted-foreground">
+              Automatically generate prep packs before customer meetings
+            </p>
+          </div>
         </div>
         {config && (
           <Badge

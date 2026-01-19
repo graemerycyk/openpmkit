@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import {
   AlertCircle,
+  ArrowLeft,
   CheckCircle2,
   Clock,
   Loader2,
@@ -389,11 +391,18 @@ export default function DailyBriefSetupPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-bold">Daily Brief Agent</h1>
-          <p className="text-muted-foreground">
-            Get a synthesized morning brief of overnight activity from Slack, Gmail and other sources
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/agents">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="font-heading text-2xl font-bold">Daily Brief Agent</h1>
+            <p className="text-muted-foreground">
+              Get a synthesized morning brief of overnight activity from Slack, Gmail and other sources
+            </p>
+          </div>
         </div>
         {config && (
           <Badge

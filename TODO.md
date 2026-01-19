@@ -293,6 +293,23 @@ Publish a single PMKit app for all customers. One-click install experience.
 | LLM data handling policy | ✅ Done |
 | Demo video | 🔲 Pending |
 
+**⚠️ Unverified App Warning (Blocks Good FTUE)**
+
+Until Google verification completes, non-test users see a scary warning:
+1. User clicks "Connect Gmail/Drive/Calendar"
+2. Sees: "Google hasn't verified this app"
+3. Must click "Advanced" → "Go to PMKit (unsafe)"
+4. Then sees normal consent screen
+
+**Impact**: Kills conversion for new users who don't trust the app yet.
+
+**Workarounds**:
+- Add early users as "test users" in Google Cloud Console (they bypass the warning)
+- Walk users through the warning on a call
+- Wait for verification to complete (1-4 weeks)
+
+**Recommendation**: Promote Slack integration first (no friction). Hold off promoting Google connectors until verified.
+
 **Required Scopes**
 
 | Scope | API | Justification |
