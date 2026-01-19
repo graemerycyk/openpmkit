@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -83,6 +83,7 @@ const DELIVERY_TIMES = [
 ];
 
 export default function DailyBriefSetupPage() {
+  const router = useRouter();
   const { currentUsage } = useUsage('daily_brief');
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const [slackConnected, setSlackConnected] = useState<boolean>(false);
@@ -393,10 +394,8 @@ export default function DailyBriefSetupPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/agents">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <h1 className="font-heading text-2xl font-bold">Daily Brief Agent</h1>

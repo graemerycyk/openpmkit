@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,19 @@ interface AgentConfig {
         recentlyEdited?: boolean;
         sharedWithMe?: boolean;
       };
+      gmail?: {
+        unreadOnly?: boolean;
+        includeStarred?: boolean;
+      };
+      'google-drive'?: {
+        sharedWithMe?: boolean;
+        recentEdits?: boolean;
+        includeComments?: boolean;
+      };
+      'google-calendar'?: {
+        todayOnly?: boolean;
+        includeDescriptions?: boolean;
+      };
     };
   };
   nextRunAt: string | null;
@@ -100,6 +113,7 @@ const LEAD_TIME_OPTIONS = [
 const DEFAULT_KEYWORDS = ['Sprint Demo', 'Sprint Review', 'Department Sprint Review'];
 
 export default function SprintReviewPage() {
+  const router = useRouter();
   const { currentUsage } = useUsage('sprint_review');
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,6 +149,9 @@ export default function SprintReviewPage() {
     jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
     confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
     slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
+    gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
+    'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
+    'google-calendar': { ...DEFAULT_CONNECTOR_CONFIGS['google-calendar']! },
   });
 
   // Check if user is admin
@@ -196,6 +213,9 @@ export default function SprintReviewPage() {
                 },
                 jira: data.config.config.connectorConfigs?.jira || prev.jira,
                 confluence: data.config.config.connectorConfigs?.confluence || prev.confluence,
+                gmail: data.config.config.connectorConfigs?.gmail || prev.gmail,
+                'google-drive': data.config.config.connectorConfigs?.['google-drive'] || prev['google-drive'],
+                'google-calendar': data.config.config.connectorConfigs?.['google-calendar'] || prev['google-calendar'],
               }));
             }
           }
@@ -330,10 +350,13 @@ export default function SprintReviewPage() {
     setError(null);
     setSuccess(null);
 
-    // Get enabled states for connectors
+    // Get enabled states for connectors from both suggestedSources and allConnectedSources
     const slackEnabled = suggestedSources.find(s => s.key === 'slack')?.enabled ?? false;
     const confluenceEnabled = suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false;
     const jiraEnabled = suggestedSources.find(s => s.key === 'jira')?.enabled ?? false;
+    const gmailEnabled = allConnectedSources.find(s => s.key === 'gmail')?.enabled ?? false;
+    const driveEnabled = allConnectedSources.find(s => s.key === 'google-drive')?.enabled ?? false;
+    const calendarEnabled = allConnectedSources.find(s => s.key === 'google-calendar')?.enabled ?? false;
 
     try {
       const res = await fetch('/api/agents/sprint-review', {
@@ -358,6 +381,9 @@ export default function SprintReviewPage() {
               } : undefined,
               jira: jiraEnabled ? connectorConfigs.jira : undefined,
               confluence: confluenceEnabled ? connectorConfigs.confluence : undefined,
+              gmail: gmailEnabled ? connectorConfigs.gmail : undefined,
+              'google-drive': driveEnabled ? connectorConfigs['google-drive'] : undefined,
+              'google-calendar': calendarEnabled ? connectorConfigs['google-calendar'] : undefined,
             },
           },
         }),
@@ -424,10 +450,8 @@ export default function SprintReviewPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/agents">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <h1 className="font-heading text-2xl font-bold">Sprint Review Agent</h1>

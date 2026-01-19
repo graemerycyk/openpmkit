@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -135,6 +136,7 @@ function BriefCard({ job }: { job: BriefJob }) {
 }
 
 export default function BriefHistoryPage() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<BriefJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -165,10 +167,8 @@ export default function BriefHistoryPage() {
             View your past Daily Briefs
           </p>
         </div>
-        <Button variant="outline" asChild>
-          <Link href="/agents/daily-brief">
-            Back to Agent
-          </Link>
+        <Button variant="outline" onClick={() => router.back()}>
+          Back
         </Button>
       </div>
 

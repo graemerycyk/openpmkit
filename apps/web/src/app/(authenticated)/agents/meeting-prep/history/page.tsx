@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -142,6 +143,7 @@ function PrepCard({ job }: { job: PrepJob }) {
 }
 
 export default function PrepHistoryPage() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<PrepJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -172,8 +174,8 @@ export default function PrepHistoryPage() {
             View your past Meeting Prep packs
           </p>
         </div>
-        <Button variant="outline" asChild>
-          <Link href="/agents/meeting-prep">Back to Agent</Link>
+        <Button variant="outline" onClick={() => router.back()}>
+          Back
         </Button>
       </div>
 

@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -108,6 +107,7 @@ function SourceIcon({ type }: { type: string }) {
 
 export default function PrepDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const jobId = params.jobId as string;
 
   const [prep, setPrep] = useState<PrepDetail | null>(null);
@@ -162,8 +162,8 @@ export default function PrepDetailPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               This Meeting Prep pack could not be found.
             </p>
-            <Button className="mt-4" variant="outline" asChild>
-              <Link href="/agents/meeting-prep/history">Back to History</Link>
+            <Button className="mt-4" variant="outline" onClick={() => router.back()}>
+              Back to History
             </Button>
           </CardContent>
         </Card>
@@ -176,10 +176,8 @@ export default function PrepDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/agents/meeting-prep/history">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <div className="flex items-center gap-2">

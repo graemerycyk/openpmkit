@@ -17,6 +17,19 @@ const ConnectorConfigSchema = z.object({
     recentlyEdited: z.boolean().optional(),
     sharedWithMe: z.boolean().optional(),
   }).optional(),
+  gmail: z.object({
+    unreadOnly: z.boolean().optional(),
+    includeStarred: z.boolean().optional(),
+  }).optional(),
+  'google-drive': z.object({
+    sharedWithMe: z.boolean().optional(),
+    recentEdits: z.boolean().optional(),
+    includeComments: z.boolean().optional(),
+  }).optional(),
+  'google-calendar': z.object({
+    todayOnly: z.boolean().optional(),
+    includeDescriptions: z.boolean().optional(),
+  }).optional(),
 }).optional();
 
 // Extended schema that includes UI-specific fields like connectorConfigs

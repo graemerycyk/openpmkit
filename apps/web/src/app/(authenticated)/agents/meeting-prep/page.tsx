@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -106,6 +107,7 @@ interface AgentConfig {
 }
 
 export default function MeetingPrepSetupPage() {
+  const router = useRouter();
   const { currentUsage } = useUsage('meeting_prep');
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -396,10 +398,8 @@ export default function MeetingPrepSetupPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/agents">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <h1 className="font-heading text-2xl font-bold">Meeting Prep Agent</h1>
