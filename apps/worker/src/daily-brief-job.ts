@@ -81,8 +81,9 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
 
   // Determine available data sources
   const wantsSlackData =
-    config.includeSlackMentions ||
-    (config.slackChannels && config.slackChannels.length > 0);
+    config.includeSlack &&
+    (config.includeSlackMentions ||
+      (config.slackChannels && config.slackChannels.length > 0));
   const hasSlackData = wantsSlackData && slackConnected;
   const hasGmailSource = config.includeGmail && gmailConnected;
 

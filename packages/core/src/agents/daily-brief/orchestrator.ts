@@ -105,7 +105,7 @@ export async function executeDailyBrief(
     // Build fetcher config from DailyBriefConfig
     const fetcherConfig: FetcherConfig = {};
 
-    if (config.slackChannels?.length > 0 || config.includeSlackMentions) {
+    if (config.includeSlack && (config.slackChannels?.length > 0 || config.includeSlackMentions)) {
       fetcherConfig.slack = {
         channelIds: config.slackChannels || [],
         includeMentions: config.includeSlackMentions,

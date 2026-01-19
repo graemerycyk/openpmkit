@@ -118,6 +118,7 @@ export async function POST(request: NextRequest) {
           deliveryTime: configData.deliveryTimeLocal,
           timezone: configData.timezone,
           channelCount: configData.slackChannels.length,
+          includeSlack: configData.includeSlack,
           includeSlackMentions: configData.includeSlackMentions,
           includeGmail: configData.includeGmail,
           includeGoogleDrive: configData.includeGoogleDrive,

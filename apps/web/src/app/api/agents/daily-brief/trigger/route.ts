@@ -43,8 +43,9 @@ export async function POST() {
     // Get agent config to check what data sources are enabled
     const configData = agentConfig.config as DailyBriefConfig;
     const wantsSlackData =
-      configData.includeSlackMentions ||
-      (configData.slackChannels && configData.slackChannels.length > 0);
+      configData.includeSlack &&
+      (configData.includeSlackMentions ||
+        (configData.slackChannels && configData.slackChannels.length > 0));
 
     // Fetch all connector installs for this tenant
     const connectorInstalls = await prisma.connectorInstall.findMany({

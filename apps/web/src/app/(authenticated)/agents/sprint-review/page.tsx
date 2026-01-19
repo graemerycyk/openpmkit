@@ -120,7 +120,7 @@ export default function SprintReviewPage() {
 
   // All connected sources from API (for showing additional connected integrations)
   const [allConnectedSources, setAllConnectedSources] = useState<
-    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
+    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean; enabled?: boolean }[]
   >([]);
 
   // Connector-specific configurations
@@ -260,14 +260,21 @@ export default function SprintReviewPage() {
   const jiraSource = suggestedSources.find((s) => s.key === 'jira');
   const jiraConnected = jiraSource?.connected ?? false;
   const jiraEnabled = jiraSource?.enabled ?? false;
-  // canSave: can save settings when Jira is connected and keywords exist
-  const canSave = jiraConnected && jiraEnabled && calendarKeywords.length > 0;
+  // canSave: can save settings when keywords exist (Jira is recommended but not strictly required for saving)
+  const canSave = calendarKeywords.length > 0;
   // canRun: can manually run when Jira connected and sprint name provided (admin only)
   const canRun = jiraConnected && jiraEnabled && sprintName.trim() !== '';
 
   // Handle toggling a source on/off
   const handleSourceToggle = (key: string, enabled: boolean) => {
+    // Update suggestedSources if the key exists there
     setSuggestedSources((prev) =>
+      prev.map((source) =>
+        source.key === key ? { ...source, enabled } : source
+      )
+    );
+    // Also update allConnectedSources for additional sources (like Google connectors)
+    setAllConnectedSources((prev) =>
       prev.map((source) =>
         source.key === key ? { ...source, enabled } : source
       )

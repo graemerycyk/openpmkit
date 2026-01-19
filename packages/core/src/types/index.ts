@@ -113,6 +113,7 @@ export const DailyBriefConfigSchema = z.object({
   timezone: z.string(), // IANA timezone, e.g., 'America/New_York'
   // Slack configuration
   slackChannels: z.array(z.string()).default([]), // Array of channel IDs (user-selected)
+  includeSlack: z.boolean().default(false), // Enable Slack as a data source
   includeSlackMentions: z.boolean().default(true), // Include messages where user is @mentioned
   // Google connectors (optional - include if connected)
   includeGmail: z.boolean().default(false),
@@ -127,7 +128,7 @@ export const MeetingPrepConfigSchema = z.object({
   timezone: z.string(),
   // Data sources
   includeJira: z.boolean().default(true),
-  includeSlack: z.boolean().default(true),
+  includeSlack: z.boolean().default(false),
   includeGong: z.boolean().default(false),
   includeConfluence: z.boolean().default(false),
 });
@@ -143,7 +144,7 @@ export const SprintReviewConfigSchema = z.object({
   includeVelocity: z.boolean().default(true),
   includeCarryover: z.boolean().default(true), // Include items carried from previous sprint
   // Additional data sources
-  includeSlackHighlights: z.boolean().default(true),
+  includeSlackHighlights: z.boolean().default(false),
   includeConfluence: z.boolean().default(false),
 });
 export type SprintReviewConfig = z.infer<typeof SprintReviewConfigSchema>;

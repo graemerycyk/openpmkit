@@ -158,14 +158,9 @@ export default function MeetingPrepSetupPage() {
 
         // Fetch connectors
         const connectorsRes = await fetch('/api/connectors');
-        let calendarIsConnected = false;
         if (connectorsRes.ok) {
           const data = await connectorsRes.json();
           const connectors = data.connectors || [];
-          calendarIsConnected = connectors.some(
-            (c: { connectorKey: string; status: string }) =>
-              c.connectorKey === 'google-calendar' && c.status === 'real'
-          );
           // Update suggested sources with connection status and restore enabled state from saved config
           setSuggestedSources((prev) =>
             prev.map((source) => {

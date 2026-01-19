@@ -45,6 +45,7 @@ interface AgentConfig {
     deliveryTimeLocal: string;
     timezone: string;
     slackChannels: string[];
+    includeSlack: boolean;
     includeSlackMentions: boolean;
     includeGmail: boolean;
     includeGoogleDrive: boolean;
@@ -185,6 +186,7 @@ export default function DailyBriefSetupPage() {
     async function fetchData() {
       // Track saved config to restore enabled states
       let savedConfig: {
+        includeSlack?: boolean;
         includeSlackMentions?: boolean;
         slackChannels?: string[];
         includeGmail?: boolean;
@@ -260,20 +262,18 @@ export default function DailyBriefSetupPage() {
                       c.connectorKey === source.key && c.status === 'real'
                   );
 
-              // Determine enabled state: use saved config if available, otherwise default to connected state
-              let isEnabled = isConnected; // Default for new users or sources without saved preference
+              // Determine enabled state: use saved config if available, otherwise default to false (not enabled)
+              let isEnabled = false; // Default for new users - data sources are off until explicitly enabled
               if (savedConfig) {
                 // Restore enabled state from saved config
                 if (source.key === 'slack') {
-                  // Slack is enabled if user has selected channels or mentions - read from connectorConfigs which was already populated
-                  const slackConf = connectorConfigs.slack;
-                  isEnabled = isSlackConnected && (slackConf?.includeMentions || ((slackConf?.selectedChannels?.length ?? 0) > 0));
+                  isEnabled = savedConfig.includeSlack ?? false;
                 } else if (source.key === 'gmail') {
-                  isEnabled = savedConfig.includeGmail ?? isGmailConnected;
+                  isEnabled = savedConfig.includeGmail ?? false;
                 } else if (source.key === 'google-drive') {
-                  isEnabled = savedConfig.includeGoogleDrive ?? isGdriveConnected;
+                  isEnabled = savedConfig.includeGoogleDrive ?? false;
                 } else if (source.key === 'google-calendar') {
-                  isEnabled = savedConfig.includeGoogleCalendar ?? isGcalConnected;
+                  isEnabled = savedConfig.includeGoogleCalendar ?? false;
                 }
               }
 
@@ -315,6 +315,7 @@ export default function DailyBriefSetupPage() {
             deliveryTimeLocal: deliveryTime,
             timezone,
             slackChannels: connectorConfigs.slack?.selectedChannels || [],
+            includeSlack: isSlackEnabled,
             includeSlackMentions: connectorConfigs.slack?.includeMentions ?? true,
             // Save enabled state from DataSourcesCard toggles
             includeGmail: isGmailEnabled,
