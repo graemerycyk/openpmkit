@@ -102,9 +102,15 @@ export class GmailFetcher implements IFetcher<GmailMessageMetadata, GmailFetchOp
       // Build Gmail search query
       const queryParts: string[] = [];
 
-      // Label filters
-      for (const label of labels) {
-        queryParts.push(`label:${label}`);
+      // Label filters - use OR logic for multiple labels (not AND)
+      // Gmail search uses space as AND, so we need explicit OR syntax
+      if (labels.length === 1) {
+        queryParts.push(`label:${labels[0]}`);
+      } else if (labels.length > 1) {
+        // Wrap multiple labels in OR group: {label:INBOX label:IMPORTANT}
+        // Gmail's curly braces mean "any of these"
+        const labelQuery = labels.map(l => `label:${l}`).join(' ');
+        queryParts.push(`{${labelQuery}}`);
       }
 
       // Optional filters
