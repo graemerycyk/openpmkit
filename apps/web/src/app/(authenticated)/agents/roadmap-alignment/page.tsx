@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
 import {
   AlertCircle,
   ArrowLeft,
@@ -16,6 +17,7 @@ import {
   Loader2,
   Play,
   Save,
+  Settings2,
   Target,
 } from 'lucide-react';
 import {
@@ -28,11 +30,13 @@ import { UsageLimitBanner } from '@/components/usage-limit-banner';
 import { useUsage } from '@/hooks/use-usage';
 
 export default function RoadmapAlignmentPage() {
+  const router = useRouter();
   const { currentUsage } = useUsage('roadmap_alignment');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -165,10 +169,8 @@ export default function RoadmapAlignmentPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/agents">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <h1 className="font-heading text-2xl font-bold">Roadmap Alignment Agent</h1>
@@ -177,7 +179,7 @@ export default function RoadmapAlignmentPage() {
             </p>
           </div>
         </div>
-        <Badge variant="outline">Autonomous</Badge>
+        <Badge variant="secondary">Coming Soon</Badge>
       </div>
 
       {/* Alerts */}
@@ -282,6 +284,32 @@ export default function RoadmapAlignmentPage() {
               <span>Recommendations for better alignment</span>
             </li>
           </ul>
+        </CardContent>
+      </Card>
+
+      {/* Agent Status */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Agent Status</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="agent-active">Enable Roadmap Alignment Agent</Label>
+              <p className="text-sm text-muted-foreground">
+                When enabled, the agent will be available for scheduled runs
+              </p>
+            </div>
+            <Switch
+              id="agent-active"
+              checked={isActive}
+              onCheckedChange={setIsActive}
+              disabled={true}
+            />
+          </div>
         </CardContent>
       </Card>
 
