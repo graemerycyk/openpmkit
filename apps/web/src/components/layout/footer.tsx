@@ -26,7 +26,7 @@ const footerLinks = {
     { name: 'Gong Insights', href: '/resources/gong-transcripts-to-product-insights' },
     { name: 'Community to Roadmap', href: '/resources/community-ideas-to-roadmap' },
     { name: 'Jira & Confluence', href: '/resources/jira-and-confluence-ai-workflows' },
-    { name: 'MCP Connectors', href: '/resources/mcp-connectors-for-enterprise-tools' },
+    { name: 'Secure Connectors', href: '/resources/secure-connectors-for-enterprise-tools' },
   ],
   governance: [
     { name: 'Enterprise Governance', href: '/resources/enterprise-pm-governance' },
