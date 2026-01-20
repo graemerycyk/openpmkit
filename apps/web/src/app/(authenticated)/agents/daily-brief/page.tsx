@@ -122,12 +122,18 @@ export default function DailyBriefSetupPage() {
   const [gdriveConnected, setGdriveConnected] = useState(false);
   const [gcalConnected, setGcalConnected] = useState(false);
 
+  // Atlassian connector states
+  const [jiraConnected, setJiraConnected] = useState(false);
+  const [confluenceConnected, setConfluenceConnected] = useState(false);
+
   // Connector-specific configurations
   const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
     gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
     'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
     'google-calendar': { ...DEFAULT_CONNECTOR_CONFIGS['google-calendar']! },
     slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
   });
 
   // Recommended sources for this agent (for DataSourcesCard display)
@@ -136,6 +142,8 @@ export default function DailyBriefSetupPage() {
     { key: 'gmail' as const, connected: false, enabled: false },
     { key: 'google-drive' as const, connected: false, enabled: false },
     { key: 'google-calendar' as const, connected: false, enabled: false },
+    { key: 'jira' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -148,6 +156,8 @@ export default function DailyBriefSetupPage() {
   const isGmailEnabled = suggestedSources.find((s) => s.key === 'gmail')?.enabled ?? false;
   const isGdriveEnabled = suggestedSources.find((s) => s.key === 'google-drive')?.enabled ?? false;
   const isGcalEnabled = suggestedSources.find((s) => s.key === 'google-calendar')?.enabled ?? false;
+  const isJiraEnabled = suggestedSources.find((s) => s.key === 'jira')?.enabled ?? false;
+  const isConfluenceEnabled = suggestedSources.find((s) => s.key === 'confluence')?.enabled ?? false;
 
   // Check if agent can run (has at least one data source enabled and configured)
   const slackConfig = connectorConfigs.slack;
@@ -155,7 +165,9 @@ export default function DailyBriefSetupPage() {
   const hasGoogleData = (gmailConnected && isGmailEnabled) ||
                         (gdriveConnected && isGdriveEnabled) ||
                         (gcalConnected && isGcalEnabled);
-  const canRun = hasSlackData || hasGoogleData;
+  const hasAtlassianData = (jiraConnected && isJiraEnabled) ||
+                           (confluenceConnected && isConfluenceEnabled);
+  const canRun = hasSlackData || hasGoogleData || hasAtlassianData;
 
   // Handle toggling a source on/off
   const handleSourceToggle = (key: string, enabled: boolean) => {
@@ -212,6 +224,8 @@ export default function DailyBriefSetupPage() {
         includeGmail?: boolean;
         includeGoogleDrive?: boolean;
         includeGoogleCalendar?: boolean;
+        includeJira?: boolean;
+        includeConfluence?: boolean;
       } | null = null;
 
       try {
@@ -238,6 +252,9 @@ export default function DailyBriefSetupPage() {
                 selectedChannels: data.config.config.slackChannels || [],
                 includeMentions: data.config.config.includeSlackMentions ?? true,
               },
+              // Restore Jira and Confluence configs if available
+              jira: data.config.config.connectorConfigs?.jira || prev.jira,
+              confluence: data.config.config.connectorConfigs?.confluence || prev.confluence,
             }));
           }
         }
@@ -272,9 +289,13 @@ export default function DailyBriefSetupPage() {
           const isGmailConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'gmail' && c.status === 'real');
           const isGdriveConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-drive' && c.status === 'real');
           const isGcalConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real');
+          const isJiraConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'jira' && c.status === 'real');
+          const isConfluenceConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'confluence' && c.status === 'real');
           setGmailConnected(isGmailConnected);
           setGdriveConnected(isGdriveConnected);
           setGcalConnected(isGcalConnected);
+          setJiraConnected(isJiraConnected);
+          setConfluenceConnected(isConfluenceConnected);
 
           // Update suggested sources - restore enabled state from saved config if available
           setSuggestedSources((prev) =>
@@ -298,6 +319,10 @@ export default function DailyBriefSetupPage() {
                   isEnabled = savedConfig.includeGoogleDrive ?? false;
                 } else if (source.key === 'google-calendar') {
                   isEnabled = savedConfig.includeGoogleCalendar ?? false;
+                } else if (source.key === 'jira') {
+                  isEnabled = savedConfig.includeJira ?? false;
+                } else if (source.key === 'confluence') {
+                  isEnabled = savedConfig.includeConfluence ?? false;
                 }
               }
 
@@ -346,11 +371,15 @@ export default function DailyBriefSetupPage() {
             includeGmail: isGmailEnabled,
             includeGoogleDrive: isGdriveEnabled,
             includeGoogleCalendar: isGcalEnabled,
+            includeJira: isJiraEnabled,
+            includeConfluence: isConfluenceEnabled,
             // Connector-specific configs
             connectorConfigs: {
               gmail: isGmailEnabled ? connectorConfigs.gmail : undefined,
               'google-drive': isGdriveEnabled ? connectorConfigs['google-drive'] : undefined,
               'google-calendar': isGcalEnabled ? connectorConfigs['google-calendar'] : undefined,
+              jira: isJiraEnabled ? connectorConfigs.jira : undefined,
+              confluence: isConfluenceEnabled ? connectorConfigs.confluence : undefined,
             },
           },
         }),

@@ -28,6 +28,7 @@ interface AgentInfo {
   id: string;
   title: string;
   href: string;
+  isAvailable: boolean;
 }
 
 interface RecentJob {
@@ -40,17 +41,20 @@ interface RecentJob {
   createdAt: string;
 }
 
+// Available agents are shown to all users, others are "Coming Soon" for non-admins
 const AGENTS: AgentInfo[] = [
-  { id: 'daily_brief', title: 'Daily Brief', href: '/agents/daily-brief' },
-  { id: 'meeting_prep', title: 'Meeting Prep', href: '/agents/meeting-prep' },
-  { id: 'sprint_review', title: 'Sprint Review', href: '/agents/sprint-review' },
-  { id: 'voc_clustering', title: 'VoC Clustering', href: '/agents/voc-clustering' },
-  { id: 'competitor_research', title: 'Competitor Research', href: '/agents/competitor-research' },
-  { id: 'roadmap_alignment', title: 'Roadmap Alignment', href: '/agents/roadmap-alignment' },
-  { id: 'prd_draft', title: 'PRD Draft', href: '/agents/prd-draft' },
-  { id: 'prototype_generation', title: 'Prototype Generation', href: '/agents/prototype-generation' },
-  { id: 'release_notes', title: 'Release Notes', href: '/agents/release-notes' },
-  { id: 'deck_content', title: 'Deck Content', href: '/agents/deck-content' },
+  // Available agents (first 3)
+  { id: 'daily_brief', title: 'Daily Brief', href: '/agents/daily-brief', isAvailable: true },
+  { id: 'meeting_prep', title: 'Meeting Prep', href: '/agents/meeting-prep', isAvailable: true },
+  { id: 'voc_clustering', title: 'VoC Clustering', href: '/agents/voc-clustering', isAvailable: true },
+  // Coming soon agents (admins can still access for testing)
+  { id: 'sprint_review', title: 'Sprint Review', href: '/agents/sprint-review', isAvailable: false },
+  { id: 'competitor_research', title: 'Competitor Research', href: '/agents/competitor-research', isAvailable: false },
+  { id: 'roadmap_alignment', title: 'Roadmap Alignment', href: '/agents/roadmap-alignment', isAvailable: false },
+  { id: 'prd_draft', title: 'PRD Draft', href: '/agents/prd-draft', isAvailable: false },
+  { id: 'prototype_generation', title: 'Prototype Generation', href: '/agents/prototype-generation', isAvailable: false },
+  { id: 'release_notes', title: 'Release Notes', href: '/agents/release-notes', isAvailable: false },
+  { id: 'deck_content', title: 'Deck Content', href: '/agents/deck-content', isAvailable: false },
 ];
 
 // Map job types to display info
@@ -67,23 +71,59 @@ const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; href: s
   deck_content: { name: 'Deck Content', icon: Presentation, href: '/agents/deck-content' },
 };
 
-function HistoryAgentCard({ title, icon: Icon, href }: { title: string; icon: typeof FileText; href: string }) {
-  return (
-    <Link href={`${href}/history`}>
-      <Card className="group transition-all hover:shadow-md hover:border-cobalt-200">
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="rounded-lg bg-cobalt-100 p-3">
-            <Icon className="h-5 w-5 text-cobalt-600" />
-          </div>
-          <div className="flex-1">
+function HistoryAgentCard({
+  title,
+  icon: Icon,
+  href,
+  isClickable
+}: {
+  title: string;
+  icon: typeof FileText;
+  href: string;
+  isClickable: boolean;
+}) {
+  const content = (
+    <Card className={cn(
+      "transition-all",
+      isClickable
+        ? "group hover:shadow-md hover:border-cobalt-200 cursor-pointer"
+        : "opacity-60 cursor-not-allowed"
+    )}>
+      <CardContent className="flex items-center gap-4 p-4">
+        <div className={cn(
+          "rounded-lg p-3",
+          isClickable ? "bg-cobalt-100" : "bg-muted"
+        )}>
+          <Icon className={cn(
+            "h-5 w-5",
+            isClickable ? "text-cobalt-600" : "text-muted-foreground"
+          )} />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
             <h3 className="font-medium">{title}</h3>
-            <p className="text-sm text-muted-foreground">View history</p>
+            {!isClickable && (
+              <Badge variant="secondary" className="text-xs">
+                Coming Soon
+              </Badge>
+            )}
           </div>
+          <p className="text-sm text-muted-foreground">
+            {isClickable ? 'View history' : 'Available soon'}
+          </p>
+        </div>
+        {isClickable && (
           <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
-        </CardContent>
-      </Card>
-    </Link>
+        )}
+      </CardContent>
+    </Card>
   );
+
+  if (isClickable) {
+    return <Link href={`${href}/history`}>{content}</Link>;
+  }
+
+  return content;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -149,15 +189,24 @@ function RecentJobCard({ job }: { job: RecentJob }) {
 export default function AgentsPage() {
   const [recentJobs, setRecentJobs] = useState<RecentJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const jobsRes = await fetch('/api/jobs/recent');
+        const [jobsRes, adminRes] = await Promise.all([
+          fetch('/api/jobs/recent'),
+          fetch('/api/workbench/run-job'),
+        ]);
 
         if (jobsRes.ok) {
           const jobsData = await jobsRes.json();
           setRecentJobs(jobsData.jobs || []);
+        }
+
+        if (adminRes.ok) {
+          const adminData = await adminRes.json();
+          setIsAdmin(adminData.isAdmin === true);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -208,12 +257,15 @@ export default function AgentsPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {AGENTS.map((agent) => {
             const info = jobTypeInfo[agent.id];
+            // Admin users can access all agents, others only available ones
+            const isClickable = isAdmin || agent.isAvailable;
             return (
               <HistoryAgentCard
                 key={agent.id}
                 title={agent.title}
                 icon={info?.icon || Bot}
                 href={agent.href}
+                isClickable={isClickable}
               />
             );
           })}

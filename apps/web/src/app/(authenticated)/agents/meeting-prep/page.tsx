@@ -72,6 +72,8 @@ interface AgentConfig {
       gong?: boolean;
       slack?: boolean;
       zendesk?: boolean;
+      jira?: boolean;
+      confluence?: boolean;
     };
     // Connector-specific configurations
     connectorConfigs?: {
@@ -99,6 +101,14 @@ interface AgentConfig {
       zendesk?: {
         openTicketsOnly?: boolean;
         includeComments?: boolean;
+      };
+      jira?: {
+        assignedToMe?: boolean;
+        recentlyUpdated?: boolean;
+      };
+      confluence?: {
+        recentlyEdited?: boolean;
+        sharedWithMe?: boolean;
       };
     };
   };
@@ -132,6 +142,8 @@ export default function MeetingPrepSetupPage() {
     { key: 'gong' as const, connected: false, enabled: false },
     { key: 'slack' as const, connected: false, enabled: false },
     { key: 'zendesk' as const, connected: false, enabled: false },
+    { key: 'jira' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -147,6 +159,8 @@ export default function MeetingPrepSetupPage() {
     gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
     zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
     slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
   });
 
   // Check if user is admin
@@ -197,6 +211,8 @@ export default function MeetingPrepSetupPage() {
                 'google-calendar': data.config.config.connectorConfigs?.['google-calendar'] || prev['google-calendar'],
                 gong: data.config.config.connectorConfigs?.gong || prev.gong,
                 zendesk: data.config.config.connectorConfigs?.zendesk || prev.zendesk,
+                jira: data.config.config.connectorConfigs?.jira || prev.jira,
+                confluence: data.config.config.connectorConfigs?.confluence || prev.confluence,
               }));
             }
           }
@@ -339,6 +355,8 @@ export default function MeetingPrepSetupPage() {
               'google-calendar': enabledSources['google-calendar'] ? connectorConfigs['google-calendar'] : undefined,
               gong: enabledSources.gong ? connectorConfigs.gong : undefined,
               zendesk: enabledSources.zendesk ? connectorConfigs.zendesk : undefined,
+              jira: enabledSources.jira ? connectorConfigs.jira : undefined,
+              confluence: enabledSources.confluence ? connectorConfigs.confluence : undefined,
             },
           },
         }),

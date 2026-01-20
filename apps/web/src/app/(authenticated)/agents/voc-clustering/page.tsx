@@ -66,6 +66,8 @@ export default function VoCClusteringPage() {
     { key: 'gong' as const, connected: false, enabled: false },
     { key: 'zendesk' as const, connected: false, enabled: false },
     { key: 'slack' as const, connected: false, enabled: false },
+    { key: 'jira' as const, connected: false, enabled: false },
+    { key: 'confluence' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -78,6 +80,8 @@ export default function VoCClusteringPage() {
     gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
     zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
     slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
+    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
+    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
   });
 
   // Check if user is admin
