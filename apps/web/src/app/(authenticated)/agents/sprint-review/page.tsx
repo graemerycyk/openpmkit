@@ -137,6 +137,7 @@ export default function SprintReviewPage() {
     { key: 'jira' as const, connected: false, enabled: false },
     { key: 'confluence' as const, connected: false, enabled: false },
     { key: 'slack' as const, connected: false, enabled: false },
+    { key: 'zendesk' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -152,6 +153,7 @@ export default function SprintReviewPage() {
     gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
     'google-drive': { ...DEFAULT_CONNECTOR_CONFIGS['google-drive']! },
     'google-calendar': { ...DEFAULT_CONNECTOR_CONFIGS['google-calendar']! },
+    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
   });
 
   // Check if user is admin
@@ -186,10 +188,12 @@ export default function SprintReviewPage() {
       let savedConfig: {
         includeSlackHighlights?: boolean;
         includeConfluence?: boolean;
+        includeZendesk?: boolean;
         connectorConfigs?: {
           gmail?: object;
           'google-drive'?: object;
           'google-calendar'?: object;
+          zendesk?: object;
         };
       } | null = null;
 
@@ -249,6 +253,8 @@ export default function SprintReviewPage() {
                   isEnabled = savedConfig.includeSlackHighlights ?? isConnected;
                 } else if (source.key === 'confluence') {
                   isEnabled = savedConfig.includeConfluence ?? isConnected;
+                } else if (source.key === 'zendesk') {
+                  isEnabled = savedConfig.includeZendesk ?? isConnected;
                 }
               }
 
@@ -375,6 +381,7 @@ export default function SprintReviewPage() {
     const slackEnabled = suggestedSources.find(s => s.key === 'slack')?.enabled ?? false;
     const confluenceEnabled = suggestedSources.find(s => s.key === 'confluence')?.enabled ?? false;
     const jiraEnabled = suggestedSources.find(s => s.key === 'jira')?.enabled ?? false;
+    const zendeskEnabled = suggestedSources.find(s => s.key === 'zendesk')?.enabled ?? false;
     const gmailEnabled = allConnectedSources.find(s => s.key === 'gmail')?.enabled ?? false;
     const driveEnabled = allConnectedSources.find(s => s.key === 'google-drive')?.enabled ?? false;
     const calendarEnabled = allConnectedSources.find(s => s.key === 'google-calendar')?.enabled ?? false;
@@ -394,6 +401,7 @@ export default function SprintReviewPage() {
             includeCarryover,
             includeSlackHighlights: slackEnabled,
             includeConfluence: confluenceEnabled,
+            includeZendesk: zendeskEnabled,
             // Save connector-specific configs (Slack channels, etc.)
             connectorConfigs: {
               slack: slackEnabled ? {
@@ -402,6 +410,7 @@ export default function SprintReviewPage() {
               } : undefined,
               jira: jiraEnabled ? connectorConfigs.jira : undefined,
               confluence: confluenceEnabled ? connectorConfigs.confluence : undefined,
+              zendesk: zendeskEnabled ? connectorConfigs.zendesk : undefined,
               gmail: gmailEnabled ? connectorConfigs.gmail : undefined,
               'google-drive': driveEnabled ? connectorConfigs['google-drive'] : undefined,
               'google-calendar': calendarEnabled ? connectorConfigs['google-calendar'] : undefined,

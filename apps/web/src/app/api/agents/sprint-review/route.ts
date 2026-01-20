@@ -17,6 +17,10 @@ const ConnectorConfigSchema = z.object({
     recentlyEdited: z.boolean().optional(),
     sharedWithMe: z.boolean().optional(),
   }).optional(),
+  zendesk: z.object({
+    openTicketsOnly: z.boolean().optional(),
+    includeComments: z.boolean().optional(),
+  }).optional(),
   gmail: z.object({
     unreadOnly: z.boolean().optional(),
     includeStarred: z.boolean().optional(),
@@ -42,6 +46,7 @@ const SprintReviewPageConfigSchema = z.object({
   includeCarryover: z.boolean().default(true),
   includeSlackHighlights: z.boolean().default(false),
   includeConfluence: z.boolean().default(false),
+  includeZendesk: z.boolean().default(false),
   connectorConfigs: ConnectorConfigSchema,
 });
 

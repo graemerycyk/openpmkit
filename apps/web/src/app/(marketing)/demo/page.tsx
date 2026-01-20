@@ -27,7 +27,7 @@ import {
 export const metadata: Metadata = {
   title: 'Demo',
   description:
-    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 10 PM workflow jobs end-to-end.',
+    'Try the pmkit Agent Console with a complete demo enterprise dataset. Run all 10+ PM workflow jobs end-to-end.',
   openGraph: {
     title: 'pmkit Demo',
     description: 'Try the Agent Console with a complete demo enterprise dataset.',
@@ -42,6 +42,14 @@ const jobs = [
     icon: FileText,
     duration: '~30s',
     sources: ['Slack', 'Jira', 'Zendesk', 'Discourse'],
+  },
+  {
+    id: 'voc_clustering',
+    name: 'VoC Clustering',
+    description: 'Cluster customer feedback into actionable themes with evidence.',
+    icon: BarChart3,
+    duration: '~45s',
+    sources: ['Zendesk', 'Gong', 'Discourse', 'Social Crawler'],
   },
   {
     id: 'meeting_prep',
@@ -67,14 +75,6 @@ const jobs = [
     icon: FileText,
     duration: '~40s',
     sources: ['Discourse', 'Gong', 'Amplitude', 'Confluence'],
-  },
-  {
-    id: 'voc_clustering',
-    name: 'VoC Clustering',
-    description: 'Cluster customer feedback into actionable themes with evidence.',
-    icon: BarChart3,
-    duration: '~45s',
-    sources: ['Zendesk', 'Gong', 'Discourse', 'Social Crawler'],
   },
   {
     id: 'competitor_research',
@@ -156,7 +156,7 @@ export default function DemoPage() {
               Try the Agent Console
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Run all 10 PM workflow jobs with a complete demo enterprise dataset. See tool calls,
+              Run all 10+ PM workflow jobs with a complete demo enterprise dataset. See tool calls,
               sources, and downloadable artifacts.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -187,7 +187,7 @@ export default function DemoPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">10 Product Manager Workflows</h2>
+            <h2 className="font-heading text-3xl font-bold">10+ Product Manager Workflows</h2>
             <p className="mt-4 text-muted-foreground">
               Run any job to see the complete workflow; tool calls, sources, and artifacts.
             </p>
@@ -227,6 +227,18 @@ export default function DemoPage() {
                 </CardContent>
               </Card>
             ))}
+            {/* More coming soon card */}
+            <Card className="border-2 border-dashed border-cobalt-200 bg-cobalt-50/30 flex items-center justify-center">
+              <CardContent className="text-center py-12">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                  <ArrowRight className="h-6 w-6 text-cobalt-600" />
+                </div>
+                <CardTitle className="text-lg text-cobalt-700">More coming soon</CardTitle>
+                <CardDescription className="mt-2">
+                  New workflows added regularly
+                </CardDescription>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

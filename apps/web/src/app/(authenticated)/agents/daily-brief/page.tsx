@@ -126,6 +126,9 @@ export default function DailyBriefSetupPage() {
   const [jiraConnected, setJiraConnected] = useState(false);
   const [confluenceConnected, setConfluenceConnected] = useState(false);
 
+  // Support connector states
+  const [zendeskConnected, setZendeskConnected] = useState(false);
+
   // Connector-specific configurations
   const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
     gmail: { ...DEFAULT_CONNECTOR_CONFIGS.gmail! },
@@ -134,6 +137,7 @@ export default function DailyBriefSetupPage() {
     slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
     jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
     confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
+    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
   });
 
   // Recommended sources for this agent (for DataSourcesCard display)
@@ -144,6 +148,7 @@ export default function DailyBriefSetupPage() {
     { key: 'google-calendar' as const, connected: false, enabled: false },
     { key: 'jira' as const, connected: false, enabled: false },
     { key: 'confluence' as const, connected: false, enabled: false },
+    { key: 'zendesk' as const, connected: false, enabled: false },
   ]);
 
   // All connected sources from API (for showing additional connected integrations)
@@ -158,6 +163,7 @@ export default function DailyBriefSetupPage() {
   const isGcalEnabled = suggestedSources.find((s) => s.key === 'google-calendar')?.enabled ?? false;
   const isJiraEnabled = suggestedSources.find((s) => s.key === 'jira')?.enabled ?? false;
   const isConfluenceEnabled = suggestedSources.find((s) => s.key === 'confluence')?.enabled ?? false;
+  const isZendeskEnabled = suggestedSources.find((s) => s.key === 'zendesk')?.enabled ?? false;
 
   // Check if agent can run (has at least one data source enabled and configured)
   const slackConfig = connectorConfigs.slack;
@@ -167,7 +173,8 @@ export default function DailyBriefSetupPage() {
                         (gcalConnected && isGcalEnabled);
   const hasAtlassianData = (jiraConnected && isJiraEnabled) ||
                            (confluenceConnected && isConfluenceEnabled);
-  const canRun = hasSlackData || hasGoogleData || hasAtlassianData;
+  const hasSupportData = zendeskConnected && isZendeskEnabled;
+  const canRun = hasSlackData || hasGoogleData || hasAtlassianData || hasSupportData;
 
   // Handle toggling a source on/off
   const handleSourceToggle = (key: string, enabled: boolean) => {
@@ -226,6 +233,12 @@ export default function DailyBriefSetupPage() {
         includeGoogleCalendar?: boolean;
         includeJira?: boolean;
         includeConfluence?: boolean;
+        includeZendesk?: boolean;
+        connectorConfigs?: {
+          jira?: object;
+          confluence?: object;
+          zendesk?: object;
+        };
       } | null = null;
 
       try {
@@ -252,9 +265,10 @@ export default function DailyBriefSetupPage() {
                 selectedChannels: data.config.config.slackChannels || [],
                 includeMentions: data.config.config.includeSlackMentions ?? true,
               },
-              // Restore Jira and Confluence configs if available
+              // Restore Jira, Confluence, and Zendesk configs if available
               jira: data.config.config.connectorConfigs?.jira || prev.jira,
               confluence: data.config.config.connectorConfigs?.confluence || prev.confluence,
+              zendesk: data.config.config.connectorConfigs?.zendesk || prev.zendesk,
             }));
           }
         }
@@ -291,11 +305,13 @@ export default function DailyBriefSetupPage() {
           const isGcalConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'google-calendar' && c.status === 'real');
           const isJiraConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'jira' && c.status === 'real');
           const isConfluenceConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'confluence' && c.status === 'real');
+          const isZendeskConnected = connectors.some((c: { connectorKey: string; status: string }) => c.connectorKey === 'zendesk' && c.status === 'real');
           setGmailConnected(isGmailConnected);
           setGdriveConnected(isGdriveConnected);
           setGcalConnected(isGcalConnected);
           setJiraConnected(isJiraConnected);
           setConfluenceConnected(isConfluenceConnected);
+          setZendeskConnected(isZendeskConnected);
 
           // Update suggested sources - restore enabled state from saved config if available
           setSuggestedSources((prev) =>
@@ -323,6 +339,8 @@ export default function DailyBriefSetupPage() {
                   isEnabled = savedConfig.includeJira ?? false;
                 } else if (source.key === 'confluence') {
                   isEnabled = savedConfig.includeConfluence ?? false;
+                } else if (source.key === 'zendesk') {
+                  isEnabled = savedConfig.includeZendesk ?? false;
                 }
               }
 
@@ -373,6 +391,7 @@ export default function DailyBriefSetupPage() {
             includeGoogleCalendar: isGcalEnabled,
             includeJira: isJiraEnabled,
             includeConfluence: isConfluenceEnabled,
+            includeZendesk: isZendeskEnabled,
             // Connector-specific configs
             connectorConfigs: {
               gmail: isGmailEnabled ? connectorConfigs.gmail : undefined,
@@ -380,6 +399,7 @@ export default function DailyBriefSetupPage() {
               'google-calendar': isGcalEnabled ? connectorConfigs['google-calendar'] : undefined,
               jira: isJiraEnabled ? connectorConfigs.jira : undefined,
               confluence: isConfluenceEnabled ? connectorConfigs.confluence : undefined,
+              zendesk: isZendeskEnabled ? connectorConfigs.zendesk : undefined,
             },
           },
         }),

@@ -119,6 +119,13 @@ export const DailyBriefConfigSchema = z.object({
   includeGmail: z.boolean().default(false),
   includeGoogleDrive: z.boolean().default(false),
   includeGoogleCalendar: z.boolean().default(false),
+  // Atlassian connectors
+  includeJira: z.boolean().default(false),
+  includeConfluence: z.boolean().default(false),
+  // Support connectors
+  includeZendesk: z.boolean().default(false),
+  // Connector-specific configurations (stored as JSON)
+  connectorConfigs: z.any().optional(),
 });
 export type DailyBriefConfig = z.infer<typeof DailyBriefConfigSchema>;
 
@@ -146,6 +153,9 @@ export const SprintReviewConfigSchema = z.object({
   // Additional data sources
   includeSlackHighlights: z.boolean().default(false),
   includeConfluence: z.boolean().default(false),
+  includeZendesk: z.boolean().default(false),
+  // Connector-specific configurations (stored as JSON)
+  connectorConfigs: z.any().optional(),
 });
 export type SprintReviewConfig = z.infer<typeof SprintReviewConfigSchema>;
 
