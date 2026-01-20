@@ -1,14 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -16,24 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { TrendingUp } from 'lucide-react';
 import {
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle2,
-  Loader2,
-  Play,
-  Save,
-  Settings2,
-  Target,
-  TrendingUp,
-} from 'lucide-react';
-import {
+  AgentPageLayout,
+  AgentStatusCard,
+  AgentActions,
+  OutputPreviewCard,
   DataSourcesCard,
-  ConnectorConfigs,
-  DEFAULT_CONNECTOR_CONFIGS,
-  AnyConnectorConfig,
-} from '@/components/agents/data-sources-card';
-import { UsageLimitBanner } from '@/components/usage-limit-banner';
+} from '@/components/agents';
+import { useAgentConfig, ConnectorKey } from '@/hooks/use-agent-config';
 import { useUsage } from '@/hooks/use-usage';
 
 const TIMEFRAMES = [
@@ -50,236 +36,134 @@ const CLUSTER_COUNTS = [
   { value: '10', label: '10 clusters' },
 ];
 
+const SUGGESTED_CONNECTORS: ConnectorKey[] = [
+  'gong',
+  'zendesk',
+  'slack',
+  'jira',
+  'confluence',
+  'gmail',
+  'google-calendar',
+  'google-drive',
+];
+
+const OUTPUT_PREVIEW = [
+  'Feedback themes clustered by semantic similarity',
+  'Top issues ranked by frequency and impact',
+  'Representative quotes for each cluster',
+  'Trend analysis over time',
+  'Actionable recommendations',
+];
+
+interface VoCConfig extends Record<string, unknown> {
+  timeframeDays: number;
+  clusterCount: number;
+  minFeedbackCount: number;
+  enabledSources?: Record<string, boolean>;
+  connectorConfigs?: object;
+}
+
 export default function VoCClusteringPage() {
-  const router = useRouter();
   const { currentUsage } = useUsage('voc_clustering');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+
+  // Agent config hook
+  const {
+    isLoading,
+    isSaving,
+    isTriggering,
+    error,
+    success,
+    config,
+    isActive,
+    setIsActive,
+    suggestedSources,
+    allConnectedSources,
+    connectorConfigs,
+    handleSourceToggle,
+    handleConfigChange,
+    canRun,
+    missingRequiredConnectors,
+    isAdmin,
+    handleSave,
+    handleTrigger,
+  } = useAgentConfig<VoCConfig>({
+    apiEndpoint: '/api/agents/voc-clustering',
+    suggestedConnectors: SUGGESTED_CONNECTORS,
+    // No required connectors - any data source can be used
+    requiredConnectors: [],
+  });
 
   // Form state
   const [timeframe, setTimeframe] = useState('30');
   const [clusterCount, setClusterCount] = useState('5');
   const [minFeedbackCount, setMinFeedbackCount] = useState('10');
 
-  // Recommended sources for this agent
-  const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'gong' as const, connected: false, enabled: false },
-    { key: 'zendesk' as const, connected: false, enabled: false },
-    { key: 'slack' as const, connected: false, enabled: false },
-    { key: 'jira' as const, connected: false, enabled: false },
-    { key: 'confluence' as const, connected: false, enabled: false },
-  ]);
-
-  // All connected sources from API (for showing additional connected integrations)
-  const [allConnectedSources, setAllConnectedSources] = useState<
-    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
-  >([]);
-
-  // Connector-specific configurations
-  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
-    gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
-    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
-    slack: { ...DEFAULT_CONNECTOR_CONFIGS.slack! },
-    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
-    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
-  });
-
-  // Check if user is admin
+  // Load saved config values
   useEffect(() => {
-    async function checkAdmin() {
-      try {
-        const res = await fetch('/api/workbench/run-job');
-        if (res.ok) {
-          const data = await res.json();
-          setIsAdmin(data.isAdmin === true);
-        }
-      } catch {
-        setIsAdmin(false);
-      }
+    if (config?.config) {
+      setTimeframe(String(config.config.timeframeDays || 30));
+      setClusterCount(String(config.config.clusterCount || 5));
+      setMinFeedbackCount(String(config.config.minFeedbackCount || 10));
     }
-    checkAdmin();
-  }, []);
+  }, [config]);
 
-  useEffect(() => {
-    async function fetchConnectors() {
-      try {
-        const res = await fetch('/api/connectors');
-        if (res.ok) {
-          const data = await res.json();
-          const connectors = data.connectors || [];
-          // Update suggested sources with connection status
-          setSuggestedSources((prev) =>
-            prev.map((source) => {
-              const isConnected = connectors.some(
-                (c: { connectorKey: string; status: string }) =>
-                  c.connectorKey === source.key && c.status === 'real'
-              );
-              return {
-                ...source,
-                connected: isConnected,
-                enabled: isConnected, // Auto-enable connected sources
-              };
-            })
-          );
-          // Build list of all connected sources
-          const allConnected = connectors
-            .filter((c: { status: string }) => c.status === 'real')
-            .map((c: { connectorKey: string }) => ({
-              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
-              connected: true,
-            }));
-          setAllConnectedSources(allConnected);
-
-          // Fetch Slack channels if Slack is connected
-          const slackIsConnected = connectors.some(
-            (c: { connectorKey: string; status: string }) =>
-              c.connectorKey === 'slack' && c.status === 'real'
-          );
-          if (slackIsConnected) {
-            try {
-              const channelsRes = await fetch('/api/connectors/slack/channels');
-              if (channelsRes.ok) {
-                const channelsData = await channelsRes.json();
-                const fetchedChannels = channelsData.channels || [];
-                // Update connector configs with fetched channels
-                setConnectorConfigs((prev) => ({
-                  ...prev,
-                  slack: {
-                    ...prev.slack!,
-                    channels: fetchedChannels,
-                  },
-                }));
-              }
-            } catch (err) {
-              console.error('Failed to fetch Slack channels:', err);
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch connectors:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchConnectors();
-  }, []);
-
+  // Check if at least one data source is enabled
   const hasDataSource = suggestedSources.some((s) => s.connected && s.enabled);
-  const canRun = hasDataSource;
+  const effectiveCanRun = hasDataSource;
 
-  // Handle toggling a source on/off
-  const handleSourceToggle = (key: string, enabled: boolean) => {
-    setSuggestedSources((prev) =>
-      prev.map((source) =>
-        source.key === key ? { ...source, enabled } : source
-      )
-    );
+  // Build save payload
+  const onSave = async () => {
+    const enabledSources: Record<string, boolean> = {};
+    suggestedSources.forEach((source) => {
+      enabledSources[source.key] = source.enabled;
+    });
+
+    await handleSave({
+      status: isActive ? 'active' : 'paused',
+      config: {
+        timeframeDays: parseInt(timeframe),
+        clusterCount: parseInt(clusterCount),
+        minFeedbackCount: parseInt(minFeedbackCount),
+        enabledSources,
+        connectorConfigs: Object.fromEntries(
+          Object.entries(connectorConfigs).filter(([key]) => enabledSources[key])
+        ),
+      },
+    });
   };
 
-  // Handle connector config changes
-  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
-    setConnectorConfigs((prev) => ({
-      ...prev,
-      [key]: config,
-    }));
-  };
-
-  const handleRun = async () => {
-    if (!canRun) return;
-
-    setIsRunning(true);
-    setError(null);
-    setSuccess(null);
-
+  // Build trigger payload
+  const onTrigger = async () => {
     const gongSource = suggestedSources.find((s) => s.key === 'gong');
     const zendeskSource = suggestedSources.find((s) => s.key === 'zendesk');
     const slackSource = suggestedSources.find((s) => s.key === 'slack');
-    const gongEnabled = gongSource?.connected && gongSource?.enabled;
-    const zendeskEnabled = zendeskSource?.connected && zendeskSource?.enabled;
-    const slackEnabled = slackSource?.connected && slackSource?.enabled;
 
-    try {
-      const res = await fetch('/api/agents/voc-clustering/trigger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          timeframeDays: parseInt(timeframe),
-          clusterCount: parseInt(clusterCount),
-          minFeedbackCount: parseInt(minFeedbackCount),
-          sources: {
-            gong: gongEnabled,
-            zendesk: zendeskEnabled,
-            slack: slackEnabled,
-          },
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setSuccess(`VoC Clustering started! Job ID: ${data.jobId}`);
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to start clustering');
-      }
-    } catch {
-      setError('Failed to start. Please try again.');
-    } finally {
-      setIsRunning(false);
-    }
+    await handleTrigger({
+      timeframeDays: parseInt(timeframe),
+      clusterCount: parseInt(clusterCount),
+      minFeedbackCount: parseInt(minFeedbackCount),
+      sources: {
+        gong: gongSource?.connected && gongSource?.enabled,
+        zendesk: zendeskSource?.connected && zendeskSource?.enabled,
+        slack: slackSource?.connected && slackSource?.enabled,
+      },
+    });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="font-heading text-2xl font-bold">VoC Clustering Agent</h1>
-            <p className="text-muted-foreground">
-              Cluster customer feedback into themes and identify top issues
-            </p>
-          </div>
-        </div>
-        <Badge variant="secondary">Coming Soon</Badge>
-      </div>
-
-      {/* Alerts */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <Alert className="border-green-200 bg-green-50 text-green-800">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Usage Limit Banner */}
-      <UsageLimitBanner
-        workflowName="VoC Clustering"
-        used={currentUsage?.used || 0}
-        limit={currentUsage?.limit || 0}
-      />
-
+    <AgentPageLayout
+      title="VoC Clustering Agent"
+      description="Cluster customer feedback into themes and identify top issues"
+      status={config?.status === 'active' ? 'active' : config?.status === 'paused' ? 'paused' : 'coming-soon'}
+      isLoading={isLoading}
+      error={error}
+      success={success}
+      usage={{
+        workflowName: 'VoC Clustering',
+        used: currentUsage?.used || 0,
+        limit: currentUsage?.limit || 0,
+      }}
+    >
       {/* Analysis Parameters */}
       <Card>
         <CardHeader>
@@ -349,91 +233,34 @@ export default function VoCClusteringPage() {
       />
 
       {/* Output Preview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">What You'll Get</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Feedback themes clustered by semantic similarity</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Top issues ranked by frequency and impact</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Representative quotes for each cluster</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Trend analysis over time</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Actionable recommendations</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      <OutputPreviewCard outputs={OUTPUT_PREVIEW} />
 
       {/* Agent Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Agent Status</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="agent-active">Enable VoC Clustering Agent</Label>
-              <p className="text-sm text-muted-foreground">
-                When enabled, the agent will be available for scheduled runs
-              </p>
-            </div>
-            <Switch
-              id="agent-active"
-              checked={isActive}
-              onCheckedChange={setIsActive}
-              disabled={true}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <AgentStatusCard
+        agentName="VoC Clustering Agent"
+        isActive={isActive}
+        onActiveChange={setIsActive}
+        disabled={!effectiveCanRun}
+        missingRequiredConnectors={!hasDataSource ? ['gong'] : []}
+      />
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Button
-              variant="outline"
-              onClick={handleRun}
-              disabled={isRunning || !canRun}
-            >
-              {isRunning ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="mr-2 h-4 w-4" />
-              )}
-              Run Now
-            </Button>
-          )}
-        </div>
-        <Button
-          disabled={true}
-          title="Agent settings coming soon"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          Save Agent Settings
-        </Button>
-      </div>
-    </div>
+      <AgentActions
+        isTriggering={isTriggering}
+        isSaving={isSaving}
+        canRun={effectiveCanRun}
+        isAdmin={isAdmin}
+        missingRequiredConnectors={!hasDataSource ? ['gong'] : []}
+        onTrigger={onTrigger}
+        onSave={onSave}
+      />
+
+      {/* Last Run Info */}
+      {config?.lastRunAt && (
+        <p className="text-center text-sm text-muted-foreground">
+          Last run: {new Date(config.lastRunAt).toLocaleString()}
+        </p>
+      )}
+    </AgentPageLayout>
   );
 }

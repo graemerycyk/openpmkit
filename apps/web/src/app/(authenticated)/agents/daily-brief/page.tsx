@@ -724,6 +724,7 @@ export default function DailyBriefSetupPage() {
               id="agent-active"
               checked={isActive}
               onCheckedChange={setIsActive}
+              disabled={!canRun}
             />
           </div>
         </CardContent>
@@ -749,7 +750,7 @@ export default function DailyBriefSetupPage() {
         </div>
         <Button
           onClick={handleSave}
-          disabled={isSaving || !canRun}
+          disabled={isSaving}
         >
           {isSaving ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

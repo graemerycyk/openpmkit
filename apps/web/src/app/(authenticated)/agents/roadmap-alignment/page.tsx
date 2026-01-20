@@ -1,209 +1,125 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Switch } from '@/components/ui/switch';
+import { Compass } from 'lucide-react';
 import {
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle2,
-  Compass,
-  Loader2,
-  Play,
-  Save,
-  Settings2,
-  Target,
-} from 'lucide-react';
-import {
+  AgentPageLayout,
+  AgentStatusCard,
+  AgentActions,
+  OutputPreviewCard,
   DataSourcesCard,
-  ConnectorConfigs,
-  DEFAULT_CONNECTOR_CONFIGS,
-  AnyConnectorConfig,
-} from '@/components/agents/data-sources-card';
-import { UsageLimitBanner } from '@/components/usage-limit-banner';
+} from '@/components/agents';
+import { useAgentConfig, ConnectorKey } from '@/hooks/use-agent-config';
 import { useUsage } from '@/hooks/use-usage';
 
-export default function RoadmapAlignmentPage() {
-  const router = useRouter();
-  const { currentUsage } = useUsage('roadmap_alignment');
-  const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+const SUGGESTED_CONNECTORS: ConnectorKey[] = [
+  'jira',
+  'confluence',
+  'slack',
+  'gmail',
+  'google-calendar',
+  'google-drive',
+];
 
-  // Check if user is admin
-  useEffect(() => {
-    async function checkAdmin() {
-      try {
-        const res = await fetch('/api/workbench/run-job');
-        if (res.ok) {
-          const data = await res.json();
-          setIsAdmin(data.isAdmin === true);
-        }
-      } catch {
-        setIsAdmin(false);
-      }
-    }
-    checkAdmin();
-  }, []);
+const OUTPUT_PREVIEW = [
+  'Alignment score for each strategic goal',
+  'Roadmap items mapped to each goal',
+  'Gaps identified (goals without coverage)',
+  'Orphaned items (work not tied to goals)',
+  'Recommendations for better alignment',
+];
+
+interface RoadmapConfig extends Record<string, unknown> {
+  strategicGoals: string;
+  additionalContext: string;
+  enabledSources?: Record<string, boolean>;
+  connectorConfigs?: object;
+}
+
+export default function RoadmapAlignmentPage() {
+  const { currentUsage } = useUsage('roadmap_alignment');
+
+  const {
+    isLoading,
+    isSaving,
+    isTriggering,
+    error,
+    success,
+    config,
+    isActive,
+    setIsActive,
+    suggestedSources,
+    allConnectedSources,
+    connectorConfigs,
+    handleSourceToggle,
+    handleConfigChange,
+    isAdmin,
+    handleSave,
+    handleTrigger,
+  } = useAgentConfig<RoadmapConfig>({
+    apiEndpoint: '/api/agents/roadmap-alignment',
+    suggestedConnectors: SUGGESTED_CONNECTORS,
+    requiredConnectors: [],
+  });
 
   // Form state
   const [strategicGoals, setStrategicGoals] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
 
-  // Recommended sources for this agent
-  const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'jira' as const, connected: false, enabled: false },
-    { key: 'confluence' as const, connected: false, enabled: false },
-    { key: 'slack' as const, connected: false, enabled: false },
-  ]);
-
-  // All connected sources from API (for showing additional connected integrations)
-  const [allConnectedSources, setAllConnectedSources] = useState<
-    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
-  >([]);
-
-  // Connector-specific configurations
-  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
-    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
-    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
-  });
-
+  // Load saved config values
   useEffect(() => {
-    async function fetchConnectors() {
-      try {
-        const res = await fetch('/api/connectors');
-        if (res.ok) {
-          const data = await res.json();
-          const connectors = data.connectors || [];
-          // Update suggested sources with connection status
-          setSuggestedSources((prev) =>
-            prev.map((source) => {
-              const isConnected = connectors.some(
-                (c: { connectorKey: string; status: string }) =>
-                  c.connectorKey === source.key && c.status === 'real'
-              );
-              return {
-                ...source,
-                connected: isConnected,
-                enabled: isConnected, // Auto-enable connected sources
-              };
-            })
-          );
-          // Build list of all connected sources
-          const allConnected = connectors
-            .filter((c: { status: string }) => c.status === 'real')
-            .map((c: { connectorKey: string }) => ({
-              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
-              connected: true,
-            }));
-          setAllConnectedSources(allConnected);
-        }
-      } catch (err) {
-        console.error('Failed to fetch connectors:', err);
-      }
+    if (config?.config) {
+      setStrategicGoals(config.config.strategicGoals || '');
+      setAdditionalContext(config.config.additionalContext || '');
     }
-    fetchConnectors();
-  }, []);
+  }, [config]);
 
   const hasAnyEnabled = suggestedSources.some((s) => s.connected && s.enabled);
   const canRun = hasAnyEnabled && strategicGoals.trim() !== '';
 
-  // Handle toggling a source on/off
-  const handleSourceToggle = (key: string, enabled: boolean) => {
-    setSuggestedSources((prev) =>
-      prev.map((source) =>
-        source.key === key ? { ...source, enabled } : source
-      )
-    );
+  const onSave = async () => {
+    const enabledSources: Record<string, boolean> = {};
+    suggestedSources.forEach((source) => {
+      enabledSources[source.key] = source.enabled;
+    });
+
+    await handleSave({
+      status: isActive ? 'active' : 'paused',
+      config: {
+        strategicGoals: strategicGoals.trim(),
+        additionalContext: additionalContext.trim(),
+        enabledSources,
+        connectorConfigs: Object.fromEntries(
+          Object.entries(connectorConfigs).filter(([key]) => enabledSources[key])
+        ),
+      },
+    });
   };
 
-  // Handle connector config changes
-  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
-    setConnectorConfigs((prev) => ({
-      ...prev,
-      [key]: config,
-    }));
-  };
-
-  const handleRun = async () => {
-    if (!canRun) return;
-
-    setIsRunning(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/agents/roadmap-alignment/trigger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          strategicGoals: strategicGoals.trim(),
-          additionalContext: additionalContext.trim() || undefined,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setSuccess(`Roadmap Alignment started! Job ID: ${data.jobId}`);
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to start alignment');
-      }
-    } catch {
-      setError('Failed to start. Please try again.');
-    } finally {
-      setIsRunning(false);
-    }
+  const onTrigger = async () => {
+    await handleTrigger({
+      strategicGoals: strategicGoals.trim(),
+      additionalContext: additionalContext.trim() || undefined,
+    });
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="font-heading text-2xl font-bold">Roadmap Alignment Agent</h1>
-            <p className="text-muted-foreground">
-              Check if your roadmap aligns with strategic goals
-            </p>
-          </div>
-        </div>
-        <Badge variant="secondary">Coming Soon</Badge>
-      </div>
-
-      {/* Alerts */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <Alert className="border-green-200 bg-green-50 text-green-800">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Usage Limit Banner */}
-      <UsageLimitBanner
-        workflowName="Roadmap Alignment"
-        used={currentUsage?.used || 0}
-        limit={currentUsage?.limit || 0}
-      />
-
+    <AgentPageLayout
+      title="Roadmap Alignment Agent"
+      description="Check if your roadmap aligns with strategic goals"
+      status="coming-soon"
+      isLoading={isLoading}
+      error={error}
+      success={success}
+      usage={{
+        workflowName: 'Roadmap Alignment',
+        used: currentUsage?.used || 0,
+        limit: currentUsage?.limit || 0,
+      }}
+    >
       {/* Strategic Goals */}
       <Card>
         <CardHeader>
@@ -254,91 +170,26 @@ export default function RoadmapAlignmentPage() {
       />
 
       {/* Output Preview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">What You'll Get</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Alignment score for each strategic goal</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Roadmap items mapped to each goal</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Gaps identified (goals without coverage)</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Orphaned items (work not tied to goals)</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Recommendations for better alignment</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      <OutputPreviewCard outputs={OUTPUT_PREVIEW} />
 
       {/* Agent Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Agent Status</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="agent-active">Enable Roadmap Alignment Agent</Label>
-              <p className="text-sm text-muted-foreground">
-                When enabled, the agent will be available for scheduled runs
-              </p>
-            </div>
-            <Switch
-              id="agent-active"
-              checked={isActive}
-              onCheckedChange={setIsActive}
-              disabled={true}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <AgentStatusCard
+        agentName="Roadmap Alignment Agent"
+        isActive={isActive}
+        onActiveChange={setIsActive}
+        comingSoon={true}
+      />
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Button
-              variant="outline"
-              onClick={handleRun}
-              disabled={isRunning || !canRun}
-            >
-              {isRunning ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="mr-2 h-4 w-4" />
-              )}
-              Run Now
-            </Button>
-          )}
-        </div>
-        <Button
-          disabled={true}
-          title="Agent settings coming soon"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          Save Agent Settings
-        </Button>
-      </div>
-    </div>
+      <AgentActions
+        isTriggering={isTriggering}
+        isSaving={isSaving}
+        canRun={canRun}
+        isAdmin={isAdmin}
+        onTrigger={onTrigger}
+        onSave={onSave}
+        comingSoon={true}
+      />
+    </AgentPageLayout>
   );
 }

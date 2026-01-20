@@ -1,64 +1,83 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Switch } from '@/components/ui/switch';
 import {
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle2,
   Globe,
-  Loader2,
   Newspaper,
-  Play,
   Plus,
-  Save,
   Search,
-  Settings2,
   Sword,
   Target,
   TrendingUp,
   X,
 } from 'lucide-react';
-import { UsageLimitBanner } from '@/components/usage-limit-banner';
+import {
+  AgentPageLayout,
+  AgentStatusCard,
+  AgentActions,
+  OutputPreviewCard,
+} from '@/components/agents';
+import { useAgentConfig, ConnectorKey } from '@/hooks/use-agent-config';
 import { useUsage } from '@/hooks/use-usage';
 
-export default function CompetitorResearchPage() {
-  const router = useRouter();
-  const { currentUsage } = useUsage('competitor_research');
-  const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+const OUTPUT_PREVIEW = [
+  'Company overview and positioning analysis',
+  'Product/feature comparison matrix',
+  'Pricing intelligence (if available)',
+  'Recent news and announcements',
+  'Strengths, weaknesses, and opportunities',
+];
 
-  // Check if user is admin
-  useEffect(() => {
-    async function checkAdmin() {
-      try {
-        const res = await fetch('/api/workbench/run-job');
-        if (res.ok) {
-          const data = await res.json();
-          setIsAdmin(data.isAdmin === true);
-        }
-      } catch {
-        setIsAdmin(false);
-      }
-    }
-    checkAdmin();
-  }, []);
+// No suggested connectors for this agent - uses web crawlers instead
+const SUGGESTED_CONNECTORS: ConnectorKey[] = [];
+
+interface CompetitorConfig extends Record<string, unknown> {
+  competitors: string[];
+  focusAreas: string;
+  additionalContext: string;
+  enabledSources?: Record<string, boolean>;
+  connectorConfigs?: object;
+}
+
+export default function CompetitorResearchPage() {
+  const { currentUsage } = useUsage('competitor_research');
+
+  const {
+    isLoading,
+    isSaving,
+    isTriggering,
+    error,
+    success,
+    config,
+    isActive,
+    setIsActive,
+    isAdmin,
+    handleSave,
+    handleTrigger,
+  } = useAgentConfig<CompetitorConfig>({
+    apiEndpoint: '/api/agents/competitor-research',
+    suggestedConnectors: SUGGESTED_CONNECTORS,
+    requiredConnectors: [],
+  });
 
   // Form state
   const [competitors, setCompetitors] = useState<string[]>(['']);
   const [focusAreas, setFocusAreas] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
+
+  // Load saved config values
+  useEffect(() => {
+    if (config?.config) {
+      setCompetitors(config.config.competitors?.length ? config.config.competitors : ['']);
+      setFocusAreas(config.config.focusAreas || '');
+      setAdditionalContext(config.config.additionalContext || '');
+    }
+  }, [config]);
 
   const addCompetitor = () => {
     if (competitors.length < 5) {
@@ -80,78 +99,39 @@ export default function CompetitorResearchPage() {
 
   const canRun = competitors.some((c) => c.trim() !== '');
 
-  const handleRun = async () => {
-    if (!canRun) return;
+  const onSave = async () => {
+    await handleSave({
+      status: isActive ? 'active' : 'paused',
+      config: {
+        competitors: competitors.filter((c) => c.trim() !== ''),
+        focusAreas: focusAreas.trim(),
+        additionalContext: additionalContext.trim(),
+      },
+    });
+  };
 
-    setIsRunning(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/agents/competitor-research/trigger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          competitors: competitors.filter((c) => c.trim() !== ''),
-          focusAreas: focusAreas.trim() || undefined,
-          additionalContext: additionalContext.trim() || undefined,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setSuccess(`Competitor Research started! Job ID: ${data.jobId}`);
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to start research');
-      }
-    } catch {
-      setError('Failed to start. Please try again.');
-    } finally {
-      setIsRunning(false);
-    }
+  const onTrigger = async () => {
+    await handleTrigger({
+      competitors: competitors.filter((c) => c.trim() !== ''),
+      focusAreas: focusAreas.trim() || undefined,
+      additionalContext: additionalContext.trim() || undefined,
+    });
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="font-heading text-2xl font-bold">Competitor Research Agent</h1>
-            <p className="text-muted-foreground">
-              Research competitors using web search and news sources
-            </p>
-          </div>
-        </div>
-        <Badge variant="secondary">Coming Soon</Badge>
-      </div>
-
-      {/* Alerts */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <Alert className="border-green-200 bg-green-50 text-green-800">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Usage Limit Banner */}
-      <UsageLimitBanner
-        workflowName="Competitor Research"
-        used={currentUsage?.used || 0}
-        limit={currentUsage?.limit || 0}
-      />
-
+    <AgentPageLayout
+      title="Competitor Research Agent"
+      description="Research competitors using web search and news sources"
+      status="coming-soon"
+      isLoading={isLoading}
+      error={error}
+      success={success}
+      usage={{
+        workflowName: 'Competitor Research',
+        used: currentUsage?.used || 0,
+        limit: currentUsage?.limit || 0,
+      }}
+    >
       {/* Competitors */}
       <Card>
         <CardHeader>
@@ -225,7 +205,7 @@ export default function CompetitorResearchPage() {
         </CardContent>
       </Card>
 
-      {/* Data Sources */}
+      {/* Data Sources (static display for this agent) */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -274,91 +254,26 @@ export default function CompetitorResearchPage() {
       </Card>
 
       {/* Output Preview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">What You'll Get</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Company overview and positioning analysis</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Product/feature comparison matrix</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Pricing intelligence (if available)</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Recent news and announcements</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Strengths, weaknesses, and opportunities</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      <OutputPreviewCard outputs={OUTPUT_PREVIEW} />
 
       {/* Agent Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Agent Status</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="agent-active">Enable Competitor Research Agent</Label>
-              <p className="text-sm text-muted-foreground">
-                When enabled, the agent will be available for scheduled runs
-              </p>
-            </div>
-            <Switch
-              id="agent-active"
-              checked={isActive}
-              onCheckedChange={setIsActive}
-              disabled={true}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <AgentStatusCard
+        agentName="Competitor Research Agent"
+        isActive={isActive}
+        onActiveChange={setIsActive}
+        comingSoon={true}
+      />
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Button
-              variant="outline"
-              onClick={handleRun}
-              disabled={isRunning || !canRun}
-            >
-              {isRunning ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="mr-2 h-4 w-4" />
-              )}
-              Run Now
-            </Button>
-          )}
-        </div>
-        <Button
-          disabled={true}
-          title="Agent settings coming soon"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          Save Agent Settings
-        </Button>
-      </div>
-    </div>
+      <AgentActions
+        isTriggering={isTriggering}
+        isSaving={isSaving}
+        canRun={canRun}
+        isAdmin={isAdmin}
+        onTrigger={onTrigger}
+        onSave={onSave}
+        comingSoon={true}
+      />
+    </AgentPageLayout>
   );
 }

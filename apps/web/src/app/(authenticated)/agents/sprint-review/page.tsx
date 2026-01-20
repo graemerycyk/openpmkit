@@ -676,6 +676,7 @@ export default function SprintReviewPage() {
               id="agent-active"
               checked={isActive}
               onCheckedChange={setIsActive}
+              disabled={!canRun}
             />
           </div>
         </CardContent>

@@ -1,15 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -17,24 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { FileText } from 'lucide-react';
 import {
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle2,
-  FileText,
-  Loader2,
-  Play,
-  Save,
-  Settings2,
-  Target,
-} from 'lucide-react';
-import {
+  AgentPageLayout,
+  AgentStatusCard,
+  AgentActions,
+  OutputPreviewCard,
   DataSourcesCard,
-  ConnectorConfigs,
-  DEFAULT_CONNECTOR_CONFIGS,
-  AnyConnectorConfig,
-} from '@/components/agents/data-sources-card';
-import { UsageLimitBanner } from '@/components/usage-limit-banner';
+} from '@/components/agents';
+import { useAgentConfig, ConnectorKey } from '@/hooks/use-agent-config';
 import { useUsage } from '@/hooks/use-usage';
 
 const PRIORITY_LEVELS = [
@@ -44,14 +30,60 @@ const PRIORITY_LEVELS = [
   { value: 'low', label: 'Low' },
 ];
 
+const SUGGESTED_CONNECTORS: ConnectorKey[] = [
+  'jira',
+  'confluence',
+  'slack',
+  'gong',
+  'zendesk',
+  'gmail',
+  'google-calendar',
+  'google-drive',
+];
+
+const OUTPUT_PREVIEW = [
+  'Executive summary and problem statement',
+  'User personas and jobs to be done',
+  'Detailed requirements with acceptance criteria',
+  'Success metrics and KPIs',
+  'Dependencies and risks',
+];
+
+interface PRDConfig extends Record<string, unknown> {
+  featureName: string;
+  problemStatement: string;
+  targetUsers: string;
+  priority: string;
+  additionalContext: string;
+  enabledSources?: Record<string, boolean>;
+  connectorConfigs?: object;
+}
+
 export default function PRDDraftPage() {
-  const router = useRouter();
   const { currentUsage } = useUsage('prd_draft');
-  const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+
+  const {
+    isLoading,
+    isSaving,
+    isTriggering,
+    error,
+    success,
+    config,
+    isActive,
+    setIsActive,
+    suggestedSources,
+    allConnectedSources,
+    connectorConfigs,
+    handleSourceToggle,
+    handleConfigChange,
+    isAdmin,
+    handleSave,
+    handleTrigger,
+  } = useAgentConfig<PRDConfig>({
+    apiEndpoint: '/api/agents/prd-draft',
+    suggestedConnectors: SUGGESTED_CONNECTORS,
+    requiredConnectors: [],
+  });
 
   // Form state
   const [featureName, setFeatureName] = useState('');
@@ -60,174 +92,65 @@ export default function PRDDraftPage() {
   const [priority, setPriority] = useState('medium');
   const [additionalContext, setAdditionalContext] = useState('');
 
-  // Recommended sources for this agent
-  const [suggestedSources, setSuggestedSources] = useState([
-    { key: 'jira' as const, connected: false, enabled: false },
-    { key: 'confluence' as const, connected: false, enabled: false },
-    { key: 'slack' as const, connected: false, enabled: false },
-    { key: 'gong' as const, connected: false, enabled: false },
-    { key: 'zendesk' as const, connected: false, enabled: false },
-  ]);
-
-  // All connected sources from API (for showing additional connected integrations)
-  const [allConnectedSources, setAllConnectedSources] = useState<
-    { key: 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma'; connected: boolean }[]
-  >([]);
-
-  // Connector-specific configurations
-  const [connectorConfigs, setConnectorConfigs] = useState<ConnectorConfigs>({
-    jira: { ...DEFAULT_CONNECTOR_CONFIGS.jira! },
-    confluence: { ...DEFAULT_CONNECTOR_CONFIGS.confluence! },
-    gong: { ...DEFAULT_CONNECTOR_CONFIGS.gong! },
-    zendesk: { ...DEFAULT_CONNECTOR_CONFIGS.zendesk! },
-  });
-
-  // Check if user is admin
+  // Load saved config values
   useEffect(() => {
-    async function checkAdmin() {
-      try {
-        const res = await fetch('/api/workbench/run-job');
-        if (res.ok) {
-          const data = await res.json();
-          setIsAdmin(data.isAdmin === true);
-        }
-      } catch {
-        setIsAdmin(false);
-      }
+    if (config?.config) {
+      setFeatureName(config.config.featureName || '');
+      setProblemStatement(config.config.problemStatement || '');
+      setTargetUsers(config.config.targetUsers || '');
+      setPriority(config.config.priority || 'medium');
+      setAdditionalContext(config.config.additionalContext || '');
     }
-    checkAdmin();
-  }, []);
-
-  useEffect(() => {
-    async function fetchConnectors() {
-      try {
-        const res = await fetch('/api/connectors');
-        if (res.ok) {
-          const data = await res.json();
-          const connectors = data.connectors || [];
-          // Update suggested sources with connection status
-          setSuggestedSources((prev) =>
-            prev.map((source) => {
-              const isConnected = connectors.some(
-                (c: { connectorKey: string; status: string }) =>
-                  c.connectorKey === source.key && c.status === 'real'
-              );
-              return {
-                ...source,
-                connected: isConnected,
-                enabled: isConnected, // Auto-enable connected sources
-              };
-            })
-          );
-          // Build list of all connected sources
-          const allConnected = connectors
-            .filter((c: { status: string }) => c.status === 'real')
-            .map((c: { connectorKey: string }) => ({
-              key: c.connectorKey as 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma',
-              connected: true,
-            }));
-          setAllConnectedSources(allConnected);
-        }
-      } catch (err) {
-        console.error('Failed to fetch connectors:', err);
-      }
-    }
-    fetchConnectors();
-  }, []);
+  }, [config]);
 
   const canRun = featureName.trim() !== '' && problemStatement.trim() !== '';
 
-  // Handle toggling a source on/off
-  const handleSourceToggle = (key: string, enabled: boolean) => {
-    setSuggestedSources((prev) =>
-      prev.map((source) =>
-        source.key === key ? { ...source, enabled } : source
-      )
-    );
+  const onSave = async () => {
+    const enabledSources: Record<string, boolean> = {};
+    suggestedSources.forEach((source) => {
+      enabledSources[source.key] = source.enabled;
+    });
+
+    await handleSave({
+      status: isActive ? 'active' : 'paused',
+      config: {
+        featureName: featureName.trim(),
+        problemStatement: problemStatement.trim(),
+        targetUsers: targetUsers.trim(),
+        priority,
+        additionalContext: additionalContext.trim(),
+        enabledSources,
+        connectorConfigs: Object.fromEntries(
+          Object.entries(connectorConfigs).filter(([key]) => enabledSources[key])
+        ),
+      },
+    });
   };
 
-  // Handle connector config changes
-  const handleConfigChange = (key: string, config: AnyConnectorConfig) => {
-    setConnectorConfigs((prev) => ({
-      ...prev,
-      [key]: config,
-    }));
-  };
-
-  const handleRun = async () => {
-    if (!canRun) return;
-
-    setIsRunning(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/agents/prd-draft/trigger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          featureName: featureName.trim(),
-          problemStatement: problemStatement.trim(),
-          targetUsers: targetUsers.trim() || undefined,
-          priority,
-          additionalContext: additionalContext.trim() || undefined,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setSuccess(`PRD Draft started! Job ID: ${data.jobId}`);
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to start PRD generation');
-      }
-    } catch {
-      setError('Failed to start. Please try again.');
-    } finally {
-      setIsRunning(false);
-    }
+  const onTrigger = async () => {
+    await handleTrigger({
+      featureName: featureName.trim(),
+      problemStatement: problemStatement.trim(),
+      targetUsers: targetUsers.trim() || undefined,
+      priority,
+      additionalContext: additionalContext.trim() || undefined,
+    });
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="font-heading text-2xl font-bold">PRD Draft Agent</h1>
-            <p className="text-muted-foreground">
-              Generate a Product Requirements Document from VoC data
-            </p>
-          </div>
-        </div>
-        <Badge variant="secondary">Coming Soon</Badge>
-      </div>
-
-      {/* Alerts */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <Alert className="border-green-200 bg-green-50 text-green-800">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Usage Limit Banner */}
-      <UsageLimitBanner
-        workflowName="PRD Draft"
-        used={currentUsage?.used || 0}
-        limit={currentUsage?.limit || 0}
-      />
-
+    <AgentPageLayout
+      title="PRD Draft Agent"
+      description="Generate a Product Requirements Document from VoC data"
+      status="coming-soon"
+      isLoading={isLoading}
+      error={error}
+      success={success}
+      usage={{
+        workflowName: 'PRD Draft',
+        used: currentUsage?.used || 0,
+        limit: currentUsage?.limit || 0,
+      }}
+    >
       {/* Feature Information */}
       <Card>
         <CardHeader>
@@ -309,91 +232,26 @@ export default function PRDDraftPage() {
       />
 
       {/* Output Preview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">What You'll Get</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Executive summary and problem statement</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>User personas and jobs to be done</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Detailed requirements with acceptance criteria</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Success metrics and KPIs</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span>Dependencies and risks</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      <OutputPreviewCard outputs={OUTPUT_PREVIEW} />
 
       {/* Agent Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Agent Status</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="agent-active">Enable PRD Draft Agent</Label>
-              <p className="text-sm text-muted-foreground">
-                When enabled, the agent will be available for scheduled runs
-              </p>
-            </div>
-            <Switch
-              id="agent-active"
-              checked={isActive}
-              onCheckedChange={setIsActive}
-              disabled={true}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <AgentStatusCard
+        agentName="PRD Draft Agent"
+        isActive={isActive}
+        onActiveChange={setIsActive}
+        comingSoon={true}
+      />
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Button
-              variant="outline"
-              onClick={handleRun}
-              disabled={isRunning || !canRun}
-            >
-              {isRunning ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="mr-2 h-4 w-4" />
-              )}
-              Run Now
-            </Button>
-          )}
-        </div>
-        <Button
-          disabled={true}
-          title="Agent settings coming soon"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          Save Agent Settings
-        </Button>
-      </div>
-    </div>
+      <AgentActions
+        isTriggering={isTriggering}
+        isSaving={isSaving}
+        canRun={canRun}
+        isAdmin={isAdmin}
+        onTrigger={onTrigger}
+        onSave={onSave}
+        comingSoon={true}
+      />
+    </AgentPageLayout>
   );
 }
