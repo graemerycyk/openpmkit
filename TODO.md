@@ -6,7 +6,132 @@
 > 3. Add new items when you discover incomplete features or make claims that aren't fully implemented
 > 4. Keep this file as the single source of truth for what's done, half-done, and still to do
 
-Last updated: 2026-01-19 (Slack & Google OAuth Production Setup)
+Last updated: 2026-01-20 (MVP Launch Readiness)
+
+---
+
+## 🚀 MVP LAUNCH CHECKLIST
+
+**Goal**: Ship a monetizable product with core value proposition working end-to-end.
+
+### Launch Requirements Summary
+
+| Requirement | Status | Priority | Notes |
+|-------------|--------|----------|-------|
+| **Stripe Payments** | 🔲 Not Started | P0 | Cannot monetize without this |
+| **Email Delivery** | 🔲 Not Started | P0 | Core UX - users need their briefs delivered |
+| **Gong Connector** | 🔄 Partial | P1 | OAuth ✅, Real MCP partial, No Fetcher |
+| **Zendesk Connector** | 🔄 Partial | P1 | OAuth ✅, Real MCP ✅, No Fetcher |
+| **Contact Form Backend** | 🔲 Not Started | P1 | Capture Teams/Enterprise leads |
+| **Error Monitoring** | 🔲 Not Started | P2 | Sentry for production debugging |
+
+### 1. Stripe Payments 🔲 REQUIRED
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Install Stripe SDK | 🔲 Pending | `npm install stripe @stripe/stripe-js` |
+| Create Individual product in Stripe | 🔲 Pending | $29/month + $228/year prices |
+| `POST /api/billing/checkout` | 🔲 Pending | Create checkout session |
+| `POST /api/webhooks/stripe` | 🔲 Pending | Handle subscription events |
+| `POST /api/billing/portal` | 🔲 Pending | Customer portal link |
+| `GET /api/billing/subscription` | 🔲 Pending | Get subscription status |
+| Pricing page checkout flow | 🔲 Pending | Redirect to Stripe Checkout |
+| Paywall for connectors | 🔲 Pending | Only paid users connect real data |
+| STRIPE_SECRET_KEY | 🔲 Pending | Add to env |
+| STRIPE_PUBLISHABLE_KEY | 🔲 Pending | Add to env |
+| STRIPE_WEBHOOK_SECRET | 🔲 Pending | Add to env |
+| STRIPE_INDIVIDUAL_MONTHLY_PRICE_ID | 🔲 Pending | Add to env |
+| STRIPE_INDIVIDUAL_YEARLY_PRICE_ID | 🔲 Pending | Add to env |
+
+**Key Files**:
+- `apps/web/src/app/api/billing/checkout/route.ts` (new)
+- `apps/web/src/app/api/webhooks/stripe/route.ts` (new)
+- `apps/web/src/lib/stripe.ts` (new)
+
+### 2. Email Delivery 🔲 REQUIRED
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Add email service (Resend) | 🔲 Pending | `npm install resend` |
+| Create email service module | 🔲 Pending | `packages/core/src/email/index.ts` |
+| Daily Brief email template | 🔲 Pending | React Email template |
+| Meeting Prep email template | 🔲 Pending | React Email template |
+| Add delivery to job processor | 🔲 Pending | After artifact creation in `daily-brief-job.ts` |
+| Enable notifications settings UI | 🔲 Pending | `/settings/notifications` currently placeholder |
+| Add notification preferences to DB | 🔲 Pending | Schema update |
+| RESEND_API_KEY | 🔲 Pending | Add to env |
+| EMAIL_FROM | 🔲 Pending | `briefs@getpmkit.com` |
+
+**Key Files**:
+- `packages/core/src/email/index.ts` (new)
+- `packages/core/src/email/templates/` (new directory)
+- `apps/worker/src/daily-brief-job.ts` (add delivery step ~line 240)
+- `apps/web/src/app/(authenticated)/settings/notifications/page.tsx` (enable)
+
+### 3. Gong Connector Completion 🔄 IN PROGRESS
+
+| Item | Status | Notes |
+|------|--------|-------|
+| OAuth authorize route | ✅ Done | `/api/connectors/gong/authorize` |
+| OAuth callback route | ✅ Done | `/api/connectors/gong/callback` |
+| Token encryption | ✅ Done | AES-256-GCM |
+| Mock MCP Server | ✅ Done | All 7 tools |
+| Real MCP `get_calls()` | ✅ Done | Working |
+| Real MCP `get_call()` | ✅ Done | Working |
+| Real MCP `get_transcript()` | ✅ Done | Working |
+| Real MCP `get_insights()` | 🔲 Pending | Returns empty, needs Points-of-Interest API |
+| Real MCP `search_transcripts()` | 🔲 Pending | Returns empty, needs implementation |
+| Real MCP `get_pain_points()` | 🔲 Pending | Returns empty, needs aggregation logic |
+| GongFetcher class | 🔲 Pending | `packages/core/src/fetchers/gong-fetcher.ts` |
+| Gong partner/dev account | 🔄 Submitted | Waiting for approval |
+| GONG_CLIENT_ID | 🔲 Pending | Add to env after account approved |
+| GONG_CLIENT_SECRET | 🔲 Pending | Add to env after account approved |
+
+### 4. Zendesk Connector Completion 🔄 IN PROGRESS
+
+| Item | Status | Notes |
+|------|--------|-------|
+| OAuth authorize route | ✅ Done | `/api/connectors/zendesk/authorize` |
+| OAuth callback route | ✅ Done | `/api/connectors/zendesk/callback` |
+| Token encryption | ✅ Done | AES-256-GCM |
+| Mock MCP Server | ✅ Done | All 6 tools |
+| Real MCP Server | ✅ Done | All 6 tools working |
+| ZendeskFetcher class | 🔲 Pending | `packages/core/src/fetchers/zendesk-fetcher.ts` |
+| Zendesk OAuth client setup | 🔲 Pending | Admin Center → OAuth Clients |
+| ZENDESK_CLIENT_ID | 🔲 Pending | Add to env |
+| ZENDESK_CLIENT_SECRET | 🔲 Pending | Add to env |
+| ZENDESK_SUBDOMAIN | 🔲 Pending | Customer-specific (or dynamic) |
+
+### 5. Contact Form Backend 🔲 REQUIRED
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `POST /api/contact` route | 🔲 Pending | Receive form submissions |
+| Send email to sales@getpmkit.com | 🔲 Pending | Use Resend (same as artifact delivery) |
+| Form validation | 🔲 Pending | Name, email, company, message |
+| Rate limiting | 🔲 Pending | Prevent spam |
+
+### 6. Error Monitoring 🔲 RECOMMENDED
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Add Sentry SDK | 🔲 Pending | `@sentry/nextjs` |
+| Configure Sentry DSN | 🔲 Pending | SENTRY_DSN env var |
+| Error boundary setup | 🔲 Pending | Catch React errors |
+| API error tracking | 🔲 Pending | Server-side errors |
+
+### 7. Production Testing Checklist 🔲 BEFORE LAUNCH
+
+| Test | Status | Notes |
+|------|--------|-------|
+| Slack OAuth flow end-to-end | 🔲 Pending | Connect real workspace |
+| Daily Brief with real Slack data | 🔲 Pending | Generate actual brief |
+| Scheduled job execution | 🔲 Pending | Verify cron triggers |
+| Artifact storage and retrieval | 🔲 Pending | View completed briefs |
+| Email delivery | 🔲 Pending | Receive brief via email |
+| Stripe payment flow (test mode) | 🔲 Pending | Complete checkout |
+| Webhook processing | 🔲 Pending | Subscription created in DB |
+| Contact form submission | 🔲 Pending | Email received |
 
 ---
 
@@ -1027,6 +1152,19 @@ High-value workflows that could differentiate from current offerings:
 
 ## Changelog
 
+### 2026-01-20 (MVP Launch Readiness Planning)
+- **Added MVP Launch Checklist** - New top-level section tracking all launch requirements:
+  - **Stripe Payments** (P0): 13 items tracked - SDK, API routes, products, webhooks, paywall
+  - **Email Delivery** (P0): 9 items tracked - Resend service, templates, job processor integration
+  - **Gong Connector** (P1): OAuth ✅, 3 Real MCP tools pending, GongFetcher pending
+  - **Zendesk Connector** (P1): OAuth ✅, Real MCP ✅, ZendeskFetcher pending
+  - **Contact Form Backend** (P1): 4 items - API route, email, validation, rate limiting
+  - **Error Monitoring** (P2): Sentry integration for production debugging
+  - **Production Testing Checklist**: 8 end-to-end tests before launch
+- **Pricing update** - Launch price now $29/month (was $79), $19/month annual ($228/year)
+- **Agent visibility** - Non-admin users see only 3 agents (Daily Brief, Meeting Prep, VoC Clustering), others "Coming Soon"
+- **Jira/Confluence toggles fixed** - Data source toggles now work and persist across all agent pages
+
 ### 2026-01-20 (Connector Terminology & Fetcher Updates)
 - **Removed MCP terminology from marketing** - Updated website to use "secure connectors" and "OAuth integrations" instead of MCP references:
   - 6 marketing pages updated: `/how-it-works`, `/integrations`, `/pricing`, `/security`, `/trust`, `/resources`
@@ -1343,7 +1481,21 @@ Plus 3 beta workflows in MCP server: Feature Ideation, One-Pager, TL;DR
 
 ### Revenue Model
 
-- **Individual**: $79/month or $69/month billed annually ($828/year)
+- **Individual**: $29/month (launch price, was $49) or $19/month billed annually ($228/year)
 - **Teams**: Contact sales (no self-serve, negotiated pricing)
 - **Enterprise**: Custom (data residency, SSO, custom connectors)
 - **Internal**: $0 (admin users via ADMIN_EMAILS)
+
+### MVP Launch Status (as of 2026-01-20)
+
+| Area | Status | Blocker |
+|------|--------|---------|
+| Infrastructure | ✅ Done | - |
+| Authentication | ✅ Done | - |
+| Slack Connector | ✅ Done | App Directory review pending |
+| Google Connectors | 🔄 In Progress | Verification pending (1-4 weeks) |
+| Gong Connector | 🔄 Partial | Dev account pending, fetcher needed |
+| Zendesk Connector | 🔄 Partial | Fetcher needed |
+| Stripe Payments | 🔲 Not Started | **BLOCKING REVENUE** |
+| Email Delivery | 🔲 Not Started | **BLOCKING CORE UX** |
+| Contact Form | 🔲 Not Started | Blocking lead capture |
