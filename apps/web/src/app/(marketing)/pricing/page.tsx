@@ -9,7 +9,7 @@ import { siteConfig } from '@/lib/utils';
 export const metadata: Metadata = {
   title: 'Pricing | pmkit - AI PM Workflow Automation',
   description:
-    'pmkit pricing: Individual plan at $49/month for solo PMs, Teams and Enterprise plans for product teams with SSO, governance, and collaboration.',
+    'pmkit pricing: Individual plan at $29/month (launch price) for solo PMs, Teams and Enterprise plans for product teams with SSO, governance, and collaboration.',
   keywords: [
     'pmkit pricing',
     'AI product management pricing',
@@ -20,13 +20,13 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'pmkit Pricing: Individual, Teams & Enterprise',
-    description: 'Individual at $49/month, Teams and Enterprise custom pricing for product teams.',
+    description: 'Individual at $29/month (launch price), Teams and Enterprise custom pricing for product teams.',
     url: `${siteConfig.url}/pricing`,
   },
   twitter: {
     card: 'summary',
     title: 'pmkit Pricing',
-    description: 'Individual at $49/month, Teams and Enterprise custom pricing.',
+    description: 'Individual at $29/month (launch price), Teams and Enterprise custom pricing.',
   },
   alternates: {
     canonical: `${siteConfig.url}/pricing`,
@@ -44,6 +44,7 @@ interface Plan {
   name: string;
   description: string;
   price: string;
+  originalPrice?: string;
   priceDetail: string;
   billingNote: string | null;
   minSeats: number | null;
@@ -60,11 +61,12 @@ const plans: Plan[] = [
   {
     name: 'Individual',
     description: 'For individual PMs who want to automate their daily workflows',
-    price: '$49',
+    price: '$29',
+    originalPrice: '$49',
     priceDetail: 'per month',
-    billingNote: 'Or $39/month billed annually ($468/year)',
+    billingNote: 'Or $19/month billed annually ($228/year)',
     minSeats: null,
-    badge: 'Most Popular',
+    badge: 'Launch Price',
     features: [
       { name: 'Single seat', included: true },
       { name: 'Monthly or annual billing', included: true },
@@ -237,6 +239,9 @@ export default function PricingPage() {
                   </div>
                   <CardDescription className="mt-2">{plan.description}</CardDescription>
                   <div className="mt-6">
+                    {plan.originalPrice && (
+                      <span className="mr-2 text-2xl text-muted-foreground line-through">{plan.originalPrice}</span>
+                    )}
                     <span className="text-4xl font-bold">{plan.price}</span>
                     <span className="ml-2 text-muted-foreground">{plan.priceDetail}</span>
                   </div>

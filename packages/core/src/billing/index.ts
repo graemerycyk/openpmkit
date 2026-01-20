@@ -103,8 +103,8 @@ export const INDIVIDUAL_PLAN: PlanConfig = {
   key: 'INDIVIDUAL',
   name: 'Individual',
   description: 'For individual PMs who want to automate their daily workflows',
-  pricePerSeatPerMonth: 79, // $79/month if monthly
-  pricePerSeatPerYear: 828, // $828/year ($69/month equivalent)
+  pricePerSeatPerMonth: 29, // $29/month launch price (regular $49)
+  pricePerSeatPerYear: 228, // $228/year ($19/month equivalent) launch price
   minSeats: 1,
   features: {
     // SSO: Not available for Individual
