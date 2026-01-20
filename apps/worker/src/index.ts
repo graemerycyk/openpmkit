@@ -213,11 +213,42 @@ async function startWorker(): Promise<void> {
 
     console.log(`[Worker] Found ${activeConfigs.length} active daily brief configs`);
 
+    // First, check the current state of the queue
+    const queue = scheduler.getQueue();
+    const delayedJobs = await queue.getDelayed();
+    const waitingJobs = await queue.getWaiting();
+    console.log(`[Worker] Queue state: ${delayedJobs.length} delayed, ${waitingJobs.length} waiting`);
+
     for (const config of activeConfigs) {
+      // Check if there's already a valid job for this config in the queue
+      const jobId = `daily-brief-${config.id}`;
+      const existingJob = await queue.getJob(jobId);
+
+      if (existingJob) {
+        const state = await existingJob.getState();
+        const jobData = existingJob.data;
+        const scheduledAt = jobData?.scheduledAt ? new Date(jobData.scheduledAt) : null;
+
+        // If job is delayed and scheduled for the future, skip re-scheduling
+        if (state === 'delayed' && scheduledAt && scheduledAt > new Date()) {
+          console.log(`[Worker] Config ${config.id} already has valid delayed job scheduled for ${scheduledAt.toISOString()}`);
+          continue;
+        }
+      }
+
       await scheduler.scheduleAgent({
         ...config,
         config: config.config as DailyBriefConfig,
       });
+    }
+
+    // Log final queue state
+    const finalDelayed = await queue.getDelayed();
+    console.log(`[Worker] After scheduling: ${finalDelayed.length} delayed jobs`);
+    for (const job of finalDelayed) {
+      const delay = job.opts.delay || 0;
+      const processAt = new Date(job.timestamp + delay);
+      console.log(`[Worker] - Job ${job.id}: scheduled to process at ${processAt.toISOString()}`);
     }
 
     await prisma.$disconnect();

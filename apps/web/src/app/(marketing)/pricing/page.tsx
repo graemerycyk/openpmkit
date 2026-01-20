@@ -68,7 +68,7 @@ const plans: Plan[] = [
     features: [
       { name: 'Single seat', included: true },
       { name: 'Monthly or annual billing', included: true },
-      { name: 'All 10 workflow jobs', included: true },
+      { name: 'All workflow automations', included: true },
       { name: 'All connectors: Slack, Jira, Confluence, Gong, Zendesk, Gmail, Google Calendar and more', included: true },
       { name: 'Amplitude, Discourse, Linear, Notion', included: true, detail: 'Coming soon' },
       { name: 'AI Crawlers: Social, Web, News', included: true, detail: 'Coming soon' },
@@ -208,7 +208,7 @@ export default function PricingPage() {
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
               Start with Individual for solo workflows, or contact sales for team pricing.
-              All plans include all connectors, all 10 workflow jobs, and full audit trails.
+              All plans include all connectors, all workflow automations, and full audit trails.
             </p>
           </div>
         </div>

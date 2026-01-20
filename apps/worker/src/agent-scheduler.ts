@@ -259,10 +259,18 @@ export class AgentScheduler {
     }
 
     // Remove any existing scheduled job for this config
+    // Only remove if it's still in delayed state (not currently processing)
     const jobId = `daily-brief-${agentConfig.id}`;
     const existingJob = await this.queue.getJob(jobId);
     if (existingJob) {
-      await existingJob.remove();
+      const state = await existingJob.getState();
+      if (state === 'delayed' || state === 'waiting') {
+        await existingJob.remove();
+        console.log(`[Scheduler] Removed existing ${state} job for ${agentConfig.id}`);
+      } else if (state === 'active') {
+        console.log(`[Scheduler] Job for ${agentConfig.id} is currently active, will schedule next run after completion`);
+        return; // Don't schedule now, let the job completion handler do it
+      }
     }
 
     // Add new scheduled job

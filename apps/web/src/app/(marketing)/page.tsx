@@ -59,30 +59,12 @@ import {
 } from 'lucide-react';
 
 const features = [
+  // First row: Available now (no Coming Soon badge)
   {
     icon: FileText,
     title: 'Daily Briefs',
     description:
       'Start each day with a synthesized brief from Slack, Jira, support, and community; automatically.',
-  },
-  {
-    icon: Users,
-    title: 'Meeting Prep Packs',
-    description:
-      'Walk into every customer meeting with context: recent calls, open tickets, and talking points.',
-  },
-  {
-    icon: Wand2,
-    title: 'PRD to Prototype',
-    description:
-      'Turn PRDs into interactive HTML prototypes with working UI - validate ideas in minutes, not weeks.',
-    highlight: true,
-  },
-  {
-    icon: FileText,
-    title: 'PRD Drafts',
-    description:
-      'Draft PRDs grounded in customer evidence, with explicit assumptions and open questions.',
   },
   {
     icon: BarChart3,
@@ -91,35 +73,60 @@ const features = [
       'Cluster customer feedback from support, calls, and community into actionable themes with evidence.',
   },
   {
+    icon: Users,
+    title: 'Meeting Prep Packs',
+    description:
+      'Walk into every customer meeting with context: recent calls, open tickets, and talking points.',
+  },
+  // Remaining workflows: Coming Soon
+  {
+    icon: Wand2,
+    title: 'PRD to Prototype',
+    description:
+      'Turn PRDs into interactive HTML prototypes with working UI - validate ideas in minutes, not weeks.',
+    comingSoon: true,
+  },
+  {
+    icon: FileText,
+    title: 'PRD Drafts',
+    description:
+      'Draft PRDs grounded in customer evidence, with explicit assumptions and open questions.',
+    comingSoon: true,
+  },
+  {
     icon: Target,
     title: 'Competitor Research',
     description:
       'Track competitor mentions across X, Reddit, LinkedIn, and news; pricing, features, messaging; with strategic implications.',
+    comingSoon: true,
   },
   {
     icon: GitBranch,
     title: 'Roadmap Alignment',
     description:
       'Generate alignment memos with options, trade-offs, and recommendations for stakeholder decisions.',
+    comingSoon: true,
   },
   {
     icon: CheckCircle2,
     title: 'Sprint Review Packs',
     description:
       'Generate sprint review packs with completed work, metrics, demos, and stakeholder updates.',
+    comingSoon: true,
   },
   {
     icon: Megaphone,
     title: 'Release Notes',
     description:
       'Generate customer-facing release notes from Jira and Confluence; clear, benefit-focused, and ready to publish.',
+    comingSoon: true,
   },
   {
     icon: Presentation,
     title: 'Deck Content',
     description:
       'Generate slide content tailored for exec, customer, team, or stakeholder audiences - ready to paste into your templates.',
-    highlight: true,
+    comingSoon: true,
   },
 ];
 
@@ -199,7 +206,7 @@ export default function HomePage() {
             '@type': 'Product',
             name: 'pmkit',
             description:
-              'AI-powered product management agent that runs 10 PM workflows: daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, release notes, and deck content.',
+              'AI-powered product management agent that automates PM workflows: daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, release notes, and deck content.',
             brand: {
               '@type': 'Brand',
               name: 'pmkit',
@@ -392,7 +399,7 @@ export default function HomePage() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              10 workflows every PM needs
+              10+ workflows every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               AI briefs, VoC themes, PRD drafts, prototypes, and release notes - run end-to-end with traceability and governance.
@@ -404,23 +411,18 @@ export default function HomePage() {
                 key={feature.title}
                 className={cn(
                   "animate-fade-up border-0 shadow-none",
-                  'highlight' in feature && feature.highlight 
-                    ? "bg-cobalt-50 ring-2 ring-cobalt-200" 
-                    : "bg-background"
+                  "bg-background"
                 )}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardHeader>
-                  <div className={cn(
-                    "mb-2 flex h-10 w-10 items-center justify-center rounded-lg",
-                    'highlight' in feature && feature.highlight ? "bg-cobalt-200" : "bg-cobalt-100"
-                  )}>
+                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-100">
                     <feature.icon className="h-5 w-5 text-cobalt-600" />
                   </div>
                   <CardTitle className="text-xl">
                     {feature.title}
-                    {'highlight' in feature && feature.highlight && (
-                      <Badge variant="cobalt" className="ml-2 text-xs">Popular</Badge>
+                    {'comingSoon' in feature && feature.comingSoon && (
+                      <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
                     )}
                   </CardTitle>
                 </CardHeader>
@@ -429,6 +431,24 @@ export default function HomePage() {
                 </CardContent>
               </Card>
             ))}
+            {/* More workflows coming soon card */}
+            <Card
+              className={cn(
+                "animate-fade-up border-2 border-dashed border-cobalt-200 bg-cobalt-50/30",
+                "flex items-center justify-center"
+              )}
+              style={{ animationDelay: `${features.length * 100}ms` }}
+            >
+              <CardContent className="text-center py-12">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
+                  <ArrowRight className="h-6 w-6 text-cobalt-600" />
+                </div>
+                <CardTitle className="text-lg text-cobalt-700">More workflows coming soon</CardTitle>
+                <CardDescription className="mt-2">
+                  We&apos;re building new workflows based on PM feedback
+                </CardDescription>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -467,7 +487,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-heading text-lg font-semibold">Run Jobs</h3>
               <p className="mt-2 text-muted-foreground">
-                Trigger any of the 10 PM workflows; on demand or scheduled.
+                Trigger any PM workflow; on demand or scheduled.
               </p>
             </div>
             <div className="text-center">
@@ -696,8 +716,8 @@ export default function HomePage() {
               Ready to try pmkit?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
-              Run all 10 workflow jobs in the demo: daily brief, meeting prep, VoC clustering,
-              competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, and release notes.
+              Run our workflow automations in the demo: daily brief, meeting prep, VoC clustering,
+              and more - with new workflows added regularly.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

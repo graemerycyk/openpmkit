@@ -16,11 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import {
   AlertCircle,
   ArrowLeft,
   CheckCircle2,
   Clock,
+  Globe,
   Loader2,
   Play,
   Save,
@@ -73,14 +75,26 @@ const TIMEZONES = [
   { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
 ];
 
-// Delivery time options
-const DELIVERY_TIMES = [
-  { value: '06:00', label: '6:00 AM' },
-  { value: '07:00', label: '7:00 AM' },
-  { value: '08:00', label: '8:00 AM' },
-  { value: '09:00', label: '9:00 AM' },
-  { value: '10:00', label: '10:00 AM' },
-];
+// Helper to convert 24h time to 12h format
+function parse24hTime(time: string): { hour: string; minute: string; period: 'AM' | 'PM' } {
+  const [h, m] = time.split(':').map(Number);
+  const period: 'AM' | 'PM' = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return {
+    hour: hour12.toString(),
+    minute: m.toString().padStart(2, '0'),
+    period,
+  };
+}
+
+// Helper to convert 12h format to 24h time string
+function to24hTime(hour: string, minute: string, period: 'AM' | 'PM'): string {
+  let h = parseInt(hour) || 12;
+  if (period === 'AM' && h === 12) h = 0;
+  else if (period === 'PM' && h !== 12) h += 12;
+  const m = parseInt(minute) || 0;
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
 
 export default function DailyBriefSetupPage() {
   const router = useRouter();
@@ -96,8 +110,11 @@ export default function DailyBriefSetupPage() {
 
   // Form state
   const [dataTimeframe, setDataTimeframe] = useState<'24' | '36'>('24');
-  const [deliveryTime, setDeliveryTime] = useState('08:00');
+  const [deliveryHour, setDeliveryHour] = useState('8');
+  const [deliveryMinute, setDeliveryMinute] = useState('00');
+  const [deliveryPeriod, setDeliveryPeriod] = useState<'AM' | 'PM'>('AM');
   const [timezone, setTimezone] = useState('America/New_York');
+  const [browserTimezone, setBrowserTimezone] = useState<string | null>(null);
   const [isActive, setIsActive] = useState(true);
 
   // Google connector states
@@ -173,9 +190,11 @@ export default function DailyBriefSetupPage() {
     checkAdmin();
   }, []);
 
-  // Detect user's timezone
+  // Detect user's timezone from browser
   useEffect(() => {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setBrowserTimezone(detected);
+    // Set as default if it's in our supported list
     const matchingTz = TIMEZONES.find((tz) => tz.value === detected);
     if (matchingTz) {
       setTimezone(detected);
@@ -204,7 +223,11 @@ export default function DailyBriefSetupPage() {
             setConfig(data.config);
             savedConfig = data.config.config; // Store for use when setting enabled states
             setDataTimeframe(data.config.config.dataTimeframeHours === 36 ? '36' : '24');
-            setDeliveryTime(data.config.config.deliveryTimeLocal);
+            // Parse the saved delivery time
+            const parsed = parse24hTime(data.config.config.deliveryTimeLocal);
+            setDeliveryHour(parsed.hour);
+            setDeliveryMinute(parsed.minute);
+            setDeliveryPeriod(parsed.period);
             setTimezone(data.config.config.timezone);
             setIsActive(data.config.status === 'active');
             // Restore Slack config from saved data
@@ -306,6 +329,7 @@ export default function DailyBriefSetupPage() {
     setSuccess(null);
 
     try {
+      const deliveryTimeLocal = to24hTime(deliveryHour, deliveryMinute, deliveryPeriod);
       const res = await fetch('/api/agents/daily-brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -313,7 +337,7 @@ export default function DailyBriefSetupPage() {
           status: isActive ? 'active' : 'paused',
           config: {
             dataTimeframeHours: parseInt(dataTimeframe),
-            deliveryTimeLocal: deliveryTime,
+            deliveryTimeLocal,
             timezone,
             slackChannels: connectorConfigs.slack?.selectedChannels || [],
             includeSlack: isSlackEnabled,
@@ -477,38 +501,104 @@ export default function DailyBriefSetupPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="delivery-time">Delivery Time</Label>
-              <Select value={deliveryTime} onValueChange={setDeliveryTime}>
-                <SelectTrigger id="delivery-time">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {DELIVERY_TIMES.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="timezone">Timezone</Label>
-              <Select value={timezone} onValueChange={setTimezone}>
-                <SelectTrigger id="timezone">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMEZONES.map((tz) => (
-                    <SelectItem key={tz.value} value={tz.value}>
-                      {tz.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Time Input */}
+          <div className="space-y-2">
+            <Label>Delivery Time</Label>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="8"
+                  value={deliveryHour}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    const num = parseInt(val);
+                    if (val === '' || (num >= 1 && num <= 12)) {
+                      setDeliveryHour(val);
+                    }
+                  }}
+                  className="w-14 text-center"
+                  maxLength={2}
+                />
+                <span className="text-muted-foreground">:</span>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="00"
+                  value={deliveryMinute}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    const num = parseInt(val);
+                    if (val === '' || (val.length <= 2 && num >= 0 && num <= 59)) {
+                      setDeliveryMinute(val.padStart(val.length > 0 ? 2 : 0, '0').slice(-2) || val);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Pad to 2 digits on blur
+                    setDeliveryMinute((deliveryMinute || '0').padStart(2, '0'));
+                  }}
+                  className="w-14 text-center"
+                  maxLength={2}
+                />
+              </div>
+              <div className="flex rounded-md border">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryPeriod('AM')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    deliveryPeriod === 'AM'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground hover:bg-muted'
+                  } rounded-l-md`}
+                >
+                  AM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryPeriod('PM')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    deliveryPeriod === 'PM'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground hover:bg-muted'
+                  } rounded-r-md border-l`}
+                >
+                  PM
+                </button>
+              </div>
             </div>
           </div>
+
+          {/* Timezone Selector */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="timezone">Timezone</Label>
+              {browserTimezone === timezone && (
+                <Badge variant="secondary" className="text-xs font-normal">
+                  <Globe className="mr-1 h-3 w-3" />
+                  Browser Default
+                </Badge>
+              )}
+            </div>
+            <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger id="timezone">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TIMEZONES.map((tz) => (
+                  <SelectItem key={tz.value} value={tz.value}>
+                    <span className="flex items-center gap-2">
+                      {tz.label}
+                      {tz.value === browserTimezone && (
+                        <span className="text-xs text-muted-foreground">(detected)</span>
+                      )}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {config?.nextRunAt && canRun && (
             <p className="text-sm text-muted-foreground">
               Next scheduled run:{' '}

@@ -967,6 +967,20 @@ Items where documentation claims features that aren't fully implemented.
 
 Items that have been discussed but not committed to.
 
+### New Workflow Ideas
+
+High-value workflows that could differentiate from current offerings:
+
+| Workflow | Why It Beats Current Offerings |
+|----------|--------------------------------|
+| **Stakeholder Update Automation** | Weekly exec updates are dreaded and time-consuming. Auto-draft from Jira/Slack with "What shipped / What's blocked / What's next" |
+| **Feature Request Triage** | Auto-categorize, dedupe, and link to existing roadmap items. This is a daily pain point. |
+| **OKR Progress Tracking** | Auto-pull metrics, draft progress updates, flag at-risk OKRs. Connects to exec accountability anxiety |
+| **Cross-Team Dependency Alerts** | Proactive detection of blocked dependencies across teams. Enterprise pain point. |
+| **User Research Synthesis** | Auto-summarize interview transcripts with theme extraction. High time-savings (10+ hours) |
+
+### Other Ideas
+
 | Idea | Category | Notes |
 |------|----------|-------|
 | **File Upload Crawler (5th AI Crawler)** | Crawlers | Upload PDF, DOCX, PPTX for AI analysis. Extract key data, synthesize insights, compare documents. Use cases: competitor whitepapers, analyst reports, sales decks, RFPs, contracts. Would need: file upload UI, document parsing (pdf-parse, mammoth), chunking for large docs, specialized analysis prompts. |

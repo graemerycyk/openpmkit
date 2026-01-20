@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { MarkdownContent } from '@/components/markdown-content';
 import {
   ArrowLeft,
   Calendar,
@@ -434,24 +435,7 @@ export default function SprintDetailPage() {
       {sprint.artifact && (
         <Card>
           <CardContent className="p-6">
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: sprint.artifact.content
-                    .replace(/^# /gm, '<h1 class="text-xl font-bold mt-6 mb-3">')
-                    .replace(/^## /gm, '<h2 class="text-lg font-semibold mt-5 mb-2">')
-                    .replace(/^### /gm, '<h3 class="text-base font-medium mt-4 mb-2">')
-                    .replace(/\n/g, '<br>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(
-                      /\[(.*?)\]\((.*?)\)/g,
-                      '<a href="$2" class="text-cobalt-600 hover:underline" target="_blank">$1</a>'
-                    )
-                    .replace(/- /g, '&bull; '),
-                }}
-              />
-            </div>
+            <MarkdownContent content={sprint.artifact.content} />
           </CardContent>
         </Card>
       )}

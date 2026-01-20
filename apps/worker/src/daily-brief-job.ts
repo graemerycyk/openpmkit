@@ -34,8 +34,17 @@ interface AgentJobPayload {
 export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<void> {
   const { agentConfigId, userId, tenantId, config, scheduledAt } = job.data;
 
+  const now = new Date();
+  const scheduledTime = new Date(scheduledAt);
+  const delayMinutes = Math.round((now.getTime() - scheduledTime.getTime()) / 60000);
+
+  console.log(`[DailyBriefJob] ========================================`);
   console.log(`[DailyBriefJob] Processing scheduled job for config ${agentConfigId}`);
-  console.log(`[DailyBriefJob] Scheduled at: ${scheduledAt}, Processing at: ${new Date().toISOString()}`);
+  console.log(`[DailyBriefJob] Job ID: ${job.id}`);
+  console.log(`[DailyBriefJob] Scheduled for: ${scheduledAt}`);
+  console.log(`[DailyBriefJob] Processing at: ${now.toISOString()}`);
+  console.log(`[DailyBriefJob] Delay from scheduled time: ${delayMinutes} minutes`);
+  console.log(`[DailyBriefJob] ========================================`);
 
   // Verify the agent config still exists and is active
   const agentConfig = await prisma.agentConfig.findUnique({

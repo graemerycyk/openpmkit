@@ -143,7 +143,6 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-pink-100 text-pink-600',
     category: 'tools',
     docsUrl: '/resources/figma-integration',
-    supportsOAuth: true,
   },
   {
     id: 'loom',
@@ -153,7 +152,14 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-purple-100 text-purple-600',
     category: 'tools',
     docsUrl: '/integrations/loom',
-    supportsOAuth: true,
+  },
+  {
+    id: 'coda',
+    name: 'Coda',
+    description: 'Access docs and tables for product documentation',
+    icon: FileText,
+    iconBg: 'bg-orange-100 text-orange-600',
+    category: 'tools',
   },
   {
     id: 'amplitude',
@@ -220,10 +226,10 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
 ];
 
 // Connectors that support OAuth
-const oauthConnectors = ['slack', 'jira', 'confluence', 'gong', 'zendesk', 'gmail', 'google-drive', 'google-calendar', 'figma', 'loom'];
+const oauthConnectors = ['slack', 'jira', 'confluence', 'gong', 'zendesk', 'gmail', 'google-drive', 'google-calendar'];
 
 // Connectors that are coming soon (no OAuth yet)
-const comingSoonConnectors = ['linear', 'notion'];
+const comingSoonConnectors = ['figma', 'loom', 'coda', 'linear', 'notion', 'amplitude', 'discourse'];
 
 function StatusBadge({ status, workspaceName }: { status: ConnectionStatus; workspaceName?: string }) {
   if (status === 'connected') {
@@ -468,8 +474,6 @@ function IntegrationsPageContent() {
       gmail: '/api/connectors/google/authorize',
       'google-drive': '/api/connectors/google/authorize',
       'google-calendar': '/api/connectors/google/authorize',
-      figma: '/api/connectors/figma/authorize',
-      loom: '/api/connectors/atlassian/authorize', // Loom is part of Atlassian
     };
 
     const endpoint = oauthEndpoints[connectorId];

@@ -17,7 +17,6 @@ import {
   Activity,
   ClipboardCheck,
   MessageSquare,
-  GitBranch,
   BarChart3,
   Layers,
   Phone,
@@ -30,6 +29,7 @@ import {
   Globe,
   Newspaper,
   Search,
+  Play,
 } from 'lucide-react';
 import { siteConfig } from '@/lib/utils';
 
@@ -386,33 +386,18 @@ export default function HowItWorksPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">Ten Workflow Jobs</h2>
+            <h2 className="font-heading text-3xl font-bold">10+ Workflows Automated</h2>
             <p className="mt-4 text-muted-foreground">
-              Pre-built workflows for the most common PM tasks. Run on-demand or on a schedule.
+              Pre-built workflows for the most common PM tasks, with more being added regularly.
             </p>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
+              // First row: Available now
               {
                 name: 'Daily Brief',
                 description: 'Synthesize overnight activity from Slack, Jira, support, and community.',
                 frequency: 'Daily',
-              },
-              {
-                name: 'Meeting Prep',
-                description: 'Prepare for customer meetings with context from calls, tickets, and CRM.',
-                frequency: 'On-demand',
-              },
-              {
-                name: 'PRD to Prototype',
-                description: 'Turn PRDs into interactive HTML prototypes for rapid user validation.',
-                frequency: 'On-demand',
-                highlight: true,
-              },
-              {
-                name: 'PRD Draft',
-                description: 'Draft PRDs grounded in customer evidence and context.',
-                frequency: 'On-demand',
               },
               {
                 name: 'VoC Clustering',
@@ -420,42 +405,56 @@ export default function HowItWorksPage() {
                 frequency: 'Weekly',
               },
               {
+                name: 'Meeting Prep',
+                description: 'Prepare for customer meetings with context from calls, tickets, and CRM.',
+                frequency: 'On-demand',
+              },
+              // Remaining: Coming Soon
+              {
+                name: 'PRD to Prototype',
+                description: 'Turn PRDs into interactive HTML prototypes for rapid user validation.',
+                comingSoon: true,
+              },
+              {
+                name: 'PRD Draft',
+                description: 'Draft PRDs grounded in customer evidence and context.',
+                comingSoon: true,
+              },
+              {
                 name: 'Competitor Research',
                 description: 'Track competitor product changes and releases.',
-                frequency: 'Weekly',
+                comingSoon: true,
               },
               {
                 name: 'Roadmap Alignment',
                 description: 'Generate alignment memos with options and trade-offs.',
-                frequency: 'On-demand',
+                comingSoon: true,
               },
               {
                 name: 'Sprint Review',
                 description: 'Generate sprint summaries with completed work and release notes.',
-                frequency: 'On-demand',
+                comingSoon: true,
               },
               {
                 name: 'Release Notes',
                 description: 'Generate customer-facing release notes from completed work.',
-                frequency: 'Per release',
+                comingSoon: true,
               },
               {
                 name: 'Deck Content',
                 description: 'Generate slide content tailored for exec, customer, team, or stakeholder audiences.',
-                frequency: 'On-demand',
-                highlight: true,
+                comingSoon: true,
               },
             ].map((job) => (
-              <Card key={job.name} className={'highlight' in job && job.highlight ? 'ring-2 ring-cobalt-200 bg-cobalt-50/30' : ''}>
+              <Card key={job.name}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      {job.name}
-                      {'highlight' in job && job.highlight && (
-                        <Badge variant="cobalt" className="ml-2 text-xs">Popular</Badge>
-                      )}
-                    </CardTitle>
-                    <Badge variant="outline">{job.frequency}</Badge>
+                    <CardTitle className="text-lg">{job.name}</CardTitle>
+                    {'comingSoon' in job && job.comingSoon ? (
+                      <Badge variant="outline">Coming Soon</Badge>
+                    ) : (
+                      <Badge variant="outline">{job.frequency}</Badge>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -463,6 +462,18 @@ export default function HowItWorksPage() {
                 </CardContent>
               </Card>
             ))}
+            {/* More workflows coming soon card */}
+            <Card className="border-2 border-dashed border-cobalt-200 bg-cobalt-50/30 flex items-center justify-center">
+              <CardContent className="text-center py-8">
+                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-cobalt-100">
+                  <ArrowRight className="h-5 w-5 text-cobalt-600" />
+                </div>
+                <CardTitle className="text-base text-cobalt-700">More coming soon</CardTitle>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  New workflows added regularly
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -480,7 +491,7 @@ export default function HowItWorksPage() {
           {/* Available Now */}
           <div className="mt-12">
             <h3 className="text-lg font-semibold mb-6 text-center">Available Now</h3>
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
               {[
                 { name: 'Slack', icon: MessageSquare, description: 'Team communication' },
                 { name: 'Jira', icon: Layers, description: 'Issue tracking' },
@@ -490,7 +501,6 @@ export default function HowItWorksPage() {
                 { name: 'Gmail', icon: Mail, description: 'Email threads' },
                 { name: 'Google Drive', icon: FolderOpen, description: 'Documents' },
                 { name: 'Google Calendar', icon: Calendar, description: 'Meetings' },
-                { name: 'Figma', icon: Palette, description: 'Design files' },
               ].map((integration) => (
                 <Card key={integration.name} className="text-center">
                   <CardContent className="pt-6">
@@ -508,10 +518,15 @@ export default function HowItWorksPage() {
           {/* Coming Soon */}
           <div className="mt-12">
             <h3 className="text-lg font-semibold mb-6 text-center">Coming Soon</h3>
-            <div className="grid gap-4 md:grid-cols-2 max-w-md mx-auto">
+            <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-7 max-w-5xl mx-auto">
               {[
+                { name: 'Figma', icon: Palette, description: 'Design files' },
+                { name: 'Loom', icon: Play, description: 'Video transcripts' },
                 { name: 'Amplitude', icon: BarChart3, description: 'Analytics' },
                 { name: 'Linear', icon: TrendingUp, description: 'Issue tracking' },
+                { name: 'Discourse', icon: MessageSquare, description: 'Community' },
+                { name: 'Notion', icon: Database, description: 'Documentation' },
+                { name: 'Coda', icon: FileText, description: 'Docs & tables' },
               ].map((integration) => (
                 <Card key={integration.name} className="text-center opacity-70">
                   <CardContent className="pt-6">
@@ -565,7 +580,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">See It In Action</h2>
             <p className="mt-4 text-cobalt-100">
-              Try all ten jobs in the interactive demo with a complete demo enterprise dataset.
+              Try our workflow automations in the interactive demo with a complete demo enterprise dataset.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>
