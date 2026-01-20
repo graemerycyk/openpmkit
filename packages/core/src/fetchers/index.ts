@@ -54,6 +54,12 @@ export type {
   ConfluenceFetchOptions,
 } from './types';
 
+// Zendesk-specific types (from fetcher)
+export type {
+  ZendeskTicketMetadata,
+  ZendeskFetchOptions,
+} from './zendesk-fetcher';
+
 export { ConnectorSourceTypeSchema } from './types';
 
 // Fetchers
@@ -63,3 +69,4 @@ export { CalendarFetcher } from './calendar-fetcher';
 export { DriveFetcher } from './drive-fetcher';
 export { JiraFetcher } from './jira-fetcher';
 export { ConfluenceFetcher } from './confluence-fetcher';
+export { ZendeskFetcher } from './zendesk-fetcher';

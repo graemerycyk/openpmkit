@@ -41,6 +41,10 @@ export interface DailyBriefResult {
     messagesProcessed: number;
     emailsProcessed: number;
     eventsProcessed: number;
+    driveFilesProcessed: number;
+    jiraIssuesProcessed: number;
+    confluencePagesProcessed: number;
+    zendeskTicketsProcessed: number;
     tokensUsed?: number;
     latencyMs: number;
   };
@@ -127,6 +131,34 @@ export async function executeDailyBrief(
       };
     }
 
+    if (config.includeGoogleDrive) {
+      fetcherConfig.drive = {
+        starredOnly: false,
+        sharedOnly: false,
+      };
+    }
+
+    if (config.includeJira) {
+      fetcherConfig.jira = {
+        assignedToMe: true,
+        recentlyUpdated: true,
+      };
+    }
+
+    if (config.includeConfluence) {
+      fetcherConfig.confluence = {
+        recentlyEdited: true,
+      };
+    }
+
+    if (config.includeZendesk) {
+      fetcherConfig.zendesk = {
+        status: ['open', 'pending', 'new'],
+        assignedToMe: true,
+        recentlyUpdated: true,
+      };
+    }
+
     // Fetch from all available connectors
     callbacks?.onProgress?.('Fetching data from connected sources...');
     const multiSource = await buildMultiSourceContext(credentials, fetcherConfig, {
@@ -147,6 +179,10 @@ export async function executeDailyBrief(
           messagesProcessed: 0,
           emailsProcessed: 0,
           eventsProcessed: 0,
+          driveFilesProcessed: 0,
+          jiraIssuesProcessed: 0,
+          confluencePagesProcessed: 0,
+          zendeskTicketsProcessed: 0,
           latencyMs: Date.now() - startTime,
         },
       };
@@ -214,6 +250,10 @@ export async function executeDailyBrief(
         messagesProcessed: multiSource.byConnector.slack?.length || 0,
         emailsProcessed: multiSource.byConnector.gmail?.length || 0,
         eventsProcessed: multiSource.byConnector.calendar?.length || 0,
+        driveFilesProcessed: multiSource.byConnector.drive?.length || 0,
+        jiraIssuesProcessed: multiSource.byConnector.jira?.length || 0,
+        confluencePagesProcessed: multiSource.byConnector.confluence?.length || 0,
+        zendeskTicketsProcessed: multiSource.byConnector.zendesk?.length || 0,
         tokensUsed: llmResponse.usage.promptTokens + llmResponse.usage.completionTokens,
         latencyMs: totalLatency,
       },
@@ -235,6 +275,10 @@ function buildSystemPrompt(connectors: string[]): string {
   if (connectors.includes('slack')) sources.push('Slack messages');
   if (connectors.includes('gmail')) sources.push('Gmail emails');
   if (connectors.includes('google-calendar')) sources.push('Calendar events');
+  if (connectors.includes('google-drive')) sources.push('Google Drive files');
+  if (connectors.includes('jira')) sources.push('Jira issues');
+  if (connectors.includes('confluence')) sources.push('Confluence pages');
+  if (connectors.includes('zendesk')) sources.push('Zendesk tickets');
 
   const sourceList = sources.length > 0 ? sources.join(', ') : 'various sources';
 
@@ -269,6 +313,10 @@ interface MultiSourceContextType {
     slack?: FetchedItem[];
     gmail?: FetchedItem[];
     calendar?: FetchedItem[];
+    drive?: FetchedItem[];
+    jira?: FetchedItem[];
+    confluence?: FetchedItem[];
+    zendesk?: FetchedItem[];
   };
 }
 
@@ -294,6 +342,30 @@ function buildPromptContext(
   if (multiSource.byConnector.calendar?.length) {
     const calendarSection = formatCalendarSection(multiSource.byConnector.calendar, citationTracker);
     sections.push(calendarSection);
+  }
+
+  // Format Google Drive files
+  if (multiSource.byConnector.drive?.length) {
+    const driveSection = formatDriveSection(multiSource.byConnector.drive, citationTracker);
+    sections.push(driveSection);
+  }
+
+  // Format Jira issues
+  if (multiSource.byConnector.jira?.length) {
+    const jiraSection = formatJiraSection(multiSource.byConnector.jira, citationTracker);
+    sections.push(jiraSection);
+  }
+
+  // Format Confluence pages
+  if (multiSource.byConnector.confluence?.length) {
+    const confluenceSection = formatConfluenceSection(multiSource.byConnector.confluence, citationTracker);
+    sections.push(confluenceSection);
+  }
+
+  // Format Zendesk tickets
+  if (multiSource.byConnector.zendesk?.length) {
+    const zendeskSection = formatZendeskSection(multiSource.byConnector.zendesk, citationTracker);
+    sections.push(zendeskSection);
   }
 
   return sections.join('\n\n');
@@ -403,4 +475,128 @@ function formatCalendarSection(items: FetchedItem[], citationTracker: CitationTr
   }
 
   return `## Upcoming Meetings\n\n${lines.join('\n')}`;
+}
+
+function formatDriveSection(items: FetchedItem[], citationTracker: CitationTracker): string {
+  // Sort by timestamp (newest first)
+  const sorted = [...items].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  const lines: string[] = [];
+  for (const item of sorted) {
+    const citationNum = citationTracker.getCitationNumber('drive_file', item.externalId);
+    const date = item.timestamp.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+    const metadata = item.metadata as { mimeType?: string; isShared?: boolean };
+
+    let typeIcon = '📄';
+    if (metadata.mimeType?.includes('spreadsheet')) typeIcon = '📊';
+    else if (metadata.mimeType?.includes('presentation')) typeIcon = '📽️';
+    else if (metadata.mimeType?.includes('document')) typeIcon = '📝';
+    else if (metadata.mimeType?.includes('folder')) typeIcon = '📁';
+
+    const sharedIndicator = metadata.isShared ? ' (shared)' : '';
+    lines.push(`[${citationNum}] ${typeIcon} **${item.title}**${sharedIndicator} - ${date}`);
+  }
+
+  return `## Google Drive Files\n\n${lines.join('\n')}`;
+}
+
+function formatJiraSection(items: FetchedItem[], citationTracker: CitationTracker): string {
+  // Sort by timestamp (newest first)
+  const sorted = [...items].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  const lines: string[] = [];
+  for (const item of sorted) {
+    const citationNum = citationTracker.getCitationNumber('jira_issue', item.externalId);
+    const metadata = item.metadata as {
+      issueKey?: string;
+      status?: string;
+      priority?: string;
+      issueType?: string;
+    };
+
+    const statusBadge = metadata.status ? `[${metadata.status}]` : '';
+    const priorityIcon = metadata.priority === 'High' ? '🔴' : metadata.priority === 'Medium' ? '🟡' : '🟢';
+    const issueKey = metadata.issueKey || item.externalId;
+
+    lines.push(`[${citationNum}] ${priorityIcon} **${issueKey}**: ${item.title} ${statusBadge}`);
+
+    // Add snippet if available
+    if (item.content && item.content.length > 0) {
+      const snippet = item.content.slice(0, 100);
+      lines.push(`    ${snippet}${item.content.length > 100 ? '...' : ''}`);
+    }
+  }
+
+  return `## Jira Issues\n\n${lines.join('\n')}`;
+}
+
+function formatConfluenceSection(items: FetchedItem[], citationTracker: CitationTracker): string {
+  // Sort by timestamp (newest first)
+  const sorted = [...items].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  const lines: string[] = [];
+  for (const item of sorted) {
+    const citationNum = citationTracker.getCitationNumber('confluence_page', item.externalId);
+    const date = item.timestamp.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+    const metadata = item.metadata as { spaceKey?: string; spaceName?: string };
+
+    const space = metadata.spaceName || metadata.spaceKey || '';
+    const spacePrefix = space ? `[${space}] ` : '';
+
+    lines.push(`[${citationNum}] 📖 ${spacePrefix}**${item.title}** - ${date}`);
+
+    // Add content snippet
+    if (item.content && item.content.length > 0) {
+      const snippet = item.content.slice(0, 120);
+      lines.push(`    ${snippet}${item.content.length > 120 ? '...' : ''}`);
+    }
+  }
+
+  return `## Confluence Pages\n\n${lines.join('\n')}`;
+}
+
+function formatZendeskSection(items: FetchedItem[], citationTracker: CitationTracker): string {
+  // Sort by timestamp (newest first)
+  const sorted = [...items].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  const lines: string[] = [];
+  for (const item of sorted) {
+    const citationNum = citationTracker.getCitationNumber('zendesk_ticket', item.externalId);
+    const metadata = item.metadata as {
+      status?: string;
+      priority?: string;
+      organization?: { name: string };
+    };
+
+    const statusBadge = metadata.status ? `[${metadata.status}]` : '';
+    const priorityIcon =
+      metadata.priority === 'urgent'
+        ? '🔴'
+        : metadata.priority === 'high'
+          ? '🟠'
+          : metadata.priority === 'normal'
+            ? '🟡'
+            : '🟢';
+
+    lines.push(`[${citationNum}] ${priorityIcon} **${item.title}** ${statusBadge}`);
+
+    // Add organization if available
+    if (metadata.organization?.name) {
+      lines.push(`    🏢 ${metadata.organization.name}`);
+    }
+
+    // Add content snippet
+    if (item.content && item.content.length > 0) {
+      const snippet = item.content.slice(0, 100);
+      lines.push(`    ${snippet}${item.content.length > 100 ? '...' : ''}`);
+    }
+  }
+
+  return `## Zendesk Tickets\n\n${lines.join('\n')}`;
 }

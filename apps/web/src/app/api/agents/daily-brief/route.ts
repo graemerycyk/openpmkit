@@ -123,6 +123,9 @@ export async function POST(request: NextRequest) {
           includeGmail: configData.includeGmail,
           includeGoogleDrive: configData.includeGoogleDrive,
           includeGoogleCalendar: configData.includeGoogleCalendar,
+          includeJira: configData.includeJira,
+          includeConfluence: configData.includeConfluence,
+          includeZendesk: configData.includeZendesk,
         },
       },
     });

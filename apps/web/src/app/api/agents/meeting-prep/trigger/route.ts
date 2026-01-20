@@ -90,6 +90,31 @@ export async function POST() {
 
     console.log(`[Meeting Prep] Starting job ${job.id} for user ${user.id}`);
 
+    // Get config details for the artifact
+    const configData = agentConfig.config as {
+      leadTimeMinutes?: number;
+      timezone?: string;
+      enabledSources?: Record<string, boolean>;
+    };
+
+    // Check what other connectors are available
+    const slackInstall = connectorMap.get('slack');
+    const gmailInstall = connectorMap.get('gmail');
+    const driveInstall = connectorMap.get('google-drive');
+    const jiraInstall = connectorMap.get('jira');
+    const confluenceInstall = connectorMap.get('confluence');
+    const gongInstall = connectorMap.get('gong');
+
+    const connectedSources = [
+      calendarConnected ? 'Google Calendar' : null,
+      slackInstall?.credentials[0] ? 'Slack' : null,
+      gmailInstall?.credentials[0] ? 'Gmail' : null,
+      driveInstall?.credentials[0] ? 'Google Drive' : null,
+      jiraInstall?.credentials[0] ? 'Jira' : null,
+      confluenceInstall?.credentials[0] ? 'Confluence' : null,
+      gongInstall?.credentials[0] ? 'Gong' : null,
+    ].filter(Boolean);
+
     // For now, mark as completed immediately since the actual execution
     // would require the meeting prep orchestrator to be implemented
     // This provides a foundation for the manual trigger functionality
@@ -98,7 +123,64 @@ export async function POST() {
       data: {
         status: 'completed',
         completedAt: new Date(),
-        result: { message: 'Meeting prep triggered successfully' },
+        result: {
+          message: 'Meeting prep triggered successfully',
+          connectedSources,
+        },
+      },
+    });
+
+    // Create placeholder artifact
+    const today = new Date();
+    const artifactContent = `# Meeting Prep - ${today.toLocaleDateString()}
+
+## Overview
+Meeting Prep agent triggered successfully.
+
+## Configuration
+- **Lead Time**: ${configData.leadTimeMinutes || 240} minutes before meeting
+- **Timezone**: ${configData.timezone || 'Not set'}
+
+## Connected Data Sources
+${connectedSources.map(s => `- ${s}`).join('\n') || '- None connected'}
+
+## What This Agent Will Do
+When fully implemented, the Meeting Prep agent will:
+
+1. **Find your upcoming meeting** from Google Calendar
+2. **Gather context** from connected sources:
+   - Recent emails with attendees (Gmail)
+   - Relevant Slack conversations
+   - Related documents (Google Drive)
+   - Customer tickets (Jira/Zendesk)
+   - Call recordings (Gong)
+3. **Generate a prep pack** with:
+   - Attendee background
+   - Recent interactions timeline
+   - Key topics to discuss
+   - Open action items
+   - Suggested talking points
+
+## Status
+The Meeting Prep agent has been triggered. Full automated prep pack generation is coming soon.
+
+---
+*Generated at ${today.toISOString()}*
+`;
+
+    await prisma.artifact.create({
+      data: {
+        tenantId: user.tenantId,
+        jobId: job.id,
+        type: 'meeting_pack',
+        title: `Meeting Prep - ${today.toLocaleDateString()}`,
+        format: 'markdown',
+        content: artifactContent,
+        metadata: {
+          status: 'placeholder',
+          connectedSources,
+          leadTimeMinutes: configData.leadTimeMinutes || 240,
+        },
       },
     });
 
@@ -116,11 +198,11 @@ export async function POST() {
         action: 'job_completed',
         resourceType: 'job',
         resourceId: job.id,
-        details: { trigger: 'manual' },
+        details: { trigger: 'manual', connectedSources },
       },
     });
 
-    console.log(`[Meeting Prep] Job ${job.id} completed successfully`);
+    console.log(`[Meeting Prep] Job ${job.id} completed (placeholder)`);
 
     return NextResponse.json({
       success: true,

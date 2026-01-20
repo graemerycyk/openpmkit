@@ -113,6 +113,21 @@ export interface FetcherConfig {
     sharedOnly?: boolean;
     query?: string;
   };
+  jira?: {
+    projectKeys?: string[];
+    assignedToMe?: boolean;
+    recentlyUpdated?: boolean;
+  };
+  confluence?: {
+    spaceKeys?: string[];
+    recentlyEdited?: boolean;
+  };
+  zendesk?: {
+    status?: string[];
+    priority?: string[];
+    assignedToMe?: boolean;
+    recentlyUpdated?: boolean;
+  };
 }
 
 /**

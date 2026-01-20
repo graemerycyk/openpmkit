@@ -83,10 +83,18 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
   const slackInstall = connectorMap.get('slack');
   const gmailInstall = connectorMap.get('gmail');
   const calendarInstall = connectorMap.get('google-calendar');
+  const driveInstall = connectorMap.get('google-drive');
+  const jiraInstall = connectorMap.get('jira');
+  const confluenceInstall = connectorMap.get('confluence');
+  const zendeskInstall = connectorMap.get('zendesk');
 
   const slackConnected = slackInstall && slackInstall.credentials[0];
   const gmailConnected = gmailInstall && gmailInstall.credentials[0];
   const calendarConnected = calendarInstall && calendarInstall.credentials[0];
+  const driveConnected = driveInstall && driveInstall.credentials[0];
+  const jiraConnected = jiraInstall && jiraInstall.credentials[0];
+  const confluenceConnected = confluenceInstall && confluenceInstall.credentials[0];
+  const zendeskConnected = zendeskInstall && zendeskInstall.credentials[0];
 
   // Determine available data sources
   const wantsSlackData =
@@ -151,6 +159,54 @@ export async function processDailyBriefJob(job: Job<AgentJobPayload>): Promise<v
       encryptionKey,
     };
   }
+
+  if (driveConnected && config.includeGoogleDrive) {
+    credentials['google-drive'] = {
+      encryptedBlob: driveInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
+  }
+
+  if (jiraConnected && config.includeJira) {
+    credentials.jira = {
+      encryptedBlob: jiraInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
+  }
+
+  if (confluenceConnected && config.includeConfluence) {
+    credentials.confluence = {
+      encryptedBlob: confluenceInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
+  }
+
+  if (zendeskConnected && config.includeZendesk) {
+    credentials.zendesk = {
+      encryptedBlob: zendeskInstall.credentials[0].encryptedBlob,
+      encryptionKey,
+    };
+  }
+
+  // Log which data sources are enabled in config vs which have credentials
+  console.log(`[DailyBriefJob] Config data sources:`, {
+    includeSlack: config.includeSlack,
+    includeGmail: config.includeGmail,
+    includeGoogleCalendar: config.includeGoogleCalendar,
+    includeGoogleDrive: config.includeGoogleDrive,
+    includeJira: config.includeJira,
+    includeConfluence: config.includeConfluence,
+    includeZendesk: config.includeZendesk,
+  });
+  console.log(`[DailyBriefJob] Connector credentials available:`, {
+    slack: !!credentials.slack,
+    gmail: !!credentials.gmail,
+    'google-calendar': !!credentials['google-calendar'],
+    'google-drive': !!credentials['google-drive'],
+    jira: !!credentials.jira,
+    confluence: !!credentials.confluence,
+    zendesk: !!credentials.zendesk,
+  });
 
   // Create job record
   const jobRecord = await prisma.job.create({

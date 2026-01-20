@@ -2,6 +2,10 @@ import type { FetchedItem } from '../../fetchers/types';
 import { SlackFetcher } from '../../fetchers/slack-fetcher';
 import { GmailFetcher } from '../../fetchers/gmail-fetcher';
 import { CalendarFetcher } from '../../fetchers/calendar-fetcher';
+import { DriveFetcher } from '../../fetchers/drive-fetcher';
+import { JiraFetcher } from '../../fetchers/jira-fetcher';
+import { ConfluenceFetcher } from '../../fetchers/confluence-fetcher';
+import { ZendeskFetcher } from '../../fetchers/zendesk-fetcher';
 import type {
   ConnectorCredentialsMap,
   CredentialsMapKey,
@@ -138,18 +142,116 @@ export async function buildMultiSourceContext(
   }
 
   // ============================================================================
-  // Fetch from Google Drive (placeholder - will be implemented in Phase 5)
+  // Fetch from Google Drive
   // ============================================================================
 
   if (credentials['google-drive'] && config.drive) {
     availableConnectors.push('google-drive');
-    onProgress?.('Drive fetcher not yet implemented');
-    // TODO: Implement DriveFetcher in Phase 5
-    // const fetcher = DriveFetcher.fromEncrypted(credentials['google-drive']);
-    // const result = await fetcher.fetch({ ...config.drive, sinceHoursAgo, limit, onProgress });
-    // byConnector.drive = result.items;
-    // items.push(...result.items);
-    // statsByConnector.drive = result.items.length;
+    onProgress?.('Starting Google Drive fetch...');
+
+    try {
+      const fetcher = DriveFetcher.fromEncrypted(credentials['google-drive']);
+      const result = await fetcher.fetch({
+        ...config.drive,
+        sinceHoursAgo,
+        limit,
+        onProgress,
+      });
+
+      byConnector.drive = result.items;
+      items.push(...result.items);
+      statsByConnector.drive = result.items.length;
+
+      onProgress?.(`Drive: fetched ${result.items.length} files`);
+    } catch (error) {
+      onProgress?.(`Drive fetch failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // ============================================================================
+  // Fetch from Jira
+  // ============================================================================
+
+  if (credentials.jira && config.jira) {
+    availableConnectors.push('jira');
+    onProgress?.('Starting Jira fetch...');
+
+    try {
+      const fetcher = JiraFetcher.fromEncrypted(credentials.jira);
+      const result = await fetcher.fetch({
+        projectKeys: config.jira.projectKeys,
+        assignedToMe: config.jira.assignedToMe,
+        recentlyUpdated: config.jira.recentlyUpdated ?? true,
+        sinceHoursAgo,
+        limit,
+        onProgress,
+      });
+
+      byConnector.jira = result.items;
+      items.push(...result.items);
+      statsByConnector.jira = result.items.length;
+
+      onProgress?.(`Jira: fetched ${result.items.length} issues`);
+    } catch (error) {
+      onProgress?.(`Jira fetch failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // ============================================================================
+  // Fetch from Confluence
+  // ============================================================================
+
+  if (credentials.confluence && config.confluence) {
+    availableConnectors.push('confluence');
+    onProgress?.('Starting Confluence fetch...');
+
+    try {
+      const fetcher = ConfluenceFetcher.fromEncrypted(credentials.confluence);
+      const result = await fetcher.fetch({
+        spaceKeys: config.confluence.spaceKeys,
+        sinceHoursAgo,
+        limit,
+        onProgress,
+      });
+
+      byConnector.confluence = result.items;
+      items.push(...result.items);
+      statsByConnector.confluence = result.items.length;
+
+      onProgress?.(`Confluence: fetched ${result.items.length} pages`);
+    } catch (error) {
+      onProgress?.(`Confluence fetch failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // ============================================================================
+  // Fetch from Zendesk
+  // ============================================================================
+
+  if (credentials.zendesk && config.zendesk) {
+    availableConnectors.push('zendesk');
+    onProgress?.('Starting Zendesk fetch...');
+
+    try {
+      const fetcher = ZendeskFetcher.fromEncrypted(credentials.zendesk);
+      const result = await fetcher.fetch({
+        status: config.zendesk.status,
+        priority: config.zendesk.priority,
+        assignedToMe: config.zendesk.assignedToMe,
+        recentlyUpdated: config.zendesk.recentlyUpdated ?? true,
+        sinceHoursAgo,
+        limit,
+        onProgress,
+      });
+
+      byConnector.zendesk = result.items;
+      items.push(...result.items);
+      statsByConnector.zendesk = result.items.length;
+
+      onProgress?.(`Zendesk: fetched ${result.items.length} tickets`);
+    } catch (error) {
+      onProgress?.(`Zendesk fetch failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   // ============================================================================
