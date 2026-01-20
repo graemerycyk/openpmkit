@@ -178,20 +178,21 @@ Publish a single PMKit app for all customers. One-click install experience.
 | SLACK_CLIENT_SECRET | `apps/web/.env.local` | From Slack app Basic Information |
 | CONNECTOR_ENCRYPTION_KEY | `apps/web/.env.local` | Generate with `openssl rand -hex 32` |
 
-**6.3 Gong**
+**6.3 Gong** 🔄 DEV ACCOUNT SUBMITTED
 
 **Option A: Development/Testing App (Quick Setup)**
 
 | Step | Status | Instructions |
 |------|--------|--------------|
-| 1. Access Gong settings | 🔲 Pending | Go to https://app.gong.io/company/api → API Settings |
-| 2. Create OAuth app | 🔲 Pending | OAuth Apps → Create New App |
-| 3. Name the app | 🔲 Pending | e.g., "PMKit Dev" |
-| 4. Set Redirect URI | 🔲 Pending | `http://localhost:3000/api/connectors/gong/callback` |
-| 5. Select scopes | 🔲 Pending | `api:calls:read`, `api:users:read`, `api:meetings:read` |
-| 6. Copy Client ID | 🔲 Pending | Copy from app settings |
-| 7. Copy Client Secret | 🔲 Pending | Copy from app settings |
-| 8. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `GONG_CLIENT_ID`, `GONG_CLIENT_SECRET` |
+| 1. Request Partner/Dev account | 🔄 Submitted | Applied for Gong partner/developer account |
+| 2. Access Gong settings | 🔲 Pending | Go to https://app.gong.io/company/api → API Settings |
+| 3. Create OAuth app | 🔲 Pending | OAuth Apps → Create New App |
+| 4. Name the app | 🔲 Pending | e.g., "PMKit Dev" |
+| 5. Set Redirect URI | 🔲 Pending | `http://localhost:3000/api/connectors/gong/callback` |
+| 6. Select scopes | 🔲 Pending | `api:calls:read`, `api:users:read`, `api:meetings:read` |
+| 7. Copy Client ID | 🔲 Pending | Copy from app settings |
+| 8. Copy Client Secret | 🔲 Pending | Copy from app settings |
+| 9. Add env vars | 🔲 Pending | Add to `apps/web/.env.local`: `GONG_CLIENT_ID`, `GONG_CLIENT_SECRET` |
 
 **Option B: Production App**
 

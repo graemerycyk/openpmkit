@@ -387,7 +387,10 @@ export default function HowItWorksPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">10+ Workflows Automated</h2>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Zap className="h-6 w-6 text-cobalt-600" />
+              <h2 className="font-heading text-3xl font-bold">10+ Workflows Automated</h2>
+            </div>
             <p className="mt-4 text-muted-foreground">
               Pre-built workflows for the most common PM tasks, with more being added regularly.
             </p>
@@ -398,12 +401,12 @@ export default function HowItWorksPage() {
               {
                 name: 'Daily Brief',
                 description: 'Synthesize overnight activity from Slack, Jira, support, and community.',
-                frequency: 'Daily',
+                frequency: 'Automated',
               },
               {
                 name: 'VoC Clustering',
                 description: 'Cluster feedback from support, calls, and community into themes.',
-                frequency: 'Weekly',
+                frequency: 'Automated',
               },
               {
                 name: 'Meeting Prep',
