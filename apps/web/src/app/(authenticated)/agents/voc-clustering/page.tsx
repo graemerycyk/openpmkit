@@ -81,8 +81,6 @@ export default function VoCClusteringPage() {
     connectorConfigs,
     handleSourceToggle,
     handleConfigChange,
-    canRun,
-    missingRequiredConnectors,
     isAdmin,
     handleSave,
     handleTrigger,

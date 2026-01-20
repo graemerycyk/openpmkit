@@ -85,8 +85,8 @@ export function useAgentConfig<TConfig extends Record<string, unknown>>({
   apiEndpoint,
   suggestedConnectors,
   requiredConnectors = [],
-  defaultConfig = {},
-  parseConfig,
+  defaultConfig: _defaultConfig = {},
+  parseConfig: _parseConfig,
   buildPayload,
 }: UseAgentConfigOptions<TConfig>): UseAgentConfigReturn<TConfig> {
   // Loading states
