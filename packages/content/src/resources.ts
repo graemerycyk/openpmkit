@@ -80,7 +80,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What tools does a PM agent connect to?',
         answer:
-          'pmkit agents connect to Jira, Confluence, Slack, Gong, Zendesk, community forums (Discourse, GitHub), and analytics platforms via MCP connectors. Enterprise customers can add custom integrations.',
+          'pmkit agents connect to Jira, Confluence, Slack, Gong, Zendesk, community forums (Discourse, GitHub), and analytics platforms via secure OAuth connectors. Enterprise customers can add custom integrations.',
       },
       {
         question: 'How long does it take to set up a PM agent?',
@@ -194,7 +194,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What integrations support agentic PM?',
         answer:
-          'pmkit connects to Jira, Confluence, Slack, Gong, Zendesk, community platforms, and analytics tools via MCP (Model Context Protocol) connectors.',
+          'pmkit connects to Jira, Confluence, Slack, Gong, Zendesk, community platforms, and analytics tools via secure OAuth connectors.',
       },
       {
         question: 'How is this different from just using ChatGPT?',
@@ -362,7 +362,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'How are changes detected?',
         answer:
-          'The competitor MCP connector aggregates signals from product pages, press releases, social media, and industry sources. Changes are classified by type and significance.',
+          'The competitor research integration aggregates signals from product pages, press releases, social media, and industry sources. Changes are classified by type and significance.',
       },
       {
         question: 'What does a competitor research report include?',
@@ -540,7 +540,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'Can I search across all Gong transcripts?',
         answer:
-          'Yes. The Gong MCP connector supports full-text search across transcripts, filtered by date, account, or speaker role.',
+          'Yes. The Gong integration supports full-text search across transcripts, filtered by date, account, or speaker role.',
       },
       {
         question: 'Does this work with other call recording tools?',
@@ -587,7 +587,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'Which community platforms does pmkit support?',
         answer:
-          'pmkit connects to Discourse, GitHub Discussions, Reddit, and custom community platforms via the community MCP connector.',
+          'pmkit connects to Discourse, GitHub Discussions, Reddit, and custom community platforms via secure OAuth connectors.',
       },
       {
         question: 'How are feature requests prioritized?',
@@ -941,7 +941,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'Does pmkit support Jira Cloud and Data Center?',
         answer:
-          'Yes. The Jira MCP connector supports both Jira Cloud and Jira Data Center deployments.',
+          'Yes. The Jira integration supports both Jira Cloud and Jira Data Center deployments.',
       },
       {
         question: 'Can I customize the Jira ticket templates?',
@@ -1118,7 +1118,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'What analytics sources does pmkit analyze?',
         answer:
-          'pmkit connects to Amplitude, Mixpanel, Algolia, Segment, and custom analytics platforms via the analytics MCP connector.',
+          'pmkit connects to Amplitude, Mixpanel, Algolia, Segment, and custom analytics platforms via secure OAuth connectors.',
       },
       {
         question: 'What insights can I extract from search analytics?',
@@ -1345,7 +1345,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Jira to pmkit to sync issues, epics, and sprint data for automated PRDs, daily briefs, and sprint reviews.',
     primaryKeyword: 'Jira integration',
-    secondaryKeywords: ['Jira AI', 'Jira automation', 'Jira MCP connector'],
+    secondaryKeywords: ['Jira AI', 'Jira automation', 'Jira integration'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/jira-and-confluence-ai-workflows', '/resources/slack-to-jira-draft-epics'],
     workedExample: {
@@ -1375,7 +1375,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'Does pmkit support Jira Cloud and Data Center?',
         answer:
-          'Yes. The Jira MCP connector supports both Jira Cloud and Jira Data Center deployments.',
+          'Yes. The Jira integration supports both Jira Cloud and Jira Data Center deployments.',
       },
       {
         question: 'How do I connect Jira?',
@@ -1397,7 +1397,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Confluence to pmkit to access existing documentation and publish PRDs, meeting notes, and artifacts directly.',
     primaryKeyword: 'Confluence integration',
-    secondaryKeywords: ['Confluence AI', 'Confluence automation', 'Confluence MCP connector'],
+    secondaryKeywords: ['Confluence AI', 'Confluence automation', 'Confluence integration'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/jira-and-confluence-ai-workflows', '/resources/prd-automation'],
     workedExample: {
@@ -1449,7 +1449,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Slack to pmkit for notifications, job triggers, and extracting product discussions from channels.',
     primaryKeyword: 'Slack integration',
-    secondaryKeywords: ['Slack AI', 'Slack automation', 'Slack MCP connector'],
+    secondaryKeywords: ['Slack AI', 'Slack automation', 'Slack integration'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/slack-to-jira-draft-epics', '/resources/product-management-agent'],
     workedExample: {
@@ -1501,7 +1501,7 @@ export const resources: ResourcePage[] = [
     description:
       'Use Model Context Protocol (MCP) to connect pmkit tools to Cursor, Claude Desktop, or other AI clients.',
     primaryKeyword: 'MCP integration',
-    secondaryKeywords: ['Model Context Protocol', 'MCP connector', 'AI client integration'],
+    secondaryKeywords: ['Model Context Protocol', 'MCP server', 'AI client integration'],
     category: 'integrations',
     relatedPages: ['/demo', '/integrations', '/how-it-works'],
     workedExample: {
@@ -1553,7 +1553,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Gong to pmkit to automatically extract pain points, feature requests, and competitive mentions from sales and CS calls.',
     primaryKeyword: 'Gong integration',
-    secondaryKeywords: ['Gong AI', 'call transcript analysis', 'Gong MCP connector'],
+    secondaryKeywords: ['Gong AI', 'call transcript analysis', 'Gong integration'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/gong-transcripts-to-product-insights', '/resources/voice-of-customer-clustering'],
     workedExample: {
@@ -1605,7 +1605,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Zendesk to pmkit to analyze support tickets for VoC clustering, escalation tracking, and trend analysis.',
     primaryKeyword: 'Zendesk integration',
-    secondaryKeywords: ['Zendesk AI', 'support ticket analysis', 'Zendesk MCP connector'],
+    secondaryKeywords: ['Zendesk AI', 'support ticket analysis', 'Zendesk integration'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/voice-of-customer-clustering', '/resources/customer-escalation-to-fix-spec'],
     workedExample: {
@@ -1657,7 +1657,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Amplitude to pmkit to pull product analytics, feature usage data, and user journeys into PRDs and reports.',
     primaryKeyword: 'Amplitude integration',
-    secondaryKeywords: ['product analytics AI', 'Amplitude MCP connector', 'usage data'],
+    secondaryKeywords: ['product analytics AI', 'Amplitude integration', 'usage data'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/search-product-analytics-insights', '/resources/prd-automation'],
     workedExample: {
@@ -1709,7 +1709,7 @@ export const resources: ResourcePage[] = [
     description:
       'Connect Discourse to pmkit to monitor community discussions, feature requests, and user feedback.',
     primaryKeyword: 'Discourse integration',
-    secondaryKeywords: ['community monitoring', 'Discourse MCP connector', 'feature request tracking'],
+    secondaryKeywords: ['community monitoring', 'Discourse integration', 'feature request tracking'],
     category: 'integrations',
     relatedPages: ['/demo', '/resources/community-ideas-to-roadmap', '/resources/voice-of-customer-clustering'],
     workedExample: {
