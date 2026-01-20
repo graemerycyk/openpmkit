@@ -146,6 +146,10 @@ export class AgentScheduler {
 
   /**
    * Calculate the next run time for a daily brief based on user's local time
+   *
+   * This properly converts user's local delivery time to UTC for scheduling.
+   * For example: If user wants 7:00 AM Pacific Time, this calculates when
+   * 7:00 AM Pacific is in UTC.
    */
   private calculateNextRunTime(
     deliveryTimeLocal: string,
@@ -153,9 +157,9 @@ export class AgentScheduler {
     afterDate?: Date
   ): Date {
     const [hours, minutes] = deliveryTimeLocal.split(':').map(Number);
-    const baseDate = afterDate || new Date();
+    const now = afterDate || new Date();
 
-    // Create a date formatter for the target timezone
+    // Get current date/time in user's timezone
     const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
       year: 'numeric',
@@ -166,36 +170,63 @@ export class AgentScheduler {
       hour12: false,
     });
 
-    // Get current time in user's timezone
-    const parts = formatter.formatToParts(baseDate);
+    const parts = formatter.formatToParts(now);
     const currentYear = parseInt(parts.find(p => p.type === 'year')?.value || '2024');
     const currentMonth = parseInt(parts.find(p => p.type === 'month')?.value || '1') - 1;
     const currentDay = parseInt(parts.find(p => p.type === 'day')?.value || '1');
     const currentHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
     const currentMinute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
 
-    // Start with today at the delivery time
-    const targetDate = new Date(
-      Date.UTC(currentYear, currentMonth, currentDay, hours, minutes)
-    );
-
-    // Calculate timezone offset
-    const utcDate = new Date(targetDate.toLocaleString('en-US', { timeZone: 'UTC' }));
-    const tzDate = new Date(targetDate.toLocaleString('en-US', { timeZone: timezone }));
-    const offset = utcDate.getTime() - tzDate.getTime();
-
-    // Adjust for timezone
-    const adjustedDate = new Date(targetDate.getTime() + offset);
-
-    // If target time has passed today, schedule for tomorrow
+    // Determine if we need to schedule for today or tomorrow
     const currentTimeInMinutes = currentHour * 60 + currentMinute;
     const targetTimeInMinutes = hours * 60 + minutes;
 
+    let targetDay = currentDay;
+    let targetMonth = currentMonth;
+    let targetYear = currentYear;
+
+    // If target time has already passed today, schedule for tomorrow
     if (targetTimeInMinutes <= currentTimeInMinutes) {
-      adjustedDate.setTime(adjustedDate.getTime() + 24 * 60 * 60 * 1000);
+      // Add one day, handling month/year rollover
+      const tempDate = new Date(currentYear, currentMonth, currentDay + 1);
+      targetDay = tempDate.getDate();
+      targetMonth = tempDate.getMonth();
+      targetYear = tempDate.getFullYear();
     }
 
-    return adjustedDate;
+    // Create a date string in the user's timezone, then convert to UTC
+    // Format: "YYYY-MM-DDTHH:mm:ss" interpreted in the user's timezone
+    const dateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(targetDay).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+
+    // Use Intl to find the UTC offset for this specific date/time in the target timezone
+    // This handles DST correctly
+    const targetFormatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    // Create initial guess in UTC
+    let utcGuess = new Date(`${dateStr}Z`);
+
+    // Check what time this UTC time shows in the target timezone
+    const guessParts = targetFormatter.formatToParts(utcGuess);
+    const guessHour = parseInt(guessParts.find(p => p.type === 'hour')?.value || '0');
+    const guessMinute = parseInt(guessParts.find(p => p.type === 'minute')?.value || '0');
+
+    // Calculate the offset needed
+    const guessTimeInMinutes = guessHour * 60 + guessMinute;
+    const offsetMinutes = guessTimeInMinutes - targetTimeInMinutes;
+
+    // Adjust to get the correct UTC time
+    const finalUtc = new Date(utcGuess.getTime() - offsetMinutes * 60 * 1000);
+
+    return finalUtc;
   }
 
   /**
@@ -208,12 +239,23 @@ export class AgentScheduler {
     }
 
     const config = agentConfig.config as DailyBriefConfig;
-    const nextRunAt = this.calculateNextRunTime(config.deliveryTimeLocal, config.timezone);
-    const delay = nextRunAt.getTime() - Date.now();
+    let nextRunAt = this.calculateNextRunTime(config.deliveryTimeLocal, config.timezone);
+    let delay = nextRunAt.getTime() - Date.now();
 
-    if (delay <= 0) {
-      console.warn(`[Scheduler] Calculated delay is negative for ${agentConfig.id}, skipping`);
-      return;
+    // If delay is negative or very small (< 1 minute), schedule for tomorrow instead
+    // This handles cases where the time has already passed today
+    if (delay < 60000) {
+      console.log(`[Scheduler] Time has passed or is imminent for ${agentConfig.id}, scheduling for tomorrow`);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      nextRunAt = this.calculateNextRunTime(config.deliveryTimeLocal, config.timezone, tomorrow);
+      delay = nextRunAt.getTime() - Date.now();
+
+      // Safety check - if still negative, something is very wrong
+      if (delay <= 0) {
+        console.error(`[Scheduler] Could not calculate valid future time for ${agentConfig.id}`);
+        return;
+      }
     }
 
     // Remove any existing scheduled job for this config
@@ -246,6 +288,12 @@ export class AgentScheduler {
         },
       }
     );
+
+    // Update nextRunAt in database so UI shows correct time
+    await this.prisma.agentConfig.update({
+      where: { id: agentConfig.id },
+      data: { nextRunAt },
+    });
 
     console.log(
       `[Scheduler] Scheduled daily brief ${agentConfig.id} for ${nextRunAt.toISOString()} (in ${Math.round(delay / 60000)} minutes)`
@@ -305,6 +353,12 @@ export class AgentScheduler {
         },
       }
     );
+
+    // Update nextRunAt in database so UI shows correct time
+    await this.prisma.agentConfig.update({
+      where: { id: agentConfig.id },
+      data: { nextRunAt },
+    });
 
     console.log(
       `[Scheduler] Scheduled next daily brief ${agentConfig.id} for ${nextRunAt.toISOString()}`
