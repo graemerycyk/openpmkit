@@ -46,6 +46,12 @@ export type {
   // Drive-specific
   DriveFileMetadata,
   DriveFetchOptions,
+  // Jira-specific
+  JiraIssueMetadata,
+  JiraFetchOptions,
+  // Confluence-specific
+  ConfluencePageMetadata,
+  ConfluenceFetchOptions,
 } from './types';
 
 export { ConnectorSourceTypeSchema } from './types';
@@ -54,4 +60,6 @@ export { ConnectorSourceTypeSchema } from './types';
 export { SlackFetcher } from './slack-fetcher';
 export { GmailFetcher } from './gmail-fetcher';
 export { CalendarFetcher } from './calendar-fetcher';
-// export { DriveFetcher } from './drive-fetcher';
+export { DriveFetcher } from './drive-fetcher';
+export { JiraFetcher } from './jira-fetcher';
+export { ConfluenceFetcher } from './confluence-fetcher';

@@ -88,10 +88,10 @@ const comparisonData: ComparisonPageData = {
       competitor: 'no',
     },
     {
-      name: 'Enterprise integrations (MCP)',
+      name: 'Enterprise integrations',
       pmkit: 'yes',
       competitor: 'partial',
-      note: 'MCP connectors for Jira, Confluence, Slack, Gong, Zendesk',
+      note: 'OAuth connectors for Jira, Confluence, Slack, Gong, Zendesk',
     },
     {
       name: 'Conversational AI interface',
@@ -161,9 +161,9 @@ const comparisonData: ComparisonPageData = {
     {
       title: 'Integration Approach',
       description:
-        'Both tools connect to PM tools, but with different architectures. pmkit uses the MCP standard for enterprise integrations.',
+        'Both tools connect to PM tools, but with different architectures. pmkit uses secure OAuth for enterprise integrations.',
       pmkitAdvantage:
-        'MCP connectors for Jira, Confluence, Slack, Gong, Zendesk with standardized tool protocol. Audit logging for every API call. MCP is the emerging standard for AI tool integration.',
+        'OAuth connectors for Jira, Confluence, Slack, Gong, Zendesk with standardized tool access. Audit logging for every API call. Encrypted credential storage.',
       competitorAdvantage:
         'May have different integration options that fit specific workflows better.',
     },

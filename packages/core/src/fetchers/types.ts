@@ -259,6 +259,88 @@ export interface CalendarFetchOptions extends FetchOptions {
 }
 
 // ============================================================================
+// Jira-specific types
+// ============================================================================
+
+/**
+ * Metadata specific to Jira issues.
+ */
+export interface JiraIssueMetadata {
+  projectKey: string;
+  projectName: string;
+  issueType: string;
+  status: string;
+  priority?: string;
+  labels?: string[];
+  assignee?: {
+    accountId: string;
+    displayName: string;
+    emailAddress?: string;
+  };
+  sprint?: {
+    id: number;
+    name: string;
+    state: string;
+  };
+  storyPoints?: number;
+  resolution?: string;
+}
+
+/**
+ * Jira-specific fetch options.
+ */
+export interface JiraFetchOptions extends FetchOptions {
+  /** Project keys to filter by (e.g., ['PROJ', 'TEAM']) */
+  projectKeys?: string[];
+  /** JQL query to filter issues */
+  jql?: string;
+  /** Issue types to include (e.g., ['Story', 'Bug', 'Task']) */
+  issueTypes?: string[];
+  /** Statuses to filter by (e.g., ['In Progress', 'Done']) */
+  statuses?: string[];
+  /** Include only issues assigned to current user */
+  assignedToMe?: boolean;
+  /** Include only recently updated issues (default: true) */
+  recentlyUpdated?: boolean;
+}
+
+// ============================================================================
+// Confluence-specific types
+// ============================================================================
+
+/**
+ * Metadata specific to Confluence pages.
+ */
+export interface ConfluencePageMetadata {
+  spaceKey: string;
+  spaceName: string;
+  parentId?: string;
+  parentTitle?: string;
+  version: number;
+  status: 'current' | 'draft' | 'historical';
+  labels?: string[];
+  ancestors?: Array<{ id: string; title: string }>;
+}
+
+/**
+ * Confluence-specific fetch options.
+ */
+export interface ConfluenceFetchOptions extends FetchOptions {
+  /** Space keys to filter by (e.g., ['TEAM', 'DOCS']) */
+  spaceKeys?: string[];
+  /** CQL query to filter pages */
+  cql?: string;
+  /** Include only pages with specific labels */
+  labels?: string[];
+  /** Include blog posts */
+  includeBlogPosts?: boolean;
+  /** Include page content (default: true) */
+  includeContent?: boolean;
+  /** Maximum content length to include per page */
+  maxContentLength?: number;
+}
+
+// ============================================================================
 // Google Drive-specific types
 // ============================================================================
 

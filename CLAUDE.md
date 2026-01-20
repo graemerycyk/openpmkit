@@ -68,6 +68,7 @@ npm run db:push       # Push schema to database
 | Audit Logging | `packages/core/src/audit/index.ts` |
 | MCP Framework | `packages/mcp/src/index.ts` |
 | Job Runner | `packages/core/src/jobs/index.ts` |
+| **Connector Fetchers** | `packages/core/src/fetchers/` |
 | Prompt Templates | `packages/prompts/src/index.ts` |
 | Crawler Analysis | `packages/prompts/src/crawler-analysis.ts` |
 | Real Crawlers | `packages/core/src/crawlers/` |
@@ -94,14 +95,24 @@ apps/
 
 ## Connectors
 
-### MVP Connectors (Available)
-- Slack, Jira, Confluence, Gong, Zendesk
+### Production Ready (OAuth + Fetcher)
+- Slack (`SlackFetcher`)
+- Jira (`JiraFetcher`)
+- Confluence (`ConfluenceFetcher`)
+- Gmail (`GmailFetcher`)
+- Google Drive (`DriveFetcher`)
+- Google Calendar (`CalendarFetcher`)
 
-### Google Connectors (Mock Data Ready)
-- Gmail (`packages/mcp-servers/src/gmail/`)
-- Google Drive (`packages/mcp-servers/src/google-drive/`)
-- Google Calendar (`packages/mcp-servers/src/google-calendar/`)
-- Mock data: `packages/mock-tenant/src/data/google.ts`
+### OAuth Pending (MCP Server Ready)
+- Gong, Zendesk
+
+### Coming Soon
+- Figma, Amplitude, Linear
+
+### Fetcher Location
+- All fetchers: `packages/core/src/fetchers/`
+- MCP servers (demo): `packages/mcp-servers/src/{connector}/`
+- Mock data: `packages/mock-tenant/src/data/`
 
 ### AI Crawlers
 - Social Crawler (Reddit, HN)

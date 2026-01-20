@@ -89,7 +89,7 @@ const differentiators = [
   },
   {
     icon: Layers,
-    title: 'MCP-Native Connectors',
+    title: 'Modular Connectors',
     description:
       'Swap demo connectors for real ones without rewriting workflows. Clean abstraction layer.',
   },
@@ -119,7 +119,7 @@ const useOfFunds = [
   {
     category: 'Engineering',
     percentage: 50,
-    description: 'Core platform, MCP connectors, enterprise features',
+    description: 'Core platform, connectors, enterprise features',
     milestones: ['Ship Teams plan enforcement', 'Complete SSO baseline', 'Expand connector coverage'],
   },
   {

@@ -126,7 +126,7 @@ export const blogPosts: BlogPost[] = [
     primaryKeyword: 'MCP product management',
     tags: ['integrations', 'agents'],
     readingTime: 14,
-    relatedResources: ['mcp-connectors-for-enterprise-tools', 'jira-and-confluence-ai-workflows'],
+    relatedResources: ['jira-and-confluence-ai-workflows'],
     relatedPosts: ['agent-workflows-with-mcp', 'jira-confluence-slack-operating-system', 'what-is-a-product-management-agent'],
   },
   {
@@ -183,7 +183,7 @@ export const blogPosts: BlogPost[] = [
     primaryKeyword: 'AI agents 2026',
     tags: ['founders-notes', 'agents'],
     readingTime: 10,
-    relatedResources: ['product-management-agent', 'mcp-connectors-for-enterprise-tools', 'draft-only-ai-agent'],
+    relatedResources: ['product-management-agent', 'draft-only-ai-agent'],
     relatedPosts: ['what-is-a-product-management-agent', 'draft-only-ai-agents', 'agent-workflows-with-mcp'],
   },
   {
@@ -309,7 +309,7 @@ export const blogPosts: BlogPost[] = [
     primaryKeyword: 'MCP connectors',
     tags: ['integrations', 'agents'],
     readingTime: 14,
-    relatedResources: ['mcp-connectors-for-enterprise-tools', 'jira-and-confluence-ai-workflows'],
+    relatedResources: ['jira-and-confluence-ai-workflows'],
     relatedPosts: ['what-is-a-product-management-agent', 'jira-confluence-slack-operating-system'],
   },
   {

@@ -1026,6 +1026,26 @@ High-value workflows that could differentiate from current offerings:
 
 ## Changelog
 
+### 2026-01-20 (Connector Terminology & Fetcher Updates)
+- **Removed MCP terminology from marketing** - Updated website to use "secure connectors" and "OAuth integrations" instead of MCP references:
+  - 6 marketing pages updated: `/how-it-works`, `/integrations`, `/pricing`, `/security`, `/trust`, `/resources`
+  - Compare page: Changed "Battlecards" to "Comparisons"
+  - Resource page URL renamed: `/resources/mcp-connectors-for-enterprise-tools` → `/resources/secure-connectors-for-enterprise-tools`
+  - Added permanent redirect from old URL to new URL in `next.config.js`
+- **Hidden MCP Clients section** - Commented out in `/settings/integrations` (code preserved, not shown to users)
+- **Created real data fetchers** - Built fetcher classes for Atlassian and Google Drive APIs:
+  - `JiraFetcher` (`packages/core/src/fetchers/jira-fetcher.ts`) - Atlassian REST API v3, supports JQL queries
+  - `ConfluenceFetcher` (`packages/core/src/fetchers/confluence-fetcher.ts`) - Atlassian REST API v3, supports CQL queries
+  - `DriveFetcher` (`packages/core/src/fetchers/drive-fetcher.ts`) - Google Drive API v3, supports folder/MIME filtering
+- **Fetcher pattern established** - All fetchers implement `IFetcher` interface with:
+  - `fromEncrypted()` static factory method
+  - `fetch()` method returning `FetchResult<TMetadata>`
+  - Token decryption via `decryptTokens()`
+- **Connector status updated**:
+  - ✅ Complete (OAuth + Fetcher): Slack, Gmail, Google Calendar, Google Drive, Jira, Confluence
+  - 🔲 OAuth only (no fetcher): Gong, Zendesk
+  - 🔲 Not started: Figma, Amplitude, Linear
+
 ### 2026-01-19 (Slack & Google OAuth Production Setup)
 - **Slack App Directory submission** - Production Slack app ready for customer installs:
   - OAuth flow working with production redirect URI

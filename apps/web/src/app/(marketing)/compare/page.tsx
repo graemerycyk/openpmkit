@@ -9,7 +9,7 @@ import { siteConfig } from '@/lib/utils';
 export const metadata: Metadata = {
   title: 'pmkit vs Competitors | AI PM Tool Comparisons',
   description:
-    'See how pmkit compares to ChatPRD, Nalin, Atlassian Jira Product Discovery, Productboard, and automation tools like Zapier. Battlecard comparisons with wins, risks, and counterpunches.',
+    'See how pmkit compares to ChatPRD, Nalin, Atlassian Jira Product Discovery, Productboard, and automation tools. Feature comparisons, strengths, and honest assessments.',
   keywords: [
     'pmkit vs competitors',
     'ChatPRD alternative',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'pmkit vs Competitors',
-    description: 'Honest comparisons with wins, risks, and counterpunches.',
+    description: 'Feature comparisons, strengths, and honest assessments.',
   },
   alternates: {
     canonical: `${siteConfig.url}/compare`,
@@ -103,14 +103,14 @@ export default function ComparePage() {
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
             <Badge variant="cobalt" className="mb-4">
-              Battlecards
+              Comparisons
             </Badge>
             <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
               pmkit vs
               <span className="text-cobalt-600"> The Competition</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Honest comparisons with wins, risks, and counterpunches. See where pmkit shines
+              Honest feature comparisons and assessments. See where pmkit shines
               and where alternatives might fit better.
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function ComparePage() {
                   <p className="text-sm text-muted-foreground">{competitor.description}</p>
                   <Button variant="outline" className="mt-4 w-full" asChild>
                     <Link href={`/compare/${competitor.slug}`}>
-                      View Battlecard
+                      View Comparison
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

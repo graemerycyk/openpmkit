@@ -134,7 +134,7 @@ const benefits = [
   'Draft-only: Never writes directly to external systems',
   'Full audit trail for every tool call and artifact',
   'RBAC with permission simulation',
-  'MCP connectors for enterprise tools',
+  'Secure connectors for enterprise tools',
   'Sources and citations for every insight',
   'Downloadable artifacts in multiple formats',
 ];
@@ -475,7 +475,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-heading text-lg font-semibold">Connect Your Tools</h3>
               <p className="mt-2 text-muted-foreground">
-                MCP connectors link to Jira, Slack, Gong, and more; securely and with audit logging.
+                OAuth connectors link to Jira, Slack, Gong, and more—securely and with audit logging.
               </p>
             </div>
             <div className="text-center">
@@ -676,7 +676,7 @@ export default function HomePage() {
               Connects to your stack
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              MCP connectors for the tools you already use. Demo uses simulated data;
+              Secure connectors for the tools you already use. Demo uses simulated data;
               paying customers get real OAuth connections.
             </p>
           </div>

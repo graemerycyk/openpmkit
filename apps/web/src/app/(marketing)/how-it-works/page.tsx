@@ -30,17 +30,18 @@ import {
   Newspaper,
   Search,
   Play,
+  GitBranch,
 } from 'lucide-react';
 import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'How It Works | pmkit - AI PM Workflow Architecture',
   description:
-    'Learn how pmkit runs PM workflows with draft-only AI agents, MCP connectors, and enterprise governance. Trace every insight to its source.',
+    'Learn how pmkit runs PM workflows with draft-only AI agents, secure integrations, and enterprise governance. Trace every insight to its source.',
   keywords: [
     'how pmkit works',
     'AI product management workflow',
-    'MCP connectors',
+    'secure integrations',
     'draft-only AI',
     'PM automation architecture',
     'enterprise AI governance',
@@ -49,13 +50,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'How pmkit Works',
     description:
-      'Learn how pmkit runs PM workflows with draft-only AI agents, MCP connectors, and enterprise governance.',
+      'Learn how pmkit runs PM workflows with draft-only AI agents, secure integrations, and enterprise governance.',
     url: `${siteConfig.url}/how-it-works`,
   },
   twitter: {
     card: 'summary',
     title: 'How pmkit Works',
-    description: 'Draft-only AI agents, MCP connectors, enterprise governance.',
+    description: 'Draft-only AI agents, secure integrations, enterprise governance.',
   },
   alternates: {
     canonical: `${siteConfig.url}/how-it-works`,
@@ -83,7 +84,7 @@ const principles = [
   },
   {
     icon: Zap,
-    title: 'MCP Architecture',
+    title: 'Modular Architecture',
     description:
       'Swap demo connectors for real ones without changing job logic. Standardized tool integration.',
   },
@@ -155,7 +156,7 @@ export default function HowItWorksPage() {
                   <h3 className="font-heading text-2xl font-bold">Connect Your Tools</h3>
                 </div>
                 <p className="mt-4 text-muted-foreground">
-                  MCP (Model Context Protocol) connectors link pmkit to your existing tools; Jira, Confluence, Slack, Gong, Zendesk, and more. Each connector authenticates securely and logs every interaction.
+                  Secure OAuth connectors link pmkit to your existing tools: Jira, Confluence, Slack, Gong, Zendesk, and more. Each connector authenticates securely and logs every interaction.
                 </p>
                 <ul className="mt-6 space-y-2">
                   <li className="flex items-center gap-2">

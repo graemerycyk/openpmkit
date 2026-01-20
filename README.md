@@ -11,7 +11,7 @@ pmkit is an AI-powered product management agent that runs daily briefs, meeting 
 - **Draft-Only**: Agents propose changes but never write directly to external systems
 - **Full Traceability**: Every tool call, source, and artifact is logged
 - **Enterprise Governance**: RBAC, permission simulation, audit logging
-- **MCP Connectors**: Standardized integration with Jira, Confluence, Slack, Gong, Zendesk, and more
+- **OAuth Connectors**: Secure integrations with Slack, Jira, Confluence, Gmail, Google Drive, Google Calendar, and more
 
 ## Tech Stack
 
@@ -154,13 +154,13 @@ All external writes are proposals, not direct actions:
 5. Human reviews and approves the proposal
 6. Only then is the write executed
 
-### MCP (Model Context Protocol)
+### Connector Architecture
 
-pmkit uses MCP for tool integration:
+pmkit uses a layered connector architecture:
 
-- **MCP Servers**: Each integration (Jira, Slack, etc.) is an MCP server
-- **MCP Client**: The job runner calls tools via the MCP client
-- **Swappable**: Mock servers can be replaced with real ones without changing job logic
+- **OAuth Connectors**: Real data fetchers in `packages/core/src/fetchers/` handle OAuth authentication and API calls
+- **MCP Servers**: Demo/mock data servers in `packages/mcp-servers/` for testing and development
+- **Fetcher Pattern**: All fetchers implement `IFetcher` interface with `fromEncrypted()` factory and `fetch()` methods
 
 ### Job Runner
 

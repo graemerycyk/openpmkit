@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -619,7 +619,7 @@ function IntegrationsPageContent() {
         </div>
       </div>
 
-      {/* MCP Section */}
+      {/* MCP Section - Hidden for now, no current plans for MCP Client
       <Separator />
       <Card>
         <CardHeader>
@@ -655,6 +655,7 @@ function IntegrationsPageContent() {
           </p>
         </CardContent>
       </Card>
+      */}
     </div>
   );
 }

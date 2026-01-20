@@ -996,6 +996,54 @@ After crawling, results are automatically analyzed by AI to produce:
 
 ## Connectors Reference
 
+### Connector Status
+
+| Connector | OAuth | Fetcher | MCP Server | Status |
+|-----------|-------|---------|------------|--------|
+| Slack | ✅ | ✅ `SlackFetcher` | ✅ | Production ready |
+| Gmail | ✅ | ✅ `GmailFetcher` | ✅ | Production ready |
+| Google Calendar | ✅ | ✅ `CalendarFetcher` | ✅ | Production ready |
+| Google Drive | ✅ | ✅ `DriveFetcher` | ✅ | Production ready |
+| Jira | ✅ | ✅ `JiraFetcher` | ✅ | Production ready |
+| Confluence | ✅ | ✅ `ConfluenceFetcher` | ✅ | Production ready |
+| Gong | 🔲 | 🔲 | ✅ | OAuth pending |
+| Zendesk | 🔲 | 🔲 | ✅ | OAuth pending |
+| Figma | 🔲 | 🔲 | 🔲 | Coming soon |
+
+### Fetcher Classes
+
+Real data fetchers live in `packages/core/src/fetchers/`. Each implements `IFetcher<TMetadata, TOptions>`:
+
+| Fetcher | File | API | Key Features |
+|---------|------|-----|--------------|
+| `SlackFetcher` | `slack-fetcher.ts` | Slack Web API | Channel history, user info |
+| `GmailFetcher` | `gmail-fetcher.ts` | Gmail API v1 | Labels, threads, token refresh |
+| `CalendarFetcher` | `calendar-fetcher.ts` | Calendar API v3 | Events, attendees, token refresh |
+| `DriveFetcher` | `drive-fetcher.ts` | Drive API v3 | Files, folders, MIME filtering |
+| `JiraFetcher` | `jira-fetcher.ts` | Atlassian REST v3 | JQL queries, project filtering |
+| `ConfluenceFetcher` | `confluence-fetcher.ts` | Atlassian REST v3 | CQL queries, space filtering |
+
+**Fetcher Usage Pattern:**
+
+```typescript
+import { JiraFetcher, type FetchedItem } from '@pmkit/core/fetchers';
+
+// Create fetcher from encrypted credentials
+const fetcher = JiraFetcher.fromEncrypted(credentials);
+
+// Fetch data
+const result = await fetcher.fetch({
+  projectKeys: ['ACME'],
+  sinceHoursAgo: 24,
+  statuses: ['In Progress', 'Done'],
+});
+
+// Use items
+const items: FetchedItem[] = result.items;
+```
+
+### MCP Servers (Demo/Mock Data)
+
 | Connector | Server Class | Mock Data | Tools |
 |-----------|--------------|-----------|-------|
 | Jira | `MockJiraMCPServer` | `jira.ts` | `get_issue`, `search_issues`, `get_sprint`, `propose_jira_epic`, `propose_jira_story` |

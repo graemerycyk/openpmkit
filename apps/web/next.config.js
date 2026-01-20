@@ -53,6 +53,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/resources/mcp-connectors-for-enterprise-tools',
+        destination: '/resources/secure-connectors-for-enterprise-tools',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

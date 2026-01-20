@@ -156,12 +156,12 @@ export const keywords: KeywordEntry[] = [
     relatedPages: ['/resources/draft-only-ai-agent', '/how-it-works'],
   },
   {
-    keyword: 'MCP connectors enterprise',
+    keyword: 'enterprise connectors',
     category: 'long-tail',
     searchVolume: 'low',
     difficulty: 'low',
     intent: 'informational',
-    relatedPages: ['/resources/mcp-connectors-for-enterprise-tools', '/how-it-works'],
+    relatedPages: ['/integrations', '/how-it-works'],
   },
   {
     keyword: 'Jira Confluence AI workflows',
@@ -366,12 +366,12 @@ export const keywords: KeywordEntry[] = [
 
   // MCP for Product Management Keywords
   {
-    keyword: 'MCP product management',
+    keyword: 'AI product management integrations',
     category: 'primary',
     searchVolume: 'low',
     difficulty: 'low',
     intent: 'informational',
-    relatedPages: ['/blog/mcp-for-product-management', '/resources/mcp-connectors-for-enterprise-tools'],
+    relatedPages: ['/blog/mcp-for-product-management', '/integrations'],
   },
   {
     keyword: 'AI PM integrations',

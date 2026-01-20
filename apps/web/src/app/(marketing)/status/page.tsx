@@ -54,7 +54,7 @@ const services: Service[] = [
   },
   {
     name: 'API',
-    description: 'REST API and MCP endpoints',
+    description: 'REST API endpoints',
     status: 'operational',
     icon: Zap,
   },

@@ -837,12 +837,12 @@ export const resources: ResourcePage[] = [
     ],
   },
   {
-    slug: 'mcp-connectors-for-enterprise-tools',
-    title: 'MCP Connectors: Enterprise Tool Integration',
+    slug: 'secure-connectors-for-enterprise-tools',
+    title: 'Secure Connectors: Enterprise Tool Integration',
     description:
-      'Connect pmkit to your enterprise tools via MCP (Model Context Protocol) for secure, standardized integration.',
-    primaryKeyword: 'MCP connectors for enterprise tools',
-    secondaryKeywords: ['Model Context Protocol', 'enterprise AI integration', 'MCP servers'],
+      'Connect pmkit to your enterprise tools via secure OAuth integrations for standardized, auditable access.',
+    primaryKeyword: 'enterprise tool connectors',
+    secondaryKeywords: ['enterprise AI integration', 'OAuth connectors', 'secure integrations'],
     category: 'governance',
     relatedPages: ['/how-it-works', '/resources/jira-and-confluence-ai-workflows', '/demo'],
     workedExample: {
@@ -850,7 +850,7 @@ export const resources: ResourcePage[] = [
       scenario: 'An enterprise customer uses a custom CRM that pmkit doesn\'t support natively. They need to integrate it for meeting prep.',
       steps: [
         'Customer provides API documentation for their CRM',
-        'pmkit team builds custom MCP connector with required endpoints',
+        'pmkit team builds custom connector with required endpoints',
         'Connector is tested in staging with sample data',
         'Customer configures OAuth credentials in pmkit',
         'Meeting prep now includes CRM data (deal stage, contacts, notes)',
@@ -865,31 +865,31 @@ export const resources: ResourcePage[] = [
       'Do you want a standardized way to add new integrations?',
     ],
     keyBenefits: [
-      'Standardized integration protocol',
-      'Secure, auditable connections',
+      'OAuth-based secure authentication',
+      'Encrypted credential storage',
       'Custom connectors for any tool',
       'Enterprise-grade security',
     ],
     faqItems: [
       {
-        question: 'What is MCP (Model Context Protocol)?',
+        question: 'How do pmkit connectors work?',
         answer:
-          'MCP is a standardized protocol for connecting AI agents to external tools. It defines how agents discover, authenticate, and interact with tool APIs.',
+          'pmkit connectors use secure OAuth 2.0 authentication to connect to your enterprise tools. Each connector authenticates on behalf of your account and logs every interaction for audit purposes.',
       },
       {
-        question: 'Which tools have MCP connectors?',
+        question: 'Which tools have connectors available?',
         answer:
-          'pmkit includes connectors for Jira, Confluence, Slack, Gong, Zendesk, community platforms, and analytics tools. Custom connectors are available for enterprise customers.',
+          'pmkit includes connectors for Jira, Confluence, Slack, Gmail, Google Drive, Google Calendar, Gong, Zendesk, and more. Custom connectors are available for enterprise customers.',
       },
       {
-        question: 'How are MCP connectors secured?',
+        question: 'How are connectors secured?',
         answer:
-          'Connectors use OAuth 2.0 or API key authentication, with credentials stored encrypted. All tool calls are logged in the audit trail.',
+          'Connectors use OAuth 2.0 authentication, with credentials stored encrypted using AES-256-GCM. All tool calls are logged in the audit trail for compliance.',
       },
       {
-        question: 'Can I build my own MCP connector?',
+        question: 'Can I request a custom connector?',
         answer:
-          'Enterprise customers can request custom connectors or use our MCP SDK to build their own. All connectors go through security review before deployment.',
+          'Enterprise customers can request custom connectors for tools not in our standard set. All connectors go through security review before deployment.',
       },
     ],
   },
@@ -1503,7 +1503,7 @@ export const resources: ResourcePage[] = [
     primaryKeyword: 'MCP integration',
     secondaryKeywords: ['Model Context Protocol', 'MCP connector', 'AI client integration'],
     category: 'integrations',
-    relatedPages: ['/demo', '/resources/mcp-connectors-for-enterprise-tools', '/how-it-works'],
+    relatedPages: ['/demo', '/integrations', '/how-it-works'],
     workedExample: {
       title: 'Adding pmkit to Cursor IDE',
       scenario: 'A developer wants to access pmkit tools directly from their Cursor IDE.',

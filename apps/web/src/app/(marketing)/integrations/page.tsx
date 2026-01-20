@@ -284,7 +284,7 @@ export default function IntegrationsPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">How Integrations Work</h2>
             <p className="mt-4 text-muted-foreground">
-              pmkit uses the Model Context Protocol (MCP) to connect to your tools securely.
+              pmkit uses secure OAuth connections to integrate with your tools.
             </p>
           </div>
 
