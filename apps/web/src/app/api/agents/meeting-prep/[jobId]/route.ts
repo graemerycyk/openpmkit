@@ -83,9 +83,14 @@ export async function GET(
     });
 
     // Build data sources info from job result stats
-    // ONLY show data sources that were actually fetched (non-zero counts)
+    // Show all CONNECTED data sources that the agent uses, even if they returned 0 items
     const jobResult = job.result as Record<string, unknown> | null;
     const jobStats = (jobResult?.stats as Record<string, unknown>) || {};
+    const connectedKeys = new Set(connectedSources.map(s => s.connectorKey));
+
+    // Get agent config to see what sources are enabled
+    const configData = (agentConfig?.config as Record<string, unknown>) || {};
+    const enabledSources = (configData.enabledSources as Record<string, boolean>) || {};
 
     const dataSourcesUsed: Array<{
       key: string;
@@ -93,15 +98,16 @@ export async function GET(
       stats: Array<{ label: string; value: number }>;
     }> = [];
 
-    // Meetings found (from Calendar)
+    // Meetings found (from Calendar) - always show if calendar is connected
     const meetingsFound = (jobStats.meetingsFound as number) || 0;
     const meetingTitles = (jobStats.meetingTitles as string[]) || [];
-    if (meetingsFound > 0) {
+    if (connectedKeys.has('google-calendar')) {
       const meetingStats: Array<{ label: string; value: number }> = [
         { label: 'Meetings', value: meetingsFound },
       ];
-      if ((jobStats.attendeesCount as number) > 0) {
-        meetingStats.push({ label: 'Attendees', value: (jobStats.attendeesCount as number) });
+      const attendeesCount = (jobStats.attendeesCount as number) || 0;
+      if (attendeesCount > 0) {
+        meetingStats.push({ label: 'Attendees', value: attendeesCount });
       }
       dataSourcesUsed.push({
         key: 'google-calendar',
@@ -110,9 +116,9 @@ export async function GET(
       });
     }
 
-    // Gmail - only show if emails were actually fetched
+    // Gmail - show if connected (always used for attendee context)
     const emailsProcessed = (jobStats.emailsProcessed as number) || 0;
-    if (emailsProcessed > 0) {
+    if (connectedKeys.has('gmail')) {
       dataSourcesUsed.push({
         key: 'gmail',
         name: 'Gmail',
@@ -122,9 +128,9 @@ export async function GET(
       });
     }
 
-    // Slack - only show if messages were actually fetched
+    // Slack - show if connected AND enabled in config
     const slackMessagesProcessed = (jobStats.slackMessagesProcessed as number) || 0;
-    if (slackMessagesProcessed > 0) {
+    if (connectedKeys.has('slack') && enabledSources.slack !== false) {
       dataSourcesUsed.push({
         key: 'slack',
         name: 'Slack',
@@ -134,9 +140,9 @@ export async function GET(
       });
     }
 
-    // Jira - only show if issues were actually fetched
+    // Jira - show if connected AND enabled in config
     const jiraIssuesProcessed = (jobStats.jiraIssuesProcessed as number) || 0;
-    if (jiraIssuesProcessed > 0) {
+    if (connectedKeys.has('jira') && enabledSources.jira !== false) {
       dataSourcesUsed.push({
         key: 'jira',
         name: 'Jira',
@@ -146,9 +152,9 @@ export async function GET(
       });
     }
 
-    // Confluence - only show if pages were actually fetched
+    // Confluence - show if connected AND enabled in config
     const confluencePagesProcessed = (jobStats.confluencePagesProcessed as number) || 0;
-    if (confluencePagesProcessed > 0) {
+    if (connectedKeys.has('confluence') && enabledSources.confluence !== false) {
       dataSourcesUsed.push({
         key: 'confluence',
         name: 'Confluence',

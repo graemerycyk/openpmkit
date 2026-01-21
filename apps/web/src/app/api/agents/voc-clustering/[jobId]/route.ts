@@ -83,9 +83,12 @@ export async function GET(
     });
 
     // Build data sources info from job result stats
-    // ONLY show data sources that were actually fetched (non-zero counts)
+    // Show all CONNECTED data sources that are enabled in config, even if they returned 0 items
     const jobResult = job.result as Record<string, unknown> | null;
     const jobStats = (jobResult?.stats as Record<string, unknown>) || {};
+    const connectedKeys = new Set(connectedSources.map(s => s.connectorKey));
+    const configData = (agentConfig?.config as Record<string, unknown>) || {};
+    const enabledSources = (configData.enabledSources as Record<string, boolean>) || {};
 
     const dataSourcesUsed: Array<{
       key: string;
@@ -93,9 +96,9 @@ export async function GET(
       stats: Array<{ label: string; value: number }>;
     }> = [];
 
-    // Zendesk - only show if tickets were actually fetched
+    // Zendesk - show if connected AND enabled in config
     const zendeskTicketsProcessed = (jobStats.zendeskTicketsProcessed as number) || 0;
-    if (zendeskTicketsProcessed > 0) {
+    if (connectedKeys.has('zendesk') && enabledSources.zendesk !== false) {
       dataSourcesUsed.push({
         key: 'zendesk',
         name: 'Zendesk',
@@ -105,9 +108,9 @@ export async function GET(
       });
     }
 
-    // Slack - only show if messages were actually fetched
+    // Slack - show if connected AND enabled in config
     const slackMessagesProcessed = (jobStats.slackMessagesProcessed as number) || 0;
-    if (slackMessagesProcessed > 0) {
+    if (connectedKeys.has('slack') && enabledSources.slack !== false) {
       dataSourcesUsed.push({
         key: 'slack',
         name: 'Slack',
@@ -117,9 +120,9 @@ export async function GET(
       });
     }
 
-    // Gong - only show if calls were actually fetched
+    // Gong - show if connected AND enabled in config
     const gongCallsProcessed = (jobStats.gongCallsProcessed as number) || 0;
-    if (gongCallsProcessed > 0) {
+    if (connectedKeys.has('gong') && enabledSources.gong !== false) {
       dataSourcesUsed.push({
         key: 'gong',
         name: 'Gong',

@@ -84,9 +84,11 @@ export async function GET(
     });
 
     // Build data sources info from job result stats
-    // ONLY show data sources that were actually fetched (non-zero counts)
+    // Show all CONNECTED data sources that are enabled in config, even if they returned 0 items
     const jobResult = job.result as Record<string, unknown> | null;
     const jobStats = (jobResult?.stats as Record<string, unknown>) || {};
+    const connectedKeys = new Set(connectedSources.map(s => s.connectorKey));
+    const configData = (agentConfig?.config as Record<string, unknown>) || {};
 
     // Map of data source keys to their display info and stats
     const dataSourcesUsed: Array<{
@@ -95,11 +97,11 @@ export async function GET(
       stats: Array<{ label: string; value: number }>;
     }> = [];
 
-    // Slack - only show if messages were actually fetched
+    // Slack - show if connected and has channels configured
     const messagesProcessed = (jobStats.messagesProcessed as number) || 0;
-    if (messagesProcessed > 0) {
+    const channelsProcessed = (jobStats.channelsProcessed as number) || 0;
+    if (connectedKeys.has('slack') && configData.slackChannels) {
       const slackStats: Array<{ label: string; value: number }> = [];
-      const channelsProcessed = (jobStats.channelsProcessed as number) || 0;
       if (channelsProcessed > 0) {
         slackStats.push({ label: 'Channels', value: channelsProcessed });
       }
@@ -111,9 +113,9 @@ export async function GET(
       });
     }
 
-    // Gmail - only show if emails were actually fetched
+    // Gmail - show if connected AND enabled in config
     const emailsProcessed = (jobStats.emailsProcessed as number) || 0;
-    if (emailsProcessed > 0) {
+    if (connectedKeys.has('gmail') && configData.includeGmail) {
       dataSourcesUsed.push({
         key: 'gmail',
         name: 'Gmail',
@@ -123,9 +125,9 @@ export async function GET(
       });
     }
 
-    // Google Calendar - only show if events were actually fetched
+    // Google Calendar - show if connected AND enabled in config
     const eventsProcessed = (jobStats.eventsProcessed as number) || 0;
-    if (eventsProcessed > 0) {
+    if (connectedKeys.has('google-calendar') && configData.includeGoogleCalendar) {
       dataSourcesUsed.push({
         key: 'google-calendar',
         name: 'Calendar',
@@ -135,9 +137,9 @@ export async function GET(
       });
     }
 
-    // Google Drive - only show if files were actually fetched
+    // Google Drive - show if connected AND enabled in config
     const driveFilesProcessed = (jobStats.driveFilesProcessed as number) || 0;
-    if (driveFilesProcessed > 0) {
+    if (connectedKeys.has('google-drive') && configData.includeGoogleDrive) {
       dataSourcesUsed.push({
         key: 'google-drive',
         name: 'Drive',
@@ -147,9 +149,9 @@ export async function GET(
       });
     }
 
-    // Jira - only show if issues were actually fetched
+    // Jira - show if connected AND enabled in config
     const jiraIssuesProcessed = (jobStats.jiraIssuesProcessed as number) || 0;
-    if (jiraIssuesProcessed > 0) {
+    if (connectedKeys.has('jira') && configData.includeJira) {
       dataSourcesUsed.push({
         key: 'jira',
         name: 'Jira',
@@ -159,9 +161,9 @@ export async function GET(
       });
     }
 
-    // Confluence - only show if pages were actually fetched
+    // Confluence - show if connected AND enabled in config
     const confluencePagesProcessed = (jobStats.confluencePagesProcessed as number) || 0;
-    if (confluencePagesProcessed > 0) {
+    if (connectedKeys.has('confluence') && configData.includeConfluence) {
       dataSourcesUsed.push({
         key: 'confluence',
         name: 'Confluence',
@@ -171,9 +173,9 @@ export async function GET(
       });
     }
 
-    // Gong - only show if calls were actually fetched
+    // Gong - show if connected AND enabled in config
     const callsProcessed = (jobStats.callsProcessed as number) || 0;
-    if (callsProcessed > 0) {
+    if (connectedKeys.has('gong') && configData.includeGong) {
       dataSourcesUsed.push({
         key: 'gong',
         name: 'Gong',
@@ -183,9 +185,9 @@ export async function GET(
       });
     }
 
-    // Zendesk - only show if tickets were actually fetched
+    // Zendesk - show if connected AND enabled in config
     const zendeskTicketsProcessed = (jobStats.zendeskTicketsProcessed as number) || 0;
-    if (zendeskTicketsProcessed > 0) {
+    if (connectedKeys.has('zendesk') && configData.includeZendesk) {
       dataSourcesUsed.push({
         key: 'zendesk',
         name: 'Zendesk',
@@ -195,9 +197,9 @@ export async function GET(
       });
     }
 
-    // Loom - only show if videos were actually fetched
+    // Loom - show if connected AND enabled in config
     const videosProcessed = (jobStats.videosProcessed as number) || 0;
-    if (videosProcessed > 0) {
+    if (connectedKeys.has('loom') && configData.includeLoom) {
       dataSourcesUsed.push({
         key: 'loom',
         name: 'Loom',
@@ -207,9 +209,9 @@ export async function GET(
       });
     }
 
-    // Figma - only show if frames were actually fetched
+    // Figma - show if connected AND enabled in config
     const framesProcessed = (jobStats.framesProcessed as number) || 0;
-    if (framesProcessed > 0) {
+    if (connectedKeys.has('figma') && configData.includeFigma) {
       dataSourcesUsed.push({
         key: 'figma',
         name: 'Figma',
