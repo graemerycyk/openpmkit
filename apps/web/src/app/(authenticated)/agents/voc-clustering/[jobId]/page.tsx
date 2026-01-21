@@ -22,6 +22,17 @@ import {
   XCircle,
 } from 'lucide-react';
 
+interface DataSourceStat {
+  label: string;
+  value: number;
+}
+
+interface DataSourceUsed {
+  key: string;
+  name: string;
+  stats: DataSourceStat[];
+}
+
 interface ClusterDetail {
   id: string;
   status: string;
@@ -33,8 +44,11 @@ interface ClusterDetail {
       feedbackProcessed: number;
       clustersGenerated: number;
       latencyMs: number;
+      tokensUsed?: number;
     };
   } | null;
+  dataSourcesUsed?: DataSourceUsed[];
+  connectedSources?: string[];
   config: {
     timeframeDays?: number;
     clusterCount?: number;
@@ -214,43 +228,85 @@ export default function ClusterDetailPage() {
       </div>
 
       {/* Stats */}
-      {cluster.result?.stats && (
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <TrendingUp className="h-4 w-4" />
-                <span className="text-sm">Feedback Items</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {cluster.result.stats.feedbackProcessed}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <GitBranch className="h-4 w-4" />
-                <span className="text-sm">Clusters</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {cluster.result.stats.clustersGenerated}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">Duration</span>
-              </div>
-              <p className="mt-1 text-2xl font-bold">
-                {(cluster.result.stats.latencyMs / 1000).toFixed(1)}s
-              </p>
-            </CardContent>
-          </Card>
+      {(cluster.dataSourcesUsed && cluster.dataSourcesUsed.length > 0) || cluster.result?.stats ? (
+        <div className="space-y-4">
+          {/* Data Source Stats - Dynamic based on what was used */}
+          {cluster.dataSourcesUsed && cluster.dataSourcesUsed.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {cluster.dataSourcesUsed.map((dataSource) => {
+                const Icon = dataSource.key === 'zendesk' ? Ticket :
+                            dataSource.key === 'slack' ? MessageSquare :
+                            dataSource.key === 'gong' ? Headphones : TrendingUp;
+                return dataSource.stats.map((stat) => (
+                  <Card key={`${dataSource.key}-${stat.label}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Icon className="h-4 w-4" />
+                        <span className="text-sm">{dataSource.name} {stat.label}</span>
+                      </div>
+                      <p className="mt-1 text-2xl font-bold">
+                        {stat.value.toLocaleString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ));
+              })}
+            </div>
+          )}
+
+          {/* Processing Stats */}
+          {cluster.result?.stats && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="text-sm">Feedback Items</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {cluster.result.stats.feedbackProcessed?.toLocaleString() || '-'}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <GitBranch className="h-4 w-4" />
+                    <span className="text-sm">Clusters</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {cluster.result.stats.clustersGenerated?.toLocaleString() || '-'}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">Duration</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {cluster.result.stats.latencyMs
+                      ? `${(cluster.result.stats.latencyMs / 1000).toFixed(1)}s`
+                      : '-'}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="text-sm">Tokens Used</span>
+                  </div>
+                  <p className="mt-1 text-2xl font-bold">
+                    {cluster.result.stats.tokensUsed?.toLocaleString() || '-'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
-      )}
+      ) : null}
 
       {/* Error */}
       {cluster.error && (

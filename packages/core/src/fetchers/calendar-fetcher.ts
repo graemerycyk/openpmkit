@@ -153,12 +153,14 @@ export class CalendarFetcher implements IFetcher<CalendarEventMetadata, Calendar
       let timeMax: Date;
 
       if (includePast) {
-        // For past events, use sinceHoursAgo
+        // For Daily Brief: look back sinceHoursAgo AND forward daysAhead
+        // This shows what meetings happened and what's coming up
         const sinceHoursAgo = options.sinceHoursAgo ?? 24;
         timeMin = new Date(now.getTime() - sinceHoursAgo * 60 * 60 * 1000);
-        timeMax = now;
+        timeMax = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
       } else {
-        // For future events, use daysAhead
+        // For Meeting Prep: look forward only using daysAhead (or leadTimeMinutes if specified)
+        // We want to find upcoming meetings, not past ones
         timeMin = now;
         timeMax = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
       }

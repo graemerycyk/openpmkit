@@ -83,10 +83,10 @@ export async function GET(
       },
     });
 
-    // Build data sources info from job result stats and config
+    // Build data sources info from job result stats
+    // ONLY show data sources that were actually fetched (non-zero counts)
     const jobResult = job.result as Record<string, unknown> | null;
     const jobStats = (jobResult?.stats as Record<string, unknown>) || {};
-    const configData = (agentConfig?.config as Record<string, unknown>) || {};
 
     // Map of data source keys to their display info and stats
     const dataSourcesUsed: Array<{
@@ -95,114 +95,126 @@ export async function GET(
       stats: Array<{ label: string; value: number }>;
     }> = [];
 
-    // Check which data sources were configured/used
-    // Slack
-    if (configData.slackChannels || jobStats.channelsProcessed !== undefined) {
+    // Slack - only show if messages were actually fetched
+    const messagesProcessed = (jobStats.messagesProcessed as number) || 0;
+    if (messagesProcessed > 0) {
+      const slackStats: Array<{ label: string; value: number }> = [];
+      const channelsProcessed = (jobStats.channelsProcessed as number) || 0;
+      if (channelsProcessed > 0) {
+        slackStats.push({ label: 'Channels', value: channelsProcessed });
+      }
+      slackStats.push({ label: 'Messages', value: messagesProcessed });
       dataSourcesUsed.push({
         key: 'slack',
         name: 'Slack',
-        stats: [
-          { label: 'Channels', value: (jobStats.channelsProcessed as number) || 0 },
-          { label: 'Messages', value: (jobStats.messagesProcessed as number) || 0 },
-        ],
+        stats: slackStats,
       });
     }
 
-    // Gmail
-    if (configData.includeGmail || jobStats.emailsProcessed !== undefined) {
+    // Gmail - only show if emails were actually fetched
+    const emailsProcessed = (jobStats.emailsProcessed as number) || 0;
+    if (emailsProcessed > 0) {
       dataSourcesUsed.push({
         key: 'gmail',
         name: 'Gmail',
         stats: [
-          { label: 'Emails', value: (jobStats.emailsProcessed as number) || 0 },
+          { label: 'Emails', value: emailsProcessed },
         ],
       });
     }
 
-    // Google Calendar
-    if (configData.includeGoogleCalendar || jobStats.eventsProcessed !== undefined) {
+    // Google Calendar - only show if events were actually fetched
+    const eventsProcessed = (jobStats.eventsProcessed as number) || 0;
+    if (eventsProcessed > 0) {
       dataSourcesUsed.push({
         key: 'google-calendar',
-        name: 'Google Calendar',
+        name: 'Calendar',
         stats: [
-          { label: 'Events', value: (jobStats.eventsProcessed as number) || 0 },
+          { label: 'Events', value: eventsProcessed },
         ],
       });
     }
 
-    // Google Drive
-    if (configData.includeGoogleDrive || jobStats.filesProcessed !== undefined) {
+    // Google Drive - only show if files were actually fetched
+    const driveFilesProcessed = (jobStats.driveFilesProcessed as number) || 0;
+    if (driveFilesProcessed > 0) {
       dataSourcesUsed.push({
         key: 'google-drive',
-        name: 'Google Drive',
+        name: 'Drive',
         stats: [
-          { label: 'Files', value: (jobStats.filesProcessed as number) || 0 },
+          { label: 'Files', value: driveFilesProcessed },
         ],
       });
     }
 
-    // Jira
-    if (configData.includeJira || jobStats.issuesProcessed !== undefined) {
+    // Jira - only show if issues were actually fetched
+    const jiraIssuesProcessed = (jobStats.jiraIssuesProcessed as number) || 0;
+    if (jiraIssuesProcessed > 0) {
       dataSourcesUsed.push({
         key: 'jira',
         name: 'Jira',
         stats: [
-          { label: 'Issues', value: (jobStats.issuesProcessed as number) || 0 },
+          { label: 'Issues', value: jiraIssuesProcessed },
         ],
       });
     }
 
-    // Confluence
-    if (configData.includeConfluence || jobStats.pagesProcessed !== undefined) {
+    // Confluence - only show if pages were actually fetched
+    const confluencePagesProcessed = (jobStats.confluencePagesProcessed as number) || 0;
+    if (confluencePagesProcessed > 0) {
       dataSourcesUsed.push({
         key: 'confluence',
         name: 'Confluence',
         stats: [
-          { label: 'Pages', value: (jobStats.pagesProcessed as number) || 0 },
+          { label: 'Pages', value: confluencePagesProcessed },
         ],
       });
     }
 
-    // Gong
-    if (configData.includeGong || jobStats.callsProcessed !== undefined) {
+    // Gong - only show if calls were actually fetched
+    const callsProcessed = (jobStats.callsProcessed as number) || 0;
+    if (callsProcessed > 0) {
       dataSourcesUsed.push({
         key: 'gong',
         name: 'Gong',
         stats: [
-          { label: 'Calls', value: (jobStats.callsProcessed as number) || 0 },
+          { label: 'Calls', value: callsProcessed },
         ],
       });
     }
 
-    // Zendesk
-    if (configData.includeZendesk || jobStats.ticketsProcessed !== undefined) {
+    // Zendesk - only show if tickets were actually fetched
+    const zendeskTicketsProcessed = (jobStats.zendeskTicketsProcessed as number) || 0;
+    if (zendeskTicketsProcessed > 0) {
       dataSourcesUsed.push({
         key: 'zendesk',
         name: 'Zendesk',
         stats: [
-          { label: 'Tickets', value: (jobStats.ticketsProcessed as number) || 0 },
+          { label: 'Tickets', value: zendeskTicketsProcessed },
         ],
       });
     }
 
-    // Loom
-    if (configData.includeLoom || jobStats.videosProcessed !== undefined) {
+    // Loom - only show if videos were actually fetched
+    const videosProcessed = (jobStats.videosProcessed as number) || 0;
+    if (videosProcessed > 0) {
       dataSourcesUsed.push({
         key: 'loom',
         name: 'Loom',
         stats: [
-          { label: 'Videos', value: (jobStats.videosProcessed as number) || 0 },
+          { label: 'Videos', value: videosProcessed },
         ],
       });
     }
 
-    // Figma
-    if (configData.includeFigma || jobStats.framesProcessed !== undefined) {
+    // Figma - only show if frames were actually fetched
+    const framesProcessed = (jobStats.framesProcessed as number) || 0;
+    if (framesProcessed > 0) {
       dataSourcesUsed.push({
         key: 'figma',
         name: 'Figma',
         stats: [
-          { label: 'Frames', value: (jobStats.framesProcessed as number) || 0 },
+          { label: 'Frames', value: framesProcessed },
         ],
       });
     }

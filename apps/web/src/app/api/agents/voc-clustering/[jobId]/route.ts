@@ -27,7 +27,7 @@ export async function GET(
       where: {
         id: jobId,
         tenantId: user.tenantId,
-        type: 'meeting_prep',
+        type: 'voc_clustering',
       },
       include: {
         artifacts: {
@@ -65,7 +65,7 @@ export async function GET(
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'meeting_prep',
+          agentType: 'voc_clustering',
         },
       },
     });
@@ -93,31 +93,14 @@ export async function GET(
       stats: Array<{ label: string; value: number }>;
     }> = [];
 
-    // Meetings found (from Calendar)
-    const meetingsFound = (jobStats.meetingsFound as number) || 0;
-    const meetingTitles = (jobStats.meetingTitles as string[]) || [];
-    if (meetingsFound > 0) {
-      const meetingStats: Array<{ label: string; value: number }> = [
-        { label: 'Meetings', value: meetingsFound },
-      ];
-      if ((jobStats.attendeesCount as number) > 0) {
-        meetingStats.push({ label: 'Attendees', value: (jobStats.attendeesCount as number) });
-      }
+    // Zendesk - only show if tickets were actually fetched
+    const zendeskTicketsProcessed = (jobStats.zendeskTicketsProcessed as number) || 0;
+    if (zendeskTicketsProcessed > 0) {
       dataSourcesUsed.push({
-        key: 'google-calendar',
-        name: 'Calendar',
-        stats: meetingStats,
-      });
-    }
-
-    // Gmail - only show if emails were actually fetched
-    const emailsProcessed = (jobStats.emailsProcessed as number) || 0;
-    if (emailsProcessed > 0) {
-      dataSourcesUsed.push({
-        key: 'gmail',
-        name: 'Gmail',
+        key: 'zendesk',
+        name: 'Zendesk',
         stats: [
-          { label: 'Emails', value: emailsProcessed },
+          { label: 'Tickets', value: zendeskTicketsProcessed },
         ],
       });
     }
@@ -134,45 +117,28 @@ export async function GET(
       });
     }
 
-    // Jira - only show if issues were actually fetched
-    const jiraIssuesProcessed = (jobStats.jiraIssuesProcessed as number) || 0;
-    if (jiraIssuesProcessed > 0) {
+    // Gong - only show if calls were actually fetched
+    const gongCallsProcessed = (jobStats.gongCallsProcessed as number) || 0;
+    if (gongCallsProcessed > 0) {
       dataSourcesUsed.push({
-        key: 'jira',
-        name: 'Jira',
+        key: 'gong',
+        name: 'Gong',
         stats: [
-          { label: 'Issues', value: jiraIssuesProcessed },
+          { label: 'Calls', value: gongCallsProcessed },
         ],
       });
     }
 
-    // Confluence - only show if pages were actually fetched
-    const confluencePagesProcessed = (jobStats.confluencePagesProcessed as number) || 0;
-    if (confluencePagesProcessed > 0) {
-      dataSourcesUsed.push({
-        key: 'confluence',
-        name: 'Confluence',
-        stats: [
-          { label: 'Pages', value: confluencePagesProcessed },
-        ],
-      });
-    }
-
-    const prep = {
+    const cluster = {
       id: job.id,
       status: job.status,
       startedAt: job.startedAt,
       completedAt: job.completedAt,
       error: job.error,
       result: job.result,
-      config: job.config,
+      config: agentConfig?.config || null,
       dataSourcesUsed,
       connectedSources: connectedSources.map(s => s.connectorKey),
-      // Meeting info from stats
-      meetingsFound,
-      meetingTitles,
-      meetingTitle: (jobStats.meetingTitle as string) || null,
-      meetingTime: (jobStats.meetingTime as string) || null,
       artifact: job.artifacts[0]
         ? {
             id: job.artifacts[0].id,
@@ -184,9 +150,9 @@ export async function GET(
       sources: formattedSources,
     };
 
-    return NextResponse.json({ prep });
+    return NextResponse.json({ cluster });
   } catch (error) {
-    console.error('[Meeting Prep Detail] Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch prep' }, { status: 500 });
+    console.error('[VoC Clustering Detail] Error:', error);
+    return NextResponse.json({ error: 'Failed to fetch cluster' }, { status: 500 });
   }
 }

@@ -88,6 +88,7 @@ interface PrepDetail {
 
 // Map data source keys to icons
 const dataSourceIcons: Record<string, LucideIcon> = {
+  meeting: Calendar,
   slack: MessageSquare,
   gmail: Mail,
   'google-calendar': Calendar,

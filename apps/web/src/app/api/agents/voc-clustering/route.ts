@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
-import { VocClusteringConfigSchema } from '@pmkit/core';
+import { z } from 'zod';
 import { notifySchedulerToReload, notifySchedulerToCancel } from '@/lib/scheduler-client';
+
+// Schema matching what the VoC Clustering page sends
+// This is more flexible than the core schema - we transform before saving
+const VocClusteringPageConfigSchema = z.object({
+  // UI uses timeframeDays, core expects lookbackDays
+  timeframeDays: z.number().min(7).max(90).default(30),
+  clusterCount: z.number().min(3).max(10).default(5),
+  minFeedbackCount: z.number().min(1).max(100).default(10),
+  // UI uses enabledSources map
+  enabledSources: z.record(z.boolean()).optional(),
+  // Connector-specific configs
+  connectorConfigs: z.any().optional(),
+  // Schedule fields (optional - UI may or may not include these)
+  scheduleDay: z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional(),
+  scheduleTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format').optional(),
+  timezone: z.string().optional(),
+});
 
 // GET - Fetch user's voc clustering config
 export async function GET() {
@@ -66,16 +83,27 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    // Validate config
-    const parseResult = VocClusteringConfigSchema.safeParse(body.config);
+    // Validate config using page-specific schema
+    const parseResult = VocClusteringPageConfigSchema.safeParse(body.config);
     if (!parseResult.success) {
+      console.error('[VoC Clustering Config] Validation error:', parseResult.error.errors);
       return NextResponse.json(
         { error: 'Invalid config', details: parseResult.error.errors },
         { status: 400 }
       );
     }
 
-    const configData = parseResult.data;
+    const pageConfig = parseResult.data;
+
+    // Store the config as-is from the UI - the trigger route will transform it
+    // This preserves all UI fields for display and editing
+    const configData = {
+      ...pageConfig,
+      // Ensure schedule fields have defaults for the scheduler
+      scheduleDay: pageConfig.scheduleDay || 'monday',
+      scheduleTimeLocal: pageConfig.scheduleTimeLocal || '09:00',
+      timezone: pageConfig.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York',
+    };
 
     // Calculate next run time based on schedule day and time
     const nextRunAt = calculateNextRunTime(
@@ -122,11 +150,8 @@ export async function POST(request: NextRequest) {
           scheduleDay: configData.scheduleDay,
           scheduleTime: configData.scheduleTimeLocal,
           timezone: configData.timezone,
-          lookbackDays: configData.lookbackDays,
-          includeZendesk: configData.includeZendesk,
-          includeGong: configData.includeGong,
-          includeSlack: configData.includeSlack,
-          includeCommunity: configData.includeCommunity,
+          timeframeDays: configData.timeframeDays,
+          enabledSources: configData.enabledSources,
         },
       },
     });

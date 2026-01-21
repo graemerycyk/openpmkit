@@ -127,7 +127,7 @@ export async function executeDailyBrief(
       fetcherConfig.calendar = {
         calendarIds: ['primary'],
         daysAhead: 1,
-        includePast: false,
+        includePast: true, // Include past meetings from the timeframe as well as upcoming
       };
     }
 

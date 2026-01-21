@@ -48,13 +48,21 @@ export interface MeetingPrepResult {
     fetchedAt: Date;
   }>;
   stats: {
+    /** Title of the first/primary meeting (for backward compatibility) */
     meetingTitle: string;
+    /** Time of the first/primary meeting */
     meetingTime: Date | null;
+    /** Total attendees across all meetings */
     attendeesCount: number;
+    /** Number of meetings found within the lead time window */
+    meetingsFound: number;
+    /** Titles of all meetings found */
+    meetingTitles: string[];
     slackMessagesProcessed: number;
     emailsProcessed: number;
     jiraIssuesProcessed: number;
     confluencePagesProcessed: number;
+    calendarEventsProcessed: number;
     tokensUsed?: number;
     latencyMs: number;
   };
@@ -116,19 +124,27 @@ export async function executeMeetingPrep(
     // Audit: Job started
     await auditLogger?.logJobStarted(tenantId, jobId);
 
-    // Step 1: Find or use the target meeting
-    callbacks?.onProgress?.('Finding target meeting...');
-    const meetingEvent = context.meetingEvent ?? await findNextMeeting(
-      credentials,
-      config.leadTimeMinutes,
-      callbacks
-    );
+    // Step 1: Find all upcoming meetings within the lead time window
+    callbacks?.onProgress?.('Finding upcoming meetings...');
+    let meetings: MeetingEvent[];
 
-    if (!meetingEvent) {
-      // Apply default if leadTimeMinutes is undefined/NaN
-      const effectiveLeadTime = Number.isFinite(config.leadTimeMinutes) ? config.leadTimeMinutes : 240;
-      const hoursDisplay = Math.round(effectiveLeadTime / 60);
+    if (context.meetingEvent) {
+      // If a specific meeting was provided, use only that one
+      meetings = [context.meetingEvent];
+    } else {
+      // Otherwise, find ALL meetings within the lead time window
+      meetings = await findUpcomingMeetings(
+        credentials,
+        config.leadTimeMinutes,
+        callbacks
+      );
+    }
 
+    // Apply default if leadTimeMinutes is undefined/NaN
+    const effectiveLeadTime = Number.isFinite(config.leadTimeMinutes) ? config.leadTimeMinutes : 240;
+    const hoursDisplay = Math.round(effectiveLeadTime / 60);
+
+    if (meetings.length === 0) {
       const noMeetingResult: MeetingPrepResult = {
         content: `# Meeting Prep Pack
 
@@ -143,10 +159,13 @@ No upcoming meetings found within the next ${hoursDisplay} hours.
           meetingTitle: 'No meeting found',
           meetingTime: null,
           attendeesCount: 0,
+          meetingsFound: 0,
+          meetingTitles: [],
           slackMessagesProcessed: 0,
           emailsProcessed: 0,
           jiraIssuesProcessed: 0,
           confluencePagesProcessed: 0,
+          calendarEventsProcessed: 0,
           latencyMs: Date.now() - startTime,
         },
       };
@@ -155,17 +174,18 @@ No upcoming meetings found within the next ${hoursDisplay} hours.
     }
 
     callbacks?.onProgress?.(
-      `Found meeting: ${meetingEvent.title} with ${meetingEvent.attendees.length} attendees`
+      `Found ${meetings.length} meeting(s) within ${hoursDisplay} hours`
     );
 
     // Step 2: Build fetcher config based on what's connected and configured
+    // This fetches CONTEXT data by looking BACKWARD in time
     const fetcherConfig = buildMeetingPrepFetcherConfig(config, credentials);
 
     // Calculate lookback period - use config value or default to 30 days
     const lookbackDays = Number.isFinite(config.lookbackDays) ? config.lookbackDays : 30;
     const sinceHoursAgo = lookbackDays * 24;
 
-    // Step 3: Fetch from available connectors
+    // Step 3: Fetch context from available connectors (looking BACKWARD)
     callbacks?.onProgress?.(`Fetching context from last ${lookbackDays} days...`);
     const multiSource = await buildMultiSourceContext(credentials, fetcherConfig, {
       sinceHoursAgo,
@@ -188,37 +208,64 @@ No upcoming meetings found within the next ${hoursDisplay} hours.
       citationTracker.register(item, item.url);
     }
 
-    // Step 5: Build formatted prompt context
-    const promptContext = buildPromptContext(meetingEvent, multiSource, citationTracker);
+    // Step 5: Generate prep for EACH meeting
+    callbacks?.onProgress?.(`Generating prep for ${meetings.length} meeting(s)`);
+    const meetingSections: string[] = [];
+    let totalTokensUsed = 0;
 
-    // Step 6: Build LLM prompts
-    const systemPrompt = buildSystemPrompt(meetingEvent, multiSource.availableConnectors as string[]);
-    const userPrompt = buildUserPrompt(meetingEvent, promptContext);
+    for (let i = 0; i < meetings.length; i++) {
+      const meeting = meetings[i];
+      callbacks?.onProgress?.(
+        `Generating prep for meeting ${i + 1}/${meetings.length}: ${meeting.title}`
+      );
 
-    // Step 7: Call LLM
-    callbacks?.onProgress?.('Generating meeting prep pack with AI');
-    callbacks?.onLLMCall?.('gpt-5-mini', userPrompt.length);
+      // Build formatted prompt context for this meeting
+      const promptContext = buildPromptContext(meeting, multiSource, citationTracker);
 
-    const llmStart = Date.now();
-    const llmResponse = await llmService.complete({
-      tenantId,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      maxTokens: 4096,
-      temperature: 0.7,
-    });
+      // Build LLM prompts
+      const systemPrompt = buildSystemPrompt(meeting, multiSource.availableConnectors as string[]);
+      const userPrompt = buildUserPrompt(meeting, promptContext);
 
-    callbacks?.onLLMComplete?.(
-      llmResponse.model,
-      llmResponse.usage.completionTokens,
-      Date.now() - llmStart
-    );
+      // Call LLM for this meeting
+      callbacks?.onLLMCall?.('gpt-5-mini', userPrompt.length);
+
+      const llmStart = Date.now();
+      const llmResponse = await llmService.complete({
+        tenantId,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        maxTokens: 4096,
+        temperature: 0.7,
+      });
+
+      callbacks?.onLLMComplete?.(
+        llmResponse.model,
+        llmResponse.usage.completionTokens,
+        Date.now() - llmStart
+      );
+
+      totalTokensUsed += llmResponse.usage.promptTokens + llmResponse.usage.completionTokens;
+
+      // Add meeting section with header
+      const meetingHeader = `---\n\n# Meeting ${i + 1}: ${meeting.title}\n\n**Time:** ${meeting.startTime.toLocaleString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })} | **Attendees:** ${meeting.attendees.length}\n`;
+
+      meetingSections.push(meetingHeader + llmResponse.content);
+    }
+
+    // Combine all meeting sections
+    const combinedContent = meetingSections.join('\n\n');
 
     // Append sources section
     const sourcesMarkdown = citationTracker.generateSourcesMarkdown();
-    const fullContent = `${llmResponse.content}\n\n${sourcesMarkdown}`;
+    const fullContent = `# Meeting Prep Pack\n\n**${meetings.length} upcoming meeting(s)** within the next ${hoursDisplay} hours\n\n${combinedContent}\n\n${sourcesMarkdown}`;
 
     // Generate source records for database
     const sourceRecords = citationTracker.generateSourceRecords(tenantId);
@@ -230,18 +277,24 @@ No upcoming meetings found within the next ${hoursDisplay} hours.
     // Audit: Job completed
     await auditLogger?.logJobCompleted(tenantId, jobId, totalLatency);
 
+    // Calculate total attendees across all meetings
+    const totalAttendees = meetings.reduce((sum, m) => sum + m.attendees.length, 0);
+
     return {
       content: fullContent,
       sources: sourceRecords,
       stats: {
-        meetingTitle: meetingEvent.title,
-        meetingTime: meetingEvent.startTime,
-        attendeesCount: meetingEvent.attendees.length,
+        meetingTitle: meetings[0].title,
+        meetingTime: meetings[0].startTime,
+        attendeesCount: totalAttendees,
+        meetingsFound: meetings.length,
+        meetingTitles: meetings.map(m => m.title),
         slackMessagesProcessed: multiSource.byConnector.slack?.length || 0,
         emailsProcessed: multiSource.byConnector.gmail?.length || 0,
         jiraIssuesProcessed: multiSource.byConnector.jira?.length || 0,
         confluencePagesProcessed: multiSource.byConnector.confluence?.length || 0,
-        tokensUsed: llmResponse.usage.promptTokens + llmResponse.usage.completionTokens,
+        calendarEventsProcessed: meetings.length,
+        tokensUsed: totalTokensUsed,
         latencyMs: totalLatency,
       },
     };
@@ -267,14 +320,19 @@ interface MeetingEvent {
   meetingLink?: string;
 }
 
-async function findNextMeeting(
+/**
+ * Find ALL upcoming meetings within the lead time window.
+ * Looks FORWARD only (from now to leadTimeMinutes in the future).
+ * Also includes meetings that started within the last hour (in case running prep mid-meeting).
+ */
+async function findUpcomingMeetings(
   credentials: ConnectorCredentialsMap,
   leadTimeMinutes: number,
   callbacks?: OrchestratorCallbacks
-): Promise<MeetingEvent | null> {
+): Promise<MeetingEvent[]> {
   if (!credentials['google-calendar']) {
-    callbacks?.onProgress?.('Calendar not connected - cannot find meeting');
-    return null;
+    callbacks?.onProgress?.('Calendar not connected - cannot find meetings');
+    return [];
   }
 
   // Apply default if leadTimeMinutes is undefined/NaN
@@ -282,19 +340,24 @@ async function findNextMeeting(
 
   try {
     const fetcher = CalendarFetcher.fromEncrypted(credentials['google-calendar']);
+
+    // Look FORWARD only - find meetings starting soon
+    // daysAhead = ceiling of leadTimeMinutes in days (minimum 1)
+    const daysAhead = Math.max(1, Math.ceil(effectiveLeadTime / (24 * 60)));
+
     const result = await fetcher.fetch({
       calendarIds: ['primary'],
-      daysAhead: 1, // Look 1 day ahead
-      includePast: true, // Include recent past meetings (within 1 hour) for prep
+      daysAhead,
+      includePast: false, // Only look forward for meetings
     });
 
     const now = new Date();
     const leadTimeWindow = new Date(now.getTime() + effectiveLeadTime * 60 * 1000);
-    // Allow meetings that started up to 1 hour ago (in case running prep mid-meeting)
+    // Also include meetings that started up to 1 hour ago (in case running prep mid-meeting)
     const recentPastWindow = new Date(now.getTime() - 60 * 60 * 1000);
 
     callbacks?.onProgress?.(
-      `Searching for meetings between ${recentPastWindow.toLocaleTimeString()} and ${leadTimeWindow.toLocaleTimeString()}`
+      `Searching for meetings between now and ${leadTimeWindow.toLocaleTimeString()} (${Math.round(effectiveLeadTime / 60)} hours ahead)`
     );
 
     // Sort events by start time
@@ -302,19 +365,16 @@ async function findNextMeeting(
       (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
     );
 
-    // Find the first meeting that's either:
-    // 1. Starting soon (within lead time window)
-    // 2. Recently started (within the last hour)
+    const meetings: MeetingEvent[] = [];
+
+    // Find ALL meetings within the window
     for (const event of sortedEvents) {
       const isUpcoming = event.timestamp > now && event.timestamp <= leadTimeWindow;
       const isRecentlyStarted = event.timestamp >= recentPastWindow && event.timestamp <= now;
 
       if (isUpcoming || isRecentlyStarted) {
         const metadata = event.metadata as CalendarEventMetadata;
-        callbacks?.onProgress?.(
-          `Found meeting: ${event.title} at ${event.timestamp.toLocaleTimeString()}`
-        );
-        return {
+        meetings.push({
           id: event.externalId,
           title: event.title,
           startTime: event.timestamp,
@@ -326,17 +386,24 @@ async function findNextMeeting(
           description: event.content,
           location: metadata.location,
           meetingLink: metadata.meetingLink,
-        };
+        });
       }
     }
 
-    callbacks?.onProgress?.(
-      `No meetings found. Searched ${result.items.length} events in calendar.`
-    );
-    return null;
+    if (meetings.length > 0) {
+      callbacks?.onProgress?.(
+        `Found ${meetings.length} meeting(s): ${meetings.map(m => m.title).join(', ')}`
+      );
+    } else {
+      callbacks?.onProgress?.(
+        `No meetings found. Searched ${result.items.length} events in calendar.`
+      );
+    }
+
+    return meetings;
   } catch (error) {
     callbacks?.onProgress?.(`Error fetching calendar: ${error instanceof Error ? error.message : String(error)}`);
-    return null;
+    return [];
   }
 }
 
