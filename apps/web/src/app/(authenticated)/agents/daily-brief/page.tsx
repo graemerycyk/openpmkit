@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -765,6 +766,13 @@ export default function DailyBriefSetupPage() {
       {config?.lastRunAt && (
         <p className="text-center text-sm text-muted-foreground">
           Last run: {new Date(config.lastRunAt).toLocaleString()}
+          {' · '}
+          <Link
+            href="/agents/daily-brief/history"
+            className="text-cobalt-600 hover:underline"
+          >
+            View History
+          </Link>
         </p>
       )}
     </div>

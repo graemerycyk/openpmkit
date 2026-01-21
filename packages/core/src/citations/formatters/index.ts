@@ -6,3 +6,4 @@
 export { SlackFormatter } from './slack-formatter';
 export { GmailFormatter } from './gmail-formatter';
 export { CalendarFormatter } from './calendar-formatter';
+export { ZendeskFormatter } from './zendesk-formatter';

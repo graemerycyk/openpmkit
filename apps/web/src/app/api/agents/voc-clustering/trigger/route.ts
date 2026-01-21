@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
 import {
-  executeMeetingPrep,
+  executeVocClustering,
   getLLMService,
-  type MeetingPrepConfig,
+  type VocClusteringConfig,
   type ConnectorCredentialsMap,
 } from '@pmkit/core';
 
@@ -28,19 +28,19 @@ export async function POST() {
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'meeting_prep',
+          agentType: 'voc_clustering',
         },
       },
     });
 
     if (!agentConfig) {
       return NextResponse.json(
-        { error: 'Meeting Prep not configured. Please set up the agent first.' },
+        { error: 'VoC Clustering not configured. Please set up the agent first.' },
         { status: 400 }
       );
     }
 
-    const configData = agentConfig.config as MeetingPrepConfig;
+    const configData = agentConfig.config as VocClusteringConfig;
 
     // Fetch all connector installs for this tenant
     const connectorInstalls = await prisma.connectorInstall.findMany({
@@ -59,50 +59,44 @@ export async function POST() {
     );
 
     // Check which connectors are connected
-    const calendarInstall = connectorMap.get('google-calendar');
+    const zendeskInstall = connectorMap.get('zendesk');
     const slackInstall = connectorMap.get('slack');
-    const gmailInstall = connectorMap.get('gmail');
-    const jiraInstall = connectorMap.get('jira');
-    const confluenceInstall = connectorMap.get('confluence');
 
-    const calendarConnected = calendarInstall && calendarInstall.credentials[0];
+    const zendeskConnected = zendeskInstall && zendeskInstall.credentials[0];
     const slackConnected = slackInstall && slackInstall.credentials[0];
-    const gmailConnected = gmailInstall && gmailInstall.credentials[0];
-    const jiraConnected = jiraInstall && jiraInstall.credentials[0];
-    const confluenceConnected = confluenceInstall && confluenceInstall.credentials[0];
 
-    // Calendar is required for Meeting Prep
-    if (!calendarConnected) {
+    // At least one feedback source is required
+    const hasZendeskSource = configData.includeZendesk && zendeskConnected;
+    const hasSlackSource = configData.includeSlack && slackConnected;
+
+    if (!hasZendeskSource && !hasSlackSource) {
       return NextResponse.json(
-        { error: 'Google Calendar not connected. Please connect Google Calendar to run Meeting Prep.' },
+        {
+          error:
+            'No feedback source available. Please connect Zendesk or enable Slack feedback channels.',
+        },
         { status: 400 }
       );
     }
 
     const encryptionKey = process.env.CONNECTOR_ENCRYPTION_KEY;
     if (!encryptionKey) {
-      console.error('[Meeting Prep Trigger] Missing CONNECTOR_ENCRYPTION_KEY');
+      console.error('[VoC Clustering Trigger] Missing CONNECTOR_ENCRYPTION_KEY');
       return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
     }
 
     // Build ConnectorCredentialsMap for the orchestrator
     const credentials: ConnectorCredentialsMap = {};
 
-    // Calendar is required
-    credentials['google-calendar'] = {
-      encryptedBlob: calendarInstall.credentials[0].encryptedBlob,
-      encryptionKey,
-    };
-
-    // Gmail - always include if connected (for attendee email history)
-    if (gmailConnected) {
-      credentials.gmail = {
-        encryptedBlob: gmailInstall.credentials[0].encryptedBlob,
+    // Zendesk - primary feedback source
+    if (configData.includeZendesk && zendeskConnected) {
+      credentials.zendesk = {
+        encryptedBlob: zendeskInstall.credentials[0].encryptedBlob,
         encryptionKey,
       };
     }
 
-    // Slack - include if configured and connected
+    // Slack - for customer feedback channels
     if (configData.includeSlack && slackConnected) {
       credentials.slack = {
         encryptedBlob: slackInstall.credentials[0].encryptedBlob,
@@ -110,44 +104,26 @@ export async function POST() {
       };
     }
 
-    // Jira - include if configured and connected
-    if (configData.includeJira && jiraConnected) {
-      credentials.jira = {
-        encryptedBlob: jiraInstall.credentials[0].encryptedBlob,
-        encryptionKey,
-      };
-    }
-
-    // Confluence - include if configured and connected
-    if (configData.includeConfluence && confluenceConnected) {
-      credentials.confluence = {
-        encryptedBlob: confluenceInstall.credentials[0].encryptedBlob,
-        encryptionKey,
-      };
-    }
-
-    // Note: Gong is not included yet as GongFetcher doesn't exist
+    // Note: Gong and Community are not included yet as their fetchers don't exist
 
     // Log which data sources are enabled in config vs which have credentials
-    console.log(`[Meeting Prep] Config data sources:`, {
+    console.log(`[VoC Clustering] Config data sources:`, {
+      includeZendesk: configData.includeZendesk,
       includeSlack: configData.includeSlack,
-      includeJira: configData.includeJira,
-      includeConfluence: configData.includeConfluence,
       includeGong: configData.includeGong,
+      includeCommunity: configData.includeCommunity,
+      lookbackDays: configData.lookbackDays,
     });
-    console.log(`[Meeting Prep] Connector credentials available:`, {
-      'google-calendar': !!credentials['google-calendar'],
-      gmail: !!credentials.gmail,
+    console.log(`[VoC Clustering] Connector credentials available:`, {
+      zendesk: !!credentials.zendesk,
       slack: !!credentials.slack,
-      jira: !!credentials.jira,
-      confluence: !!credentials.confluence,
     });
 
     // Create job record
     const job = await prisma.job.create({
       data: {
         tenantId: user.tenantId,
-        type: 'meeting_prep',
+        type: 'voc_clustering',
         status: 'running',
         triggeredBy: user.id,
         config: agentConfig.config as object,
@@ -164,15 +140,16 @@ export async function POST() {
         resourceType: 'job',
         resourceId: job.id,
         details: {
-          agentType: 'meeting_prep',
+          agentType: 'voc_clustering',
           trigger: 'manual',
           connectors: Object.keys(credentials),
+          lookbackDays: configData.lookbackDays,
         },
       },
     });
 
     console.log(
-      `[Meeting Prep] Starting job ${job.id} for user ${user.id} with connectors: ${Object.keys(credentials).join(', ')}`
+      `[VoC Clustering] Starting job ${job.id} for user ${user.id} with connectors: ${Object.keys(credentials).join(', ')}`
     );
 
     // Get LLM service
@@ -182,7 +159,7 @@ export async function POST() {
     const toolCallIds: string[] = [];
 
     try {
-      const result = await executeMeetingPrep(
+      const result = await executeVocClustering(
         {
           tenantId: user.tenantId,
           userId: user.id,
@@ -236,7 +213,7 @@ export async function POST() {
             }
           },
           onProgress: (step) => {
-            console.log(`[Meeting Prep ${job.id}] ${step}`);
+            console.log(`[VoC Clustering ${job.id}] ${step}`);
           },
         }
       );
@@ -246,10 +223,8 @@ export async function POST() {
         data: {
           tenantId: user.tenantId,
           jobId: job.id,
-          type: 'meeting_pack',
-          title: result.stats.meetingTitle
-            ? `Meeting Prep - ${result.stats.meetingTitle}`
-            : `Meeting Prep - ${new Date().toLocaleDateString()}`,
+          type: 'voc_report',
+          title: `Voice of Customer Report - ${new Date().toLocaleDateString()}`,
           format: 'markdown',
           content: result.content,
           metadata: {
@@ -314,7 +289,7 @@ export async function POST() {
         },
       });
 
-      console.log(`[Meeting Prep] Job ${job.id} completed successfully`);
+      console.log(`[VoC Clustering] Job ${job.id} completed successfully`);
 
       return NextResponse.json({
         success: true,
@@ -322,7 +297,7 @@ export async function POST() {
         stats: result.stats,
       });
     } catch (execError) {
-      console.error(`[Meeting Prep] Job ${job.id} failed:`, execError);
+      console.error(`[VoC Clustering] Job ${job.id} failed:`, execError);
 
       // Update job as failed
       await prisma.job.update({
@@ -352,7 +327,7 @@ export async function POST() {
       );
     }
   } catch (error) {
-    console.error('[Meeting Prep Trigger] Error:', error);
+    console.error('[VoC Clustering Trigger] Error:', error);
     return NextResponse.json({ error: 'Failed to trigger agent' }, { status: 500 });
   }
 }
