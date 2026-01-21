@@ -42,15 +42,26 @@ export function AgentStatusCard({
   missingRequiredConnectors = [],
   comingSoon = false,
 }: AgentStatusCardProps) {
-  const isDisabled = comingSoon || disabled || missingRequiredConnectors.length > 0;
+  // Determine if we can enable the agent (requires all prerequisites)
+  const canEnable = !comingSoon && !disabled && missingRequiredConnectors.length === 0;
 
-  // Build helper text explaining why the toggle is disabled
+  // The toggle is disabled only if:
+  // 1. It's a coming soon agent, OR
+  // 2. It's off AND can't be enabled (missing requirements)
+  // When the agent is currently ON, we always allow toggling OFF
+  const isToggleDisabled = comingSoon || (!isActive && !canEnable);
+
+  // Build helper text explaining the current state
   let helperText = 'When enabled, the agent will run automatically at your scheduled time';
   if (comingSoon) {
     helperText = 'This agent is coming soon and cannot be enabled yet';
   } else if (missingRequiredConnectors.length > 0) {
     const connectorNames = missingRequiredConnectors.map((key) => CONNECTOR_NAMES[key]).join(', ');
-    helperText = `Connect and enable ${connectorNames} to enable this agent`;
+    if (isActive) {
+      helperText = `Warning: ${connectorNames} is no longer available. The agent will fail on next run.`;
+    } else {
+      helperText = `Connect and enable ${connectorNames} to enable this agent`;
+    }
   }
 
   return (
@@ -72,8 +83,14 @@ export function AgentStatusCard({
           <Switch
             id="agent-active"
             checked={isActive}
-            onCheckedChange={onActiveChange}
-            disabled={isDisabled}
+            onCheckedChange={(checked) => {
+              // Only allow turning ON if prerequisites are met
+              if (checked && !canEnable) {
+                return;
+              }
+              onActiveChange(checked);
+            }}
+            disabled={isToggleDisabled}
           />
         </div>
       </CardContent>

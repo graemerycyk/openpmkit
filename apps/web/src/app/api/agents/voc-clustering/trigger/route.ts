@@ -40,7 +40,27 @@ export async function POST() {
       );
     }
 
-    const configData = agentConfig.config as VocClusteringConfig;
+    // Transform UI config to orchestrator config format
+    // UI saves: timeframeDays, enabledSources (e.g., { zendesk: true, slack: false })
+    // Orchestrator expects: lookbackDays, includeZendesk, includeSlack, etc.
+    const savedConfig = agentConfig.config as Record<string, unknown>;
+    const enabledSources = (savedConfig.enabledSources || {}) as Record<string, boolean>;
+
+    const configData: VocClusteringConfig = {
+      // Map timeframeDays (UI field name) to lookbackDays (orchestrator field name)
+      lookbackDays: typeof savedConfig.timeframeDays === 'number'
+        ? savedConfig.timeframeDays
+        : (typeof savedConfig.lookbackDays === 'number' ? savedConfig.lookbackDays : 7),
+      // Map enabledSources to individual include* flags for the orchestrator
+      includeZendesk: enabledSources.zendesk === true || savedConfig.includeZendesk === true,
+      includeSlack: enabledSources.slack === true || savedConfig.includeSlack === true,
+      includeGong: enabledSources.gong === true || savedConfig.includeGong === true,
+      includeCommunity: enabledSources.community === true || savedConfig.includeCommunity === true,
+      // Schedule fields (use defaults if not set - these are for the scheduler, not the orchestrator)
+      scheduleDay: typeof savedConfig.scheduleDay === 'string' ? savedConfig.scheduleDay : 'monday',
+      scheduleTimeLocal: typeof savedConfig.scheduleTimeLocal === 'string' ? savedConfig.scheduleTimeLocal : '09:00',
+      timezone: typeof savedConfig.timezone === 'string' ? savedConfig.timezone : 'America/New_York',
+    } as VocClusteringConfig;
 
     // Fetch all connector installs for this tenant
     const connectorInstalls = await prisma.connectorInstall.findMany({
@@ -106,13 +126,17 @@ export async function POST() {
 
     // Note: Gong and Community are not included yet as their fetchers don't exist
 
-    // Log which data sources are enabled in config vs which have credentials
-    console.log(`[VoC Clustering] Config data sources:`, {
+    // Log transformed config values including timing settings
+    console.log(`[VoC Clustering] Config timing (transformed from UI):`, {
+      lookbackDays: configData.lookbackDays,
+      originalTimeframeDays: savedConfig.timeframeDays,
+    });
+    console.log(`[VoC Clustering] Config data sources (from enabledSources):`, {
+      enabledSources,
       includeZendesk: configData.includeZendesk,
       includeSlack: configData.includeSlack,
       includeGong: configData.includeGong,
       includeCommunity: configData.includeCommunity,
-      lookbackDays: configData.lookbackDays,
     });
     console.log(`[VoC Clustering] Connector credentials available:`, {
       zendesk: !!credentials.zendesk,

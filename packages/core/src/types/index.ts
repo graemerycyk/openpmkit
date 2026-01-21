@@ -131,13 +131,21 @@ export type DailyBriefConfig = z.infer<typeof DailyBriefConfigSchema>;
 
 // Meeting Prep config (calendar-triggered)
 export const MeetingPrepConfigSchema = z.object({
-  leadTimeMinutes: z.number().min(30).max(1440).default(240), // 4 hours default
-  timezone: z.string(),
+  leadTimeMinutes: z.number().min(15).max(1440).default(30), // How far ahead to generate prep (minutes)
+  lookbackDays: z.number().min(7).max(90).default(30), // How far back to search for context (days)
+  timezone: z.string().optional(),
+  // Meeting filters
+  filterDomains: z.array(z.string()).default([]),
+  includeAllExternalMeetings: z.boolean().default(true),
   // Data sources
   includeJira: z.boolean().default(true),
   includeSlack: z.boolean().default(false),
   includeGong: z.boolean().default(false),
   includeConfluence: z.boolean().default(false),
+  // Enabled sources map (from UI)
+  enabledSources: z.record(z.boolean()).optional(),
+  // Connector-specific configs
+  connectorConfigs: z.any().optional(),
 });
 export type MeetingPrepConfig = z.infer<typeof MeetingPrepConfigSchema>;
 

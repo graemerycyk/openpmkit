@@ -125,10 +125,14 @@ export async function executeMeetingPrep(
     );
 
     if (!meetingEvent) {
+      // Apply default if leadTimeMinutes is undefined/NaN
+      const effectiveLeadTime = Number.isFinite(config.leadTimeMinutes) ? config.leadTimeMinutes : 240;
+      const hoursDisplay = Math.round(effectiveLeadTime / 60);
+
       const noMeetingResult: MeetingPrepResult = {
         content: `# Meeting Prep Pack
 
-No upcoming meetings found within the next ${Math.round(config.leadTimeMinutes / 60)} hours.
+No upcoming meetings found within the next ${hoursDisplay} hours.
 
 **To generate a meeting prep pack:**
 1. Ensure Google Calendar is connected
@@ -157,10 +161,14 @@ No upcoming meetings found within the next ${Math.round(config.leadTimeMinutes /
     // Step 2: Build fetcher config based on what's connected and configured
     const fetcherConfig = buildMeetingPrepFetcherConfig(config, credentials);
 
+    // Calculate lookback period - use config value or default to 30 days
+    const lookbackDays = Number.isFinite(config.lookbackDays) ? config.lookbackDays : 30;
+    const sinceHoursAgo = lookbackDays * 24;
+
     // Step 3: Fetch from available connectors
-    callbacks?.onProgress?.('Fetching context from connected sources...');
+    callbacks?.onProgress?.(`Fetching context from last ${lookbackDays} days...`);
     const multiSource = await buildMultiSourceContext(credentials, fetcherConfig, {
-      sinceHoursAgo: 168, // 7 days of history for meeting context
+      sinceHoursAgo,
       onProgress: (msg) => callbacks?.onProgress?.(msg),
     });
 
@@ -269,21 +277,43 @@ async function findNextMeeting(
     return null;
   }
 
+  // Apply default if leadTimeMinutes is undefined/NaN
+  const effectiveLeadTime = Number.isFinite(leadTimeMinutes) ? leadTimeMinutes : 240;
+
   try {
     const fetcher = CalendarFetcher.fromEncrypted(credentials['google-calendar']);
     const result = await fetcher.fetch({
       calendarIds: ['primary'],
       daysAhead: 1, // Look 1 day ahead
-      includePast: false,
+      includePast: true, // Include recent past meetings (within 1 hour) for prep
     });
 
-    // Find first meeting starting within lead time window
     const now = new Date();
-    const leadTimeWindow = new Date(now.getTime() + leadTimeMinutes * 60 * 1000);
+    const leadTimeWindow = new Date(now.getTime() + effectiveLeadTime * 60 * 1000);
+    // Allow meetings that started up to 1 hour ago (in case running prep mid-meeting)
+    const recentPastWindow = new Date(now.getTime() - 60 * 60 * 1000);
 
-    for (const event of result.items) {
-      if (event.timestamp <= leadTimeWindow && event.timestamp > now) {
+    callbacks?.onProgress?.(
+      `Searching for meetings between ${recentPastWindow.toLocaleTimeString()} and ${leadTimeWindow.toLocaleTimeString()}`
+    );
+
+    // Sort events by start time
+    const sortedEvents = [...result.items].sort(
+      (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+    );
+
+    // Find the first meeting that's either:
+    // 1. Starting soon (within lead time window)
+    // 2. Recently started (within the last hour)
+    for (const event of sortedEvents) {
+      const isUpcoming = event.timestamp > now && event.timestamp <= leadTimeWindow;
+      const isRecentlyStarted = event.timestamp >= recentPastWindow && event.timestamp <= now;
+
+      if (isUpcoming || isRecentlyStarted) {
         const metadata = event.metadata as CalendarEventMetadata;
+        callbacks?.onProgress?.(
+          `Found meeting: ${event.title} at ${event.timestamp.toLocaleTimeString()}`
+        );
         return {
           id: event.externalId,
           title: event.title,
@@ -300,6 +330,9 @@ async function findNextMeeting(
       }
     }
 
+    callbacks?.onProgress?.(
+      `No meetings found. Searched ${result.items.length} events in calendar.`
+    );
     return null;
   } catch (error) {
     callbacks?.onProgress?.(`Error fetching calendar: ${error instanceof Error ? error.message : String(error)}`);

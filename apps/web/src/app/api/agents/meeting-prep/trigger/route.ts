@@ -40,7 +40,29 @@ export async function POST() {
       );
     }
 
-    const configData = agentConfig.config as MeetingPrepConfig;
+    // Transform UI config to orchestrator config format
+    // UI saves: prepTimingMinutes, lookbackDays, enabledSources (e.g., { slack: true, jira: false })
+    // Orchestrator expects: leadTimeMinutes, lookbackDays, includeSlack, includeJira, etc.
+    const savedConfig = agentConfig.config as Record<string, unknown>;
+    const enabledSources = (savedConfig.enabledSources || {}) as Record<string, boolean>;
+
+    const configData: MeetingPrepConfig = {
+      ...savedConfig,
+      // Map prepTimingMinutes (UI field name) to leadTimeMinutes (orchestrator field name)
+      leadTimeMinutes: typeof savedConfig.prepTimingMinutes === 'number'
+        ? savedConfig.prepTimingMinutes
+        : (typeof savedConfig.leadTimeMinutes === 'number' ? savedConfig.leadTimeMinutes : 240),
+      // Ensure lookbackDays has a default
+      lookbackDays: typeof savedConfig.lookbackDays === 'number' ? savedConfig.lookbackDays : 30,
+      // Map enabledSources to individual include* flags for the orchestrator
+      // The UI saves enabled state in enabledSources map, but orchestrator expects includeSlack etc.
+      includeSlack: enabledSources.slack === true,
+      includeJira: enabledSources.jira === true,
+      includeGong: enabledSources.gong === true,
+      includeConfluence: enabledSources.confluence === true,
+      filterDomains: Array.isArray(savedConfig.filterDomains) ? savedConfig.filterDomains as string[] : [],
+      includeAllExternalMeetings: savedConfig.includeAllExternalMeetings !== false,
+    } as MeetingPrepConfig;
 
     // Fetch all connector installs for this tenant
     const connectorInstalls = await prisma.connectorInstall.findMany({
@@ -128,8 +150,15 @@ export async function POST() {
 
     // Note: Gong is not included yet as GongFetcher doesn't exist
 
-    // Log which data sources are enabled in config vs which have credentials
-    console.log(`[Meeting Prep] Config data sources:`, {
+    // Log transformed config values including timing settings
+    console.log(`[Meeting Prep] Config timing (transformed from UI):`, {
+      leadTimeMinutes: configData.leadTimeMinutes,
+      lookbackDays: configData.lookbackDays,
+      originalPrepTimingMinutes: savedConfig.prepTimingMinutes,
+      originalLookbackDays: savedConfig.lookbackDays,
+    });
+    console.log(`[Meeting Prep] Config data sources (from enabledSources):`, {
+      enabledSources,
       includeSlack: configData.includeSlack,
       includeJira: configData.includeJira,
       includeConfluence: configData.includeConfluence,
