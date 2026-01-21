@@ -311,7 +311,7 @@ export default async function ResourcePageComponent({ params }: PageProps) {
                       from calls and tickets
                     </li>
                     <li>
-                      • <strong>VoC Clustering</strong>: Cluster feedback into actionable themes
+                      • <strong>Feature Intelligence</strong>: Cluster feedback into actionable themes
                       with evidence
                     </li>
                     <li>

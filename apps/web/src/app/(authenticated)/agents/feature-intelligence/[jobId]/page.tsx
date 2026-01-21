@@ -1,25 +1,32 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { MarkdownContent } from '@/components/markdown-content';
 import {
   ArrowLeft,
   CheckCircle2,
   Clock,
+  Database,
   Download,
   ExternalLink,
+  FileText,
   GitBranch,
+  Hash,
   Headphones,
+  HelpCircle,
   Loader2,
   MessageSquare,
+  Phone,
+  RefreshCw,
+  Shield,
   Ticket,
-  TrendingUp,
   XCircle,
+  type LucideIcon,
 } from 'lucide-react';
 
 interface DataSourceStat {
@@ -103,6 +110,15 @@ function StatusBadge({ status }: { status: string }) {
   }
 }
 
+// Map data source keys to icons
+const dataSourceIcons: Record<string, LucideIcon> = {
+  slack: MessageSquare,
+  zendesk: HelpCircle,
+  gong: Phone,
+  jira: FileText,
+  confluence: Database,
+};
+
 function SourceIcon({ type }: { type: string }) {
   switch (type) {
     case 'gong_call':
@@ -118,15 +134,17 @@ function SourceIcon({ type }: { type: string }) {
 
 export default function ClusterDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const jobId = params.jobId as string;
 
   const [cluster, setCluster] = useState<ClusterDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRerunning, setIsRerunning] = useState(false);
 
   useEffect(() => {
     async function fetchCluster() {
       try {
-        const res = await fetch(`/api/agents/voc-clustering/${jobId}`);
+        const res = await fetch(`/api/agents/feature-intelligence/${jobId}`);
         if (res.ok) {
           const data = await res.json();
           setCluster(data.cluster);
@@ -140,6 +158,25 @@ export default function ClusterDetailPage() {
     fetchCluster();
   }, [jobId]);
 
+  const handleRerun = async () => {
+    setIsRerunning(true);
+    try {
+      const res = await fetch('/api/agents/feature-intelligence/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cluster?.config || {}),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        window.location.href = `/agents/feature-intelligence/${data.jobId}`;
+      }
+    } catch (err) {
+      console.error('Failed to rerun:', err);
+    } finally {
+      setIsRerunning(false);
+    }
+  };
+
   const handleDownload = () => {
     if (!cluster?.artifact) return;
 
@@ -148,6 +185,82 @@ export default function ClusterDetailPage() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `${cluster.artifact.title.replace(/\s+/g, '-')}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSIEMExport = () => {
+    if (!cluster) return;
+
+    // Build dynamic data sources from the API response
+    const dataSources: Record<string, Record<string, number>> = {};
+    if (cluster.dataSourcesUsed) {
+      for (const ds of cluster.dataSourcesUsed) {
+        dataSources[ds.key] = {};
+        for (const stat of ds.stats) {
+          dataSources[ds.key][stat.label.toLowerCase().replace(/\s+/g, '_')] = stat.value;
+        }
+      }
+    }
+
+    // Create CEF-formatted SIEM event
+    const siemEvent = {
+      version: 'CEF:0',
+      deviceVendor: 'pmkit',
+      deviceProduct: 'agent-platform',
+      deviceVersion: '1.0.0',
+      signatureId: cluster.status === 'completed' ? 'PMKIT-JOB-002' : 'PMKIT-JOB-003',
+      name: cluster.status === 'completed' ? 'Job Completed' : 'Job Failed',
+      severity: cluster.status === 'completed' ? 1 : 6,
+      src: 'tenant',
+      act: cluster.status === 'completed' ? 'job.complete' : 'job.fail',
+      outcome: cluster.status === 'completed' ? 'success' : 'failure',
+      reason: cluster.error || undefined,
+      cs1: cluster.id,
+      cs1Label: 'runId',
+      cs3: 'feature_intelligence',
+      cs3Label: 'jobType',
+      cn1: cluster.result?.stats?.latencyMs,
+      cn1Label: 'latencyMs',
+      cn2: cluster.result?.stats?.tokensUsed,
+      cn2Label: 'tokenCount',
+      rt: cluster.startedAt ? new Date(cluster.startedAt).getTime() : Date.now(),
+      start: cluster.startedAt ? new Date(cluster.startedAt).getTime() : undefined,
+      end: cluster.completedAt ? new Date(cluster.completedAt).getTime() : undefined,
+      dataSources,
+      connectedSources: cluster.connectedSources || [],
+    };
+
+    // Format as CEF string
+    const cefHeader = `${siemEvent.version}|${siemEvent.deviceVendor}|${siemEvent.deviceProduct}|${siemEvent.deviceVersion}|${siemEvent.signatureId}|${siemEvent.name}|${siemEvent.severity}`;
+    const extensions = [
+      `src=${siemEvent.src}`,
+      `act=${siemEvent.act}`,
+      `outcome=${siemEvent.outcome}`,
+      siemEvent.reason ? `reason=${siemEvent.reason}` : null,
+      `cs1=${siemEvent.cs1} cs1Label=${siemEvent.cs1Label}`,
+      `cs3=${siemEvent.cs3} cs3Label=${siemEvent.cs3Label}`,
+      siemEvent.cn1 !== undefined ? `cn1=${siemEvent.cn1} cn1Label=${siemEvent.cn1Label}` : null,
+      siemEvent.cn2 !== undefined ? `cn2=${siemEvent.cn2} cn2Label=${siemEvent.cn2Label}` : null,
+      `rt=${siemEvent.rt}`,
+      siemEvent.start ? `start=${siemEvent.start}` : null,
+      siemEvent.end ? `end=${siemEvent.end}` : null,
+    ].filter(Boolean).join(' ');
+
+    const cefString = `${cefHeader}|${extensions}`;
+
+    const exportData = {
+      cef: cefString,
+      json: siemEvent,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `feature-intelligence-${cluster.id}-siem.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -170,10 +283,10 @@ export default function ClusterDetailPage() {
             <XCircle className="h-12 w-12 text-muted-foreground" />
             <h3 className="mt-4 font-medium">Analysis not found</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              This VoC clustering analysis could not be found.
+              This Feature Intelligence analysis could not be found.
             </p>
-            <Button className="mt-4" variant="outline" asChild>
-              <Link href="/agents/voc-clustering/history">Back to History</Link>
+            <Button className="mt-4" variant="outline" onClick={() => router.back()}>
+              Back to History
             </Button>
           </CardContent>
         </Card>
@@ -188,15 +301,13 @@ export default function ClusterDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/agents/voc-clustering/history">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-heading text-2xl font-bold">
-                VoC Clustering Analysis
+                Feature Intelligence Analysis
               </h1>
               <StatusBadge status={cluster.status} />
             </div>
@@ -208,9 +319,15 @@ export default function ClusterDetailPage() {
                 <span>
                   Generated on{' '}
                   {startDate.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
+                    weekday: 'long',
                     year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}{' '}
+                  at{' '}
+                  {startDate.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
                   })}
                 </span>
               )}
@@ -218,6 +335,20 @@ export default function ClusterDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          {cluster.status === 'failed' && (
+            <Button variant="outline" onClick={handleRerun} disabled={isRerunning}>
+              {isRerunning ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Re-run
+            </Button>
+          )}
+          <Button variant="outline" onClick={handleSIEMExport}>
+            <Shield className="mr-2 h-4 w-4" />
+            SIEM Export
+          </Button>
           {cluster.artifact && (
             <Button variant="outline" onClick={handleDownload}>
               <Download className="mr-2 h-4 w-4" />
@@ -234,9 +365,7 @@ export default function ClusterDetailPage() {
           {cluster.dataSourcesUsed && cluster.dataSourcesUsed.length > 0 && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {cluster.dataSourcesUsed.map((dataSource) => {
-                const Icon = dataSource.key === 'zendesk' ? Ticket :
-                            dataSource.key === 'slack' ? MessageSquare :
-                            dataSource.key === 'gong' ? Headphones : TrendingUp;
+                const Icon = dataSourceIcons[dataSource.key] || Hash;
                 return dataSource.stats.map((stat) => (
                   <Card key={`${dataSource.key}-${stat.label}`}>
                     <CardContent className="p-4">
@@ -256,29 +385,7 @@ export default function ClusterDetailPage() {
 
           {/* Processing Stats */}
           {cluster.result?.stats && (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="text-sm">Feedback Items</span>
-                  </div>
-                  <p className="mt-1 text-2xl font-bold">
-                    {cluster.result.stats.feedbackProcessed?.toLocaleString() || '-'}
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <GitBranch className="h-4 w-4" />
-                    <span className="text-sm">Clusters</span>
-                  </div>
-                  <p className="mt-1 text-2xl font-bold">
-                    {cluster.result.stats.clustersGenerated?.toLocaleString() || '-'}
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-muted-foreground">
@@ -295,7 +402,7 @@ export default function ClusterDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <TrendingUp className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                     <span className="text-sm">Tokens Used</span>
                   </div>
                   <p className="mt-1 text-2xl font-bold">
@@ -327,24 +434,7 @@ export default function ClusterDetailPage() {
       {cluster.artifact && (
         <Card>
           <CardContent className="p-6">
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: cluster.artifact.content
-                    .replace(/^# /gm, '<h1 class="text-xl font-bold mt-6 mb-3">')
-                    .replace(/^## /gm, '<h2 class="text-lg font-semibold mt-5 mb-2">')
-                    .replace(/^### /gm, '<h3 class="text-base font-medium mt-4 mb-2">')
-                    .replace(/\n/g, '<br>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(
-                      /\[(.*?)\]\((.*?)\)/g,
-                      '<a href="$2" class="text-cobalt-600 hover:underline" target="_blank">$1</a>'
-                    )
-                    .replace(/- /g, '&bull; '),
-                }}
-              />
-            </div>
+            <MarkdownContent content={cluster.artifact.content} />
           </CardContent>
         </Card>
       )}

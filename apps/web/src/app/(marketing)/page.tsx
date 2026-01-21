@@ -165,7 +165,7 @@ const intelligenceFramework = [
   {
     icon: Lightbulb,
     name: 'Feature Intelligence',
-    agent: 'VoC Clustering',
+    agent: 'Feature Intelligence',
     question: 'What should we build next?',
     description: 'Specific feature recommendations with quantified demand, competitive context, and internal alignment signals.',
     href: '/feature-intelligence',

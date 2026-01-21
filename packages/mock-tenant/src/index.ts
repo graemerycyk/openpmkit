@@ -159,8 +159,8 @@ export const DEMO_ARCS: DemoArc[] = [
     ],
   },
   {
-    id: 'arc-voc-clustering',
-    name: 'Voice of Customer Clustering',
+    id: 'arc-feature-intelligence',
+    name: 'Feature Intelligence',
     description:
       'Cluster customer feedback from support, community, and calls into actionable themes.',
     steps: [
@@ -168,21 +168,21 @@ export const DEMO_ARCS: DemoArc[] = [
         id: 'step-1',
         title: 'Collect feedback sources',
         description: 'Gather data from Zendesk, Gong, and Community',
-        jobType: 'voc_clustering',
+        jobType: 'feature_intelligence',
         config: { sources: ['zendesk', 'gong', 'community'] },
       },
       {
         id: 'step-2',
         title: 'Extract themes',
         description: 'Identify recurring patterns and pain points',
-        jobType: 'voc_clustering',
+        jobType: 'feature_intelligence',
         config: { step: 'extract' },
       },
       {
         id: 'step-3',
         title: 'Generate VoC report',
-        description: 'Create the themed VoC report with evidence',
-        jobType: 'voc_clustering',
+        description: 'Create the themed Feature Intelligence report with evidence',
+        jobType: 'feature_intelligence',
         config: { step: 'report' },
       },
     ],

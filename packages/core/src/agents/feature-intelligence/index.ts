@@ -1,12 +1,12 @@
 /**
- * VoC (Voice of Customer) Clustering Agent
+ * Feature Intelligence Agent
  *
  * Analyzes customer feedback from multiple sources to identify themes,
  * patterns, and actionable insights.
  */
 
 export {
-  executeVocClustering,
-  type VocClusteringContext,
-  type VocClusteringResult,
+  executeFeatureIntelligence,
+  type FeatureIntelligenceContext,
+  type FeatureIntelligenceResult,
 } from './orchestrator';

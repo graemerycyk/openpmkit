@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
 import {
-  executeVocClustering,
+  executeFeatureIntelligence,
   getLLMService,
-  type VocClusteringConfig,
+  type FeatureIntelligenceConfig,
   type ConnectorCredentialsMap,
 } from '@pmkit/core';
 
@@ -28,14 +28,14 @@ export async function POST() {
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
         },
       },
     });
 
     if (!agentConfig) {
       return NextResponse.json(
-        { error: 'VoC Clustering not configured. Please set up the agent first.' },
+        { error: 'Feature Intelligence not configured. Please set up the agent first.' },
         { status: 400 }
       );
     }
@@ -46,7 +46,7 @@ export async function POST() {
     const savedConfig = agentConfig.config as Record<string, unknown>;
     const enabledSources = (savedConfig.enabledSources || {}) as Record<string, boolean>;
 
-    const configData: VocClusteringConfig = {
+    const configData: FeatureIntelligenceConfig = {
       // Map timeframeDays (UI field name) to lookbackDays (orchestrator field name)
       lookbackDays: typeof savedConfig.timeframeDays === 'number'
         ? savedConfig.timeframeDays
@@ -60,7 +60,7 @@ export async function POST() {
       scheduleDay: typeof savedConfig.scheduleDay === 'string' ? savedConfig.scheduleDay : 'monday',
       scheduleTimeLocal: typeof savedConfig.scheduleTimeLocal === 'string' ? savedConfig.scheduleTimeLocal : '09:00',
       timezone: typeof savedConfig.timezone === 'string' ? savedConfig.timezone : 'America/New_York',
-    } as VocClusteringConfig;
+    } as FeatureIntelligenceConfig;
 
     // Fetch all connector installs for this tenant
     const connectorInstalls = await prisma.connectorInstall.findMany({
@@ -101,7 +101,7 @@ export async function POST() {
 
     const encryptionKey = process.env.CONNECTOR_ENCRYPTION_KEY;
     if (!encryptionKey) {
-      console.error('[VoC Clustering Trigger] Missing CONNECTOR_ENCRYPTION_KEY');
+      console.error('[Feature Intelligence Trigger] Missing CONNECTOR_ENCRYPTION_KEY');
       return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
     }
 
@@ -127,18 +127,18 @@ export async function POST() {
     // Note: Gong and Community are not included yet as their fetchers don't exist
 
     // Log transformed config values including timing settings
-    console.log(`[VoC Clustering] Config timing (transformed from UI):`, {
+    console.log(`[Feature Intelligence] Config timing (transformed from UI):`, {
       lookbackDays: configData.lookbackDays,
       originalTimeframeDays: savedConfig.timeframeDays,
     });
-    console.log(`[VoC Clustering] Config data sources (from enabledSources):`, {
+    console.log(`[Feature Intelligence] Config data sources (from enabledSources):`, {
       enabledSources,
       includeZendesk: configData.includeZendesk,
       includeSlack: configData.includeSlack,
       includeGong: configData.includeGong,
       includeCommunity: configData.includeCommunity,
     });
-    console.log(`[VoC Clustering] Connector credentials available:`, {
+    console.log(`[Feature Intelligence] Connector credentials available:`, {
       zendesk: !!credentials.zendesk,
       slack: !!credentials.slack,
     });
@@ -147,7 +147,7 @@ export async function POST() {
     const job = await prisma.job.create({
       data: {
         tenantId: user.tenantId,
-        type: 'voc_clustering',
+        type: 'feature_intelligence',
         status: 'running',
         triggeredBy: user.id,
         config: agentConfig.config as object,
@@ -164,7 +164,7 @@ export async function POST() {
         resourceType: 'job',
         resourceId: job.id,
         details: {
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
           trigger: 'manual',
           connectors: Object.keys(credentials),
           lookbackDays: configData.lookbackDays,
@@ -173,7 +173,7 @@ export async function POST() {
     });
 
     console.log(
-      `[VoC Clustering] Starting job ${job.id} for user ${user.id} with connectors: ${Object.keys(credentials).join(', ')}`
+      `[Feature Intelligence] Starting job ${job.id} for user ${user.id} with connectors: ${Object.keys(credentials).join(', ')}`
     );
 
     // Get LLM service
@@ -183,7 +183,7 @@ export async function POST() {
     const toolCallIds: string[] = [];
 
     try {
-      const result = await executeVocClustering(
+      const result = await executeFeatureIntelligence(
         {
           tenantId: user.tenantId,
           userId: user.id,
@@ -237,7 +237,7 @@ export async function POST() {
             }
           },
           onProgress: (step) => {
-            console.log(`[VoC Clustering ${job.id}] ${step}`);
+            console.log(`[Feature Intelligence ${job.id}] ${step}`);
           },
         }
       );
@@ -313,7 +313,7 @@ export async function POST() {
         },
       });
 
-      console.log(`[VoC Clustering] Job ${job.id} completed successfully`);
+      console.log(`[Feature Intelligence] Job ${job.id} completed successfully`);
 
       return NextResponse.json({
         success: true,
@@ -321,7 +321,7 @@ export async function POST() {
         stats: result.stats,
       });
     } catch (execError) {
-      console.error(`[VoC Clustering] Job ${job.id} failed:`, execError);
+      console.error(`[Feature Intelligence] Job ${job.id} failed:`, execError);
 
       // Update job as failed
       await prisma.job.update({
@@ -351,7 +351,7 @@ export async function POST() {
       );
     }
   } catch (error) {
-    console.error('[VoC Clustering Trigger] Error:', error);
+    console.error('[Feature Intelligence Trigger] Error:', error);
     return NextResponse.json({ error: 'Failed to trigger agent' }, { status: 500 });
   }
 }

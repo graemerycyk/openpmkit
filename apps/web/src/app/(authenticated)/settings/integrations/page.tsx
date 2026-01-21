@@ -30,6 +30,7 @@ import {
   Calendar,
   Palette,
   Play,
+  Video,
 } from 'lucide-react';
 
 type ConnectionStatus = 'connected' | 'not_connected' | 'coming_soon';
@@ -195,6 +196,14 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
     iconBg: 'bg-gray-100 text-gray-600',
     category: 'tools',
   },
+  {
+    id: 'zoom',
+    name: 'Zoom',
+    description: 'Video meetings and recordings',
+    icon: Video,
+    iconBg: 'bg-blue-100 text-blue-600',
+    category: 'tools',
+  },
   // AI Crawlers
   {
     id: 'social_crawler',
@@ -229,7 +238,7 @@ const integrationDefinitions: Omit<Integration, 'status' | 'workspaceName'>[] = 
 const oauthConnectors = ['slack', 'jira', 'confluence', 'gong', 'zendesk', 'gmail', 'google-drive', 'google-calendar'];
 
 // Connectors that are coming soon (no OAuth yet)
-const comingSoonConnectors = ['figma', 'loom', 'coda', 'linear', 'notion', 'amplitude', 'discourse'];
+const comingSoonConnectors = ['figma', 'loom', 'coda', 'linear', 'notion', 'amplitude', 'discourse', 'zoom'];
 
 function StatusBadge({ status, workspaceName }: { status: ConnectionStatus; workspaceName?: string }) {
   if (status === 'connected') {

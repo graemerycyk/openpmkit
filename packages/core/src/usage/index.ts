@@ -13,7 +13,7 @@ export const UsageEventTypeSchema = z.enum([
   // Job runs (all 10 job types)
   'job.run.daily_brief',
   'job.run.meeting_prep',
-  'job.run.voc_clustering',
+  'job.run.feature_intelligence',
   'job.run.competitor_research',
   'job.run.roadmap_alignment',
   'job.run.prd_draft',
@@ -322,7 +322,7 @@ export class UsageTracker {
       jobRuns: {
         daily_brief: 0,
         meeting_prep: 0,
-        voc_clustering: 0,
+        feature_intelligence: 0,
         competitor_research: 0,
         roadmap_alignment: 0,
         prd_draft: 0,
@@ -473,7 +473,7 @@ export class LimitsEnforcer {
       'sprint_review',
       'release_notes',
       'prototype_generation',
-      'voc_clustering',
+      'feature_intelligence',
       'competitor_research',
       'deck_content',
     ];
@@ -520,7 +520,7 @@ export class LimitsEnforcer {
       maxOnDemandSprintReviewPerMonth: number;
       maxOnDemandReleaseNotesPerMonth: number;
       maxOnDemandPrototypeGenPerMonth: number;
-      maxOnDemandVocClusteringPerMonth: number;
+      maxOnDemandFeatureIntelligencePerMonth: number;
       maxOnDemandCompetitorResearchPerMonth: number;
       maxOnDemandDeckContentPerMonth: number;
     }
@@ -559,8 +559,8 @@ export class LimitsEnforcer {
       case 'prototype_generation':
         limit = features.maxOnDemandPrototypeGenPerMonth;
         break;
-      case 'voc_clustering':
-        limit = features.maxOnDemandVocClusteringPerMonth;
+      case 'feature_intelligence':
+        limit = features.maxOnDemandFeatureIntelligencePerMonth;
         break;
       case 'competitor_research':
         limit = features.maxOnDemandCompetitorResearchPerMonth;

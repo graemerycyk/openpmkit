@@ -46,7 +46,7 @@ const AGENTS: AgentInfo[] = [
   // Available agents (first 3)
   { id: 'daily_brief', title: 'Daily Brief', href: '/agents/daily-brief', isAvailable: true },
   { id: 'meeting_prep', title: 'Meeting Prep', href: '/agents/meeting-prep', isAvailable: true },
-  { id: 'voc_clustering', title: 'VoC Clustering', href: '/agents/voc-clustering', isAvailable: true },
+  { id: 'feature_intelligence', title: 'Feature Intelligence', href: '/agents/feature-intelligence', isAvailable: true },
   // Coming soon agents (admins can still access for testing)
   { id: 'sprint_review', title: 'Sprint Review', href: '/agents/sprint-review', isAvailable: false },
   { id: 'competitor_research', title: 'Competitor Research', href: '/agents/competitor-research', isAvailable: false },
@@ -62,7 +62,7 @@ const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; href: s
   daily_brief: { name: 'Daily Brief', icon: Zap, href: '/agents/daily-brief' },
   meeting_prep: { name: 'Meeting Prep', icon: Users, href: '/agents/meeting-prep' },
   sprint_review: { name: 'Sprint Review', icon: Calendar, href: '/agents/sprint-review' },
-  voc_clustering: { name: 'VoC Clustering', icon: BarChart3, href: '/agents/voc-clustering' },
+  feature_intelligence: { name: 'Feature Intelligence', icon: BarChart3, href: '/agents/feature-intelligence' },
   competitor_research: { name: 'Competitor Research', icon: Search, href: '/agents/competitor-research' },
   roadmap_alignment: { name: 'Roadmap Alignment', icon: Target, href: '/agents/roadmap-alignment' },
   prd_draft: { name: 'PRD Draft', icon: FileText, href: '/agents/prd-draft' },

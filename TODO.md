@@ -1087,6 +1087,51 @@ Items where documentation claims features that aren't fully implemented.
 | ~~Agent scheduler not syncing on config changes~~ | ✅ Fixed | Web app now notifies worker via BullMQ command queue |
 | ~~Data sources settings not persisting~~ | ✅ Fixed | Enabled state now restored from saved config on page load |
 
+### Scheduler Debugging Guide
+
+If scheduled agents (Daily Brief, Feature Intelligence, Meeting Prep) are not running:
+
+**1. Check if Redis is running**
+```bash
+# If using Docker:
+docker ps | grep redis
+# Or start Redis:
+npm run docker:up
+# Or if standalone:
+redis-server
+```
+
+**2. Check if the Worker is running**
+```bash
+# In a separate terminal:
+cd apps/worker
+npm run dev
+# Or for production:
+npm run start
+```
+
+**3. Verify scheduled jobs in Redis**
+```bash
+# Connect to Redis CLI
+redis-cli
+# Check for delayed jobs
+LRANGE bull:pmkit-agents:delayed 0 -1
+```
+
+**4. Check worker logs for scheduling output**
+- Look for `[Scheduler] Scheduled daily brief` or `[Scheduler] Scheduled feature intelligence` logs
+- If you see `[Worker] Redis not available, running in inline mode`, Redis is not connected
+
+**5. After saving agent config, check for reload commands**
+- Look for `[SchedulerClient] Sent reload command for {configId}` in web app logs
+- Look for `[Scheduler] Processing command: reload` in worker logs
+
+**Requirements for scheduled agents to work**:
+1. Redis must be running (either via Docker or standalone)
+2. Worker process must be running (`npm run dev` in `apps/worker`)
+3. Agent must be set to "Active" status
+4. For Daily Brief: at least one primary data source (Slack or Gmail) must be connected
+
 ---
 
 ## 💡 Ideas & Future Considerations
@@ -1241,7 +1286,7 @@ High-value workflows that could differentiate from current offerings:
 
 ### 2026-01-18 (Autonomous Agent Architecture)
 - **Extended AgentTypeSchema** - Added all 10 agent types to core types:
-  - `daily_brief`, `meeting_prep`, `sprint_review`, `voc_clustering`, `competitor_research`
+  - `daily_brief`, `meeting_prep`, `sprint_review`, `feature_intelligence`, `competitor_research`
   - `roadmap_alignment`, `deck_content`, `release_notes`, `prd_draft`, `prototype_generation`
 - **Added AgentTriggerTypeSchema** - New trigger types for autonomous agents:
   - `schedule` - Daily/weekly/monthly schedules (Daily Brief)
@@ -1251,7 +1296,7 @@ High-value workflows that could differentiate from current offerings:
 - **Config schemas for all agents** - Created typed config schemas:
   - `MeetingPrepConfigSchema` - Lead time, timezone, data sources
   - `SprintReviewConfigSchema` - Calendar keywords, lead time, Jira projects, velocity/carryover options
-  - `VocClusteringConfigSchema` - Weekly schedule, lookback days, data sources
+  - `FeatureIntelligenceConfigSchema` - Weekly schedule, lookback days, data sources
   - `CompetitorResearchConfigSchema` - Weekly schedule, competitor list, tracking options
   - `RoadmapAlignmentConfigSchema` - Monthly schedule, data sources
   - `DeckContentConfigSchema` - Calendar keywords for presentations, lead time
@@ -1405,7 +1450,7 @@ High-value workflows that could differentiate from current offerings:
 ### 2026-01-13
 - **Added pmkit-prompts MCP Server** - Standalone MCP server exposing all 13 PM workflows as tools for the Claude app
   - Created `packages/mcp-servers/src/pmkit-prompts/` with server implementation
-  - All 13 workflows available: daily_brief, meeting_prep, voc_clustering, competitor_research, roadmap_alignment, prd_draft, sprint_review, prototype_generation, release_notes, deck_content, feature_ideation, one_pager, tldr
+  - All 13 workflows available: daily_brief, meeting_prep, feature_intelligence, competitor_research, roadmap_alignment, prd_draft, sprint_review, prototype_generation, release_notes, deck_content, feature_ideation, one_pager, tldr
   - Comprehensive README.md with setup instructions, usage examples, and troubleshooting
   - QUICKSTART.md for 5-minute setup
   - Standalone server executable with environment configuration

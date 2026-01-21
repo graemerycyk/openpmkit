@@ -53,7 +53,7 @@ You should see a table of all 10 PM workflows.
 |---------|------|--------------|
 | `/brief` | Daily Brief | Morning brief from Slack, Jira, support, community |
 | `/meeting` | Meeting Prep | Customer meeting prep pack |
-| `/voc` | VoC Clustering | Customer feedback theme analysis |
+| `/voc` | Feature Intelligence | Customer feedback theme analysis |
 | `/competitor` | Competitor Research | Competitor intel report |
 | `/roadmap` | Roadmap Alignment | Decision memo with options |
 | `/prd` | PRD Draft | Evidence-based PRD |
@@ -88,7 +88,7 @@ You should see a table of all 10 PM workflows.
 | `meetingDate` | | Meeting date |
 | `accountHealth` | | Account health metrics and notes |
 
-### `/voc` - VoC Clustering
+### `/voc` - Feature Intelligence
 | Input | Required | Description |
 |-------|----------|-------------|
 | `supportTickets` | ✅ | Support ticket feedback |

@@ -47,8 +47,8 @@ const features = [
   },
   {
     icon: Users,
-    title: 'VoC Clustering',
-    description: 'Combine call insights with support tickets and Slack for comprehensive VoC reports.',
+    title: 'Feature Intelligence',
+    description: 'Combine call insights with support tickets and Slack for comprehensive feature recommendations.',
   },
   {
     icon: Phone,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -55,7 +56,7 @@ const OUTPUT_PREVIEW = [
   'Actionable recommendations with effort estimates',
 ];
 
-interface VoCConfig extends Record<string, unknown> {
+interface FeatureIntelligenceFormConfig extends Record<string, unknown> {
   timeframeDays: number;
   clusterCount: number;
   minFeedbackCount: number;
@@ -63,8 +64,8 @@ interface VoCConfig extends Record<string, unknown> {
   connectorConfigs?: object;
 }
 
-export default function VoCClusteringPage() {
-  const { currentUsage } = useUsage('voc_clustering');
+export default function FeatureIntelligencePage() {
+  const { currentUsage } = useUsage('feature_intelligence');
 
   // Agent config hook
   const {
@@ -84,8 +85,8 @@ export default function VoCClusteringPage() {
     isAdmin,
     handleSave,
     handleTrigger,
-  } = useAgentConfig<VoCConfig>({
-    apiEndpoint: '/api/agents/voc-clustering',
+  } = useAgentConfig<FeatureIntelligenceFormConfig>({
+    apiEndpoint: '/api/agents/feature-intelligence',
     suggestedConnectors: SUGGESTED_CONNECTORS,
     // No required connectors - any data source can be used
     requiredConnectors: [],
@@ -152,7 +153,7 @@ export default function VoCClusteringPage() {
     <AgentPageLayout
       title="Feature Intelligence Agent"
       description="Go beyond sentiment. Get specific feature recommendations with quantified demand, competitive context, and internal alignment signals."
-      status={config?.status === 'active' ? 'active' : config?.status === 'paused' ? 'paused' : 'coming-soon'}
+      status={config?.status === 'active' ? 'active' : 'paused'}
       isLoading={isLoading}
       error={error}
       success={success}
@@ -257,6 +258,13 @@ export default function VoCClusteringPage() {
       {config?.lastRunAt && (
         <p className="text-center text-sm text-muted-foreground">
           Last run: {new Date(config.lastRunAt).toLocaleString()}
+          {' · '}
+          <Link
+            href="/agents/feature-intelligence/history"
+            className="text-cobalt-600 hover:underline"
+          >
+            View History
+          </Link>
         </p>
       )}
     </AgentPageLayout>

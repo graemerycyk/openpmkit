@@ -8,7 +8,7 @@ All 10 PM workflow prompts in one document. Use these prompts in ChatGPT, Claude
 
 1. [Daily Brief](#1-daily-brief)
 2. [Meeting Prep Pack](#2-meeting-prep-pack)
-3. [Voice of Customer (VoC) Clustering](#3-voice-of-customer-voc-clustering)
+3. [Feature Intelligence](#3-feature-intelligence)
 4. [Competitor Research Report](#4-competitor-research-report)
 5. [Roadmap Alignment Memo](#5-roadmap-alignment-memo)
 6. [PRD Draft](#6-prd-draft)
@@ -36,7 +36,7 @@ All 10 PM workflow prompts in one document. Use these prompts in ChatGPT, Claude
 | **Artifacts** | Output disappears after session | Stored, searchable, chainable |
 | **Traceability** | None | Full audit log of tool calls & sources |
 | **Proposals** | Just text output | Creates reviewable proposals for Jira/Confluence |
-| **Chaining** | Start fresh each time | VoC → PRD → Prototype in one flow |
+| **Chaining** | Start fresh each time | Feature Intelligence → PRD → Prototype in one flow |
 
 ---
 
@@ -153,7 +153,7 @@ Create a prep pack with:
 
 ---
 
-# 3. Voice of Customer (VoC) Clustering
+# 3. Feature Intelligence
 
 Cluster customer feedback into actionable themes.
 
@@ -192,7 +192,7 @@ Analyze customer feedback for {{tenantName}} and identify key themes.
 
 ## Output Format
 
-Create a VoC report with:
+Create a Feature Intelligence report with:
 1. **Executive Summary** - Top 3-5 themes with impact assessment
 2. **Theme Analysis** - For each theme:
    - Theme name and description
@@ -709,9 +709,9 @@ Tailor the tone, depth, and content focus based on the {{audienceType}} audience
 |---|--------|---------|------------|
 | 1 | Daily Brief | Morning synthesis of overnight activity | Slack, Jira, Support, Community |
 | 2 | Meeting Prep | Customer meeting preparation | Gong calls, Support tickets, Account health |
-| 3 | VoC Clustering | Cluster feedback into themes | Support, Gong, Community, NPS |
+| 3 | Feature Intelligence | Cluster feedback into themes | Support, Gong, Community, NPS |
 | 4 | Competitor Research | Track competitor changes | Competitor updates, Feature comparison |
-| 5 | Roadmap Alignment | Decision memo with options | Decision context, VoC, Analytics, Competitors |
+| 5 | Roadmap Alignment | Decision memo with options | Decision context, Feature Intelligence, Analytics, Competitors |
 | 6 | PRD Draft | Draft a PRD from evidence | Feature name, Customer evidence |
 | 7 | Sprint Review | Sprint summary for stakeholders | Completed stories, Sprint metrics |
 | 8 | Prototype Generation | HTML prototype from PRD | PRD content |

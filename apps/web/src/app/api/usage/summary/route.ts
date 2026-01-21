@@ -12,7 +12,7 @@ const JOB_TYPE_LIMITS: Record<string, { limitKey: string; displayName: string }>
   sprint_review: { limitKey: 'maxOnDemandSprintReviewPerMonth', displayName: 'Sprint Review' },
   release_notes: { limitKey: 'maxOnDemandReleaseNotesPerMonth', displayName: 'Release Notes' },
   prototype_generation: { limitKey: 'maxOnDemandPrototypeGenPerMonth', displayName: 'Prototype Generation' },
-  voc_clustering: { limitKey: 'maxOnDemandVocClusteringPerMonth', displayName: 'VoC Clustering' },
+  feature_intelligence: { limitKey: 'maxOnDemandFeatureIntelligencePerMonth', displayName: 'Feature Intelligence' },
   competitor_research: { limitKey: 'maxOnDemandCompetitorResearchPerMonth', displayName: 'Competitor Research' },
   deck_content: { limitKey: 'maxOnDemandDeckContentPerMonth', displayName: 'Deck Content' },
 };
@@ -26,7 +26,7 @@ const PLAN_LIMITS: Record<string, number> = {
   maxOnDemandSprintReviewPerMonth: 8,
   maxOnDemandReleaseNotesPerMonth: 16,
   maxOnDemandPrototypeGenPerMonth: 8,
-  maxOnDemandVocClusteringPerMonth: 4,
+  maxOnDemandFeatureIntelligencePerMonth: 4,
   maxOnDemandCompetitorResearchPerMonth: 4,
   maxOnDemandDeckContentPerMonth: 12,
 };

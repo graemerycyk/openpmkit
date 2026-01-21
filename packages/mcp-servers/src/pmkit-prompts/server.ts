@@ -97,8 +97,8 @@ async function main() {
         required: ['accountName', 'gongCalls', 'supportTickets'],
       },
     },
-    run_voc_clustering: {
-      name: 'run_voc_clustering',
+    run_feature_intelligence: {
+      name: 'run_feature_intelligence',
       description: 'Cluster customer feedback into actionable themes from support tickets, Gong insights, community posts, and NPS',
       inputSchema: {
         type: 'object',
@@ -252,7 +252,7 @@ async function main() {
     const jobTypeMap: Record<string, JobType> = {
       run_daily_brief: 'daily_brief',
       run_meeting_prep: 'meeting_prep',
-      run_voc_clustering: 'voc_clustering',
+      run_feature_intelligence: 'feature_intelligence',
       run_competitor_research: 'competitor_research',
       run_roadmap_alignment: 'roadmap_alignment',
       run_prd_draft: 'prd_draft',

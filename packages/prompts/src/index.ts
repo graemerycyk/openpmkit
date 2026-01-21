@@ -119,11 +119,11 @@ Create a prep pack with:
     requiredContext: ['accountName', 'gongCalls', 'supportTickets'],
   },
 
-  voc_clustering: {
-    id: 'voc-clustering-v1',
-    name: 'Voice of Customer Clustering',
+  feature_intelligence: {
+    id: 'feature-intelligence-v1',
+    name: 'Feature Intelligence',
     description: 'Cluster customer feedback into actionable themes',
-    jobType: 'voc_clustering',
+    jobType: 'feature_intelligence',
     systemPrompt: `You are a product management assistant specializing in voice of customer analysis.
 Your job is to identify patterns in customer feedback and cluster them into actionable themes.
 
@@ -626,8 +626,8 @@ export function generateStubResponse(
       return generateDailyBriefStub(context, date);
     case 'meeting_prep':
       return generateMeetingPrepStub(context, date);
-    case 'voc_clustering':
-      return generateVocClusteringStub(context, date);
+    case 'feature_intelligence':
+      return generateFeatureIntelligenceStub(context, date);
     case 'competitor_research':
       return generateCompetitorResearchStub(context, date);
     case 'roadmap_alignment':
@@ -769,7 +769,7 @@ function generateMeetingPrepStub(context: PromptContext, date: string): string {
 - 🎯 API integration could drive stickiness`;
 }
 
-function generateVocClusteringStub(context: PromptContext, date: string): string {
+function generateFeatureIntelligenceStub(context: PromptContext, date: string): string {
   return `# Voice of Customer Report
 
 **Period**: Last 30 days
@@ -2058,7 +2058,7 @@ export function createStubGenerator(): (messages: LLMMessage[]) => string {
     } else if (systemPrompt.includes('meeting prep') || systemPrompt.includes('customer meetings')) {
       return generateStubResponse('meeting_prep', context);
     } else if (systemPrompt.includes('voice of customer') || systemPrompt.includes('VoC')) {
-      return generateStubResponse('voc_clustering', context);
+      return generateStubResponse('feature_intelligence', context);
     } else if (systemPrompt.includes('competitor') || systemPrompt.includes('competitive')) {
       return generateStubResponse('competitor_research', context);
     } else if (systemPrompt.includes('roadmap') || systemPrompt.includes('alignment')) {

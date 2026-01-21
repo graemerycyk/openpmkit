@@ -34,7 +34,7 @@ const footerLinks = {
     { name: 'Cross-Team Dependencies', href: '/resources/ai-for-cross-team-dependencies' },
   ],
   voc: [
-    { name: 'VoC Clustering', href: '/resources/voice-of-customer-clustering' },
+    { name: 'Feature Intelligence', href: '/resources/voice-of-customer-clustering' },
     { name: 'Competitor Research', href: '/resources/competitor-research' },
     { name: 'Social Crawler', href: '/resources/social-crawler-integration' },
     { name: 'Web Search', href: '/resources/web-search-integration' },

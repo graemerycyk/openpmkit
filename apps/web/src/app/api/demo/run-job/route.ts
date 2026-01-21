@@ -9,7 +9,7 @@ import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 const JOB_MAX_TOKENS: Record<JobType, number> = {
   daily_brief: 12288,
   meeting_prep: 12288,
-  voc_clustering: 12288,
+  feature_intelligence: 12288,
   competitor_research: 12288,
   roadmap_alignment: 12288,
   prd_draft: 12288,
@@ -255,7 +255,7 @@ function buildJobContext(jobType: JobType): PromptContext {
         `.trim(),
       };
 
-    case 'voc_clustering':
+    case 'feature_intelligence':
       return {
         ...baseContext,
         supportTickets: MOCK_CONNECTOR_DATA.zendesk.tickets,

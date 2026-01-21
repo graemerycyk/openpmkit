@@ -176,7 +176,7 @@ const JOB_TYPES: JobType[] = [
   'daily_brief',
   'meeting_prep',
   'prd_draft',
-  'voc_clustering',
+  'feature_intelligence',
   'competitor_research',
   'roadmap_alignment',
   'sprint_review',

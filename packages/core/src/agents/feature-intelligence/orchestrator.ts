@@ -1,4 +1,4 @@
-import type { VocClusteringConfig } from '../../types';
+import type { FeatureIntelligenceConfig } from '../../types';
 import type { AuditLogger } from '../../audit';
 import type { ConnectorSourceType, FetchedItem } from '../../fetchers/types';
 import {
@@ -13,16 +13,16 @@ import { SlackFormatter } from '../../citations/formatters/slack-formatter';
 // Context Types
 // ============================================================================
 
-export interface VocClusteringContext {
+export interface FeatureIntelligenceContext {
   tenantId: string;
   userId: string;
   jobId: string;
-  config: VocClusteringConfig;
+  config: FeatureIntelligenceConfig;
   credentials: ConnectorCredentialsMap;
   auditLogger?: AuditLogger;
 }
 
-export interface VocClusteringResult {
+export interface FeatureIntelligenceResult {
   content: string;
   sources: Array<{
     tenantId: string;
@@ -71,36 +71,36 @@ interface LLMService {
 }
 
 // ============================================================================
-// VoC Clustering Orchestrator
+// Feature Intelligence Orchestrator
 // ============================================================================
 
 /**
- * Orchestrator for the VoC (Voice of Customer) Clustering agent
+ * Orchestrator for the Feature Intelligence agent
  *
  * Execution flow:
  * 1. Build fetcher config based on enabled sources and lookback period
  * 2. Fetch feedback from connected sources (Zendesk, Slack)
  * 3. Set up citation tracker with formatters
  * 4. Build prompt context with all feedback data
- * 5. Call LLM with voc_clustering prompt template
+ * 5. Call LLM with feature_intelligence prompt template
  * 6. Return structured result with citations and theme analysis
  */
-export async function executeVocClustering(
-  context: VocClusteringContext,
+export async function executeFeatureIntelligence(
+  context: FeatureIntelligenceContext,
   llmService: LLMService,
   callbacks?: OrchestratorCallbacks
-): Promise<VocClusteringResult> {
+): Promise<FeatureIntelligenceResult> {
   const startTime = Date.now();
   const { config, credentials, tenantId, jobId, auditLogger } = context;
 
   try {
-    callbacks?.onProgress?.('Starting VoC Clustering analysis');
+    callbacks?.onProgress?.('Starting Feature Intelligence analysis');
 
     // Audit: Job started
     await auditLogger?.logJobStarted(tenantId, jobId);
 
     // Step 1: Build fetcher config based on what's connected and configured
-    const fetcherConfig = buildVocFetcherConfig(config, credentials);
+    const fetcherConfig = buildFeatureIntelligenceFetcherConfig(config, credentials);
     const lookbackHours = config.lookbackDays * 24;
 
     callbacks?.onProgress?.(`Analyzing feedback from the last ${config.lookbackDays} days...`);
@@ -116,7 +116,7 @@ export async function executeVocClustering(
     );
 
     if (multiSource.items.length === 0) {
-      const noDataResult: VocClusteringResult = {
+      const noDataResult: FeatureIntelligenceResult = {
         content: `# Voice of Customer Report
 
 ## No Feedback Data Available
@@ -189,7 +189,7 @@ ${multiSource.availableConnectors.length > 0 ? multiSource.availableConnectors.m
     // Generate source records for database
     const sourceRecords = citationTracker.generateSourceRecords(tenantId);
 
-    callbacks?.onProgress?.('VoC Clustering analysis complete');
+    callbacks?.onProgress?.('Feature Intelligence analysis complete');
 
     const totalLatency = Date.now() - startTime;
 
@@ -220,8 +220,8 @@ ${multiSource.availableConnectors.length > 0 ? multiSource.availableConnectors.m
 // Fetcher Config Builder
 // ============================================================================
 
-function buildVocFetcherConfig(
-  config: VocClusteringConfig,
+function buildFeatureIntelligenceFetcherConfig(
+  config: FeatureIntelligenceConfig,
   credentials: ConnectorCredentialsMap
 ): FetcherConfig {
   const fetcherConfig: FetcherConfig = {};
@@ -255,7 +255,7 @@ function buildVocFetcherConfig(
 // Prompt Building Helpers
 // ============================================================================
 
-function buildSystemPrompt(config: VocClusteringConfig, connectors: string[]): string {
+function buildSystemPrompt(config: FeatureIntelligenceConfig, connectors: string[]): string {
   const sources: string[] = [];
   if (connectors.includes('zendesk')) sources.push('support tickets');
   if (connectors.includes('slack')) sources.push('Slack conversations');
@@ -283,7 +283,7 @@ Guidelines:
 Format your response as a well-structured markdown report.`;
 }
 
-function buildUserPrompt(config: VocClusteringConfig, context: string, totalItems: number): string {
+function buildUserPrompt(config: FeatureIntelligenceConfig, context: string, totalItems: number): string {
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -349,7 +349,7 @@ interface MultiSourceContextType {
 function buildPromptContext(
   multiSource: MultiSourceContextType,
   citationTracker: CitationTracker,
-  _config: VocClusteringConfig
+  _config: FeatureIntelligenceConfig
 ): string {
   const sections: string[] = [];
 

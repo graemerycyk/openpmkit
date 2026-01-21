@@ -27,7 +27,7 @@ export async function GET(
       where: {
         id: jobId,
         tenantId: user.tenantId,
-        type: 'voc_clustering',
+        type: 'feature_intelligence',
       },
       include: {
         artifacts: {
@@ -65,7 +65,7 @@ export async function GET(
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
         },
       },
     });
@@ -155,7 +155,7 @@ export async function GET(
 
     return NextResponse.json({ cluster });
   } catch (error) {
-    console.error('[VoC Clustering Detail] Error:', error);
+    console.error('[Feature Intelligence Detail] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch cluster' }, { status: 500 });
   }
 }

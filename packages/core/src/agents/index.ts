@@ -4,8 +4,8 @@ export * from './daily-brief';
 // Meeting Prep Agent
 export * from './meeting-prep';
 
-// VoC Clustering Agent
-export * from './voc-clustering';
+// Feature Intelligence Agent
+export * from './feature-intelligence';
 
 // Shared Agent Types and Utilities
 export * from './shared';

@@ -137,6 +137,15 @@ const integrations = [
     status: 'coming-soon',
     category: 'dev',
   },
+  {
+    slug: 'zoom',
+    name: 'Zoom',
+    tagline: 'Video meetings and recordings',
+    description: 'Extract insights from meeting recordings and transcripts for briefs and PRDs.',
+    icon: Video,
+    status: 'coming-soon',
+    category: 'communication',
+  },
 ];
 
 const crawlers = [

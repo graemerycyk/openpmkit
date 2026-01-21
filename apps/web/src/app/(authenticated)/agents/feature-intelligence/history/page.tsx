@@ -84,7 +84,7 @@ function ClusterCard({ job }: { job: ClusterJob }) {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-medium">
-                  VoC Clustering
+                  Feature Intelligence
                   {job.config?.timeframeDays && (
                     <span className="text-muted-foreground">
                       {' '}
@@ -123,7 +123,7 @@ function ClusterCard({ job }: { job: ClusterJob }) {
             </div>
           </div>
           <Button variant="ghost" size="sm" asChild>
-            <Link href={`/agents/voc-clustering/${job.id}`}>
+            <Link href={`/agents/feature-intelligence/${job.id}`}>
               View
               <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
@@ -141,7 +141,7 @@ export default function ClusterHistoryPage() {
   useEffect(() => {
     async function fetchHistory() {
       try {
-        const res = await fetch('/api/agents/voc-clustering/history');
+        const res = await fetch('/api/agents/feature-intelligence/history');
         if (res.ok) {
           const data = await res.json();
           setJobs(data.jobs || []);
@@ -162,11 +162,11 @@ export default function ClusterHistoryPage() {
         <div>
           <h1 className="font-heading text-2xl font-bold">Clustering History</h1>
           <p className="text-muted-foreground">
-            View your past VoC clustering analyses
+            View your past Feature Intelligence analyses
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/agents/voc-clustering">Back to Agent</Link>
+          <Link href="/agents/feature-intelligence">Back to Agent</Link>
         </Button>
       </div>
 
@@ -181,10 +181,10 @@ export default function ClusterHistoryPage() {
             <GitBranch className="h-12 w-12 text-muted-foreground" />
             <h3 className="mt-4 font-medium">No analyses yet</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Your VoC clustering results will appear here.
+              Your Feature Intelligence results will appear here.
             </p>
             <Button className="mt-4" asChild>
-              <Link href="/agents/voc-clustering">Run Clustering</Link>
+              <Link href="/agents/feature-intelligence">Run Clustering</Link>
             </Button>
           </CardContent>
         </Card>

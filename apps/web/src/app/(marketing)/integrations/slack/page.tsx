@@ -63,7 +63,7 @@ const useCases = [
     description: 'Start your day with a synthesized summary of what happened overnight in key Slack channels.',
   },
   {
-    title: 'VoC Clustering',
+    title: 'Feature Intelligence',
     description: 'Customer feedback shared in Slack gets clustered into themes with citations.',
   },
   {

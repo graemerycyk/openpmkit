@@ -67,8 +67,8 @@ Gong: Last call discussed search frustrations, expansion blocked
 Support: 2 open tickets - dashboard loading, search relevance
 Health: 72/100, at risk due to search issues`,
   },
-  voc_clustering: {
-    name: 'VoC Clustering',
+  feature_intelligence: {
+    name: 'Feature Intelligence',
     command: '/voc',
     description: 'Cluster customer feedback into actionable themes from support tickets, Gong insights, community posts, and NPS',
     shortDescription: 'Customer feedback theme analysis',

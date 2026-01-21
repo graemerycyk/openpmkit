@@ -39,7 +39,7 @@ export type User = z.infer<typeof UserSchema>;
 export const JobTypeSchema = z.enum([
   'daily_brief',
   'meeting_prep',
-  'voc_clustering',
+  'feature_intelligence',
   'competitor_research',
   'roadmap_alignment',
   'prd_draft',
@@ -84,7 +84,7 @@ export const AgentTypeSchema = z.enum([
   'daily_brief',
   'meeting_prep',
   'sprint_review',
-  'voc_clustering',
+  'feature_intelligence',
   'competitor_research',
   'roadmap_alignment',
   'deck_content',
@@ -167,8 +167,8 @@ export const SprintReviewConfigSchema = z.object({
 });
 export type SprintReviewConfig = z.infer<typeof SprintReviewConfigSchema>;
 
-// VoC Clustering config (schedule-triggered)
-export const VocClusteringConfigSchema = z.object({
+// Feature Intelligence config (schedule-triggered)
+export const FeatureIntelligenceConfigSchema = z.object({
   scheduleDay: z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).default('monday'),
   scheduleTimeLocal: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Must be HH:MM format'),
   timezone: z.string(),
@@ -179,7 +179,7 @@ export const VocClusteringConfigSchema = z.object({
   includeSlack: z.boolean().default(false),
   includeCommunity: z.boolean().default(true),
 });
-export type VocClusteringConfig = z.infer<typeof VocClusteringConfigSchema>;
+export type FeatureIntelligenceConfig = z.infer<typeof FeatureIntelligenceConfigSchema>;
 
 // Competitor Research config (schedule-triggered)
 export const CompetitorResearchConfigSchema = z.object({
@@ -255,7 +255,7 @@ export const AgentConfigDataSchema = z.discriminatedUnion('agentType', [
   z.object({ agentType: z.literal('daily_brief'), ...DailyBriefConfigSchema.shape }),
   z.object({ agentType: z.literal('meeting_prep'), ...MeetingPrepConfigSchema.shape }),
   z.object({ agentType: z.literal('sprint_review'), ...SprintReviewConfigSchema.shape }),
-  z.object({ agentType: z.literal('voc_clustering'), ...VocClusteringConfigSchema.shape }),
+  z.object({ agentType: z.literal('feature_intelligence'), ...FeatureIntelligenceConfigSchema.shape }),
   z.object({ agentType: z.literal('competitor_research'), ...CompetitorResearchConfigSchema.shape }),
   z.object({ agentType: z.literal('roadmap_alignment'), ...RoadmapAlignmentConfigSchema.shape }),
   z.object({ agentType: z.literal('deck_content'), ...DeckContentConfigSchema.shape }),

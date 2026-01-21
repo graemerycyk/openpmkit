@@ -99,10 +99,10 @@ export class PmkitPromptsMCPServer extends BaseMCPServer {
     });
 
     // ========================================================================
-    // VoC Clustering Tool
+    // Feature Intelligence Tool
     // ========================================================================
     this.registerTool({
-      name: 'run_voc_clustering',
+      name: 'run_feature_intelligence',
       description: 'Cluster customer feedback into actionable themes from support tickets, Gong insights, community posts, and NPS',
       inputSchema: z.object({
         tenantName: z.string().optional().default('Your Company').describe('Company name'),
@@ -112,7 +112,7 @@ export class PmkitPromptsMCPServer extends BaseMCPServer {
         npsVerbatims: z.string().optional().describe('NPS survey responses'),
       }),
       outputSchema: z.object({
-        content: z.string().describe('Generated VoC clustering report in markdown'),
+        content: z.string().describe('Generated Feature Intelligence report in markdown'),
         usage: z.object({
           inputTokens: z.number(),
           outputTokens: z.number(),
@@ -120,7 +120,7 @@ export class PmkitPromptsMCPServer extends BaseMCPServer {
         }),
       }),
       execute: async (input, context) => {
-        return this.executeWorkflow('voc_clustering', input, context);
+        return this.executeWorkflow('feature_intelligence', input, context);
       },
     });
 

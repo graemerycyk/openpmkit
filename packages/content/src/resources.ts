@@ -273,7 +273,7 @@ export const resources: ResourcePage[] = [
     relatedPages: ['/demo', '/resources/gong-transcripts-to-product-insights', '/blog'],
     workedExample: {
       title: 'Quarterly VoC Report in 10 Minutes',
-      scenario: 'Before the quarterly planning session, the PM needs a comprehensive view of customer feedback. The VoC Clustering job analyzes 3 months of data.',
+      scenario: 'Before the quarterly planning session, the PM needs a comprehensive view of customer feedback. The Feature Intelligence job analyzes 3 months of data.',
       steps: [
         'Analyzes 156 support tickets from Zendesk',
         'Processes 89 Gong call transcripts for pain points and requests',
@@ -1562,7 +1562,7 @@ export const resources: ResourcePage[] = [
       steps: [
         'Connect Gong via OAuth in pmkit settings',
         'Configure which call types to analyze (sales, CS, onboarding)',
-        'Run the VoC Clustering job with Gong as a source',
+        'Run the Feature Intelligence job with Gong as a source',
         'pmkit extracts pain points, feature requests, and competitor mentions',
         'Review clustered themes with supporting call excerpts',
       ],
@@ -1614,7 +1614,7 @@ export const resources: ResourcePage[] = [
       steps: [
         'Connect Zendesk via OAuth in pmkit settings',
         'Configure which ticket views or tags to analyze',
-        'Run VoC Clustering with Zendesk as a source',
+        'Run Feature Intelligence with Zendesk as a source',
         'pmkit clusters tickets by theme and tracks trends over time',
         'Daily briefs highlight escalations and trending issues',
       ],
@@ -1718,7 +1718,7 @@ export const resources: ResourcePage[] = [
       steps: [
         'Connect Discourse via API key in pmkit settings',
         'Configure which categories to monitor (Feature Requests, Feedback)',
-        'Run VoC Clustering with Discourse as a source',
+        'Run Feature Intelligence with Discourse as a source',
         'pmkit clusters requests by theme and ranks by engagement',
         'Roadmap alignment memo includes community evidence',
       ],

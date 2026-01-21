@@ -8,7 +8,7 @@ Run pmkit workflows directly from Claude with natural language:
 
 - 📋 **Daily Brief** - Morning briefs from Slack, Jira, support, community
 - 🤝 **Meeting Prep** - Customer meeting prep with Gong insights
-- 💬 **VoC Clustering** - Customer feedback analysis and themes
+- 💬 **Feature Intelligence** - Customer feedback analysis and themes
 - 🔍 **Competitor Research** - Track competitor changes and strategy
 - 🗺️ **Roadmap Alignment** - Decision memos with options and trade-offs
 - 📝 **PRD Draft** - Evidence-based PRDs with requirements
@@ -114,7 +114,7 @@ Claude will call `run_prd_draft` and generate a complete PRD with requirements, 
 
 Claude will call `run_prototype_generation` and return a complete, interactive HTML prototype.
 
-### Example 4: VoC Clustering
+### Example 4: Feature Intelligence
 
 > "Analyze this customer feedback and identify themes:
 >
@@ -124,7 +124,7 @@ Claude will call `run_prototype_generation` and return a complete, interactive H
 >
 > Community: Top requests are dark mode, API docs, and Slack integration"
 
-Claude will call `run_voc_clustering` and generate a themed analysis with recommendations.
+Claude will call `run_feature_intelligence` and generate a themed analysis with recommendations.
 
 ## Available Tools
 
@@ -158,7 +158,7 @@ Prepare for customer meetings.
 
 **Output:** Markdown prep pack with account summary, history, insights, talking points, and risks/opportunities.
 
-### 3. run_voc_clustering
+### 3. run_feature_intelligence
 
 Cluster customer feedback into themes.
 
@@ -364,7 +364,7 @@ With GPT-5 Mini (default model):
 |----------|--------|--------------|
 | Daily Brief | ~10K | ~$0.02 |
 | Meeting Prep | ~10K | ~$0.02 |
-| VoC Clustering | ~12K | ~$0.025 |
+| Feature Intelligence | ~12K | ~$0.025 |
 | Competitor Research | ~12K | ~$0.025 |
 | Roadmap Alignment | ~12K | ~$0.025 |
 | PRD Draft | ~12K | ~$0.025 |

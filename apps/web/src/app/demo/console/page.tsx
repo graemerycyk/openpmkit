@@ -78,7 +78,7 @@ import {
 type JobType =
   | 'daily_brief'
   | 'meeting_prep'
-  | 'voc_clustering'
+  | 'feature_intelligence'
   | 'competitor_research'
   | 'roadmap_alignment'
   | 'prd_draft'
@@ -281,8 +281,8 @@ const jobConfigs: Record<
       { name: 'search_pages', server: 'confluence', input: { query: 'search', spaceKey: 'PROD' } },
     ],
   },
-  voc_clustering: {
-    name: 'VoC Clustering',
+  feature_intelligence: {
+    name: 'Feature Intelligence',
     description: 'Cluster customer feedback into themes',
     icon: BarChart3,
     sources: ['zendesk', 'gong', 'discourse', 'social_crawler'],
@@ -364,9 +364,9 @@ const jobTypeMap: Record<string, { type: JobType; name: string; icon: typeof Fil
   meeting_prep: { type: 'meeting_prep', name: 'Meeting Prep', icon: Users },
   meeting: { type: 'meeting_prep', name: 'Meeting Prep', icon: Users },
   prep: { type: 'meeting_prep', name: 'Meeting Prep', icon: Users },
-  voc: { type: 'voc_clustering', name: 'VoC Clustering', icon: BarChart3 },
-  voc_clustering: { type: 'voc_clustering', name: 'VoC Clustering', icon: BarChart3 },
-  themes: { type: 'voc_clustering', name: 'VoC Clustering', icon: BarChart3 },
+  voc: { type: 'feature_intelligence', name: 'Feature Intelligence', icon: BarChart3 },
+  feature_intelligence: { type: 'feature_intelligence', name: 'Feature Intelligence', icon: BarChart3 },
+  themes: { type: 'feature_intelligence', name: 'Feature Intelligence', icon: BarChart3 },
   competitor: { type: 'competitor_research', name: 'Competitor Research', icon: Target },
   competitor_research: { type: 'competitor_research', name: 'Competitor Research', icon: Target },
   research: { type: 'competitor_research', name: 'Competitor Research', icon: Target },
@@ -439,8 +439,8 @@ const workflowExamples: WorkflowExample[] = [
     },
   },
   {
-    jobType: 'voc_clustering',
-    jobName: 'VoC Clustering',
+    jobType: 'feature_intelligence',
+    jobName: 'Feature Intelligence',
     icon: BarChart3,
     commands: {
       slack: '/pmkit voc themes last 30 days',
@@ -641,7 +641,7 @@ function ConsolePageContent() {
   const [jobRuns, setJobRuns] = useState<Record<JobType, JobRun | null>>({
     daily_brief: null,
     meeting_prep: null,
-    voc_clustering: null,
+    feature_intelligence: null,
     competitor_research: null,
     roadmap_alignment: null,
     prd_draft: null,

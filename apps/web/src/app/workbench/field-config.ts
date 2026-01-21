@@ -151,7 +151,7 @@ DM from CEO: "Great progress on search. Let's discuss AI roadmap"`,
     },
   ],
 
-  voc_clustering: [
+  feature_intelligence: [
     {
       key: 'supportTickets',
       label: 'Support Tickets',
@@ -770,8 +770,8 @@ export const JOB_TYPE_INFO: Record<
     description: 'Prepare for customer meetings with context and talking points',
     icon: 'Users',
   },
-  voc_clustering: {
-    name: 'VoC Clustering',
+  feature_intelligence: {
+    name: 'Feature Intelligence',
     description: 'Cluster customer feedback into actionable themes',
     icon: 'BarChart3',
   },

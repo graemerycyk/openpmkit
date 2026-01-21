@@ -125,7 +125,7 @@ const intelligenceFramework = [
   },
   {
     name: 'Feature Intelligence',
-    agent: 'VoC Clustering',
+    agent: 'Feature Intelligence',
     description: 'Know exactly what to build and why.',
     href: '/feature-intelligence',
     current: true,

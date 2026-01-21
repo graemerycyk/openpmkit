@@ -28,7 +28,7 @@ import {
 type JobType =
   | 'daily_brief'
   | 'meeting_prep'
-  | 'voc_clustering'
+  | 'feature_intelligence'
   | 'competitor_research'
   | 'roadmap_alignment'
   | 'prd_draft'
@@ -148,11 +148,11 @@ Create a prep pack with:
     requiredContext: ['accountName', 'gongCalls', 'supportTickets'],
   },
 
-  voc_clustering: {
-    id: 'voc-clustering-v1',
-    name: 'Voice of Customer Clustering',
+  feature_intelligence: {
+    id: 'feature-intelligence-v1',
+    name: 'Feature Intelligence',
     description: 'Cluster customer feedback into actionable themes',
-    jobType: 'voc_clustering',
+    jobType: 'feature_intelligence',
     systemPrompt: `You are a product management assistant specializing in voice of customer analysis.
 Your job is to identify patterns in customer feedback and cluster them into actionable themes.
 
@@ -895,8 +895,8 @@ Gong: Last call discussed search frustrations, expansion blocked
 Support: 2 open tickets - dashboard loading, search relevance
 Health: 72/100, at risk due to search issues`,
   },
-  voc_clustering: {
-    name: 'VoC Clustering',
+  feature_intelligence: {
+    name: 'Feature Intelligence',
     command: '/voc',
     description: 'Cluster customer feedback into actionable themes from support tickets, Gong insights, community posts, and NPS',
     shortDescription: 'Customer feedback theme analysis',

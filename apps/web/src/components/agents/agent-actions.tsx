@@ -15,6 +15,7 @@ const CONNECTOR_NAMES: Record<ConnectorKey, string> = {
   'google-drive': 'Google Drive',
   gmail: 'Gmail',
   figma: 'Figma',
+  zoom: 'Zoom',
 };
 
 interface AgentActionsProps {

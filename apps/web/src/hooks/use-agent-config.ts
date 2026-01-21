@@ -8,7 +8,7 @@ import {
 } from '@/components/agents/data-sources-card';
 
 // Connector key type
-export type ConnectorKey = 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma';
+export type ConnectorKey = 'slack' | 'jira' | 'confluence' | 'gong' | 'zendesk' | 'google-calendar' | 'google-drive' | 'gmail' | 'figma' | 'zoom';
 
 // Source status type used throughout agent pages
 export interface SourceStatus {

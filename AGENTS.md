@@ -218,7 +218,7 @@ enum JobStatus { Pending, Running, ... }
 
 ### Jobs
 
-- 10 job types: `daily_brief`, `meeting_prep`, `voc_clustering`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`, `release_notes`, `deck_content`
+- 10 job types: `daily_brief`, `meeting_prep`, `feature_intelligence`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`, `release_notes`, `deck_content`
 - Job handlers implement `JobHandler` interface
 - All jobs produce artifacts in markdown format
 - Jobs run via `JobRunner.runJob()` which creates a `JobContext`
@@ -1277,7 +1277,7 @@ Demo jobs have per-job-type token limits to balance output quality and cost:
 |----------|------------|-----------|
 | `daily_brief` | 12,288 | Standard markdown output |
 | `meeting_prep` | 12,288 | Standard markdown output |
-| `voc_clustering` | 12,288 | Standard markdown output |
+| `feature_intelligence` | 12,288 | Standard markdown output |
 | `competitor_research` | 12,288 | Standard markdown output |
 | `roadmap_alignment` | 12,288 | Standard markdown output |
 | `prd_draft` | 12,288 | Standard markdown output |

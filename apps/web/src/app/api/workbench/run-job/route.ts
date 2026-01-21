@@ -10,7 +10,7 @@ import { isAdminEmail } from '@/lib/admin';
 const JOB_MAX_TOKENS: Record<JobType, number> = {
   daily_brief: 12288,
   meeting_prep: 12288,
-  voc_clustering: 12288,
+  feature_intelligence: 12288,
   competitor_research: 12288,
   roadmap_alignment: 12288,
   prd_draft: 12288,

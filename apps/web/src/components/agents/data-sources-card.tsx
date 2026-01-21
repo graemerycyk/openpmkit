@@ -22,6 +22,7 @@ import {
   Star,
   Target,
   Ticket,
+  Video,
 } from 'lucide-react';
 
 // All available connectors with their metadata
@@ -70,6 +71,11 @@ const CONNECTORS = {
     name: 'Figma',
     description: 'Design files and components',
     icon: Palette,
+  },
+  zoom: {
+    name: 'Zoom',
+    description: 'Video meetings and recordings',
+    icon: Video,
   },
 };
 

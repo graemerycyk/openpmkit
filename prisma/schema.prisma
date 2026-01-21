@@ -398,7 +398,7 @@ model Job {
 enum JobType {
   daily_brief
   meeting_prep
-  voc_clustering
+  feature_intelligence
   competitor_research
   roadmap_alignment
   prd_draft

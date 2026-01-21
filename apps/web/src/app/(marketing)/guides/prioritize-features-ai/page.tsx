@@ -263,7 +263,7 @@ export default function PrioritizeFeaturesPage() {
       <section className="bg-cobalt-600 py-16 text-white md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">Try VoC Clustering</h2>
+            <h2 className="font-heading text-3xl font-bold">Try Feature Intelligence</h2>
             <p className="mt-4 text-cobalt-100">
               See how pmkit clusters customer feedback into prioritizable themes.
             </p>
@@ -275,7 +275,7 @@ export default function PrioritizeFeaturesPage() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="bg-white text-cobalt-600 border-white hover:bg-cobalt-50" asChild>
-                <Link href="/resources/voc-clustering">Learn About VoC</Link>
+                <Link href="/resources/feature-intelligence">Learn About Feature Intelligence</Link>
               </Button>
             </div>
           </div>

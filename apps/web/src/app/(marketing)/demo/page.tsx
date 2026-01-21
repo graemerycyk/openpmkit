@@ -44,8 +44,8 @@ const jobs = [
     sources: ['Slack', 'Jira', 'Zendesk', 'Discourse'],
   },
   {
-    id: 'voc_clustering',
-    name: 'VoC Clustering',
+    id: 'feature_intelligence',
+    name: 'Feature Intelligence',
     description: 'Cluster customer feedback into actionable themes with evidence.',
     icon: BarChart3,
     duration: '~45s',

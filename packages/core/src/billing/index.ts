@@ -70,7 +70,7 @@ export interface PlanFeatures {
   maxOnDemandSprintReviewPerMonth: number;
   maxOnDemandReleaseNotesPerMonth: number;
   maxOnDemandPrototypeGenPerMonth: number;
-  maxOnDemandVocClusteringPerMonth: number;
+  maxOnDemandFeatureIntelligencePerMonth: number;
   maxOnDemandCompetitorResearchPerMonth: number;
   maxOnDemandDeckContentPerMonth: number;
 
@@ -129,7 +129,7 @@ export const INDIVIDUAL_PLAN: PlanConfig = {
     maxOnDemandSprintReviewPerMonth: 8,
     maxOnDemandReleaseNotesPerMonth: 16,
     maxOnDemandPrototypeGenPerMonth: 8,
-    maxOnDemandVocClusteringPerMonth: 4,
+    maxOnDemandFeatureIntelligencePerMonth: 4,
     maxOnDemandCompetitorResearchPerMonth: 4,
     maxOnDemandDeckContentPerMonth: 12,
 
@@ -185,7 +185,7 @@ export const TEAMS_PLAN: PlanConfig = {
     maxOnDemandSprintReviewPerMonth: 8,
     maxOnDemandReleaseNotesPerMonth: 16,
     maxOnDemandPrototypeGenPerMonth: 8,
-    maxOnDemandVocClusteringPerMonth: 4,
+    maxOnDemandFeatureIntelligencePerMonth: 4,
     maxOnDemandCompetitorResearchPerMonth: 4,
     maxOnDemandDeckContentPerMonth: 12,
 
@@ -241,7 +241,7 @@ export const ENTERPRISE_PLAN: PlanConfig = {
     maxOnDemandSprintReviewPerMonth: 40,
     maxOnDemandReleaseNotesPerMonth: 80,
     maxOnDemandPrototypeGenPerMonth: 40,
-    maxOnDemandVocClusteringPerMonth: 20,
+    maxOnDemandFeatureIntelligencePerMonth: 20,
     maxOnDemandCompetitorResearchPerMonth: 20,
     maxOnDemandDeckContentPerMonth: 60,
 
@@ -299,7 +299,7 @@ export const INTERNAL_PLAN: PlanConfig = {
     maxOnDemandSprintReviewPerMonth: -1,
     maxOnDemandReleaseNotesPerMonth: -1,
     maxOnDemandPrototypeGenPerMonth: -1,
-    maxOnDemandVocClusteringPerMonth: -1,
+    maxOnDemandFeatureIntelligencePerMonth: -1,
     maxOnDemandCompetitorResearchPerMonth: -1,
     maxOnDemandDeckContentPerMonth: -1,
 
@@ -383,7 +383,7 @@ export const EntitlementKeySchema = z.enum([
   'jobs.maxOnDemandSprintReviewPerMonth',
   'jobs.maxOnDemandReleaseNotesPerMonth',
   'jobs.maxOnDemandPrototypeGenPerMonth',
-  'jobs.maxOnDemandVocClusteringPerMonth',
+  'jobs.maxOnDemandFeatureIntelligencePerMonth',
   'jobs.maxOnDemandCompetitorResearchPerMonth',
   'jobs.maxOnDemandDeckContentPerMonth',
   'jobs.maxConcurrentRunsPer10Seats',
@@ -505,7 +505,7 @@ export class EntitlementService {
     await this.store.upsert(tenantId, 'jobs.maxOnDemandSprintReviewPerMonth', features.maxOnDemandSprintReviewPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandReleaseNotesPerMonth', features.maxOnDemandReleaseNotesPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandPrototypeGenPerMonth', features.maxOnDemandPrototypeGenPerMonth);
-    await this.store.upsert(tenantId, 'jobs.maxOnDemandVocClusteringPerMonth', features.maxOnDemandVocClusteringPerMonth);
+    await this.store.upsert(tenantId, 'jobs.maxOnDemandFeatureIntelligencePerMonth', features.maxOnDemandFeatureIntelligencePerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandCompetitorResearchPerMonth', features.maxOnDemandCompetitorResearchPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxOnDemandDeckContentPerMonth', features.maxOnDemandDeckContentPerMonth);
     await this.store.upsert(tenantId, 'jobs.maxConcurrentRunsPer10Seats', features.maxConcurrentRunsPer10Seats);
@@ -546,8 +546,8 @@ export class EntitlementService {
         return features.maxOnDemandReleaseNotesPerMonth;
       case 'jobs.maxOnDemandPrototypeGenPerMonth':
         return features.maxOnDemandPrototypeGenPerMonth;
-      case 'jobs.maxOnDemandVocClusteringPerMonth':
-        return features.maxOnDemandVocClusteringPerMonth;
+      case 'jobs.maxOnDemandFeatureIntelligencePerMonth':
+        return features.maxOnDemandFeatureIntelligencePerMonth;
       case 'jobs.maxOnDemandCompetitorResearchPerMonth':
         return features.maxOnDemandCompetitorResearchPerMonth;
       case 'jobs.maxOnDemandDeckContentPerMonth':

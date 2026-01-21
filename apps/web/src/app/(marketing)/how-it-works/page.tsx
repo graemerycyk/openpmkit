@@ -245,7 +245,7 @@ export default function HowItWorksPage() {
                   <div className="mt-4 space-y-3">
                     {[
                       { name: 'Daily Brief', schedule: 'Every day at 8am', icon: FileText },
-                      { name: 'VoC Clustering', schedule: 'Every Monday', icon: BarChart3 },
+                      { name: 'Feature Intelligence', schedule: 'Every Monday', icon: BarChart3 },
                       { name: 'Competitor Research', schedule: 'Every Friday', icon: Eye },
                     ].map((job) => (
                       <div key={job.name} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
@@ -404,7 +404,7 @@ export default function HowItWorksPage() {
                 frequency: 'Automated',
               },
               {
-                name: 'VoC Clustering',
+                name: 'Feature Intelligence',
                 description: 'Cluster feedback from support, calls, and community into themes.',
                 frequency: 'Automated',
               },

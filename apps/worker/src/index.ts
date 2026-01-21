@@ -1,11 +1,13 @@
 import { Worker, Queue, Job } from 'bullmq';
 import { Redis } from 'ioredis';
 import { PrismaClient } from '@prisma/client';
-import { JobType, type DailyBriefConfig } from '@pmkit/core';
+import { JobType, type DailyBriefConfig, type FeatureIntelligenceConfig, type MeetingPrepConfig } from '@pmkit/core';
 import { createMockMCPClient, initializeMockData } from '@pmkit/mock-tenant';
 import { generateStubResponse, PROMPT_TEMPLATES } from '@pmkit/prompts';
 import { initializeScheduler, createAgentWorker } from './agent-scheduler';
 import { processDailyBriefJob } from './daily-brief-job';
+import { processFeatureIntelligenceJob } from './feature-intelligence-job';
+import { processMeetingPrepJob } from './meeting-prep-job';
 
 // ============================================================================
 // Configuration
@@ -198,20 +200,51 @@ async function startWorker(): Promise<void> {
     await scheduler.startCommandWorker();
     console.log('[Worker] Scheduler command worker started');
 
-    // Create agent worker
-    const agentWorker = await createAgentWorker(connection, processDailyBriefJob);
+    // Create agent worker with a dispatcher that routes to the correct processor
+    const agentJobDispatcher = async (job: Job) => {
+      const agentType = job.data.agentType;
+      if (agentType === 'daily_brief') {
+        await processDailyBriefJob(job);
+      } else if (agentType === 'feature_intelligence') {
+        await processFeatureIntelligenceJob(job);
+      } else if (agentType === 'meeting_prep') {
+        await processMeetingPrepJob(job);
+      } else {
+        console.warn(`[Worker] Unknown agent type: ${agentType}, skipping job ${job.id}`);
+      }
+    };
+    const agentWorker = await createAgentWorker(connection, agentJobDispatcher);
     console.log('[Worker] Agent worker started');
 
-    // Load and schedule all active daily brief configs
+    // Load and schedule all active agent configs
     const prisma = new PrismaClient();
-    const activeConfigs = await prisma.agentConfig.findMany({
+
+    // Load Daily Brief configs
+    const dailyBriefConfigs = await prisma.agentConfig.findMany({
       where: {
         status: 'active',
         agentType: 'daily_brief',
       },
     });
+    console.log(`[Worker] Found ${dailyBriefConfigs.length} active daily brief configs`);
 
-    console.log(`[Worker] Found ${activeConfigs.length} active daily brief configs`);
+    // Load Feature Intelligence configs
+    const featureIntelligenceConfigs = await prisma.agentConfig.findMany({
+      where: {
+        status: 'active',
+        agentType: 'feature_intelligence',
+      },
+    });
+    console.log(`[Worker] Found ${featureIntelligenceConfigs.length} active feature intelligence configs`);
+
+    // Load Meeting Prep configs
+    const meetingPrepConfigs = await prisma.agentConfig.findMany({
+      where: {
+        status: 'active',
+        agentType: 'meeting_prep',
+      },
+    });
+    console.log(`[Worker] Found ${meetingPrepConfigs.length} active meeting prep configs`);
 
     // First, check the current state of the queue
     const queue = scheduler.getQueue();
@@ -219,7 +252,8 @@ async function startWorker(): Promise<void> {
     const waitingJobs = await queue.getWaiting();
     console.log(`[Worker] Queue state: ${delayedJobs.length} delayed, ${waitingJobs.length} waiting`);
 
-    for (const config of activeConfigs) {
+    // Schedule Daily Brief configs
+    for (const config of dailyBriefConfigs) {
       // Check if there's already a valid job for this config in the queue
       const jobId = `daily-brief-${config.id}`;
       const existingJob = await queue.getJob(jobId);
@@ -231,7 +265,7 @@ async function startWorker(): Promise<void> {
 
         // If job is delayed and scheduled for the future, skip re-scheduling
         if (state === 'delayed' && scheduledAt && scheduledAt > new Date()) {
-          console.log(`[Worker] Config ${config.id} already has valid delayed job scheduled for ${scheduledAt.toISOString()}`);
+          console.log(`[Worker] Daily Brief ${config.id} already has valid delayed job scheduled for ${scheduledAt.toISOString()}`);
           continue;
         }
       }
@@ -239,6 +273,55 @@ async function startWorker(): Promise<void> {
       await scheduler.scheduleAgent({
         ...config,
         config: config.config as DailyBriefConfig,
+      });
+    }
+
+    // Schedule Feature Intelligence configs
+    for (const config of featureIntelligenceConfigs) {
+      // Check if there's already a valid job for this config in the queue
+      const jobId = `feature-intelligence-${config.id}`;
+      const existingJob = await queue.getJob(jobId);
+
+      if (existingJob) {
+        const state = await existingJob.getState();
+        const jobData = existingJob.data;
+        const scheduledAt = jobData?.scheduledAt ? new Date(jobData.scheduledAt) : null;
+
+        // If job is delayed and scheduled for the future, skip re-scheduling
+        if (state === 'delayed' && scheduledAt && scheduledAt > new Date()) {
+          console.log(`[Worker] Feature Intelligence ${config.id} already has valid delayed job scheduled for ${scheduledAt.toISOString()}`);
+          continue;
+        }
+      }
+
+      await scheduler.scheduleAgent({
+        ...config,
+        config: config.config as FeatureIntelligenceConfig,
+      });
+    }
+
+    // Schedule Meeting Prep configs (calendar polling)
+    for (const config of meetingPrepConfigs) {
+      // Check if there's already a valid job for this config in the queue
+      const jobId = `meeting-prep-${config.id}`;
+      const existingJob = await queue.getJob(jobId);
+
+      if (existingJob) {
+        const state = await existingJob.getState();
+        // Meeting Prep jobs run frequently, so we always reschedule unless currently active
+        if (state === 'active') {
+          console.log(`[Worker] Meeting Prep ${config.id} is currently active`);
+          continue;
+        }
+        // Remove delayed/waiting job and reschedule to ensure fresh timing
+        if (state === 'delayed' || state === 'waiting') {
+          await existingJob.remove();
+        }
+      }
+
+      await scheduler.scheduleAgent({
+        ...config,
+        config: config.config as MeetingPrepConfig,
       });
     }
 

@@ -4,9 +4,9 @@ import { prisma } from '@/lib/db';
 import { z } from 'zod';
 import { notifySchedulerToReload, notifySchedulerToCancel } from '@/lib/scheduler-client';
 
-// Schema matching what the VoC Clustering page sends
+// Schema matching what the Feature Intelligence page sends
 // This is more flexible than the core schema - we transform before saving
-const VocClusteringPageConfigSchema = z.object({
+const FeatureIntelligencePageConfigSchema = z.object({
   // UI uses timeframeDays, core expects lookbackDays
   timeframeDays: z.number().min(7).max(90).default(30),
   clusterCount: z.number().min(3).max(10).default(5),
@@ -21,7 +21,7 @@ const VocClusteringPageConfigSchema = z.object({
   timezone: z.string().optional(),
 });
 
-// GET - Fetch user's voc clustering config
+// GET - Fetch user's feature intelligence config
 export async function GET() {
   try {
     const session = await getServerSession();
@@ -41,7 +41,7 @@ export async function GET() {
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
         },
       },
     });
@@ -60,12 +60,12 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('[VoC Clustering Config] GET error:', error);
+    console.error('[Feature Intelligence Config] GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch config' }, { status: 500 });
   }
 }
 
-// POST - Create or update voc clustering config
+// POST - Create or update feature intelligence config
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
@@ -84,9 +84,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate config using page-specific schema
-    const parseResult = VocClusteringPageConfigSchema.safeParse(body.config);
+    const parseResult = FeatureIntelligencePageConfigSchema.safeParse(body.config);
     if (!parseResult.success) {
-      console.error('[VoC Clustering Config] Validation error:', parseResult.error.errors);
+      console.error('[Feature Intelligence Config] Validation error:', parseResult.error.errors);
       return NextResponse.json(
         { error: 'Invalid config', details: parseResult.error.errors },
         { status: 400 }
@@ -117,13 +117,13 @@ export async function POST(request: NextRequest) {
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
         },
       },
       create: {
         userId: user.id,
         tenantId: user.tenantId,
-        agentType: 'voc_clustering',
+        agentType: 'feature_intelligence',
         status: body.status || 'active',
         config: configData,
         nextRunAt,
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
         resourceType: 'agent_config',
         resourceId: config.id,
         details: {
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
           action: 'config_saved',
           scheduleDay: configData.scheduleDay,
           scheduleTime: configData.scheduleTimeLocal,
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
     });
 
     console.log(
-      `[VoC Clustering Config] Saved for user ${user.id}, next run at ${nextRunAt?.toISOString()}`
+      `[Feature Intelligence Config] Saved for user ${user.id}, next run at ${nextRunAt?.toISOString()}`
     );
 
     // Notify the worker scheduler to update the scheduled job
@@ -174,12 +174,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[VoC Clustering Config] POST error:', error);
+    console.error('[Feature Intelligence Config] POST error:', error);
     return NextResponse.json({ error: 'Failed to save config' }, { status: 500 });
   }
 }
 
-// DELETE - Remove voc clustering config
+// DELETE - Remove feature intelligence config
 export async function DELETE() {
   try {
     const session = await getServerSession();
@@ -200,7 +200,7 @@ export async function DELETE() {
       where: {
         userId_agentType: {
           userId: user.id,
-          agentType: 'voc_clustering',
+          agentType: 'feature_intelligence',
         },
       },
     });
@@ -208,7 +208,7 @@ export async function DELETE() {
     await prisma.agentConfig.deleteMany({
       where: {
         userId: user.id,
-        agentType: 'voc_clustering',
+        agentType: 'feature_intelligence',
       },
     });
 
@@ -217,11 +217,11 @@ export async function DELETE() {
       await notifySchedulerToCancel(existingConfig.id);
     }
 
-    console.log(`[VoC Clustering Config] Deleted for user ${user.id}`);
+    console.log(`[Feature Intelligence Config] Deleted for user ${user.id}`);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[VoC Clustering Config] DELETE error:', error);
+    console.error('[Feature Intelligence Config] DELETE error:', error);
     return NextResponse.json({ error: 'Failed to delete config' }, { status: 500 });
   }
 }

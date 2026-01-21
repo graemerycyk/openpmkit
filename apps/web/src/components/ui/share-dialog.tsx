@@ -118,7 +118,7 @@ interface ShareDialogProps {
 const JOB_TYPE_NAMES: Record<JobType, string> = {
   daily_brief: 'Daily Brief',
   meeting_prep: 'Meeting Prep',
-  voc_clustering: 'VoC Clustering',
+  feature_intelligence: 'Feature Intelligence',
   competitor_research: 'Competitor Research',
   roadmap_alignment: 'Roadmap Alignment',
   prd_draft: 'PRD Draft',
