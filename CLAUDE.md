@@ -13,6 +13,7 @@
 - Database and testing information
 - Frontend design system
 - AI Crawlers and LLM configuration
+- **Deployment infrastructure** (DigitalOcean App Platform)
 
 > **Model Reference**: See [OpenAI Models Documentation](https://platform.openai.com/docs/models) for full details on GPT-5 series capabilities.
 
@@ -77,6 +78,24 @@ npm run db:push       # Push schema to database
 | Demo Data | `packages/mock-tenant/src/data/` |
 | Admin Check | `apps/web/src/lib/admin.ts` |
 
+## Deployment Infrastructure
+
+**This project is deployed on DigitalOcean App Platform, NOT run locally in production.**
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| **pmkit** | Web Service | Next.js frontend |
+| **worker** | Worker | BullMQ job processor |
+| **pmkit-db-postgresql** | Managed DB | PostgreSQL 17 |
+| **pmkit-db-valkey** | Managed DB | Valkey 8 (Redis-compatible) |
+
+Key files:
+- `.do/app.yaml` - DigitalOcean App Platform spec
+- `docker/Dockerfile.worker` - Worker container
+- `docker/Dockerfile.web` - Web container
+
+See "Deployment Infrastructure" section in AGENTS.md for full details.
+
 ## Monorepo Structure
 
 ```
@@ -89,8 +108,8 @@ packages/
 └── content/       # Marketing content
 
 apps/
-├── web/           # Next.js 15 app
-└── worker/        # BullMQ job worker
+├── web/           # Next.js 15 app (deployed as web service)
+└── worker/        # BullMQ job worker (deployed as worker service)
 ```
 
 ## Connectors

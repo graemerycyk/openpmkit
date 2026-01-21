@@ -1326,6 +1326,89 @@ The Workbench (`/workbench`) allows admins to select between models:
 
 The model selector is in the job toolbar next to the "Run Job" button. All models use `OPENAI_API_KEY_DEMO`.
 
+## Deployment Infrastructure
+
+**IMPORTANT**: This project is deployed on DigitalOcean App Platform, NOT run locally in production.
+
+### DigitalOcean Components
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| **pmkit** | Web Service | Next.js frontend (`apps/web`) |
+| **worker** | Worker | BullMQ job processor (`apps/worker`) |
+| **pmkit-db-postgresql** | Managed Database | PostgreSQL 17 |
+| **pmkit-db-valkey** | Managed Database | Valkey 8 (Redis-compatible) |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `.do/app.yaml` | DigitalOcean App Platform spec |
+| `docker/Dockerfile.web` | Web service container |
+| `docker/Dockerfile.worker` | Worker service container |
+| `apps/web/Dockerfile` | Alternative web Dockerfile |
+
+### Environment Variables (DigitalOcean)
+
+The worker requires these environment variables set in DigitalOcean App Platform:
+
+| Variable | Source |
+|----------|--------|
+| `DATABASE_URL` | DigitalOcean PostgreSQL connection string |
+| `REDIS_URL` | DigitalOcean Valkey connection string (format: `rediss://default:PASSWORD@host:25061`) |
+| `OPENAI_API_KEY_PROD` | OpenAI API key for production jobs |
+
+### Deploying Changes
+
+1. Push to `main` branch
+2. DigitalOcean auto-deploys via `deploy_on_push: true`
+3. Both web service and worker are rebuilt and deployed
+
+### Adding the Worker (First Time)
+
+If the worker isn't deployed yet:
+
+1. Push the updated `.do/app.yaml` with the worker section
+2. In DigitalOcean console, go to your app → Settings → Components
+3. The worker should appear; if not, click "Add Component" and select Worker
+4. Configure environment variables for the worker
+5. Deploy
+
+### Debugging Scheduled Agents
+
+If scheduled agents aren't running:
+
+1. **Check worker is deployed**: DigitalOcean console → Components → Worker should be running
+2. **Check worker logs**: DigitalOcean console → Runtime Logs → Select "worker"
+3. **Check Redis connectivity**: Worker logs should show `[Worker] Redis connection established`
+4. **Check database connectivity**: Worker should log `Found N active {agent} configs`
+
+**Common Issues:**
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Worker not in components | `.do/app.yaml` missing worker section | Add worker to app.yaml, push, redeploy |
+| Redis connection failed | Wrong `REDIS_URL` format | Use `rediss://` (with TLS) for managed Valkey |
+| No scheduled jobs | No active agent configs | User must enable agent in UI |
+| Jobs not executing | Worker crashed | Check Runtime Logs for errors |
+
+### Local Development
+
+For local development only (not production):
+
+```bash
+# Start Redis locally (optional - worker has inline fallback)
+redis-server
+
+# Start the worker
+cd apps/worker && npm run dev
+
+# Or use docker-compose
+docker compose up redis
+```
+
+**Note**: Local development cannot connect to DigitalOcean's managed databases without VPN/trusted sources configuration.
+
 ## Related Files
 
 - `TODO.md` - **Incomplete features tracking** (check before/after changes)

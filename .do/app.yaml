@@ -43,6 +43,30 @@ services:
         type: SECRET
 
 # ============================================
+# WORKER SERVICE (BullMQ job processor)
+# ============================================
+workers:
+  - name: worker
+    dockerfile_path: docker/Dockerfile.worker
+    github:
+      branch: main
+      deploy_on_push: true
+    instance_count: 1
+    instance_size_slug: basic-xxs  # $5/mo - upgrade as needed
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: OPENAI_API_KEY_PROD
+        scope: RUN_TIME
+        type: SECRET
+
+# ============================================
 # DOMAIN (Optional)
 # ============================================
 # domains:
