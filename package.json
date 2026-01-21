@@ -31,6 +31,8 @@
   "packageManager": "npm@10.2.0",
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "resend": "^6.8.0"
   }
 }
-

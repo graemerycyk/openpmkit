@@ -48,25 +48,36 @@ Last updated: 2026-01-20 (MVP Launch Readiness)
 - `apps/web/src/app/api/webhooks/stripe/route.ts` (new)
 - `apps/web/src/lib/stripe.ts` (new)
 
-### 2. Email Delivery 🔲 REQUIRED
+### 2. Email Delivery ✅ COMPLETE
 
 | Item | Status | Notes |
 |------|--------|-------|
-| Add email service (Resend) | 🔲 Pending | `npm install resend` |
-| Create email service module | 🔲 Pending | `packages/core/src/email/index.ts` |
-| Daily Brief email template | 🔲 Pending | React Email template |
-| Meeting Prep email template | 🔲 Pending | React Email template |
-| Add delivery to job processor | 🔲 Pending | After artifact creation in `daily-brief-job.ts` |
+| Add email service (Resend) | ✅ Done | `npm install resend` |
+| Create email service module | ✅ Done | `packages/core/src/email/index.ts` |
+| Daily Brief email template | ✅ Done | Included in email service (HTML template with markdown conversion) |
+| Meeting Prep email template | ✅ Done | Included in email service (shared template with agent-specific icons) |
+| Feature Intelligence email template | ✅ Done | Included in email service |
+| Add delivery to job processor | ✅ Done | Daily Brief, Meeting Prep, Feature Intelligence jobs send emails |
+| SIEM export attachments | ✅ Done | JSON and CEF format attachments included |
+| Markdown attachment | ✅ Done | Full artifact content attached as .md file |
 | Enable notifications settings UI | 🔲 Pending | `/settings/notifications` currently placeholder |
 | Add notification preferences to DB | 🔲 Pending | Schema update |
-| RESEND_API_KEY | 🔲 Pending | Add to env |
-| EMAIL_FROM | 🔲 Pending | `briefs@getpmkit.com` |
+| RESEND_API_KEY | ✅ Done | Add to env (required for email delivery) |
+| EMAIL_FROM | ✅ Done | `briefs@getpmkit.com` (configurable via env) |
 
 **Key Files**:
-- `packages/core/src/email/index.ts` (new)
-- `packages/core/src/email/templates/` (new directory)
-- `apps/worker/src/daily-brief-job.ts` (add delivery step ~line 240)
-- `apps/web/src/app/(authenticated)/settings/notifications/page.tsx` (enable)
+- `packages/core/src/email/index.ts` - Email service with templates, SIEM export helpers
+- `apps/worker/src/daily-brief-job.ts` - Sends email after job completion
+- `apps/worker/src/meeting-prep-job.ts` - Sends email after job completion
+- `apps/worker/src/feature-intelligence-job.ts` - Sends email after job completion
+
+**Email Features**:
+- HTML email with styled template (cobalt accent, Space Grotesk headings)
+- Markdown-to-HTML conversion for artifact content
+- Stats summary bar showing key metrics
+- "View in Dashboard" CTA button
+- Attachments: .md (full artifact), .json (SIEM export), .cef (CEF format SIEM)
+- Works for all 10 agent types (template adapts based on agent type)
 
 ### 3. Gong Connector Completion 🔄 IN PROGRESS
 

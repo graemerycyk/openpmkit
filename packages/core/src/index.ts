@@ -33,3 +33,6 @@ export * from './crawlers';
 
 // Agents
 export * from './agents';
+
+// Email
+export * from './email';

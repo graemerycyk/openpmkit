@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import {
   executeMeetingPrep,
   getLLMService,
+  getEmailService,
+  createJobCompletionTelemetryEvent,
   type MeetingPrepConfig,
   type ConnectorCredentialsMap,
 } from '@pmkit/core';
@@ -305,6 +307,60 @@ export async function processMeetingPrepJob(job: Job<AgentJobPayload>): Promise<
     });
 
     console.log(`[MeetingPrepJob] Job ${jobRecord.id} completed successfully`);
+
+    // Send email notification (only if meetings were found)
+    if (result.stats.meetingsFound > 0) {
+      const emailService = getEmailService();
+      if (emailService.isConfigured()) {
+        try {
+          // Fetch user email
+          const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { email: true, name: true },
+          });
+
+          if (user?.email) {
+            const artifactTitle = `Meeting Prep - ${result.stats.meetingTitle || 'Upcoming Meeting'} - ${new Date().toLocaleDateString()}`;
+
+            // Create telemetry event for SIEM export
+            const telemetryEvent = createJobCompletionTelemetryEvent({
+              jobId: jobRecord.id,
+              jobType: 'meeting_prep',
+              tenantId,
+              userId,
+              startTime: jobRecord.startedAt || new Date(),
+              endTime: new Date(),
+              stats: result.stats as Record<string, unknown>,
+            });
+
+            const emailResult = await emailService.sendAgentJobCompletion({
+              to: user.email,
+              userName: user.name || 'there',
+              agentType: 'meeting_prep',
+              jobId: jobRecord.id,
+              artifactTitle,
+              artifactContent: result.content,
+              stats: result.stats as Record<string, unknown>,
+              siemEvents: [telemetryEvent],
+              includeAttachments: true,
+            });
+
+            if (emailResult.success) {
+              console.log(`[MeetingPrepJob] Email sent to ${user.email}, messageId: ${emailResult.messageId}`);
+            } else {
+              console.warn(`[MeetingPrepJob] Failed to send email: ${emailResult.error}`);
+            }
+          } else {
+            console.warn(`[MeetingPrepJob] User ${userId} has no email address`);
+          }
+        } catch (emailError) {
+          // Don't fail the job if email fails
+          console.error('[MeetingPrepJob] Error sending email notification:', emailError);
+        }
+      } else {
+        console.log('[MeetingPrepJob] Email service not configured, skipping notification');
+      }
+    }
   } catch (error) {
     console.error(`[MeetingPrepJob] Job ${jobRecord.id} failed:`, error);
 

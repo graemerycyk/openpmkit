@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import {
   executeFeatureIntelligence,
   getLLMService,
+  getEmailService,
+  createJobCompletionTelemetryEvent,
   type FeatureIntelligenceConfig,
   type ConnectorCredentialsMap,
 } from '@pmkit/core';
@@ -295,6 +297,58 @@ export async function processFeatureIntelligenceJob(job: Job<AgentJobPayload>): 
     });
 
     console.log(`[FeatureIntelligenceJob] Job ${jobRecord.id} completed successfully`);
+
+    // Send email notification
+    const emailService = getEmailService();
+    if (emailService.isConfigured()) {
+      try {
+        // Fetch user email
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { email: true, name: true },
+        });
+
+        if (user?.email) {
+          const artifactTitle = `Feature Intelligence Report - ${new Date().toLocaleDateString()}`;
+
+          // Create telemetry event for SIEM export
+          const telemetryEvent = createJobCompletionTelemetryEvent({
+            jobId: jobRecord.id,
+            jobType: 'feature_intelligence',
+            tenantId,
+            userId,
+            startTime: jobRecord.startedAt || new Date(),
+            endTime: new Date(),
+            stats: result.stats as Record<string, unknown>,
+          });
+
+          const emailResult = await emailService.sendAgentJobCompletion({
+            to: user.email,
+            userName: user.name || 'there',
+            agentType: 'feature_intelligence',
+            jobId: jobRecord.id,
+            artifactTitle,
+            artifactContent: result.content,
+            stats: result.stats as Record<string, unknown>,
+            siemEvents: [telemetryEvent],
+            includeAttachments: true,
+          });
+
+          if (emailResult.success) {
+            console.log(`[FeatureIntelligenceJob] Email sent to ${user.email}, messageId: ${emailResult.messageId}`);
+          } else {
+            console.warn(`[FeatureIntelligenceJob] Failed to send email: ${emailResult.error}`);
+          }
+        } else {
+          console.warn(`[FeatureIntelligenceJob] User ${userId} has no email address`);
+        }
+      } catch (emailError) {
+        // Don't fail the job if email fails
+        console.error('[FeatureIntelligenceJob] Error sending email notification:', emailError);
+      }
+    } else {
+      console.log('[FeatureIntelligenceJob] Email service not configured, skipping notification');
+    }
   } catch (error) {
     console.error(`[FeatureIntelligenceJob] Job ${jobRecord.id} failed:`, error);
 
