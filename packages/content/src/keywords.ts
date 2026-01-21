@@ -180,6 +180,72 @@ export const keywords: KeywordEntry[] = [
     relatedPages: ['/resources/customer-escalation-to-fix-spec', '/demo'],
   },
 
+  // Feature Intelligence Keywords
+  {
+    keyword: 'feature intelligence',
+    category: 'primary',
+    searchVolume: 'medium',
+    difficulty: 'low',
+    intent: 'commercial',
+    relatedPages: ['/feature-intelligence', '/demo', '/blog/feature-intelligence-vs-customer-intelligence'],
+  },
+  {
+    keyword: 'feature prioritization AI',
+    category: 'adjacent',
+    searchVolume: 'medium',
+    difficulty: 'medium',
+    intent: 'commercial',
+    relatedPages: ['/feature-intelligence', '/demo'],
+  },
+  {
+    keyword: 'product intelligence platform',
+    category: 'primary',
+    searchVolume: 'medium',
+    difficulty: 'medium',
+    intent: 'commercial',
+    relatedPages: ['/', '/feature-intelligence', '/demo'],
+  },
+  {
+    keyword: 'feature intelligence vs customer intelligence',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'informational',
+    relatedPages: ['/blog/feature-intelligence-vs-customer-intelligence', '/feature-intelligence'],
+  },
+  {
+    keyword: 'AI feature recommendations',
+    category: 'adjacent',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'commercial',
+    relatedPages: ['/feature-intelligence', '/demo'],
+  },
+  {
+    keyword: 'product management intelligence',
+    category: 'primary',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'informational',
+    relatedPages: ['/', '/feature-intelligence', '/resources/product-management-agent'],
+  },
+  {
+    keyword: 'operational intelligence PM',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'informational',
+    relatedPages: ['/', '/templates/daily-brief'],
+  },
+  {
+    keyword: 'stakeholder intelligence PM',
+    category: 'long-tail',
+    searchVolume: 'low',
+    difficulty: 'low',
+    intent: 'informational',
+    relatedPages: ['/', '/templates/meeting-prep'],
+  },
+
   // PRD to Prototype Keywords
   {
     keyword: 'PRD to prototype',

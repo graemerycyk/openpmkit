@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TrendingUp } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import {
   AgentPageLayout,
   AgentStatusCard,
@@ -48,11 +48,11 @@ const SUGGESTED_CONNECTORS: ConnectorKey[] = [
 ];
 
 const OUTPUT_PREVIEW = [
-  'Feedback themes clustered by semantic similarity',
-  'Top issues ranked by frequency and impact',
-  'Representative quotes for each cluster',
-  'Trend analysis over time',
-  'Actionable recommendations',
+  'Priority features ranked by demand and impact',
+  'Quantified evidence with mention counts per source',
+  'Competitive context for each recommendation',
+  'Internal alignment signals from your team',
+  'Actionable recommendations with effort estimates',
 ];
 
 interface VoCConfig extends Record<string, unknown> {
@@ -150,14 +150,14 @@ export default function VoCClusteringPage() {
 
   return (
     <AgentPageLayout
-      title="VoC Clustering Agent"
-      description="Cluster customer feedback into themes and identify top issues"
+      title="Feature Intelligence Agent"
+      description="Go beyond sentiment. Get specific feature recommendations with quantified demand, competitive context, and internal alignment signals."
       status={config?.status === 'active' ? 'active' : config?.status === 'paused' ? 'paused' : 'coming-soon'}
       isLoading={isLoading}
       error={error}
       success={success}
       usage={{
-        workflowName: 'VoC Clustering',
+        workflowName: 'Feature Intelligence',
         used: currentUsage?.used || 0,
         limit: currentUsage?.limit || 0,
       }}
@@ -166,11 +166,11 @@ export default function VoCClusteringPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+            <Lightbulb className="h-5 w-5 text-muted-foreground" />
             <CardTitle className="text-lg">Analysis Parameters</CardTitle>
           </div>
           <CardDescription>
-            Configure how feedback should be analyzed and clustered
+            Configure how feedback is analyzed to extract feature recommendations
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -235,11 +235,11 @@ export default function VoCClusteringPage() {
 
       {/* Agent Status */}
       <AgentStatusCard
-        agentName="VoC Clustering Agent"
+        agentName="Feature Intelligence Agent"
         isActive={isActive}
         onActiveChange={setIsActive}
         disabled={!effectiveCanRun}
-        missingRequiredConnectors={!hasDataSource ? ['gong'] : []}
+        missingRequiredConnectors={!hasDataSource ? ['zendesk'] : []}
       />
 
       {/* Actions */}
@@ -248,7 +248,7 @@ export default function VoCClusteringPage() {
         isSaving={isSaving}
         canRun={effectiveCanRun}
         isAdmin={isAdmin}
-        missingRequiredConnectors={!hasDataSource ? ['gong'] : []}
+        missingRequiredConnectors={!hasDataSource ? ['zendesk'] : []}
         onTrigger={onTrigger}
         onSave={onSave}
       />

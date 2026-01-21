@@ -28,6 +28,22 @@ export type BlogTag =
   | 'founders-notes';
 
 export const blogPosts: BlogPost[] = [
+  // Feature Intelligence blog post
+  {
+    slug: 'feature-intelligence-vs-customer-intelligence',
+    title: 'Feature Intelligence vs Customer Intelligence: Why Sentiment Isn\'t Enough',
+    description:
+      'Go beyond "customers are frustrated" to specific feature recommendations with quantified demand, competitive context, and internal alignment signals.',
+    publishedAt: '2026-01-21',
+    author: 'pmkit team',
+    authorRole: 'Product',
+    primaryKeyword: 'feature intelligence',
+    tags: ['voc', 'product-management', 'agents'],
+    readingTime: 12,
+    relatedResources: ['voice-of-customer-clustering', 'product-management-agent', 'agentic-product-management'],
+    relatedPosts: ['voice-of-customer-at-scale', '10-pm-workflows-automate-today', 'enterprise-pm-toolkit'],
+    featured: true,
+  },
   // Deck Content blog post
   {
     slug: 'deck-content-ai-slide-generation',

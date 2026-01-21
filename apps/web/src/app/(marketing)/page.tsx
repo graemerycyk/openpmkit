@@ -56,27 +56,33 @@ import {
   Wand2,
   Megaphone,
   Presentation,
+  Lightbulb,
+  Sunrise,
+  UserCheck,
 } from 'lucide-react';
 
 const features = [
-  // First row: Available now (no Coming Soon badge)
+  // First row: Available now (no Coming Soon badge) - Intelligence Framework
   {
     icon: FileText,
     title: 'Daily Briefs',
     description:
       'Start each day with a synthesized brief from Slack, Jira, support, and community; automatically.',
+    intelligence: 'Operational Intelligence',
   },
   {
     icon: BarChart3,
-    title: 'VoC Clustering',
+    title: 'Feature Intelligence',
     description:
-      'Cluster customer feedback from support, calls, and community into actionable themes with evidence.',
+      'Go beyond sentiment. Get specific feature recommendations with quantified demand, competitive context, and internal alignment signals.',
+    intelligence: 'Feature Intelligence',
   },
   {
     icon: Users,
     title: 'Meeting Prep Packs',
     description:
       'Walk into every customer meeting with context: recent calls, open tickets, and talking points.',
+    intelligence: 'Stakeholder Intelligence',
   },
   // Remaining workflows: Coming Soon
   {
@@ -137,6 +143,33 @@ const benefits = [
   'Secure connectors for enterprise tools',
   'Sources and citations for every insight',
   'Downloadable artifacts in multiple formats',
+];
+
+const intelligenceFramework = [
+  {
+    icon: Sunrise,
+    name: 'Operational Intelligence',
+    agent: 'Daily Brief',
+    question: 'What happened overnight?',
+    description: 'Synthesized updates from Slack, Jira, and support. Start every morning knowing exactly what needs attention.',
+    href: '/templates/daily-brief',
+  },
+  {
+    icon: UserCheck,
+    name: 'Stakeholder Intelligence',
+    agent: 'Meeting Prep',
+    question: 'Who am I meeting and what\'s their context?',
+    description: 'Complete context on attendees: recent conversations, open issues, relationship history, and talking points.',
+    href: '/templates/meeting-prep',
+  },
+  {
+    icon: Lightbulb,
+    name: 'Feature Intelligence',
+    agent: 'VoC Clustering',
+    question: 'What should we build next?',
+    description: 'Specific feature recommendations with quantified demand, competitive context, and internal alignment signals.',
+    href: '/feature-intelligence',
+  },
 ];
 
 const integrations = [
@@ -296,6 +329,63 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Product Management Intelligence Section */}
+      <section className="py-20 md:py-32 bg-muted/30">
+        <div className="container">
+          <div className="mx-auto max-w-3xl text-center">
+            <Badge variant="cobalt" className="mb-4">
+              Product Management Intelligence
+            </Badge>
+            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
+              Three types of intelligence. One platform.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Modern PMs need more than tools - they need synthesized intelligence.
+              pmkit delivers operational, stakeholder, and feature intelligence so you can decide with confidence.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
+            {intelligenceFramework.map((item) => (
+              <Card key={item.name} className="relative overflow-hidden">
+                <CardHeader>
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-cobalt-100">
+                    <item.icon className="h-6 w-6 text-cobalt-600" />
+                  </div>
+                  <CardTitle className="text-xl">{item.name}</CardTitle>
+                  <CardDescription className="text-base font-medium text-foreground">
+                    &ldquo;{item.question}&rdquo;
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Powered by <span className="font-medium">{item.agent}</span>
+                    </span>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={item.href}>
+                        Learn more
+                        <ArrowRight className="ml-1 h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-12 text-center">
+            <Button size="lg" asChild>
+              <Link href="/feature-intelligence">
+                Explore Feature Intelligence
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* PRD to Prototype Hero Section */}
       <section className="py-20 md:py-32">
         <div className="container">
@@ -425,6 +515,11 @@ export default function HomePage() {
                       <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
                     )}
                   </CardTitle>
+                  {'intelligence' in feature && feature.intelligence && (
+                    <Badge variant="cobalt" className="w-fit text-xs">
+                      {feature.intelligence}
+                    </Badge>
+                  )}
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-base">{feature.description}</CardDescription>
