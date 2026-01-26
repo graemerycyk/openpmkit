@@ -351,6 +351,7 @@ export async function POST() {
         stats: result.stats,
       });
     } catch (execError) {
+      const errorMessage = execError instanceof Error ? execError.message : 'Unknown error';
       console.error(`[Meeting Prep] Job ${job.id} failed:`, execError);
 
       // Update job as failed
@@ -359,7 +360,7 @@ export async function POST() {
         data: {
           status: 'failed',
           completedAt: new Date(),
-          error: execError instanceof Error ? execError.message : 'Unknown error',
+          error: errorMessage,
         },
       });
 
@@ -371,12 +372,12 @@ export async function POST() {
           action: 'job_failed',
           resourceType: 'job',
           resourceId: job.id,
-          details: { error: execError instanceof Error ? execError.message : 'Unknown error' },
+          details: { error: errorMessage },
         },
       });
 
       return NextResponse.json(
-        { error: 'Agent execution failed', jobId: job.id },
+        { error: `Agent execution failed: ${errorMessage}`, jobId: job.id },
         { status: 500 }
       );
     }
