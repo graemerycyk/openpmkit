@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Layout } from 'lucide-react';
+import { Layout, FileText, CheckCircle2 } from 'lucide-react';
 import {
   AgentPageLayout,
   AgentStatusCard,
@@ -56,13 +55,18 @@ const OUTPUT_PREVIEW = [
 ];
 
 interface PrototypeConfig extends Record<string, unknown> {
-  featureName: string;
-  description: string;
+  selectedPrdId: string;
   prototypeType: string;
   platform: string;
-  designNotes: string;
+  usePmkitPrd: boolean;
   enabledSources?: Record<string, boolean>;
   connectorConfigs?: object;
+}
+
+interface PrdArtifact {
+  id: string;
+  title: string;
+  createdAt: string;
 }
 
 export default function PrototypeGenerationPage() {
@@ -92,24 +96,42 @@ export default function PrototypeGenerationPage() {
   });
 
   // Form state
-  const [featureName, setFeatureName] = useState('');
-  const [description, setDescription] = useState('');
+  const [selectedPrdId, setSelectedPrdId] = useState('');
   const [prototypeType, setPrototypeType] = useState('wireframe');
   const [platform, setPlatform] = useState('web');
-  const [designNotes, setDesignNotes] = useState('');
+  const [availablePrds, setAvailablePrds] = useState<PrdArtifact[]>([]);
+  const [isLoadingPrds, setIsLoadingPrds] = useState(true);
+
+  // Fetch available PRDs from pmkit
+  useEffect(() => {
+    async function fetchPrds() {
+      setIsLoadingPrds(true);
+      try {
+        const res = await fetch('/api/artifacts?type=prd_draft');
+        if (res.ok) {
+          const data = await res.json();
+          setAvailablePrds(data.artifacts || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch PRDs:', err);
+      } finally {
+        setIsLoadingPrds(false);
+      }
+    }
+    fetchPrds();
+  }, []);
 
   // Load saved config values
   useEffect(() => {
     if (config?.config) {
-      setFeatureName(config.config.featureName || '');
-      setDescription(config.config.description || '');
+      setSelectedPrdId(config.config.selectedPrdId || '');
       setPrototypeType(config.config.prototypeType || 'wireframe');
       setPlatform(config.config.platform || 'web');
-      setDesignNotes(config.config.designNotes || '');
     }
   }, [config]);
 
-  const canRun = featureName.trim() !== '' && description.trim() !== '';
+  // Can run when a PRD is selected
+  const canRun = selectedPrdId !== '';
 
   const onSave = async () => {
     const enabledSources: Record<string, boolean> = {};
@@ -120,11 +142,10 @@ export default function PrototypeGenerationPage() {
     await handleSave({
       status: isActive ? 'active' : 'paused',
       config: {
-        featureName: featureName.trim(),
-        description: description.trim(),
+        selectedPrdId,
         prototypeType,
         platform,
-        designNotes: designNotes.trim(),
+        usePmkitPrd: true,
         enabledSources,
         connectorConfigs: Object.fromEntries(
           Object.entries(connectorConfigs).filter(([key]) => enabledSources[key])
@@ -135,18 +156,19 @@ export default function PrototypeGenerationPage() {
 
   const onTrigger = async () => {
     await handleTrigger({
-      featureName: featureName.trim(),
-      description: description.trim(),
+      selectedPrdId,
       prototypeType,
       platform,
-      designNotes: designNotes.trim() || undefined,
+      usePmkitPrd: true,
     });
   };
+
+  const selectedPrd = availablePrds.find((p) => p.id === selectedPrdId);
 
   return (
     <AgentPageLayout
       title="Prototype Generation Agent"
-      description="Generate low-fidelity prototypes from PRDs"
+      description="Generate low-fidelity prototypes from PRD Draft artifacts"
       status="coming-soon"
       isLoading={isLoading}
       error={error}
@@ -157,37 +179,72 @@ export default function PrototypeGenerationPage() {
         limit: currentUsage?.limit || 0,
       }}
     >
-      {/* Feature Information */}
+      {/* PRD Source Selection */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Layout className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Feature to Prototype</CardTitle>
+            <FileText className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Source PRD</CardTitle>
           </div>
           <CardDescription>
-            Describe the feature you want to prototype
+            Select a PRD from your PRD Draft artifacts to generate a prototype
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="feature-name">Feature Name *</Label>
-            <Input
-              id="feature-name"
-              placeholder="e.g., User Onboarding Flow"
-              value={featureName}
-              onChange={(e) => setFeatureName(e.target.value)}
-            />
+            <Label htmlFor="prd-select">Select PRD *</Label>
+            <Select value={selectedPrdId} onValueChange={setSelectedPrdId}>
+              <SelectTrigger id="prd-select">
+                <SelectValue placeholder={isLoadingPrds ? "Loading PRDs..." : "Select a PRD..."} />
+              </SelectTrigger>
+              <SelectContent>
+                {availablePrds.length === 0 && !isLoadingPrds && (
+                  <SelectItem value="none" disabled>
+                    No PRDs available - run PRD Draft agent first
+                  </SelectItem>
+                )}
+                {availablePrds.map((prd) => (
+                  <SelectItem key={prd.id} value={prd.id}>
+                    {prd.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {availablePrds.length === 0 && !isLoadingPrds && (
+              <p className="text-sm text-muted-foreground">
+                Run the PRD Draft agent first to generate PRDs that can be prototyped.
+              </p>
+            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Feature Description *</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the feature, its purpose, key user flows, and any specific requirements..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-            />
+
+          {selectedPrd && (
+            <div className="rounded-lg border bg-muted/30 p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <p className="font-medium">{selectedPrd.title}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Created {new Date(selectedPrd.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Prototype Configuration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Layout className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Prototype Settings</CardTitle>
           </div>
+          <CardDescription>
+            Configure the type and platform for your prototype
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="prototype-type">Prototype Type</Label>
@@ -220,24 +277,43 @@ export default function PrototypeGenerationPage() {
               </Select>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="design-notes">Design Notes (optional)</Label>
-            <Textarea
-              id="design-notes"
-              placeholder="Any specific design requirements, brand guidelines, or reference examples..."
-              value={designNotes}
-              onChange={(e) => setDesignNotes(e.target.value)}
-              rows={3}
-            />
+        </CardContent>
+      </Card>
+
+      {/* pmkit Data Source info */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Data Sources</CardTitle>
+          </div>
+          <CardDescription>
+            The prototype will be generated from pmkit artifacts and additional context
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-3 rounded-lg border p-4 bg-cobalt-50/50">
+            <div className="rounded-lg bg-cobalt-100 p-2">
+              <FileText className="h-5 w-5 text-cobalt-600" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">pmkit PRD Drafts</span>
+                <Badge variant="default" className="bg-cobalt-600">Primary Source</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Uses the selected PRD as the primary input for prototype generation
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Data Sources */}
+      {/* Additional Data Sources */}
       <DataSourcesCard
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
-        description="Connect to pull existing design context"
+        description="Connect additional sources to pull design context and references"
         onToggle={handleSourceToggle}
         connectorConfigs={connectorConfigs}
         onConfigChange={handleConfigChange}

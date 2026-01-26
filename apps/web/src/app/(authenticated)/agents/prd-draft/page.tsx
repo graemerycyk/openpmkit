@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FileText } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import {
   AgentPageLayout,
   AgentStatusCard,
@@ -50,11 +49,11 @@ const OUTPUT_PREVIEW = [
 ];
 
 interface PRDConfig extends Record<string, unknown> {
-  featureName: string;
-  problemStatement: string;
-  targetUsers: string;
-  priority: string;
-  additionalContext: string;
+  autoDiscover: boolean;
+  priorityFilter: string;
+  includeVoC: boolean;
+  includeJiraEpics: boolean;
+  includeSlackDiscussions: boolean;
   enabledSources?: Record<string, boolean>;
   connectorConfigs?: object;
 }
@@ -85,25 +84,25 @@ export default function PRDDraftPage() {
     requiredConnectors: [],
   });
 
-  // Form state
-  const [featureName, setFeatureName] = useState('');
-  const [problemStatement, setProblemStatement] = useState('');
-  const [targetUsers, setTargetUsers] = useState('');
-  const [priority, setPriority] = useState('medium');
-  const [additionalContext, setAdditionalContext] = useState('');
+  // Form state - automated discovery settings
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [includeVoC, setIncludeVoC] = useState(true);
+  const [includeJiraEpics, setIncludeJiraEpics] = useState(true);
+  const [includeSlackDiscussions, setIncludeSlackDiscussions] = useState(true);
 
   // Load saved config values
   useEffect(() => {
     if (config?.config) {
-      setFeatureName(config.config.featureName || '');
-      setProblemStatement(config.config.problemStatement || '');
-      setTargetUsers(config.config.targetUsers || '');
-      setPriority(config.config.priority || 'medium');
-      setAdditionalContext(config.config.additionalContext || '');
+      setPriorityFilter(config.config.priorityFilter || 'all');
+      setIncludeVoC(config.config.includeVoC ?? true);
+      setIncludeJiraEpics(config.config.includeJiraEpics ?? true);
+      setIncludeSlackDiscussions(config.config.includeSlackDiscussions ?? true);
     }
   }, [config]);
 
-  const canRun = featureName.trim() !== '' && problemStatement.trim() !== '';
+  // Can run when at least one data source is connected and enabled
+  const hasEnabledSource = suggestedSources.some((s) => s.connected && s.enabled);
+  const canRun = hasEnabledSource;
 
   const onSave = async () => {
     const enabledSources: Record<string, boolean> = {};
@@ -114,11 +113,11 @@ export default function PRDDraftPage() {
     await handleSave({
       status: isActive ? 'active' : 'paused',
       config: {
-        featureName: featureName.trim(),
-        problemStatement: problemStatement.trim(),
-        targetUsers: targetUsers.trim(),
-        priority,
-        additionalContext: additionalContext.trim(),
+        autoDiscover: true,
+        priorityFilter,
+        includeVoC,
+        includeJiraEpics,
+        includeSlackDiscussions,
         enabledSources,
         connectorConfigs: Object.fromEntries(
           Object.entries(connectorConfigs).filter(([key]) => enabledSources[key])
@@ -129,18 +128,18 @@ export default function PRDDraftPage() {
 
   const onTrigger = async () => {
     await handleTrigger({
-      featureName: featureName.trim(),
-      problemStatement: problemStatement.trim(),
-      targetUsers: targetUsers.trim() || undefined,
-      priority,
-      additionalContext: additionalContext.trim() || undefined,
+      autoDiscover: true,
+      priorityFilter: priorityFilter !== 'all' ? priorityFilter : undefined,
+      includeVoC,
+      includeJiraEpics,
+      includeSlackDiscussions,
     });
   };
 
   return (
     <AgentPageLayout
       title="PRD Draft Agent"
-      description="Generate a Product Requirements Document from VoC data"
+      description="Automatically discover and document features from your connected sources"
       status="coming-soon"
       isLoading={isLoading}
       error={error}
@@ -151,72 +150,72 @@ export default function PRDDraftPage() {
         limit: currentUsage?.limit || 0,
       }}
     >
-      {/* Feature Information */}
+      {/* Auto-Discovery Settings */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Feature Information</CardTitle>
+            <Sparkles className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Automated Discovery</CardTitle>
           </div>
           <CardDescription>
-            Describe the feature you want to document
+            The agent automatically identifies features to document from your connected data sources
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="feature-name">Feature Name *</Label>
-              <Input
-                id="feature-name"
-                placeholder="e.g., Advanced Analytics Dashboard"
-                value={featureName}
-                onChange={(e) => setFeatureName(e.target.value)}
-              />
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Include Voice of Customer Data</Label>
+              <p className="text-sm text-muted-foreground">
+                Analyze Gong calls, Zendesk tickets, and support requests
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger id="priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRIORITY_LEVELS.map((p) => (
-                    <SelectItem key={p.value} value={p.value}>
-                      {p.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <Switch
+              checked={includeVoC}
+              onCheckedChange={setIncludeVoC}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Include Jira Epics & Features</Label>
+              <p className="text-sm text-muted-foreground">
+                Pull feature requests and epics from Jira
+              </p>
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="problem-statement">Problem Statement *</Label>
-            <Textarea
-              id="problem-statement"
-              placeholder="e.g., Users struggle to understand their product usage patterns and cannot make data-driven decisions about which features to invest in..."
-              value={problemStatement}
-              onChange={(e) => setProblemStatement(e.target.value)}
-              rows={4}
+            <Switch
+              checked={includeJiraEpics}
+              onCheckedChange={setIncludeJiraEpics}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="target-users">Target Users (optional)</Label>
-            <Input
-              id="target-users"
-              placeholder="e.g., Enterprise admins, Product managers"
-              value={targetUsers}
-              onChange={(e) => setTargetUsers(e.target.value)}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Include Slack Discussions</Label>
+              <p className="text-sm text-muted-foreground">
+                Extract feature ideas from Slack conversations
+              </p>
+            </div>
+            <Switch
+              checked={includeSlackDiscussions}
+              onCheckedChange={setIncludeSlackDiscussions}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="context">Additional Context (optional)</Label>
-            <Textarea
-              id="context"
-              placeholder="e.g., This ties into our Q3 enterprise push. Related features include..."
-              value={additionalContext}
-              onChange={(e) => setAdditionalContext(e.target.value)}
-              rows={3}
-            />
+          <div className="space-y-2 pt-2">
+            <Label htmlFor="priority-filter">Priority Filter</Label>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger id="priority-filter">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                {PRIORITY_LEVELS.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>
+                    {p.label} and above
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Only generate PRDs for features matching this priority threshold
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -225,7 +224,7 @@ export default function PRDDraftPage() {
       <DataSourcesCard
         suggestedSources={suggestedSources}
         allConnectedSources={allConnectedSources}
-        description="Connect sources to enrich the PRD with existing context"
+        description="Connect sources to discover features and enrich PRDs with context"
         onToggle={handleSourceToggle}
         connectorConfigs={connectorConfigs}
         onConfigChange={handleConfigChange}
