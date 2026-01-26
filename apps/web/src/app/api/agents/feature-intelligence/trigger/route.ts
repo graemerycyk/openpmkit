@@ -10,28 +10,53 @@ import {
 
 export async function POST() {
   try {
+    console.log('[Feature Intelligence Trigger] Starting...');
+
     const session = await getServerSession();
     if (!session?.user?.email) {
+      console.log('[Feature Intelligence Trigger] No session/email');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findFirst({
-      where: { email: session.user.email },
-    });
+    console.log('[Feature Intelligence Trigger] Session found for:', session.user.email);
+
+    let user;
+    try {
+      user = await prisma.user.findFirst({
+        where: { email: session.user.email },
+      });
+    } catch (dbError) {
+      console.error('[Feature Intelligence Trigger] Database error finding user:', dbError);
+      return NextResponse.json(
+        { error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}` },
+        { status: 500 }
+      );
+    }
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    console.log('[Feature Intelligence Trigger] User found:', user.id, 'tenant:', user.tenantId);
+
     // Get agent config
-    const agentConfig = await prisma.agentConfig.findUnique({
-      where: {
-        userId_agentType: {
-          userId: user.id,
-          agentType: 'feature_intelligence',
+    let agentConfig;
+    try {
+      agentConfig = await prisma.agentConfig.findUnique({
+        where: {
+          userId_agentType: {
+            userId: user.id,
+            agentType: 'feature_intelligence',
+          },
         },
-      },
-    });
+      });
+    } catch (dbError) {
+      console.error('[Feature Intelligence Trigger] Database error finding config:', dbError);
+      return NextResponse.json(
+        { error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}` },
+        { status: 500 }
+      );
+    }
 
     if (!agentConfig) {
       return NextResponse.json(
@@ -63,15 +88,25 @@ export async function POST() {
     } as FeatureIntelligenceConfig;
 
     // Fetch all connector installs for this tenant
-    const connectorInstalls = await prisma.connectorInstall.findMany({
-      where: {
-        tenantId: user.tenantId,
-        status: 'real',
-      },
-      include: {
-        credentials: true,
-      },
-    });
+    let connectorInstalls;
+    try {
+      connectorInstalls = await prisma.connectorInstall.findMany({
+        where: {
+          tenantId: user.tenantId,
+          status: 'real',
+        },
+        include: {
+          credentials: true,
+        },
+      });
+      console.log('[Feature Intelligence Trigger] Found', connectorInstalls.length, 'connector installs');
+    } catch (dbError) {
+      console.error('[Feature Intelligence Trigger] Database error finding connectors:', dbError);
+      return NextResponse.json(
+        { error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}` },
+        { status: 500 }
+      );
+    }
 
     // Build a map of connected connectors
     const connectorMap = new Map(
@@ -352,6 +387,10 @@ export async function POST() {
     }
   } catch (error) {
     console.error('[Feature Intelligence Trigger] Error:', error);
-    return NextResponse.json({ error: 'Failed to trigger agent' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json(
+      { error: `Failed to trigger agent: ${errorMessage}` },
+      { status: 500 }
+    );
   }
 }
