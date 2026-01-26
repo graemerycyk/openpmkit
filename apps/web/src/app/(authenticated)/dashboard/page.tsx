@@ -212,9 +212,12 @@ export default function DashboardPage() {
         if (jobsRes.ok) {
           const jobsData = await jobsRes.json();
           setRecentJobs(jobsData.jobs || []);
+        } else {
+          console.error('[Dashboard] Jobs API returned:', jobsRes.status);
         }
-      } catch {
-        // Silently fail - just show empty state
+      } catch (error) {
+        console.error('[Dashboard] Failed to fetch data:', error);
+        // Show empty state on error
       } finally {
         setIsLoadingJobs(false);
         setIsLoadingStats(false);
