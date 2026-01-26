@@ -14,8 +14,11 @@ export async function GET() {
     });
 
     if (!user) {
+      console.log('[Recent Jobs] User not found for email:', session.user.email);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    console.log('[Recent Jobs] Fetching jobs for tenant:', user.tenantId);
 
     // Get recent jobs across all agent types for the user's tenant
     const jobs = await prisma.job.findMany({
@@ -36,6 +39,8 @@ export async function GET() {
         createdAt: true,
       },
     });
+
+    console.log('[Recent Jobs] Found', jobs.length, 'jobs for tenant', user.tenantId);
 
     return NextResponse.json({ jobs });
   } catch (error) {
