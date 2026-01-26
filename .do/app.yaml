@@ -41,6 +41,21 @@ services:
       - key: NEXTAUTH_SECRET
         scope: RUN_TIME
         type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: GOOGLE_CLIENT_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: GOOGLE_CLIENT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: CONNECTOR_ENCRYPTION_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: OPENAI_API_KEY_PROD
+        scope: RUN_TIME
+        type: SECRET
 
 # ============================================
 # WORKER SERVICE (BullMQ job processor)
