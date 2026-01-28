@@ -52,7 +52,7 @@ export async function GET(
     });
 
     // Format sources for response
-    const formattedSources = sources.map((source) => ({
+    const formattedSources = sources.map((source: typeof sources[number]) => ({
       id: source.id,
       title: source.title,
       url: source.url,
