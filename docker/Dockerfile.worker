@@ -42,14 +42,21 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 worker
 
-# Copy built assets
+# Copy built assets and package.json files for module resolution
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/worker/dist ./apps/worker/dist
+COPY --from=builder /app/apps/worker/package.json ./apps/worker/package.json
 COPY --from=builder /app/packages/core/dist ./packages/core/dist
+COPY --from=builder /app/packages/core/package.json ./packages/core/package.json
 COPY --from=builder /app/packages/mcp/dist ./packages/mcp/dist
+COPY --from=builder /app/packages/mcp/package.json ./packages/mcp/package.json
 COPY --from=builder /app/packages/mcp-servers/dist ./packages/mcp-servers/dist
+COPY --from=builder /app/packages/mcp-servers/package.json ./packages/mcp-servers/package.json
 COPY --from=builder /app/packages/mock-tenant/dist ./packages/mock-tenant/dist
+COPY --from=builder /app/packages/mock-tenant/package.json ./packages/mock-tenant/package.json
 COPY --from=builder /app/packages/prompts/dist ./packages/prompts/dist
+COPY --from=builder /app/packages/prompts/package.json ./packages/prompts/package.json
+COPY --from=builder /app/package.json ./package.json
 
 USER worker
 
