@@ -21,8 +21,8 @@ RUN npm ci
 # Copy source
 COPY . .
 
-# Generate Prisma client
-RUN npm run db:generate --workspace=@pmkit/web || true
+# Generate Prisma client (run from root where prisma folder exists)
+RUN npx prisma generate
 
 # Note: db:push runs at runtime via entrypoint to have DATABASE_URL available
 # Build packages (order matters - dependencies must be built first)
