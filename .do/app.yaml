@@ -20,7 +20,7 @@ services:
   - name: web
     dockerfile_path: apps/web/Dockerfile
     github:
-      branch: main
+      branch: prod
       deploy_on_push: true
       # repo: your-github-username/pmkit
     http_port: 3000
@@ -67,7 +67,7 @@ workers:
   - name: worker
     dockerfile_path: docker/Dockerfile.worker
     github:
-      branch: main
+      branch: prod
       deploy_on_push: true
     instance_count: 1
     instance_size_slug: basic-xxs  # $5/mo - upgrade as needed
