@@ -25,12 +25,12 @@ COPY . .
 RUN npm run db:generate --workspace=@pmkit/web || true
 
 # Note: db:push runs at runtime via entrypoint to have DATABASE_URL available
-# Build packages
+# Build packages (order matters - dependencies must be built first)
 RUN npm run build --workspace=@pmkit/core
 RUN npm run build --workspace=@pmkit/mcp
+RUN npm run build --workspace=@pmkit/prompts
 RUN npm run build --workspace=@pmkit/mcp-servers
 RUN npm run build --workspace=@pmkit/mock-tenant
-RUN npm run build --workspace=@pmkit/prompts
 RUN npm run build --workspace=@pmkit/content
 
 # Build web app
