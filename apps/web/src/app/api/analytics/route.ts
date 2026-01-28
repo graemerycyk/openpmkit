@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getServerSession();
@@ -22,6 +24,7 @@ export async function GET() {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     // Get all jobs for the tenant
+    console.log('[Analytics] Fetching jobs for tenant:', user.tenantId);
     const allJobs = await prisma.job.findMany({
       where: {
         tenantId: user.tenantId,
@@ -38,6 +41,7 @@ export async function GET() {
         createdAt: 'desc',
       },
     });
+    console.log('[Analytics] Found', allJobs.length, 'jobs');
 
     // Calculate summary stats
     const totalJobs = allJobs.length;

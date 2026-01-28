@@ -80,17 +80,30 @@ interface AnalyticsData {
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchAnalytics() {
       try {
         const res = await fetch('/api/analytics');
-        if (res.ok) {
-          const analyticsData = await res.json();
-          setData(analyticsData);
+        const responseData = await res.json();
+
+        if (!res.ok) {
+          console.error('Analytics API error:', res.status, responseData);
+          setError(responseData.error || `Error: ${res.status}`);
+          return;
+        }
+
+        // Check if we got valid analytics data
+        if (responseData && responseData.summary) {
+          setData(responseData);
+        } else {
+          console.error('Invalid analytics data structure:', responseData);
+          setError('Invalid data received');
         }
       } catch (error) {
         console.error('Failed to fetch analytics:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error');
       } finally {
         setIsLoading(false);
       }
@@ -111,7 +124,9 @@ export default function AnalyticsPage() {
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <BarChart3 className="h-12 w-12 text-muted-foreground" />
         <h2 className="mt-4 text-lg font-semibold">No analytics available</h2>
-        <p className="text-sm text-muted-foreground">Run some agents to see your analytics here.</p>
+        <p className="text-sm text-muted-foreground">
+          {error ? `Error: ${error}` : 'Run some agents to see your analytics here.'}
+        </p>
       </div>
     );
   }
