@@ -128,6 +128,7 @@ const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; href: s
   meeting_prep: { name: 'Meeting Prep', icon: Users, href: '/agents/meeting-prep' },
   sprint_review: { name: 'Sprint Review', icon: Clock, href: '/agents/sprint-review' },
   feature_intelligence: { name: 'Feature Intelligence', icon: BarChart3, href: '/agents/feature-intelligence' },
+  voc_clustering: { name: 'Feature Intelligence', icon: BarChart3, href: '/agents/feature-intelligence' }, // Legacy
   competitor_research: { name: 'Competitor Research', icon: Target, href: '/agents/competitor-research' },
   roadmap_alignment: { name: 'Roadmap Alignment', icon: GitBranch, href: '/agents/roadmap-alignment' },
   prd_draft: { name: 'PRD Draft', icon: FileText, href: '/agents/prd-draft' },

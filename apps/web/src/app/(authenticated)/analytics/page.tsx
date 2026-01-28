@@ -45,6 +45,7 @@ const jobTypeInfo: Record<string, { name: string; icon: typeof FileText; color: 
   meeting_prep: { name: 'Meeting Prep', icon: Users, color: '#0891B2' },
   sprint_review: { name: 'Sprint Review', icon: Clock, color: '#7C3AED' },
   feature_intelligence: { name: 'Feature Intelligence', icon: BarChart3, color: '#059669' },
+  voc_clustering: { name: 'Feature Intelligence', icon: BarChart3, color: '#059669' }, // Legacy name
   competitor_research: { name: 'Competitor Research', icon: Target, color: '#DC2626' },
   roadmap_alignment: { name: 'Roadmap Alignment', icon: GitBranch, color: '#D97706' },
   prd_draft: { name: 'PRD Draft', icon: FileText, color: '#2563EB' },
