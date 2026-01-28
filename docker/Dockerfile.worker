@@ -23,11 +23,12 @@ COPY . .
 RUN npx prisma generate
 
 # Build only the packages and worker (not the web app)
+# Order matters - dependencies must be built first
 RUN npm run build --workspace=@pmkit/core
 RUN npm run build --workspace=@pmkit/mcp
+RUN npm run build --workspace=@pmkit/prompts
 RUN npm run build --workspace=@pmkit/mcp-servers
 RUN npm run build --workspace=@pmkit/mock-tenant
-RUN npm run build --workspace=@pmkit/prompts
 RUN npm run build --workspace=@pmkit/worker
 
 # Production stage
