@@ -71,7 +71,7 @@ export async function GET() {
     const usage: Record<string, { used: number; limit: number; exceeded: boolean; displayName: string }> = {};
 
     for (const [jobType, config] of Object.entries(JOB_TYPE_LIMITS)) {
-      const countRecord = jobCounts.find((c) => c.type === jobType);
+      const countRecord = jobCounts.find((c: typeof jobCounts[number]) => c.type === jobType);
       const used = countRecord?._count?.id || 0;
       const limit = isAdmin ? -1 : PLAN_LIMITS[config.limitKey] || 0;
       const exceeded = limit !== -1 && used > limit;

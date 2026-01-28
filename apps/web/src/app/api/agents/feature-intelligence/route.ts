@@ -258,11 +258,12 @@ function calculateNextRunTime(
   });
 
   const parts = formatter.formatToParts(now);
-  const currentYear = parseInt(parts.find((p) => p.type === 'year')?.value || '2024');
-  const currentMonth = parseInt(parts.find((p) => p.type === 'month')?.value || '1') - 1;
-  const currentDay = parseInt(parts.find((p) => p.type === 'day')?.value || '1');
-  const currentHour = parseInt(parts.find((p) => p.type === 'hour')?.value || '0');
-  const currentMinute = parseInt(parts.find((p) => p.type === 'minute')?.value || '0');
+  type DatePart = typeof parts[number];
+  const currentYear = parseInt(parts.find((p: DatePart) => p.type === 'year')?.value || '2024');
+  const currentMonth = parseInt(parts.find((p: DatePart) => p.type === 'month')?.value || '1') - 1;
+  const currentDay = parseInt(parts.find((p: DatePart) => p.type === 'day')?.value || '1');
+  const currentHour = parseInt(parts.find((p: DatePart) => p.type === 'hour')?.value || '0');
+  const currentMinute = parseInt(parts.find((p: DatePart) => p.type === 'minute')?.value || '0');
 
   // Calculate current day of week in user's timezone
   const currentDate = new Date(currentYear, currentMonth, currentDay);

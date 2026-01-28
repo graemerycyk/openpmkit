@@ -92,7 +92,7 @@ export async function GET() {
     const prepTimingMinutes = (agentConfig?.config as { prepTimingMinutes?: number })?.prepTimingMinutes || 30;
 
     // Update prepScheduledFor based on user's config
-    const meetingsWithConfig = MOCK_MEETINGS.map(meeting => ({
+    const meetingsWithConfig = MOCK_MEETINGS.map((meeting: typeof MOCK_MEETINGS[number]) => ({
       ...meeting,
       prepScheduledFor: new Date(
         new Date(meeting.datetime).getTime() - prepTimingMinutes * 60 * 1000

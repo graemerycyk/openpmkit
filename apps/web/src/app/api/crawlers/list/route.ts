@@ -24,9 +24,10 @@ export async function GET() {
     }
 
     // Get all jobs sorted by creation date (newest first)
+    type CrawlerJob = ReturnType<typeof crawlerJobs.values> extends IterableIterator<infer T> ? T : never;
     const jobs = Array.from(crawlerJobs.values())
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .map(job => ({
+      .map((job: CrawlerJob) => ({
         id: job.id,
         type: job.type,
         status: job.status,

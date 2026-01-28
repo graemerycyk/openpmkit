@@ -218,11 +218,12 @@ function calculateNextRunTime(deliveryTimeLocal: string, timezone: string): Date
   });
 
   const parts = formatter.formatToParts(now);
-  const currentYear = parseInt(parts.find(p => p.type === 'year')?.value || '2024');
-  const currentMonth = parseInt(parts.find(p => p.type === 'month')?.value || '1') - 1;
-  const currentDay = parseInt(parts.find(p => p.type === 'day')?.value || '1');
-  const currentHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-  const currentMinute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+  type DatePart = typeof parts[number];
+  const currentYear = parseInt(parts.find((p: DatePart) => p.type === 'year')?.value || '2024');
+  const currentMonth = parseInt(parts.find((p: DatePart) => p.type === 'month')?.value || '1') - 1;
+  const currentDay = parseInt(parts.find((p: DatePart) => p.type === 'day')?.value || '1');
+  const currentHour = parseInt(parts.find((p: DatePart) => p.type === 'hour')?.value || '0');
+  const currentMinute = parseInt(parts.find((p: DatePart) => p.type === 'minute')?.value || '0');
 
   // Create target date in user's timezone (today at delivery time)
   let targetDate = new Date(Date.UTC(currentYear, currentMonth, currentDay, hours, minutes));
