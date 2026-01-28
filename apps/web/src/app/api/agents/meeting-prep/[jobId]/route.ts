@@ -86,7 +86,7 @@ export async function GET(
     // Show all CONNECTED data sources that the agent uses, even if they returned 0 items
     const jobResult = job.result as Record<string, unknown> | null;
     const jobStats = (jobResult?.stats as Record<string, unknown>) || {};
-    const connectedKeys = new Set(connectedSources.map(s => s.connectorKey));
+    const connectedKeys = new Set(connectedSources.map((s: typeof connectedSources[number]) => s.connectorKey));
 
     // Get agent config to see what sources are enabled
     const configData = (agentConfig?.config as Record<string, unknown>) || {};
@@ -173,7 +173,7 @@ export async function GET(
       result: job.result,
       config: job.config,
       dataSourcesUsed,
-      connectedSources: connectedSources.map(s => s.connectorKey),
+      connectedSources: connectedSources.map((s: typeof connectedSources[number]) => s.connectorKey),
       // Meeting info from stats
       meetingsFound,
       meetingTitles,

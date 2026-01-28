@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
         const hnResults = (platforms?.includes('hackernews') || !platforms?.length)
           ? socialData.hackernews
           : [];
-        mockResults = [...redditResults, ...hnResults].map(r => ({
+        type SocialResult = typeof redditResults[number];
+        mockResults = [...redditResults, ...hnResults].map((r: SocialResult) => ({
           source: r.source,
           title: r.title,
           content: r.content,
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
         break;
       }
       case 'web_search':
-        mockResults = MOCK_CRAWLER_DATA.web_search.map(r => ({
+        mockResults = MOCK_CRAWLER_DATA.web_search.map((r: typeof MOCK_CRAWLER_DATA.web_search[number]) => ({
           source: r.source,
           title: r.title,
           content: r.content,
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
         }));
         break;
       case 'news':
-        mockResults = MOCK_CRAWLER_DATA.news.map(r => ({
+        mockResults = MOCK_CRAWLER_DATA.news.map((r: typeof MOCK_CRAWLER_DATA.news[number]) => ({
           source: r.source,
           title: r.title,
           content: r.content,
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
         }));
         break;
       case 'url_scrape':
-        mockResults = MOCK_CRAWLER_DATA.url_scrape.map(r => ({
+        mockResults = MOCK_CRAWLER_DATA.url_scrape.map((r: typeof MOCK_CRAWLER_DATA.url_scrape[number]) => ({
           source: r.source,
           title: r.title,
           content: r.content,

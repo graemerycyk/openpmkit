@@ -165,7 +165,8 @@ async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
     }
 
     // Update job with results
-    jobState.results = response.results.map(r => ({ ...r, jobId }));
+    type CrawlerResult = typeof response.results[number];
+    jobState.results = response.results.map((r: CrawlerResult) => ({ ...r, jobId }));
     
     if (!response.success) {
       jobState.status = 'failed';
@@ -203,7 +204,7 @@ async function runCrawlerAsync(jobId: string, job: CrawlerJobState) {
         crawlerType: job.type as CrawlerType,
         keywords: contextKeywords,
         platforms: job.platforms.length > 0 ? job.platforms : undefined,
-        results: response.results.map(r => ({
+        results: response.results.map((r: CrawlerResult) => ({
           source: r.source,
           title: r.title,
           content: r.content,
