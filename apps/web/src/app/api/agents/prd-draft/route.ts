@@ -48,7 +48,7 @@ const PRDDraftConfigSchema = z.object({
   includeJiraEpics: z.boolean().default(true),
   includeSlackDiscussions: z.boolean().default(true),
   enabledSources: z.record(z.boolean()).optional(),
-  connectorConfigs: ConnectorConfigSchema,
+  connectorConfigs: ConnectorConfigSchema.optional(),
 });
 
 // GET - Fetch user's PRD Draft config
@@ -116,6 +116,8 @@ export async function POST(request: NextRequest) {
     // Validate config
     const parseResult = PRDDraftConfigSchema.safeParse(body.config);
     if (!parseResult.success) {
+      console.error('[PRD Draft Config] Validation failed:', parseResult.error.errors);
+      console.error('[PRD Draft Config] Received config:', JSON.stringify(body.config, null, 2));
       return NextResponse.json(
         { error: 'Invalid config', details: parseResult.error.errors },
         { status: 400 }
