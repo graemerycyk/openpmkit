@@ -52,10 +52,12 @@ COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
-# Copy Prisma schema and generated client for db push at runtime
+# Copy Prisma schema, CLI, and generated client for db push at runtime
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
 # Copy entrypoint script (from builder since source files were copied there)
 COPY --from=builder /app/apps/web/docker-entrypoint.sh ./docker-entrypoint.sh
