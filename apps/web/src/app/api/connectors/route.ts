@@ -37,7 +37,7 @@ export async function GET() {
     const encryptionKey = process.env.CONNECTOR_ENCRYPTION_KEY;
 
     // Map to response format
-    const connectors = installs.map((install) => {
+    const connectors = installs.map((install: typeof installs[number]) => {
       let workspaceName: string | undefined;
 
       // Try to extract workspace name from credentials for Slack

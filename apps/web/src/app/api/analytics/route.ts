@@ -44,11 +44,12 @@ export async function GET() {
     console.log('[Analytics] Found', allJobs.length, 'jobs');
 
     // Calculate summary stats
+    type Job = typeof allJobs[number];
     const totalJobs = allJobs.length;
-    const completedJobs = allJobs.filter((j) => j.status === 'completed').length;
-    const failedJobs = allJobs.filter((j) => j.status === 'failed').length;
-    const pendingJobs = allJobs.filter((j) => j.status === 'pending').length;
-    const runningJobs = allJobs.filter((j) => j.status === 'running').length;
+    const completedJobs = allJobs.filter((j: Job) => j.status === 'completed').length;
+    const failedJobs = allJobs.filter((j: Job) => j.status === 'failed').length;
+    const pendingJobs = allJobs.filter((j: Job) => j.status === 'pending').length;
+    const runningJobs = allJobs.filter((j: Job) => j.status === 'running').length;
 
     // Calculate success rate
     const finishedJobs = completedJobs + failedJobs;
@@ -108,9 +109,9 @@ export async function GET() {
     const twoWeeksAgo = new Date();
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
-    const jobsThisWeek = allJobs.filter((j) => j.createdAt >= oneWeekAgo).length;
+    const jobsThisWeek = allJobs.filter((j: Job) => j.createdAt >= oneWeekAgo).length;
     const jobsLastWeek = allJobs.filter(
-      (j) => j.createdAt >= twoWeeksAgo && j.createdAt < oneWeekAgo
+      (j: Job) => j.createdAt >= twoWeeksAgo && j.createdAt < oneWeekAgo
     ).length;
 
     // Calculate week-over-week change
@@ -122,7 +123,7 @@ export async function GET() {
     }
 
     // Recent jobs (last 5)
-    const recentJobs = allJobs.slice(0, 5).map((job) => ({
+    const recentJobs = allJobs.slice(0, 5).map((job: typeof allJobs[number]) => ({
       id: job.id,
       type: job.type,
       status: job.status,
