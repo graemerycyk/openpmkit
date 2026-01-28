@@ -24,6 +24,7 @@ COPY . .
 # Generate Prisma client
 RUN npm run db:generate --workspace=@pmkit/web || true
 
+# Note: db:push runs at runtime via entrypoint to have DATABASE_URL available
 # Build packages
 RUN npm run build --workspace=@pmkit/core
 RUN npm run build --workspace=@pmkit/mcp
@@ -51,6 +52,18 @@ COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
+# Copy Prisma schema and generated client for db push at runtime
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy entrypoint script (from builder since source files were copied there)
+COPY --from=builder /app/apps/web/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
+# Set ownership for nextjs user
+RUN chown -R nextjs:nodejs ./prisma ./docker-entrypoint.sh
+
 USER nextjs
 
 EXPOSE 3000
@@ -58,5 +71,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "apps/web/server.js"]
+# Use entrypoint to run db push before starting server
+ENTRYPOINT ["./docker-entrypoint.sh"]
 

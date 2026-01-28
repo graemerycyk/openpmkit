@@ -148,12 +148,7 @@ export async function executeMeetingPrep(
       const noMeetingResult: MeetingPrepResult = {
         content: `# Meeting Prep Pack
 
-No upcoming meetings found within the next ${hoursDisplay} hours.
-
-**To generate a meeting prep pack:**
-1. Ensure Google Calendar is connected
-2. Have a meeting scheduled within the lead time window
-3. Run this agent again closer to your meeting time`,
+No upcoming meetings found within the next ${hoursDisplay} hours.`,
         sources: [],
         stats: {
           meetingTitle: 'No meeting found',

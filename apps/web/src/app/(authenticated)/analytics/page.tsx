@@ -90,7 +90,10 @@ export default function AnalyticsPage() {
 
         if (!res.ok) {
           console.error('Analytics API error:', res.status, responseData);
-          setError(responseData.error || `Error: ${res.status}`);
+          const errorMsg = responseData.details
+            ? `${responseData.error}: ${responseData.details}`
+            : responseData.error || `Error: ${res.status}`;
+          setError(errorMsg);
           return;
         }
 
