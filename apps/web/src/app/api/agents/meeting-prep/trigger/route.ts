@@ -77,7 +77,7 @@ export async function POST() {
 
     // Build a map of connected connectors
     const connectorMap = new Map(
-      connectorInstalls.map((c) => [c.connectorKey, c])
+      connectorInstalls.map((c: typeof connectorInstalls[number]) => [c.connectorKey, c])
     );
 
     // Check which connectors are connected

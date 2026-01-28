@@ -110,8 +110,8 @@ export async function GET() {
 
     // Format response - only include channels where the bot is a member
     const channels = allChannels
-      .filter((c) => c.is_member)
-      .map((c) => ({
+      .filter((c: SlackChannel) => c.is_member)
+      .map((c: SlackChannel) => ({
         id: c.id,
         name: c.name,
         isPrivate: c.is_private,
