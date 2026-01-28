@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         const hnResults = (platforms?.includes('hackernews') || !platforms?.length)
           ? socialData.hackernews
           : [];
-        type SocialResult = typeof redditResults[number];
+        type SocialResult = typeof redditResults[number] | typeof hnResults[number];
         mockResults = [...redditResults, ...hnResults].map((r: SocialResult) => ({
           source: r.source,
           title: r.title,
