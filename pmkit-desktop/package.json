@@ -1,0 +1,42 @@
+{
+  "name": "pmkit-desktop",
+  "version": "1.0.0",
+  "description": "PM-focused AI assistant desktop app - 10 autonomous workflows for Product Managers",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "pmkit": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/cli/index.ts",
+    "start": "node dist/cli/index.js",
+    "run:daily-brief": "tsx src/cli/index.ts run daily-brief",
+    "run:meeting-prep": "tsx src/cli/index.ts run meeting-prep",
+    "run:feature-intel": "tsx src/cli/index.ts run feature-intel",
+    "run:prd-draft": "tsx src/cli/index.ts run prd-draft",
+    "run:sprint-review": "tsx src/cli/index.ts run sprint-review",
+    "run:competitor": "tsx src/cli/index.ts run competitor",
+    "run:roadmap": "tsx src/cli/index.ts run roadmap",
+    "run:release-notes": "tsx src/cli/index.ts run release-notes",
+    "run:deck-content": "tsx src/cli/index.ts run deck-content",
+    "run:prototype": "tsx src/cli/index.ts run prototype",
+    "scheduler:start": "tsx src/scheduler/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pmkit/core": "*",
+    "@pmkit/prompts": "*",
+    "commander": "^12.0.0",
+    "node-cron": "^3.0.3",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}
