@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUser } from '@/lib/mac-auth';
 import {
   executeDailyBrief,
   getLLMService,
@@ -8,19 +8,12 @@ import {
   type ConnectorCredentialsMap,
 } from '@pmkit/core';
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession();
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findFirst({
-      where: { email: session.user.email },
-    });
-
+    // Support both NextAuth session and Bearer token auth (for Mac app)
+    const user = await getAuthenticatedUser(req);
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get agent config
@@ -384,6 +377,10 @@ export async function POST() {
         success: true,
         jobId: job.id,
         stats: result.stats,
+        // Include content for Mac app to display immediately
+        title: `Daily Brief - ${new Date().toLocaleDateString()}`,
+        content: result.content,
+        summary: `Daily brief generated with ${Object.keys(result.stats).length} data sources`,
       });
     } catch (execError) {
       console.error(`[Daily Brief] Job ${job.id} failed:`, execError);

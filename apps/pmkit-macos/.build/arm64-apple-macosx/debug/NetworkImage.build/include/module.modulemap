@@ -1,0 +1,3 @@
+module NetworkImage {
+    header "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/NetworkImage.build/include/NetworkImage-Swift.h"
+}

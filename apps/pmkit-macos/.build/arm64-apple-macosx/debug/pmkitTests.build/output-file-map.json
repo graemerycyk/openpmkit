@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkitTests.build/master.swiftdeps"
+  },
+  "/Users/grae/Developer/pmkit/apps/pmkit-macos/Tests/pmkitTests.swift": {
+    "dependencies": "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkitTests.build/pmkitTests.d",
+    "object": "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkitTests.build/pmkitTests.swift.o",
+    "swiftmodule": "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkitTests.build/pmkitTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkitTests.build/pmkitTests.swiftdeps",
+    "diagnostics": "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkitTests.build/pmkitTests.dia"
+  }
+}

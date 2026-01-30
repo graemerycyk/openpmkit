@@ -1,0 +1,3 @@
+module pmkit_macosPackageTests {
+    header "/Users/grae/Developer/pmkit/apps/pmkit-macos/.build/arm64-apple-macosx/debug/pmkit_macosPackageTests.build/include/pmkit-macosPackageTests-Swift.h"
+}
