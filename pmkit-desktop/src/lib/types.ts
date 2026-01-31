@@ -177,13 +177,38 @@ export interface PMKitConfig {
   llmModel?: string;
   useStubs: boolean;
 
-  // Tenant settings
+  // Tenant settings (your company/product info)
   tenantId: string;
   tenantName: string;
   productName: string;
   userName: string;
 
-  // Connector credentials (encrypted)
+  // API Keys (stored securely in config)
+  apiKeys?: {
+    // LLM Providers
+    openai?: string;
+    anthropic?: string;
+    google?: string;
+
+    // AI Crawlers
+    serper?: string;       // Web search (serper.dev)
+    newsapi?: string;      // News (newsapi.org)
+    gnews?: string;        // News alternative (gnews.io)
+
+    // Integrations
+    figma?: string;
+    loom?: string;
+    coda?: string;
+    amplitude?: string;
+    amplitudeSecret?: string;
+    discourse?: string;
+    discourseUrl?: string;
+    linear?: string;
+    notion?: string;
+    zoom?: string;
+  };
+
+  // Connector credentials (for authenticated data sources)
   connectors?: {
     slack?: {
       accessToken: string;
@@ -219,3 +244,125 @@ export interface PMKitConfig {
     }>>;
   };
 }
+
+// API Key metadata for the settings UI
+export interface ApiKeyInfo {
+  key: keyof NonNullable<PMKitConfig['apiKeys']>;
+  name: string;
+  description: string;
+  url: string;
+  required: boolean;
+  category: 'llm' | 'crawler' | 'integration';
+}
+
+export const API_KEY_INFO: ApiKeyInfo[] = [
+  // LLM Providers
+  {
+    key: 'openai',
+    name: 'OpenAI API Key',
+    description: 'Required for generating AI-powered content',
+    url: 'https://platform.openai.com/api-keys',
+    required: true,
+    category: 'llm',
+  },
+  {
+    key: 'anthropic',
+    name: 'Anthropic API Key',
+    description: 'Alternative LLM provider (Claude)',
+    url: 'https://console.anthropic.com/settings/keys',
+    required: false,
+    category: 'llm',
+  },
+
+  // AI Crawlers
+  {
+    key: 'serper',
+    name: 'Serper API Key',
+    description: 'Web search for competitor research (2,500 free/month)',
+    url: 'https://serper.dev',
+    required: false,
+    category: 'crawler',
+  },
+  {
+    key: 'newsapi',
+    name: 'NewsAPI Key',
+    description: 'News crawler for industry updates (100 free/day)',
+    url: 'https://newsapi.org/register',
+    required: false,
+    category: 'crawler',
+  },
+  {
+    key: 'gnews',
+    name: 'GNews API Key',
+    description: 'Alternative news source (600 free/day)',
+    url: 'https://gnews.io',
+    required: false,
+    category: 'crawler',
+  },
+
+  // Integrations
+  {
+    key: 'figma',
+    name: 'Figma Access Token',
+    description: 'Access design files and comments',
+    url: 'https://www.figma.com/developers/api#access-tokens',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'loom',
+    name: 'Loom API Key',
+    description: 'Access video recordings',
+    url: 'https://dev.loom.com',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'coda',
+    name: 'Coda API Key',
+    description: 'Access docs and tables',
+    url: 'https://coda.io/developers/apis/v1',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'linear',
+    name: 'Linear API Key',
+    description: 'Access issues and projects',
+    url: 'https://linear.app/settings/api',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'notion',
+    name: 'Notion Integration Token',
+    description: 'Access pages and databases',
+    url: 'https://www.notion.so/my-integrations',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'discourse',
+    name: 'Discourse API Key',
+    description: 'Access community forums',
+    url: 'https://meta.discourse.org/t/create-and-configure-an-api-key/230124',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'amplitude',
+    name: 'Amplitude API Key',
+    description: 'Access product analytics',
+    url: 'https://help.amplitude.com/hc/en-us/articles/360058073772',
+    required: false,
+    category: 'integration',
+  },
+  {
+    key: 'zoom',
+    name: 'Zoom Access Token',
+    description: 'Access meetings and recordings',
+    url: 'https://marketplace.zoom.us/docs/guides/build/oauth-app',
+    required: false,
+    category: 'integration',
+  },
+];

@@ -78,21 +78,36 @@ pmkit scheduler set-schedule daily-brief "0 8 * * 1-5"
 pmkit scheduler start
 ```
 
-### Configuration
+### First-Time Setup
 
 ```bash
-# Show config
+# Run the interactive setup wizard
+pmkit setup
+```
+
+The wizard will guide you through:
+1. Your profile (name, company, product)
+2. OpenAI API Key (required for AI-powered content)
+3. Optional crawler and integration API keys
+
+### Managing Settings
+
+```bash
+# Show all settings
 pmkit config
 
-# Set output directory
-pmkit config --output-dir ~/Documents/pmkit
+# View API key status
+pmkit config keys
 
-# Set user/tenant info
-pmkit config --user-name "Sarah Chen"
-pmkit config --tenant-name "Acme Inc"
+# Set an API key
+pmkit config set-key openai sk-...
+pmkit config set-key linear your-linear-key
 
-# Enable/disable stubs
-pmkit config --use-stubs false
+# Update your profile
+pmkit config set-profile --name "Sarah Chen" --company "Acme Inc"
+
+# Reset all settings
+pmkit config reset
 ```
 
 ## Output Structure
@@ -158,6 +173,11 @@ Config is stored at `~/.pmkit/config.json`:
   "tenantName": "Acme Inc",
   "productName": "Acme Platform",
   "userName": "Sarah Chen",
+  "apiKeys": {
+    "openai": "sk-...",
+    "serper": "...",
+    "linear": "lin_api_..."
+  },
   "scheduler": {
     "enabled": true,
     "timezone": "America/Los_Angeles",
@@ -170,16 +190,27 @@ Config is stored at `~/.pmkit/config.json`:
 }
 ```
 
-## Environment Variables
+## API Keys Reference
+
+All API keys are managed through the CLI - no `.env` files needed!
+
+| Key | Purpose | Get it at |
+|-----|---------|-----------|
+| **openai** | AI content generation (required) | https://platform.openai.com/api-keys |
+| **serper** | Web search crawler | https://serper.dev |
+| **newsapi** | News crawler | https://newsapi.org/register |
+| **linear** | Issue tracking | https://linear.app/settings/api |
+| **notion** | Pages and databases | https://notion.so/my-integrations |
+| **figma** | Design files | https://figma.com/developers/api |
+| **coda** | Docs and tables | https://coda.io/developers/apis/v1 |
+| **discourse** | Community forums | Your Discourse admin settings |
 
 ```bash
-# LLM API keys
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-GOOGLE_API_KEY=...
+# Set any key with:
+pmkit config set-key <name> <value>
 
-# Use stub responses (for development)
-USE_STUB_LLM=true
+# Example:
+pmkit config set-key openai sk-proj-abc123...
 ```
 
 ## Development
@@ -281,47 +312,7 @@ await figma.connect({ accessToken: 'your-token' });
 const files = await figma.fetchData({ action: 'list_files' });
 ```
 
-## Environment Variables
-
-Create a `.env` file in the pmkit-desktop directory:
-
-```bash
-# LLM API Keys (required for real responses)
-OPENAI_API_KEY=sk-...
-
-# Use stub responses (for development without API key)
-USE_STUB_LLM=true
-
-# AI Crawlers (optional - free fallbacks available)
-SERPER_API_KEY=           # https://serper.dev - Web search
-NEWSAPI_KEY=              # https://newsapi.org - News
-GNEWS_API_KEY=            # https://gnews.io - News (alternative)
-
-# MVP Integrations - OAuth2
-FIGMA_CLIENT_ID=
-FIGMA_CLIENT_SECRET=
-ZOOM_CLIENT_ID=
-ZOOM_CLIENT_SECRET=
-NOTION_CLIENT_ID=
-NOTION_CLIENT_SECRET=
-
-# MVP Integrations - API Keys
-LOOM_API_KEY=             # https://dev.loom.com
-CODA_API_KEY=             # https://coda.io/developers
-AMPLITUDE_API_KEY=
-AMPLITUDE_SECRET_KEY=
-DISCOURSE_API_KEY=
-DISCOURSE_URL=            # Your Discourse instance URL
-LINEAR_API_KEY=           # https://linear.app/settings/api
-```
-
 ## What's Still TODO
-
-### High Priority (Core Functionality)
-- [ ] `SERPER_API_KEY` setup - Web search is core for competitor research
-- [ ] `NEWSAPI_KEY` setup - News crawler is core for industry monitoring
-- [ ] Credential storage system - Users need a way to save API keys persistently
-- [ ] Config file loader - Load `.env` automatically on startup
 
 ### Medium Priority (Nice to Have)
 - [ ] Figma OAuth flow - Full design integration

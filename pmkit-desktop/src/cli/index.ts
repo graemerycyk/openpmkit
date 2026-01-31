@@ -3,12 +3,11 @@
  * pmkit CLI - Ad-hoc workflow runner for Product Managers
  *
  * Usage:
- *   pmkit run <workflow> [options]
- *   pmkit list
- *   pmkit history <workflow>
- *   pmkit stats [workflow]
- *   pmkit config
- *   pmkit scheduler start
+ *   pmkit setup              # First-time setup wizard
+ *   pmkit run <workflow>     # Run a workflow
+ *   pmkit list               # List all workflows
+ *   pmkit config             # Manage settings
+ *   pmkit scheduler start    # Start autonomous scheduler
  */
 
 import { Command } from 'commander';
@@ -16,9 +15,9 @@ import chalk from 'chalk';
 import ora from 'ora';
 import * as fs from 'fs';
 import type { WorkflowId } from '../lib/types.js';
-import { WORKFLOWS } from '../lib/types.js';
+import { WORKFLOWS, API_KEY_INFO } from '../lib/types.js';
 import { PMKitStorage } from '../lib/storage.js';
-import { configManager } from '../lib/config.js';
+import { configManager, runSetupWizard, showSettings } from '../lib/config.js';
 import { WorkflowRunner } from '../lib/runner.js';
 
 const program = new Command();
@@ -27,6 +26,17 @@ const program = new Command();
 const config = configManager.getConfig();
 const storage = new PMKitStorage({ baseDir: config.outputDir });
 const runner = new WorkflowRunner({ config, storage });
+
+// ============================================================================
+// Setup Command (First-Time Wizard)
+// ============================================================================
+
+program
+  .command('setup')
+  .description('Run the first-time setup wizard')
+  .action(async () => {
+    await runSetupWizard();
+  });
 
 program
   .name('pmkit')
@@ -41,6 +51,12 @@ program
   .command('list')
   .description('List all available workflows')
   .action(() => {
+    // Check for first run
+    if (configManager.isFirstRun()) {
+      console.log(chalk.yellow('\n⚠️  pmkit is not configured yet.'));
+      console.log(chalk.gray('Run "pmkit setup" to configure your API keys and profile.\n'));
+    }
+
     console.log(chalk.bold('\npmkit Workflows\n'));
 
     const categories = new Map<string, Array<{ id: WorkflowId; config: typeof WORKFLOWS[WorkflowId] }>>();
@@ -328,56 +344,160 @@ program
   });
 
 // ============================================================================
-// Config Command
+// Config Command (Settings Management)
 // ============================================================================
 
-program
+const configCmd = program
   .command('config')
-  .description('Show or update configuration')
-  .option('--show', 'Show current config')
-  .option('--set <key=value>', 'Set a config value')
-  .option('--output-dir <path>', 'Set output directory')
-  .option('--use-stubs <bool>', 'Use stub responses (true/false)')
-  .option('--tenant-name <name>', 'Set tenant name')
-  .option('--user-name <name>', 'Set user name')
+  .description('Manage pmkit settings and API keys');
+
+// Default action: show settings
+configCmd
+  .action(() => {
+    showSettings();
+  });
+
+// Show all settings
+configCmd
+  .command('show')
+  .description('Show all settings')
+  .action(() => {
+    showSettings();
+  });
+
+// Set an API key
+configCmd
+  .command('set-key <name> <value>')
+  .description('Set an API key (e.g., openai, serper, linear)')
+  .action((name: string, value: string) => {
+    const validKeys = API_KEY_INFO.map(k => k.key);
+    if (!validKeys.includes(name as any)) {
+      console.error(chalk.red(`\nUnknown API key: ${name}`));
+      console.log(chalk.gray(`\nValid keys: ${validKeys.join(', ')}\n`));
+      process.exit(1);
+    }
+
+    configManager.setApiKey(name as any, value);
+    console.log(chalk.green(`\n✓ ${name} API key saved\n`));
+  });
+
+// Remove an API key
+configCmd
+  .command('remove-key <name>')
+  .description('Remove an API key')
+  .action((name: string) => {
+    configManager.removeApiKey(name as any);
+    console.log(chalk.yellow(`\n✓ ${name} API key removed\n`));
+  });
+
+// List API keys
+configCmd
+  .command('keys')
+  .description('List all API keys and their status')
+  .action(() => {
+    const keys = configManager.getApiKeysStatus();
+
+    console.log(chalk.bold('\n🔑 API Keys\n'));
+
+    const categories = ['llm', 'crawler', 'integration'] as const;
+    const categoryNames = {
+      llm: 'LLM Providers',
+      crawler: 'AI Crawlers',
+      integration: 'Integrations',
+    };
+
+    for (const category of categories) {
+      const categoryKeys = keys.filter(k => k.category === category);
+      console.log(chalk.cyan(`  ${categoryNames[category]}:`));
+
+      for (const key of categoryKeys) {
+        const status = key.configured ? chalk.green('✓') : chalk.gray('○');
+        const required = key.required ? chalk.yellow(' (required)') : '';
+        console.log(`    ${status} ${key.name.padEnd(25)} ${key.maskedValue}${required}`);
+      }
+      console.log('');
+    }
+
+    console.log(chalk.gray('  Set a key: pmkit config set-key <name> <value>'));
+    console.log(chalk.gray('  Example:   pmkit config set-key openai sk-...\n'));
+  });
+
+// Set profile
+configCmd
+  .command('set-profile')
+  .description('Update your profile information')
+  .option('--name <name>', 'Your name')
+  .option('--company <company>', 'Your company name')
+  .option('--product <product>', 'Your product name')
   .action((options) => {
-    const config = configManager.getConfig();
-
-    if (options.outputDir) {
-      configManager.updateConfig({ outputDir: options.outputDir });
-      console.log(chalk.green(`\nOutput directory set to: ${options.outputDir}\n`));
-      return;
+    if (options.name) {
+      configManager.setProfile({ userName: options.name });
+      console.log(chalk.green(`\n✓ Name set to: ${options.name}`));
     }
-
-    if (options.useStubs !== undefined) {
-      const useStubs = options.useStubs === 'true';
-      configManager.updateConfig({ useStubs });
-      console.log(chalk.green(`\nStub mode: ${useStubs ? 'enabled' : 'disabled'}\n`));
-      return;
+    if (options.company) {
+      configManager.setProfile({ tenantName: options.company });
+      console.log(chalk.green(`✓ Company set to: ${options.company}`));
     }
-
-    if (options.tenantName) {
-      configManager.updateConfig({ tenantName: options.tenantName });
-      console.log(chalk.green(`\nTenant name set to: ${options.tenantName}\n`));
-      return;
+    if (options.product) {
+      configManager.setProfile({ productName: options.product });
+      console.log(chalk.green(`✓ Product set to: ${options.product}`));
     }
-
-    if (options.userName) {
-      configManager.updateConfig({ userName: options.userName });
-      console.log(chalk.green(`\nUser name set to: ${options.userName}\n`));
-      return;
+    if (!options.name && !options.company && !options.product) {
+      const profile = configManager.getProfile();
+      console.log(chalk.bold('\n📋 Current Profile\n'));
+      console.log(`  Name:    ${profile.userName}`);
+      console.log(`  Company: ${profile.tenantName}`);
+      console.log(`  Product: ${profile.productName}\n`);
+    } else {
+      console.log('');
     }
+  });
 
-    // Default: show config
-    console.log(chalk.bold('\npmkit Configuration\n'));
-    console.log(chalk.gray('─'.repeat(40)));
-    console.log(`Output Dir:    ${config.outputDir}`);
-    console.log(`LLM Provider:  ${config.llmProvider}`);
-    console.log(`Use Stubs:     ${config.useStubs}`);
-    console.log(`Tenant:        ${config.tenantName}`);
-    console.log(`User:          ${config.userName}`);
-    console.log(chalk.gray('─'.repeat(40)));
-    console.log(chalk.gray('\nConfig file: ~/.pmkit/config.json\n'));
+// Toggle stubs
+configCmd
+  .command('use-stubs <enabled>')
+  .description('Enable or disable stub responses (true/false)')
+  .action((enabled: string) => {
+    const useStubs = enabled === 'true';
+    configManager.updateConfig({ useStubs });
+    console.log(chalk.green(`\n✓ Stub mode: ${useStubs ? 'enabled' : 'disabled'}\n`));
+  });
+
+// Set output directory
+configCmd
+  .command('output-dir <path>')
+  .description('Set the output directory for workflow results')
+  .action((path: string) => {
+    configManager.updateConfig({ outputDir: path });
+    console.log(chalk.green(`\n✓ Output directory set to: ${path}\n`));
+  });
+
+// Reset config
+configCmd
+  .command('reset')
+  .description('Reset all settings to defaults')
+  .action(async () => {
+    const readline = await import('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    rl.question(chalk.yellow('\nAre you sure you want to reset all settings? (y/N): '), (answer) => {
+      rl.close();
+      if (answer.toLowerCase() === 'y') {
+        // Delete the config file
+        const os = require('os');
+        const path = require('path');
+        const configPath = path.join(os.homedir(), '.pmkit', 'config.json');
+        if (fs.existsSync(configPath)) {
+          fs.unlinkSync(configPath);
+        }
+        console.log(chalk.green('\n✓ Settings reset. Run "pmkit setup" to reconfigure.\n'));
+      } else {
+        console.log(chalk.gray('\nReset cancelled.\n'));
+      }
+    });
   });
 
 // ============================================================================
