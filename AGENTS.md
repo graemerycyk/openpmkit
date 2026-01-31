@@ -47,12 +47,8 @@ Keep solutions minimal and focused:
 
 ## Project Structure
 
-### CLI (`pmkit-desktop/`)
-
-The main product - published to npm as `openpmkit`:
-
 ```
-pmkit-desktop/
+openpmkit/
 ├── src/
 │   ├── cli/index.ts       # CLI entry point (Commander.js)
 │   ├── lib/
@@ -63,25 +59,12 @@ pmkit-desktop/
 │   ├── crawlers/          # Social, Web, News crawlers
 │   ├── integrations/      # Slack, Jira, etc. API clients
 │   └── workflows/         # 10 workflow definitions
-├── package.json           # Published as 'openpmkit'
-└── README.md
+├── packages/
+│   ├── core/              # Shared utilities, crawlers, telemetry
+│   └── prompts/           # LLM prompt templates
+├── prompts/               # Workflow prompt definitions
+└── skills/                # Skill definitions
 ```
-
-### Shared Packages (`packages/`)
-
-```
-packages/
-├── core/                  # Shared utilities
-│   ├── src/crawlers/      # Crawler implementations
-│   ├── src/types/         # Domain types
-│   └── src/telemetry/     # SIEM telemetry
-├── prompts/               # LLM prompt templates
-└── content/               # Blog/marketing content
-```
-
-### Marketing Website (`apps/web/`)
-
-Static Next.js site for getpmkit.com - SEO pages, blog, guides.
 
 ## The 10 Workflows
 
@@ -122,45 +105,22 @@ openpmkit settings list
 
 ## Adding a New Workflow
 
-1. **Define the workflow** in `pmkit-desktop/src/workflows/{name}.ts`
+1. **Define the workflow** in `src/workflows/{name}.ts`
 2. **Add prompt template** in `prompts/{nn}-{name}.md`
-3. **Register in runner** at `pmkit-desktop/src/lib/runner.ts`
-4. **Add CLI command** in `pmkit-desktop/src/cli/index.ts`
+3. **Register in runner** at `src/lib/runner.ts`
+4. **Add CLI command** in `src/cli/index.ts`
 
 ## Adding a New Integration
 
-1. **Create client** in `pmkit-desktop/src/integrations/{name}.ts`
-2. **Define credential** in `pmkit-desktop/src/lib/types.ts` (add to CREDENTIALS array)
-3. **Update setup wizard** in `pmkit-desktop/src/cli/index.ts`
-
-## Website Development
-
-The marketing site at `apps/web/` is a static Next.js site:
-
-```bash
-cd apps/web
-npm run dev      # Development
-npm run build    # Production build
-```
-
-Key pages:
-- `/` - Landing page
-- `/blog/*` - Blog posts
-- `/compare/*` - Competitor comparisons
-- `/guides/*` - How-to guides
-- `/integrations/*` - Integration pages
+1. **Create client** in `src/integrations/{name}.ts`
+2. **Define credential** in `src/lib/types.ts` (add to CREDENTIALS array)
+3. **Update setup wizard** in `src/cli/index.ts`
 
 ## Environment Variables
 
-For CLI development:
 ```bash
 OPENAI_API_KEY=sk-...           # Required
 USE_STUB_LLM=true               # Use stubs (no API key needed)
-```
-
-For website:
-```bash
-# No env vars required - static site
 ```
 
 ## Testing

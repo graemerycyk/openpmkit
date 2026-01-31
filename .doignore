@@ -1,3 +1,0 @@
-# Ignore everything for buildpack detection - we use Dockerfile
-node_modules
-.git

@@ -54,14 +54,11 @@ openpmkit run daily-brief
 openpmkit run meeting-prep --params '{"accountName": "Acme Corp"}'
 
 # View settings
-openpmkit settings
+openpmkit settings list
 
 # Set credentials
-openpmkit settings set openai sk-...
-openpmkit settings set serper your-serper-key
-
-# Start autonomous scheduler
-openpmkit scheduler start
+openpmkit settings set OPENAI_API_KEY sk-...
+openpmkit settings set SERPER_API_KEY your-serper-key
 ```
 
 ## Output
@@ -88,8 +85,8 @@ Config is stored at `~/.openpmkit/config.json`:
 ```json
 {
   "credentials": {
-    "openai": "sk-...",
-    "serper": "..."
+    "OPENAI_API_KEY": "sk-...",
+    "SERPER_API_KEY": "..."
   },
   "userName": "Sarah Chen",
   "tenantName": "Acme Inc",
@@ -101,43 +98,43 @@ Config is stored at `~/.openpmkit/config.json`:
 
 | Key | Purpose | Get it at |
 |-----|---------|-----------|
-| **openai** | AI generation (required) | https://platform.openai.com/api-keys |
-| **serper** | Web search | https://serper.dev |
-| **newsapi** | News search | https://newsapi.org |
+| **OPENAI_API_KEY** | AI generation (required) | https://platform.openai.com/api-keys |
+| **SERPER_API_KEY** | Web search | https://serper.dev |
+| **NEWSAPI_KEY** | News search | https://newsapi.org |
 
 ## Project Structure
 
 ```
 openpmkit/
-├── pmkit-desktop/        # CLI tool (npm package)
-│   ├── src/cli/          # CLI commands
-│   ├── src/lib/          # Core library
-│   ├── src/crawlers/     # AI crawlers
-│   └── src/integrations/ # PM tool integrations
+├── src/
+│   ├── cli/              # CLI commands (Commander.js)
+│   ├── lib/              # Core: types, config, runner, storage
+│   ├── crawlers/         # AI Crawlers (Social, Web, News)
+│   ├── integrations/     # Integration clients
+│   └── workflows/        # 10 PM workflow definitions
 ├── packages/
-│   ├── core/             # Domain models, fetchers, crawlers
-│   ├── mcp/              # MCP framework helpers
-│   ├── mock-tenant/      # Demo dataset
-│   └── prompts/          # Prompt templates
-└── apps/web/             # Landing page (getpmkit.com)
+│   ├── core/             # Shared types, crawlers
+│   └── prompts/          # LLM prompt templates
+├── prompts/              # Workflow prompt definitions
+└── skills/               # Skill definitions
 ```
 
 ## Development
 
 ```bash
 # Clone the repo
-git clone https://github.com/openpmkit/openpmkit.git
+git clone https://github.com/graemerycyk/openpmkit.git
 cd openpmkit
 
 # Install dependencies
 npm install
 
-# Build all packages
+# Build
 npm run build
 
 # Run CLI in development
-cd pmkit-desktop
 npx tsx src/cli/index.ts list
+npx tsx src/cli/index.ts run daily-brief
 ```
 
 ## Contributing
@@ -160,4 +157,4 @@ MIT - see [LICENSE](LICENSE) for details.
 
 **Website**: [getpmkit.com](https://getpmkit.com)
 **npm**: [openpmkit](https://www.npmjs.com/package/openpmkit)
-**GitHub**: [openpmkit/openpmkit](https://github.com/openpmkit/openpmkit)
+**GitHub**: [graemerycyk/openpmkit](https://github.com/graemerycyk/openpmkit)

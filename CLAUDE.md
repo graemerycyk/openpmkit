@@ -8,8 +8,8 @@
 # Install dependencies
 npm install
 
-# Build CLI
-cd pmkit-desktop && npm run build
+# Build
+npm run build
 
 # Run a workflow
 openpmkit run daily-brief
@@ -22,18 +22,17 @@ npx tsx src/cli/index.ts run daily-brief
 
 ```
 openpmkit/
-├── pmkit-desktop/         # CLI tool (published as 'openpmkit' on npm)
-│   ├── src/cli/           # CLI commands (Commander.js)
-│   ├── src/lib/           # Core: types, config, runner, storage
-│   ├── src/crawlers/      # AI Crawlers (Social, Web, News)
-│   ├── src/integrations/  # Integration clients
-│   └── src/workflows/     # 10 PM workflows
-├── apps/web/              # Marketing website (getpmkit.com)
+├── src/
+│   ├── cli/              # CLI commands (Commander.js)
+│   ├── lib/              # Core: types, config, runner, storage
+│   ├── crawlers/         # AI Crawlers (Social, Web, News)
+│   ├── integrations/     # Integration clients
+│   └── workflows/        # 10 PM workflow definitions
 ├── packages/
-│   ├── core/              # Shared types, crawlers, prompts
-│   ├── prompts/           # LLM prompt templates
-│   └── content/           # Blog/SEO content
-└── prompts/               # Workflow prompt definitions
+│   ├── core/             # Shared types, crawlers
+│   └── prompts/          # LLM prompt templates
+├── prompts/              # Workflow prompt definitions
+└── skills/               # Skill definitions
 ```
 
 ## Key Principles
@@ -77,23 +76,22 @@ OPENAI_API_KEY=sk-...
 # Optional integrations
 SLACK_BOT_TOKEN=xoxb-...
 JIRA_API_TOKEN=...
-# etc.
 ```
 
 ## Critical Files
 
 | Purpose | Location |
 |---------|----------|
-| CLI Entry | `pmkit-desktop/src/cli/index.ts` |
-| Config Manager | `pmkit-desktop/src/lib/config.ts` |
-| Workflow Runner | `pmkit-desktop/src/lib/runner.ts` |
-| Type Definitions | `pmkit-desktop/src/lib/types.ts` |
+| CLI Entry | `src/cli/index.ts` |
+| Config Manager | `src/lib/config.ts` |
+| Workflow Runner | `src/lib/runner.ts` |
+| Type Definitions | `src/lib/types.ts` |
 | Prompt Templates | `packages/prompts/src/index.ts` |
 | AI Crawlers | `packages/core/src/crawlers/` |
 
 ## Adding a New Workflow
 
-1. Create workflow definition in `pmkit-desktop/src/workflows/`
+1. Create workflow definition in `src/workflows/`
 2. Add prompt template in `prompts/`
-3. Register in `pmkit-desktop/src/lib/runner.ts`
-4. Add CLI command in `pmkit-desktop/src/cli/index.ts`
+3. Register in `src/lib/runner.ts`
+4. Add CLI command in `src/cli/index.ts`
