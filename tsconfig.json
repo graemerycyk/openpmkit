@@ -19,7 +19,11 @@
       "@pmkit/core": ["./packages/core/src/index.ts"],
       "@pmkit/core/*": ["./packages/core/src/*"],
       "@pmkit/prompts": ["./packages/prompts/src/index.ts"],
-      "@pmkit/prompts/*": ["./packages/prompts/src/*"]
+      "@pmkit/prompts/*": ["./packages/prompts/src/*"],
+      "@openpmkit/core": ["./packages/core/src/index.ts"],
+      "@openpmkit/core/*": ["./packages/core/src/*"],
+      "@openpmkit/prompts": ["./packages/prompts/src/index.ts"],
+      "@openpmkit/prompts/*": ["./packages/prompts/src/*"]
     }
   },
   "include": ["src/**/*"],

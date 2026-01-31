@@ -1,0 +1,41 @@
+# Source files (bundled into dist/)
+src/
+packages/
+tsup.config.ts
+tsconfig.json
+
+# Development
+*.tsbuildinfo
+.env
+.env.*
+coverage/
+.nyc_output/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Testing
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Documentation source
+docs/
+
+# Misc
+*.log
+*.tgz
+.npmrc
+CLAUDE.md
+CONTRIBUTING.md

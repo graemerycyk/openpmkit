@@ -1,17 +1,34 @@
 {
   "name": "openpmkit",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Open-source PM-focused AI assistant - 10 autonomous workflows for Product Managers",
-  "main": "dist/index.js",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "bin": {
     "openpmkit": "./dist/cli/index.js"
   },
+  "files": [
+    "dist",
+    "prompts",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "npm run build:packages && tsc",
+    "build": "tsup",
     "build:packages": "cd packages/core && npm run build && cd ../prompts && npm run build",
+    "build:legacy": "npm run build:packages && tsc",
     "dev": "tsx watch src/cli/index.ts",
     "start": "node dist/cli/index.js",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
     "run:daily-brief": "tsx src/cli/index.ts run daily-brief",
     "run:meeting-prep": "tsx src/cli/index.ts run meeting-prep",
     "run:feature-intel": "tsx src/cli/index.ts run feature-intel",
@@ -21,30 +38,36 @@
     "run:roadmap": "tsx src/cli/index.ts run roadmap",
     "run:release-notes": "tsx src/cli/index.ts run release-notes",
     "run:deck-content": "tsx src/cli/index.ts run deck-content",
-    "run:prototype": "tsx src/cli/index.ts run prototype",
-    "typecheck": "tsc --noEmit"
+    "run:prototype": "tsx src/cli/index.ts run prototype"
   },
   "workspaces": [
     "packages/*"
   ],
   "dependencies": {
-    "@pmkit/core": "*",
-    "@pmkit/prompts": "*",
-    "commander": "^12.0.0",
-    "node-cron": "^3.0.3",
     "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "nanoid": "^5.0.0",
+    "node-cron": "^3.0.3",
     "ora": "^8.0.1",
-    "dotenv": "^16.4.5"
+    "zod": "^3.22.0"
   },
   "devDependencies": {
+    "@pmkit/core": "*",
+    "@pmkit/prompts": "*",
     "@types/node": "^20.12.7",
     "@types/node-cron": "^3.0.11",
+    "tsup": "^8.5.1",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/graemerycyk/openpmkit.git"
+  },
+  "homepage": "https://github.com/graemerycyk/openpmkit#readme",
+  "bugs": {
+    "url": "https://github.com/graemerycyk/openpmkit/issues"
   },
   "keywords": [
     "product-management",
@@ -53,7 +76,9 @@
     "workflows",
     "openai",
     "pm",
-    "byok"
+    "byok",
+    "product-manager",
+    "ai-assistant"
   ],
   "author": "openpmkit",
   "license": "MIT",

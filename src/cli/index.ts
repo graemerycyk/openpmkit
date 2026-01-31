@@ -14,11 +14,19 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 import type { WorkflowId, CredentialCategory } from '../lib/types.js';
 import { WORKFLOWS, CREDENTIALS, CREDENTIAL_CATEGORY_NAMES } from '../lib/types.js';
 import { PMKitStorage } from '../lib/storage.js';
 import { configManager, runSetupWizard, showSettings } from '../lib/config.js';
 import { WorkflowRunner } from '../lib/runner.js';
+
+// Get version from package.json
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packageJsonPath = path.resolve(__dirname, '../../package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+const VERSION = packageJson.version;
 
 const program = new Command();
 
@@ -41,7 +49,7 @@ program
 program
   .name('openpmkit')
   .description('PM-focused AI assistant - 10 autonomous workflows for Product Managers')
-  .version('1.0.0');
+  .version(VERSION);
 
 // ============================================================================
 // List Workflows Command
