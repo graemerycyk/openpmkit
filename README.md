@@ -1,319 +1,163 @@
-# pmkit
+# openpmkit
 
-> Your daily PM toolkit - briefs, meetings, and PRDs made simple.
+> Open-source AI Product Management toolkit - 10 autonomous workflows for PMs
 
-pmkit is an AI-powered product management agent that runs daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, and deck content; all with draft-only governance and full traceability.
+**openpmkit** is a CLI tool that runs AI-powered PM workflows locally. Daily briefs, PRDs, prototypes, competitor research - all powered by your own API keys. No SaaS, no subscriptions, no data leaving your machine.
+
+## Quick Start
+
+```bash
+# Install globally
+npm install -g openpmkit
+
+# Run setup wizard
+openpmkit setup
+
+# Run your first workflow
+openpmkit run daily-brief
+```
 
 ## Features
 
-- **10 Workflow Jobs**: Daily brief, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD draft, sprint review, prototype generation, release notes, deck content
-- **3 AI Crawlers**: Social (Reddit, Hacker News), Web Search (Google, DuckDuckGo), News (NewsAPI, Google News) with AI-powered analysis
-- **Draft-Only**: Agents propose changes but never write directly to external systems
-- **Full Traceability**: Every tool call, source, and artifact is logged
-- **Enterprise Governance**: RBAC, permission simulation, audit logging
-- **OAuth Connectors**: Secure integrations with Slack, Jira, Confluence, Gmail, Google Drive, Google Calendar, and more
+- **10 PM Workflows**: Daily brief, meeting prep, feature intel, PRD draft, sprint review, competitor research, roadmap alignment, release notes, deck content, prototype generation
+- **3 AI Crawlers**: Social (Reddit, HN, X), Web Search (Serper), News (NewsAPI)
+- **BYOK (Bring Your Own Key)**: Use your own OpenAI API key - full control over costs
+- **Local Output**: All results saved to `~/openpmkit/` as markdown with SIEM telemetry
+- **Autonomous Scheduling**: Run workflows manually or on cron schedules
+- **No Account Required**: Install and run immediately
 
-## Tech Stack
+## Workflows
 
-- **Frontend**: Next.js 15, React 18, Tailwind CSS, shadcn/ui
-- **Backend**: Node.js 20+, BullMQ, Redis
-- **Database**: PostgreSQL, Prisma
-- **Storage**: S3-compatible (DigitalOcean Spaces) with local fallback
-- **Monorepo**: Turborepo with npm workspaces
+| Workflow | Description | Default Schedule |
+|----------|-------------|------------------|
+| **daily-brief** | Morning brief from Slack, Jira, support | Weekdays 7am |
+| **meeting-prep** | Customer meeting context and talking points | Weekdays 8am |
+| **feature-intel** | VoC clustering with quantified demand | Mondays 9am |
+| **prd-draft** | PRDs grounded in customer evidence | Manual |
+| **sprint-review** | Sprint summaries with metrics | Fridays 2pm |
+| **competitor** | Competitor tracking with implications | Mondays 10am |
+| **roadmap** | Alignment memos with trade-offs | Manual |
+| **release-notes** | Customer-facing release notes | Manual |
+| **deck-content** | Slide content for any audience | Manual |
+| **prototype** | Interactive HTML prototypes from PRDs | Manual |
+
+## Usage
+
+```bash
+# List all workflows
+openpmkit list
+
+# Run a workflow
+openpmkit run daily-brief
+
+# Run with parameters
+openpmkit run meeting-prep --params '{"accountName": "Acme Corp"}'
+
+# View settings
+openpmkit settings
+
+# Set credentials
+openpmkit settings set openai sk-...
+openpmkit settings set serper your-serper-key
+
+# Start autonomous scheduler
+openpmkit scheduler start
+```
+
+## Output
+
+All outputs are saved to `~/openpmkit/{workflow-id}/{timestamp}/`:
+
+```
+~/openpmkit/
+├── daily-brief/
+│   └── 2026-01-30T07-00-00-000Z/
+│       ├── output.md          # Workflow output
+│       └── telemetry.json     # SIEM telemetry
+├── competitor/
+│   └── 2026-01-30T10-00-00-000Z/
+│       ├── output.md
+│       └── telemetry.json
+...
+```
+
+## Configuration
+
+Config is stored at `~/.openpmkit/config.json`:
+
+```json
+{
+  "credentials": {
+    "openai": "sk-...",
+    "serper": "..."
+  },
+  "userName": "Sarah Chen",
+  "tenantName": "Acme Inc",
+  "productName": "Acme Platform"
+}
+```
+
+## Credentials
+
+| Key | Purpose | Get it at |
+|-----|---------|-----------|
+| **openai** | AI generation (required) | https://platform.openai.com/api-keys |
+| **serper** | Web search | https://serper.dev |
+| **newsapi** | News search | https://newsapi.org |
 
 ## Project Structure
 
 ```
-pmkit/
-├── apps/
-│   ├── web/              # Next.js marketing + demo app
-│   └── worker/           # BullMQ job worker
+openpmkit/
+├── pmkit-desktop/        # CLI tool (npm package)
+│   ├── src/cli/          # CLI commands
+│   ├── src/lib/          # Core library
+│   ├── src/crawlers/     # AI crawlers
+│   └── src/integrations/ # PM tool integrations
 ├── packages/
-│   ├── core/             # Domain models, RBAC, audit, job runner
-│   ├── mcp/              # MCP framework
-│   ├── mcp-servers/      # Mocked MCP servers (Jira, Slack, etc.)
+│   ├── core/             # Domain models, fetchers, crawlers
+│   ├── mcp/              # MCP framework helpers
 │   ├── mock-tenant/      # Demo dataset
-│   ├── prompts/          # Prompt templates + stub generators
-│   └── content/          # Keywords, resources, blog content
-├── prisma/               # Database schema
-├── docker/               # Docker configuration
-└── tests/                # Test suites
+│   └── prompts/          # Prompt templates
+└── apps/web/             # Landing page (getpmkit.com)
 ```
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm 10+
-- PostgreSQL 15+ (optional for dev)
-- Redis 7+ (optional for dev)
-
-### Installation
+## Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/getpmkit/pmkit.git
-cd pmkit
+# Clone the repo
+git clone https://github.com/openpmkit/openpmkit.git
+cd openpmkit
 
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp apps/web/.env.example apps/web/.env.local
-
-# Generate Prisma client
-npm run db:generate
-
-# Start development servers
-npm run dev
-```
-
-### Development
-
-The development server runs at `http://localhost:3000`.
-
-```bash
-# Run all apps in development mode
-npm run dev
-
-# Run only the web app
-cd apps/web && npm run dev
-
-# Run only the worker
-cd apps/worker && npm run dev
-```
-
-### Building
-
-```bash
-# Build all packages and apps
+# Build all packages
 npm run build
 
-# Build specific app
-cd apps/web && npm run build
+# Run CLI in development
+cd pmkit-desktop
+npx tsx src/cli/index.ts list
 ```
-
-### Docker Deployment
-
-```bash
-# Build Docker images
-npm run docker:build
-
-# Start all services
-npm run docker:up
-
-# Stop all services
-npm run docker:down
-```
-
-## Environment Variables
-
-### Required
-
-- `DATABASE_URL`: PostgreSQL connection string
-- `NEXTAUTH_SECRET`: Secret for NextAuth.js sessions
-
-### Optional
-
-- `REDIS_URL`: Redis connection string (uses inline fallback if not set)
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: Google OAuth
-- `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`: Microsoft OAuth
-- `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`: S3 storage
-- `OPENAI_API_KEY_DEMO`: OpenAI API key for demo/workbench (uses stubs if not set)
-- `OPENAI_API_KEY_PROD`: OpenAI API key for production tenants (uses stubs if not set)
-- `USE_STUB_LLM`: Set to `true` to use stub responses instead of real LLM
-- `SERPER_API_KEY`: Serper.dev for Google search (2,500 free/month)
-- `NEWSAPI_KEY`: NewsAPI.org for news (100 free/day)
-- `ADMIN_EMAILS`: Comma-separated admin emails for Workbench access
-- `NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN`: Simple Analytics domain
-- `NEXT_PUBLIC_GSC_VERIFICATION`: Google Search Console verification
-- `NEXT_PUBLIC_BING_VERIFICATION`: Bing Webmaster Tools verification
-
-## Demo Mode
-
-The demo runs with a complete mock enterprise dataset and doesn't require any external services. All tool calls use mocked MCP servers, and artifact generation uses stub responses.
-
-Visit `/demo/console` to try:
-- **PM Workflows**: Run any of the 10 job types with mock data and real LLM analysis
-- **Slack & Teams Commands**: Test natural language commands
-- **AI Crawlers**: Run mock crawls with real AI-powered analysis
-
-Unauthenticated users get 2 free job runs. Sign in for unlimited access.
-
-## Architecture
-
-### Draft-Only Pattern
-
-All external writes are proposals, not direct actions:
-
-1. Agent runs a job (e.g., PRD draft)
-2. Agent calls read-only tools to gather data
-3. Agent generates an artifact
-4. For any external writes, agent creates a **proposal**
-5. Human reviews and approves the proposal
-6. Only then is the write executed
-
-### Connector Architecture
-
-pmkit uses a layered connector architecture:
-
-- **OAuth Connectors**: Real data fetchers in `packages/core/src/fetchers/` handle OAuth authentication and API calls
-- **MCP Servers**: Demo/mock data servers in `packages/mcp-servers/` for testing and development
-- **Fetcher Pattern**: All fetchers implement `IFetcher` interface with `fromEncrypted()` factory and `fetch()` methods
-
-### Job Runner
-
-Jobs are executed by the BullMQ worker:
-
-1. Job is enqueued with type and config
-2. Worker picks up the job
-3. Worker executes tool calls via MCP
-4. Worker generates artifact using prompts
-5. Results are saved to database
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `npm run test`
-5. Run linting: `npm run lint`
-6. Submit a pull request
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## Cursor Rules
+## Acknowledgments
 
-# Cursor Rules for pmkit
+openpmkit is inspired by and built on patterns from:
+- [Anthropic's cookbook](https://github.com/anthropics/anthropic-cookbook) - AI application patterns
+- [openclaw](https://github.com/openclaw/openclaw) - CLI architecture inspiration
 
-## Primary Documentation
-
-Read `AGENTS.md` for complete project documentation before making changes.
-
-## Core Principles
-
-### Draft-Only Pattern
-All external writes MUST use proposal tools. Never create direct write tools.
-
-```typescript
-// ✅ Correct
-this.registerTool(createProposalTool('jira_epic', ...));
-
-// ❌ Wrong
-this.registerTool({ name: 'create_jira_epic', ... });
-```
-
-### Type Definitions
-Use Zod schemas with inferred types. Never use TypeScript enums.
-
-```typescript
-// ✅ Correct
-export const StatusSchema = z.enum(['pending', 'active', 'done']);
-export type Status = z.infer<typeof StatusSchema>;
-
-// ❌ Wrong
-enum Status { Pending, Active, Done }
-```
-
-### Tool Naming
-- Read tools: `get_*`, `search_*`, `list_*`, `find_*`
-- Write tools: `propose_*` (never direct writes)
-- All tool names are snake_case
-
-## File Locations
-
-| What | Where |
-|------|-------|
-| Domain types | `packages/core/src/types/index.ts` |
-| MCP tools | `packages/mcp-servers/src/{connector}/index.ts` |
-| Prompt templates | `packages/prompts/src/index.ts` |
-| Demo data | `packages/mock-tenant/src/data/` |
-| Database schema | `prisma/schema.prisma` |
-| Web pages | `apps/web/src/app/` |
-| UI components | `apps/web/src/components/ui/` |
-
-## Frontend Conventions
-
-### Typography
-- Headings: Space Grotesk (`font-heading`)
-- Body: Geist Sans (`font-sans`)
-- Code: Geist Mono (`font-mono`)
-
-### Colors
-Primary brand color is cobalt/indigo:
-- `text-cobalt-600` for links and primary text
-- `bg-cobalt-100` for icon backgrounds
-- `bg-cobalt-600` for primary buttons
-
-### Components
-Use shadcn/ui components from `apps/web/src/components/ui/`.
-Badge variants: `default`, `secondary`, `destructive`, `outline`, `cobalt`
-
-### Animations
-Use Tailwind animations: `animate-fade-in`, `animate-fade-up`
-Stagger with: `animate-delay-100`, `animate-delay-200`, etc.
-
-## Common Tasks
-
-### Adding a Connector
-1. Create MCP server in `packages/mcp-servers/src/{connector}/`
-2. Add mock data in `packages/mock-tenant/src/data/{connector}.ts`
-3. Export from `packages/mcp-servers/src/index.ts`
-4. Add to ConnectorKeySchema if needed
-
-### Adding a Job Type
-1. Add to `JobTypeSchema` in `packages/core/src/types/index.ts`
-2. Add prompt template in `packages/prompts/src/index.ts`
-3. Add stub generator function
-4. Update Prisma enum in `prisma/schema.prisma`
-5. Create job handler
-
-### Adding a Page
-1. Create in `apps/web/src/app/(marketing)/` for marketing pages
-2. Use the established layout patterns (Hero → Features → CTA)
-3. Export metadata for SEO
-4. Follow the cobalt accent color scheme
-
-## Testing
-
-```bash
-npm run test        # Run all tests
-npm run test:watch  # Watch mode
-npm run typecheck   # TypeScript checks
-npm run lint        # ESLint
-```
-
-## Database
-
-```bash
-npm run db:generate  # Generate Prisma client
-npm run db:push      # Push schema to dev database
-npm run db:migrate   # Create and run migrations
-```
-
-## Build
-
-```bash
-npm run build        # Build all packages (Turborepo)
-npm run dev          # Start dev servers
-```
-
-## Avoid
-
-- Over-engineering or adding features not requested
-- Direct write tools (use proposals)
-- TypeScript enums (use Zod)
-- Speculating about code without reading it first
-- Adding error handling for impossible scenarios
-- Creating abstractions for one-time operations
-
+We believe AI tools for PMs should be open, extensible, and privacy-first.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT - see [LICENSE](LICENSE) for details.
 
 ---
 
-**pmkit** - Draft smarter. Decide faster.
-
-[Website](https://getpmkit.com) · [Demo](https://getpmkit.com/demo) · [Blog](https://getpmkit.com/blog)
-
+**Website**: [getpmkit.com](https://getpmkit.com)
+**npm**: [openpmkit](https://www.npmjs.com/package/openpmkit)
+**GitHub**: [openpmkit/openpmkit](https://github.com/openpmkit/openpmkit)

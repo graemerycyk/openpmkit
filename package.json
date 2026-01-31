@@ -1,7 +1,8 @@
 {
-  "name": "pmkit",
-  "version": "0.1.0",
+  "name": "openpmkit",
+  "version": "1.0.0",
   "private": true,
+  "description": "Open-source AI Product Management toolkit - 10 autonomous workflows for PMs",
   "workspaces": [
     "apps/*",
     "packages/*",
@@ -13,14 +14,9 @@
     "start": "npm run start --workspace=apps/web",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
-    "db:generate": "turbo run db:generate",
-    "db:push": "turbo run db:push",
-    "db:migrate": "turbo run db:migrate",
-    "docker:build": "docker-compose -f docker/docker-compose.yml build",
-    "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
-    "docker:down": "docker-compose -f docker/docker-compose.yml down"
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx}\""
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -33,7 +29,18 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "dependencies": {
-    "resend": "^6.8.0"
-  }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openpmkit/openpmkit.git"
+  },
+  "keywords": [
+    "openpmkit",
+    "product-management",
+    "ai",
+    "cli",
+    "workflows",
+    "byok"
+  ],
+  "author": "openpmkit",
+  "license": "MIT"
 }

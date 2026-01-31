@@ -3,194 +3,138 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn, siteConfig } from '@/lib/utils';
+import { siteConfig } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'pmkit - AI Product Management Toolkit | Daily Briefs, PRDs, Prototypes',
+  title: 'openpmkit - Open Source AI Product Management Toolkit',
   description:
-    'Your daily PM toolkit. AI-powered workflows for product managers: daily briefs, meeting prep, PRD drafts, VoC clustering, competitor research, and PRD to prototype conversion.',
+    'Open-source PM toolkit. 10 autonomous AI workflows for Product Managers: daily briefs, meeting prep, PRD drafts, competitor research, and more. Install with npm.',
   keywords: [
-    'pmkit',
+    'openpmkit',
+    'open source',
     'AI product management',
     'PM toolkit',
     'AI PRD generator',
     'daily brief automation',
-    'meeting prep AI',
-    'VoC clustering',
-    'competitor research AI',
-    'PRD to prototype',
-    'product management software',
+    'product management CLI',
     'AI PM assistant',
+    'BYOK',
+    'bring your own key',
   ],
   openGraph: {
-    title: 'pmkit - AI Product Management Toolkit',
+    title: 'openpmkit - Open Source AI Product Management Toolkit',
     description:
-      'Your daily PM toolkit. AI-powered briefs, PRDs, and prototypes - made simple.',
+      'Open-source PM toolkit. 10 AI workflows for Product Managers - install with npm.',
     url: siteConfig.url,
-    siteName: 'pmkit',
+    siteName: 'openpmkit',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'pmkit - AI Product Management Toolkit',
-    description: 'Your daily PM toolkit. AI-powered briefs, PRDs, and prototypes - made simple.',
+    title: 'openpmkit - Open Source AI Product Management Toolkit',
+    description: 'Open-source PM toolkit. 10 AI workflows for Product Managers.',
   },
   alternates: {
     canonical: siteConfig.url,
   },
 };
+
 import {
   FileText,
   Users,
   BarChart3,
-  Shield,
-  GitBranch,
   Target,
   ArrowRight,
   CheckCircle2,
-  Link2,
-  Play,
-  ClipboardCheck,
-  MessageSquare,
-  Mail,
   Wand2,
   Megaphone,
   Presentation,
-  Lightbulb,
-  Sunrise,
-  UserCheck,
+  Terminal,
+  Github,
+  Heart,
+  Key,
+  Folder,
+  Clock,
 } from 'lucide-react';
 
-const features = [
-  // First row: Available now (no Coming Soon badge) - Intelligence Framework
+const workflows = [
   {
     icon: FileText,
-    title: 'Daily Briefs',
-    description:
-      'Start each day with a synthesized brief from Slack, Jira, support, and community; automatically.',
-    intelligence: 'Operational Intelligence',
+    title: 'Daily Brief',
+    description: 'Morning brief synthesizing overnight activity from Slack, Jira, and support.',
+    schedule: 'Weekdays 7am',
+  },
+  {
+    icon: Users,
+    title: 'Meeting Prep',
+    description: 'Customer meeting context with recent conversations and talking points.',
+    schedule: 'Weekdays 8am',
   },
   {
     icon: BarChart3,
     title: 'Feature Intelligence',
-    description:
-      'Go beyond sentiment. Get specific feature recommendations with quantified demand, competitive context, and internal alignment signals.',
-    intelligence: 'Feature Intelligence',
-  },
-  {
-    icon: Users,
-    title: 'Meeting Prep Packs',
-    description:
-      'Walk into every customer meeting with context: recent calls, open tickets, and talking points.',
-    intelligence: 'Stakeholder Intelligence',
-  },
-  // Remaining workflows: Coming Soon
-  {
-    icon: Wand2,
-    title: 'PRD to Prototype',
-    description:
-      'Turn PRDs into interactive HTML prototypes with working UI - validate ideas in minutes, not weeks.',
-    comingSoon: true,
+    description: 'VoC clustering with quantified demand and competitive context.',
+    schedule: 'Mondays 9am',
   },
   {
     icon: FileText,
-    title: 'PRD Drafts',
-    description:
-      'Draft PRDs grounded in customer evidence, with explicit assumptions and open questions.',
-    comingSoon: true,
+    title: 'PRD Draft',
+    description: 'PRDs grounded in customer evidence with explicit assumptions.',
+    schedule: 'Manual',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Sprint Review',
+    description: 'Sprint summaries with completed work, metrics, and demos.',
+    schedule: 'Fridays 2pm',
   },
   {
     icon: Target,
     title: 'Competitor Research',
-    description:
-      'Track competitor mentions across X, Reddit, LinkedIn, and news; pricing, features, messaging; with strategic implications.',
-    comingSoon: true,
+    description: 'Track competitor mentions across social, news, and forums.',
+    schedule: 'Mondays 10am',
   },
   {
-    icon: GitBranch,
-    title: 'Roadmap Alignment',
-    description:
-      'Generate alignment memos with options, trade-offs, and recommendations for stakeholder decisions.',
-    comingSoon: true,
-  },
-  {
-    icon: CheckCircle2,
-    title: 'Sprint Review Packs',
-    description:
-      'Generate sprint review packs with completed work, metrics, demos, and stakeholder updates.',
-    comingSoon: true,
+    icon: Wand2,
+    title: 'PRD to Prototype',
+    description: 'Turn PRDs into interactive HTML prototypes for validation.',
+    schedule: 'Manual',
   },
   {
     icon: Megaphone,
     title: 'Release Notes',
-    description:
-      'Generate customer-facing release notes from Jira and Confluence; clear, benefit-focused, and ready to publish.',
-    comingSoon: true,
+    description: 'Customer-facing release notes from Jira and Confluence.',
+    schedule: 'Manual',
   },
   {
     icon: Presentation,
     title: 'Deck Content',
-    description:
-      'Generate slide content tailored for exec, customer, team, or stakeholder audiences - ready to paste into your templates.',
-    comingSoon: true,
+    description: 'Slide content for exec, customer, or stakeholder audiences.',
+    schedule: 'Manual',
   },
 ];
 
-const benefits = [
-  'Draft-only: Never writes directly to external systems',
-  'Full audit trail for every tool call and artifact',
-  'RBAC with permission simulation',
-  'Secure connectors for enterprise tools',
-  'Sources and citations for every insight',
-  'Downloadable artifacts in multiple formats',
-];
-
-const intelligenceFramework = [
+const features = [
   {
-    icon: Sunrise,
-    name: 'Operational Intelligence',
-    agent: 'Daily Brief',
-    question: 'What happened overnight?',
-    description: 'Synthesized updates from Slack, Jira, and support. Start every morning knowing exactly what needs attention.',
-    href: '/templates/daily-brief',
+    icon: Key,
+    title: 'BYOK (Bring Your Own Key)',
+    description: 'Use your own API keys. No data leaves your machine. Full control over costs.',
   },
   {
-    icon: UserCheck,
-    name: 'Stakeholder Intelligence',
-    agent: 'Meeting Prep',
-    question: 'Who am I meeting and what\'s their context?',
-    description: 'Complete context on attendees: recent conversations, open issues, relationship history, and talking points.',
-    href: '/templates/meeting-prep',
+    icon: Folder,
+    title: 'Local Markdown Output',
+    description: 'All outputs saved to ~/openpmkit as markdown files with SIEM telemetry.',
   },
   {
-    icon: Lightbulb,
-    name: 'Feature Intelligence',
-    agent: 'Feature Intelligence',
-    question: 'What should we build next?',
-    description: 'Specific feature recommendations with quantified demand, competitive context, and internal alignment signals.',
-    href: '/feature-intelligence',
+    icon: Clock,
+    title: 'Scheduled or Ad-hoc',
+    description: 'Run workflows manually or on autonomous schedules with cron.',
   },
-];
-
-const integrations = [
-  // Tool Integrations
-  { name: 'Jira', category: 'Project Management' },
-  { name: 'Confluence', category: 'Documentation' },
-  { name: 'Slack', category: 'Communication' },
-  { name: 'Gmail', category: 'Email' },
-  { name: 'Google Drive', category: 'Documents' },
-  { name: 'Google Calendar', category: 'Meetings' },
-  { name: 'Gong', category: 'Call Intelligence' },
-  { name: 'Loom', category: 'Video Transcripts' },
-  { name: 'Zendesk', category: 'Support' },
-  { name: 'Figma', category: 'Design' },
-  { name: 'Discourse', category: 'Community' },
-  { name: 'Amplitude', category: 'Analytics' },
-  // AI Crawlers
-  { name: 'Social Crawler', category: 'X, Reddit, LinkedIn, Discord, Bluesky, Threads' },
-  { name: 'Web Search', category: 'Google & Bing' },
-  { name: 'News Crawler', category: 'Industry News' },
-  { name: 'URL Scraper', category: 'Specific Page Analysis' },
+  {
+    icon: Terminal,
+    title: 'Simple CLI',
+    description: 'Install globally with npm. Run with a single command. No setup required.',
+  },
 ];
 
 export default function HomePage() {
@@ -202,98 +146,21 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: 'pmkit',
-            url: 'https://getpmkit.com',
-            logo: 'https://getpmkit.com/logo.png',
+            '@type': 'SoftwareApplication',
+            name: 'openpmkit',
+            applicationCategory: 'DeveloperApplication',
+            applicationSubCategory: 'Product Management CLI',
+            operatingSystem: 'Windows, macOS, Linux',
             description:
-              'Your daily PM toolkit - briefs, PRDs, and prototypes made simple.',
-            sameAs: [
-              'https://twitter.com/getpmkit',
-              'https://github.com/getpmkit',
-            ],
-          }),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            name: 'pmkit',
-            url: 'https://getpmkit.com',
-            potentialAction: {
-              '@type': 'SearchAction',
-              target: 'https://getpmkit.com/search?q={search_term_string}',
-              'query-input': 'required name=search_term_string',
-            },
-          }),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: 'pmkit',
-            description:
-              'AI-powered product management agent that automates PM workflows: daily briefs, meeting prep, VoC clustering, competitor research, roadmap alignment, PRD drafts, sprint reviews, prototype generation, release notes, and deck content.',
-            brand: {
-              '@type': 'Brand',
-              name: 'pmkit',
-            },
+              'Open-source AI product management CLI. 10 autonomous workflows for PMs: daily briefs, PRDs, prototypes, and more.',
             offers: {
               '@type': 'Offer',
-              availability: 'https://schema.org/InStock',
-              priceCurrency: 'USD',
               price: '0',
-              priceValidUntil: '2026-12-31',
-            },
-          }),
-        }}
-      />
-      {/* JSON-LD for SoftwareApplication (AEO/GEO - helps AI understand this is a SaaS tool) */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'SoftwareApplication',
-            name: 'pmkit',
-            applicationCategory: 'BusinessApplication',
-            applicationSubCategory: 'Product Management Software',
-            operatingSystem: 'Web Browser',
-            description:
-              'AI-powered product management automation platform. Automate daily briefs, PRD writing, meeting prep, VoC clustering, competitive research, and more.',
-            offers: {
-              '@type': 'AggregateOffer',
-              lowPrice: '0',
-              highPrice: '49',
               priceCurrency: 'USD',
-              offerCount: '2',
             },
-            featureList: [
-              'Daily Brief automation',
-              'AI PRD generator',
-              'Meeting prep packs',
-              'Voice of Customer clustering',
-              'Competitive research automation',
-              'Roadmap alignment memos',
-              'Sprint review packs',
-              'Release notes generator',
-              'PRD to prototype conversion',
-              'Deck content generation',
-            ],
-            softwareVersion: '1.0',
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: '4.8',
-              ratingCount: '50',
-              bestRating: '5',
-              worstRating: '1',
-            },
+            softwareVersion: '1.0.0',
+            downloadUrl: 'https://www.npmjs.com/package/openpmkit',
+            codeRepository: 'https://github.com/openpmkit/openpmkit',
           }),
         }}
       />
@@ -302,23 +169,51 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-cobalt-50/50 to-background py-20 md:py-32">
         <div className="container relative z-10">
           <div className="mx-auto max-w-4xl text-center">
+            <Badge variant="outline" className="mb-4 border-green-500 bg-green-50 text-green-700">
+              <Github className="mr-1 h-3 w-3" />
+              Open Source
+            </Badge>
             <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Your daily PM toolkit;
-              <span className="text-cobalt-600"> briefs, PRDs, and prototypes</span> - made simple.
+              <span className="text-cobalt-600">openpmkit</span>
+              <br />
+              AI workflows for Product Managers
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Draft smarter. Decide faster. pmkit runs your PM workflows - daily briefs, meeting
-              prep, PRD drafts, and interactive prototypes - while you focus on strategy.
+              10 autonomous workflows that run locally. Daily briefs, PRDs, prototypes, competitor research -
+              all powered by your own API keys. No SaaS, no subscriptions, no data leaving your machine.
             </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+            {/* Install command */}
+            <div className="mx-auto mt-8 max-w-lg">
+              <div className="rounded-lg border-2 border-cobalt-200 bg-slate-900 p-4">
+                <div className="flex items-center justify-between">
+                  <code className="font-mono text-sm text-white">
+                    <span className="text-green-400">$</span> npm install -g openpmkit
+                  </code>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-slate-400 hover:text-white"
+                    onClick={() => navigator.clipboard?.writeText('npm install -g openpmkit')}
+                  >
+                    Copy
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
-                <Link href="/demo">
-                  Try the Demo
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="https://github.com/openpmkit/openpmkit" target="_blank">
+                  <Github className="mr-2 h-4 w-4" />
+                  View on GitHub
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/how-it-works">See How It Works</Link>
+                <Link href="https://www.npmjs.com/package/openpmkit" target="_blank">
+                  <Terminal className="mr-2 h-4 w-4" />
+                  npm package
+                </Link>
               </Button>
             </div>
           </div>
@@ -329,505 +224,169 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Product Management Intelligence Section */}
-      <section className="py-20 md:py-32 bg-muted/30">
+      {/* Quick Start Section */}
+      <section className="py-16 md:py-24">
         <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="cobalt" className="mb-4">
-              Product Management Intelligence
-            </Badge>
-            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              Three types of intelligence. One platform.
+          <div className="mx-auto max-w-3xl">
+            <h2 className="font-heading text-2xl font-bold text-center sm:text-3xl mb-8">
+              Get started in 30 seconds
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Modern PMs need more than tools - they need synthesized intelligence.
-              pmkit delivers operational, stakeholder, and feature intelligence so you can decide with confidence.
-            </p>
-          </div>
-          <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
-            {intelligenceFramework.map((item) => (
-              <Card key={item.name} className="relative overflow-hidden">
-                <CardHeader>
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-cobalt-100">
-                    <item.icon className="h-6 w-6 text-cobalt-600" />
-                  </div>
-                  <CardTitle className="text-xl">{item.name}</CardTitle>
-                  <CardDescription className="text-base font-medium text-foreground">
-                    &ldquo;{item.question}&rdquo;
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Powered by <span className="font-medium">{item.agent}</span>
-                    </span>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={item.href}>
-                        Learn more
-                        <ArrowRight className="ml-1 h-3 w-3" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <Button size="lg" asChild>
-              <Link href="/feature-intelligence">
-                Explore Feature Intelligence
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* PRD to Prototype Hero Section */}
-      <section className="py-20 md:py-32">
-        <div className="container">
-          <div className="mx-auto max-w-4xl text-center">
-            <Badge variant="cobalt" className="mb-4">
-              See It In Action
-            </Badge>
-            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              From PRD to clickable prototype in minutes
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Watch pmkit transform a product requirements document into an interactive UI you can share with stakeholders - no design handoff required.
-            </p>
-          </div>
-          <div className="mt-12 mx-auto max-w-5xl">
-            <div className="rounded-xl border-2 border-cobalt-200 bg-white p-2 shadow-xl overflow-hidden">
-              <div className="rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-                {/* Browser chrome mockup */}
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                  </div>
-                  <div className="flex-1 mx-4">
-                    <div className="bg-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-300 font-mono">
-                      prototype-search-filters.html
-                    </div>
-                  </div>
-                </div>
-                {/* Prototype preview */}
-                <div className="bg-white rounded-lg overflow-hidden">
-                  <div className="bg-slate-50 border-b px-4 py-3">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 bg-white border rounded-lg px-3 py-2">
-                          <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                          <span className="text-slate-400 text-sm">Search documents...</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="bg-white border rounded-lg px-3 py-2 text-sm text-slate-600">
-                          Last 30 days
-                        </div>
-                        <div className="bg-white border rounded-lg px-3 py-2 text-sm text-slate-600">
-                          All types
-                        </div>
-                        <div className="bg-cobalt-600 text-white rounded-lg px-4 py-2 text-sm font-medium">
-                          Search
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    {[
-                      { title: 'Q4 Product Roadmap', type: 'Document', date: 'Dec 28' },
-                      { title: 'Search Filters PRD', type: 'PRD', date: 'Dec 27' },
-                      { title: 'Customer Feedback Analysis', type: 'Report', date: 'Dec 26' },
-                    ].map((item) => (
-                      <div key={item.title} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded bg-cobalt-100 flex items-center justify-center">
-                            <FileText className="w-4 h-4 text-cobalt-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-900 text-sm">{item.title}</p>
-                            <p className="text-xs text-slate-500">{item.type}</p>
-                          </div>
-                        </div>
-                        <span className="text-xs text-slate-400">{item.date}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <div className="rounded-lg border bg-slate-900 p-6 font-mono text-sm">
+              <div className="space-y-2 text-slate-300">
+                <p><span className="text-green-400">$</span> npm install -g openpmkit</p>
+                <p><span className="text-green-400">$</span> openpmkit setup</p>
+                <p className="text-slate-500"># Enter your OpenAI API key when prompted</p>
+                <p><span className="text-green-400">$</span> openpmkit run daily-brief</p>
+                <p className="text-slate-500"># Output saved to ~/openpmkit/daily-brief/</p>
               </div>
             </div>
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link href="/demo/console?job=prototype_generation">
-                  Try Prototype Generation
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/blog/prd-to-prototype-ai-ui-generation">
-                  Learn How It Works
-                </Link>
-              </Button>
-            </div>
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              PRD → Prototype is part of pmkit&apos;s artifact chaining - each job builds on previous outputs.
-            </p>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="bg-muted/30 py-20 md:py-32">
+      <section className="bg-muted/30 py-16 md:py-24">
         <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
+          <div className="mx-auto max-w-2xl text-center mb-12">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              10+ workflows every PM needs
+              Built for PMs who value control
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              AI briefs, VoC themes, PRD drafts, prototypes, and release notes - run end-to-end with traceability and governance.
+              No cloud dependencies. No subscription fees. Your data stays on your machine.
             </p>
           </div>
-          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <Card
-                key={feature.title}
-                className={cn(
-                  "animate-fade-up border-0 shadow-none",
-                  "bg-background"
-                )}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+            {features.map((feature) => (
+              <Card key={feature.title} className="border-0 bg-background">
                 <CardHeader>
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-100">
                     <feature.icon className="h-5 w-5 text-cobalt-600" />
                   </div>
-                  <CardTitle className="text-xl">
-                    {feature.title}
-                    {'comingSoon' in feature && feature.comingSoon && (
-                      <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
-                    )}
-                  </CardTitle>
-                  {'intelligence' in feature && feature.intelligence && (
-                    <Badge variant="cobalt" className="w-fit text-xs">
-                      {feature.intelligence}
-                    </Badge>
-                  )}
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-base">{feature.description}</CardDescription>
                 </CardContent>
               </Card>
             ))}
-            {/* More workflows coming soon card */}
-            <Card
-              className={cn(
-                "animate-fade-up border-2 border-dashed border-cobalt-200 bg-cobalt-50/30",
-                "flex items-center justify-center"
-              )}
-              style={{ animationDelay: `${features.length * 100}ms` }}
-            >
-              <CardContent className="text-center py-12">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-100">
-                  <ArrowRight className="h-6 w-6 text-cobalt-600" />
-                </div>
-                <CardTitle className="text-lg text-cobalt-700">More workflows coming soon</CardTitle>
-                <CardDescription className="mt-2">
-                  We&apos;re building new workflows based on PM feedback
-                </CardDescription>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 md:py-32">
+      {/* Workflows Section */}
+      <section className="py-16 md:py-24">
         <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
+          <div className="mx-auto max-w-2xl text-center mb-12">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              Draft-only by design
+              10 workflows every PM needs
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              pmkit agents propose changes but never write directly. You review, edit, and approve
-              before anything is published.
+              Each workflow runs locally and outputs markdown with full telemetry.
             </p>
           </div>
-          <div className="mt-16 grid gap-8 md:grid-cols-3">
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-2xl bg-cobalt-100">
-                <Link2 className="h-12 w-12 text-cobalt-600" />
-              </div>
-              <div className="mx-auto mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-600 text-sm font-bold text-white">
-                1
-              </div>
-              <h3 className="font-heading text-lg font-semibold">Connect Your Tools</h3>
-              <p className="mt-2 text-muted-foreground">
-                OAuth connectors link to Jira, Slack, Gong, and more—securely and with audit logging.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-2xl bg-cobalt-100">
-                <Play className="h-12 w-12 text-cobalt-600" />
-              </div>
-              <div className="mx-auto mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-600 text-sm font-bold text-white">
-                2
-              </div>
-              <h3 className="font-heading text-lg font-semibold">Run Jobs</h3>
-              <p className="mt-2 text-muted-foreground">
-                Trigger any PM workflow; on demand or scheduled.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-2xl bg-cobalt-100">
-                <ClipboardCheck className="h-12 w-12 text-cobalt-600" />
-              </div>
-              <div className="mx-auto mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-600 text-sm font-bold text-white">
-                3
-              </div>
-              <h3 className="font-heading text-lg font-semibold">Review & Approve</h3>
-              <p className="mt-2 text-muted-foreground">
-                Every output is a proposal. Review the diff, edit if needed, then approve to
-                publish.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 md:py-32">
-        <div className="container">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
-              <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-                Enterprise governance built in
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                pmkit is designed for teams that need autonomy without risk. Every action is
-                traceable, every write is a proposal.
-              </p>
-              <ul className="mt-8 space-y-4">
-                {benefits.map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-cobalt-600" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8">
-                <Button asChild>
-                  <Link href="/resources/enterprise-pm-governance">
-                    Learn About Governance
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-            <div className="rounded-lg border bg-card p-8">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Shield className="h-4 w-4" />
-                Audit Log
-              </div>
-              <div className="mt-4 space-y-3 font-mono text-sm">
-                <div className="rounded bg-muted p-2">
-                  <span className="text-cobalt-600">job.started</span> daily_brief by sarah.chen
-                </div>
-                <div className="rounded bg-muted p-2">
-                  <span className="text-cobalt-600">tool.called</span> slack.get_channel_messages
-                </div>
-                <div className="rounded bg-muted p-2">
-                  <span className="text-cobalt-600">tool.called</span> jira.get_sprint_issues
-                </div>
-                <div className="rounded bg-muted p-2">
-                  <span className="text-cobalt-600">artifact.created</span> brief_2025-12-29.md
-                </div>
-                <div className="rounded bg-muted p-2">
-                  <span className="text-cobalt-600">job.completed</span> 4 tool calls, 1 artifact
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trigger From Where You Work Section */}
-      <section className="py-20 md:py-32">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="outline" className="mb-4 border-cobalt-200 bg-cobalt-50 text-cobalt-700">
-              Demo Preview
-            </Badge>
-            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              Trigger pmkit from where you already work
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Start jobs from Slack, Teams, or email. The demo shows how triggers work with simulated data.
-            </p>
-          </div>
-
-          <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-3">
-            {/* Slack */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-[#4A154B] p-2">
-                      <MessageSquare className="h-5 w-5 text-white" />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {workflows.map((workflow) => (
+              <Card key={workflow.title} className="border bg-background">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cobalt-100">
+                      <workflow.icon className="h-4 w-4 text-cobalt-600" />
                     </div>
-                    <CardTitle className="text-lg">Slack</CardTitle>
+                    <Badge variant="outline" className="text-xs">
+                      {workflow.schedule}
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-xs">Demo</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <code className="block rounded bg-muted p-3 text-sm font-mono">
-                  /pmkit run daily brief
-                </code>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  DM the agent or use slash commands in any channel.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Teams */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-[#5059C9] p-2">
-                      <Users className="h-5 w-5 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">Teams</CardTitle>
-                  </div>
-                  <Badge variant="outline" className="text-xs">Demo</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <code className="block rounded bg-muted p-3 text-sm font-mono">
-                  @pmkit prep meeting Acme
-                </code>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Mention the bot in any Teams channel or chat.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Email */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-cobalt-600 p-2">
-                      <Mail className="h-5 w-5 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">Email</CardTitle>
-                  </div>
-                  <Badge variant="outline" className="text-xs">Demo</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <code className="block rounded bg-muted p-3 text-sm font-mono">
-                  Subject: weekly themes
-                </code>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Email your agent address with job instructions.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Demo shows trigger patterns with simulated data.{' '}
-            <Link href="/contact" className="text-cobalt-600 hover:underline">
-              Contact sales
-            </Link>{' '}
-            to set up real Slack/Teams integrations.
-          </p>
-
-          <div className="mt-8 text-center">
-            <Button asChild>
-              <Link href="/demo/console?view=commands">
-                Try the Slack & Teams Demo
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Integrations Section */}
-      <section className="bg-muted/30 py-20 md:py-32">
-        <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              Connects to your stack
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Secure connectors for the tools you already use. Demo uses simulated data;
-              paying customers get real OAuth connections.
-            </p>
-          </div>
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            {integrations.map((integration) => (
-              <div
-                key={integration.name}
-                className="flex items-center gap-2 rounded-full border bg-background px-4 py-2"
-              >
-                <span className="font-medium">{integration.name}</span>
-                <span className="text-sm text-muted-foreground">{integration.category}</span>
-              </div>
+                  <CardTitle className="text-lg mt-2">{workflow.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{workflow.description}</CardDescription>
+                </CardContent>
+              </Card>
             ))}
           </div>
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            All connectors use simulated data in demo.{' '}
-            <Link href="/contact" className="text-cobalt-600 hover:underline">
-              Contact sales
-            </Link>{' '}
-            to connect your real tools.
-          </p>
-          <div className="mt-6 text-center">
-            <Button variant="outline" asChild>
-              <Link href="/integrations">
-                View All Integrations
-              </Link>
-            </Button>
+          <div className="mt-8 text-center">
+            <code className="rounded bg-muted px-3 py-2 font-mono text-sm">
+              openpmkit list
+            </code>
+            <span className="ml-2 text-muted-foreground">to see all available workflows</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Built on openclaw Section */}
+      <section className="py-16 md:py-24 bg-muted/30">
+        <div className="container">
+          <div className="mx-auto max-w-3xl text-center">
+            <Badge variant="outline" className="mb-4">
+              <Heart className="mr-1 h-3 w-3 text-red-500" />
+              Open Source Ecosystem
+            </Badge>
+            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
+              Standing on the shoulders of giants
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              openpmkit is inspired by and built on patterns from{' '}
+              <Link href="https://github.com/anthropics/anthropic-cookbook" className="text-cobalt-600 hover:underline">
+                Anthropic&apos;s cookbook
+              </Link>{' '}
+              and the{' '}
+              <Link href="https://github.com/openclaw/openclaw" className="text-cobalt-600 hover:underline">
+                openclaw
+              </Link>{' '}
+              CLI architecture. We believe AI tools for PMs should be open, extensible, and privacy-first.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Button variant="outline" asChild>
+                <Link href="https://github.com/openpmkit/openpmkit" target="_blank">
+                  <Github className="mr-2 h-4 w-4" />
+                  Contribute
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="https://github.com/openpmkit/openpmkit/issues" target="_blank">
+                  Report Issues
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-cobalt-600 py-20 text-white md:py-32">
+      <section className="bg-cobalt-600 py-16 text-white md:py-24">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              Ready to try pmkit?
+              Ready to automate your PM workflows?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-cobalt-100">
-              Run our workflow automations in the demo: daily brief, meeting prep, VoC clustering,
-              and more - with new workflows added regularly.
+              Install openpmkit and run your first workflow in under a minute.
+              Free forever, open source, no account required.
             </p>
+            <div className="mt-8">
+              <div className="mx-auto max-w-md rounded-lg bg-slate-900 p-4">
+                <code className="font-mono text-white">
+                  npm install -g openpmkit && openpmkit setup
+                </code>
+              </div>
+            </div>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>
-                <Link href="/demo">
-                  Try the Demo
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="https://github.com/openpmkit/openpmkit" target="_blank">
+                  <Github className="mr-2 h-4 w-4" />
+                  Star on GitHub
                 </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white bg-white text-cobalt-600 hover:bg-white/90"
+                className="border-white text-white hover:bg-white hover:text-cobalt-600"
                 asChild
               >
-                <Link href="/contact">Contact Sales</Link>
+                <Link href="https://github.com/openpmkit/openpmkit#readme" target="_blank">
+                  Read the Docs
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -836,4 +395,3 @@ export default function HomePage() {
     </>
   );
 }
-
