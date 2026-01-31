@@ -1,64 +1,32 @@
 # AGENTS.md
 
-> Documentation for AI programming agents working in this codebase.
+> Documentation for AI programming agents working on openpmkit.
+
+## Overview
+
+openpmkit is an open-source CLI tool that provides 10 autonomous PM workflows. Users install via npm and run workflows locally with their own API keys (BYOK model).
 
 ## Quick Reference
 
 | Task | Command |
 |------|---------|
-| Install dependencies | `npm install` |
-| Build all packages | `npm run build` |
-| Start dev server | `npm run dev` |
-| Run tests | `npm run test` |
-| Type check | `npm run typecheck` |
-| Lint | `npm run lint` |
-| Generate Prisma client | `npm run db:generate` |
-| Push schema to DB | `npm run db:push` |
+| Install globally | `npm install -g openpmkit` |
+| Run setup | `openpmkit setup` |
+| List workflows | `openpmkit list` |
+| Run workflow | `openpmkit run daily-brief` |
+| Dev mode | `npx tsx src/cli/index.ts run daily-brief` |
 
-### Critical Files at a Glance
+## Architecture
 
-| What | Where |
-|------|-------|
-| **TODO tracking** | `TODO.md` ⚠️ **Check this first!** |
-| Domain types | `packages/core/src/types/index.ts` |
-| Telemetry & SIEM | `packages/core/src/telemetry/index.ts` |
-| MCP framework | `packages/mcp/src/index.ts` |
-| Job runner | `packages/core/src/jobs/index.ts` |
-| Prompt templates | `packages/prompts/src/index.ts` |
-| Crawler analysis | `packages/prompts/src/crawler-analysis.ts` |
-| Real crawlers | `packages/core/src/crawlers/` |
-| Database schema | `prisma/schema.prisma` |
-| Demo data | `packages/mock-tenant/src/data/` |
-| Web app | `apps/web/src/app/` |
-| UI components | `apps/web/src/components/ui/` |
+```
+User runs CLI → Workflow executes → AI processes → Markdown output saved
+                     ↓
+              Uses configured API keys from ~/.openpmkit/config.json
+                     ↓
+              Outputs to ~/openpmkit/{workflow}/{date}.md
+```
 
-### TODO.md - Incomplete Features Tracking
-
-**Always check `TODO.md` before and after making changes.**
-
-This file tracks:
-- 🔴 Critical items blocking security reviews
-- 🟠 High priority items backing up marketing claims
-- 🟡 "Coming soon" features claimed on marketing pages
-- 🟢 Nice-to-have improvements
-- 📝 Documentation gaps where claims exceed implementation
-- 💡 Ideas for future consideration
-
-**When building:**
-1. Check TODO.md for related incomplete work
-2. Update status when completing items
-3. Add new items when you discover incomplete features
-4. Add items when making claims that aren't fully implemented
-
-**Keep TODO.md as the single source of truth for what's done, half-done, and still to do.**
-
----
-
-## Agent Behavior Guidelines
-
-This section provides guidance for AI agents (Claude 4.x models) working in this codebase, based on [Claude 4 best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices).
-
-### Code Exploration
+## Code Exploration Guidelines
 
 **Always read before editing.** Never speculate about code you haven't inspected:
 
@@ -67,7 +35,7 @@ This section provides guidance for AI agents (Claude 4.x models) working in this
 - Thoroughly review the style, conventions, and abstractions before implementing new features
 - Give grounded, hallucination-free answers based on actual code
 
-### Avoid Over-Engineering
+## Avoid Over-Engineering
 
 Keep solutions minimal and focused:
 
@@ -75,1463 +43,164 @@ Keep solutions minimal and focused:
 - Don't add features, refactor code, or make "improvements" beyond what was asked
 - Don't add error handling or validation for scenarios that can't happen
 - Don't create helpers, utilities, or abstractions for one-time operations
-- Don't design for hypothetical future requirements
-- Reuse existing abstractions where possible (follow DRY principle)
+- Reuse existing abstractions where possible
 
-### Tool Usage
+## Project Structure
 
-Be explicit about taking action:
+### CLI (`pmkit-desktop/`)
 
-- When asked to make changes, implement them rather than just suggesting
-- Use parallel tool calls when operations are independent
-- Read multiple files at once to build context faster
-- Execute independent searches/reads simultaneously
-
-### State Tracking for Long Tasks
-
-For complex multi-step work:
-
-- Use structured formats (JSON) for tracking test results and task status
-- Use git for state tracking across sessions
-- Focus on incremental progress—complete components before moving on
-- Track progress in structured files when working across context windows
-
-### Communication Style
-
-Be direct and efficient:
-
-- Provide fact-based progress reports rather than self-celebratory updates
-- Skip unnecessary elaboration unless more detail is requested
-- Jump directly to the next action after tool calls (unless summaries are helpful)
-
-## Project Overview
-
-pmkit is an AI-powered product management agent platform using a **draft-only governance pattern**. Agents propose changes but never write directly to external systems. All tool calls, sources, and artifacts are logged for full traceability.
-
-### Core Concept
-
-```
-Agent runs job → Gathers data (read-only) → Generates artifact → Creates proposal → Human reviews → Approved writes execute
-```
-
-## Architecture Principles
-
-### Draft-Only Pattern
-
-All external writes use `propose_*` tools that create proposals for human review. **Never implement direct write tools** - always use `createProposalTool()` from `@pmkit/mcp`.
-
-```typescript
-// ✅ Correct: Proposal tool
-this.registerTool(
-  createProposalTool('jira_epic', 'Propose a new epic', schema, 'jira', ...)
-);
-
-// ❌ Wrong: Direct write tool
-this.registerTool({ name: 'create_jira_epic', ... });
-```
-
-### MCP (Model Context Protocol)
-
-- Each integration is an MCP server in `packages/mcp-servers/src/{connector}/`
-- Tools are registered with Zod schemas for input/output validation
-- Mock servers return data from `packages/mock-tenant/src/data/`
-- Real connectors extend `RealConnectorServer` and implement OAuth
-
-### Multi-Tenancy
-
-- All data is scoped by `tenantId`
-- Users belong to tenants with role-based permissions
-- Jobs, artifacts, proposals all reference their tenant
-
-### Artifact Chaining
-
-pmkit artifacts can be used as data sources for subsequent jobs, enabling compound workflows:
-
-- **VoC Report** → PRD Draft (customer evidence)
-- **PRD** → Prototype Generation (requirements)
-- **PRD + Jira** → Release Notes (feature context)
-- **Competitor Report** → Roadmap Alignment (competitive context)
-
-The `pmkit` MCP server exposes tools for querying artifacts:
-- `get_artifact` - Retrieve by ID
-- `list_artifacts` - List by type
-- `search_artifacts` - Semantic search
-- `get_recent_artifacts` - Get most recent by type
-
-This enables workflows where each job builds on previous outputs, reducing hallucination through evidence grounding.
-
-## Package Responsibilities
-
-| Package | Purpose | Key Exports |
-|---------|---------|-------------|
-| `@pmkit/core` | Domain types, RBAC, audit logging, job runner, crawlers | `JobRunner`, `AuditLogger`, `RBACService`, `runSocialCrawler`, `runWebSearchCrawler`, `runNewsCrawler` |
-| `@pmkit/mcp` | MCP framework, tool definitions, policy enforcement | `BaseMCPServer`, `MCPClient`, `createProposalTool` |
-| `@pmkit/mcp-servers` | Mock MCP servers for each connector | `mockJiraServer`, `mockSlackServer`, etc. |
-| `@pmkit/mock-tenant` | Demo dataset for all connectors | `mockTenant`, `mockUsers`, connector data |
-| `@pmkit/prompts` | Prompt templates, stub generators, crawler analysis | `PROMPT_TEMPLATES`, `renderPrompt`, `executeCrawlerAnalysis`, `MOCK_CRAWLER_DATA` |
-| `@pmkit/content` | Marketing content, blog posts, keywords | `blogPosts`, `resources`, `keywords` |
-
-### Apps
-
-| App | Purpose |
-|-----|---------|
-| `apps/web` | Next.js 15 marketing site + demo console + workbench |
-| `apps/worker` | BullMQ job worker (processes queued jobs) |
-
-### Workbench (Admin-Only)
-
-The Workbench (`/workbench`) is a copy/paste MVP that allows admin users to run jobs without connector setup:
-
-- **Purpose**: Dogfooding, demo validation, prompt iteration
-- **Access**: Admin-only (controlled via `ADMIN_EMAILS` env variable)
-- **How it works**: Users paste data (Slack messages, Jira updates, etc.) instead of pulling from connectors
-- **Key files**:
-  - `apps/web/src/app/workbench/page.tsx` - Main UI
-  - `apps/web/src/app/workbench/field-config.ts` - Field definitions per job type
-  - `apps/web/src/app/api/workbench/run-job/route.ts` - API endpoint
-  - `apps/web/src/lib/admin.ts` - Admin email check utility
-
-## Code Conventions
-
-### Types
-
-- All domain types use Zod schemas with inferred TypeScript types
-- Schema naming: `{Entity}Schema` → Type: `{Entity}`
-- Use `z.enum()` not TypeScript enums
-- Export both schema and type
-
-```typescript
-// ✅ Correct pattern
-export const JobStatusSchema = z.enum(['pending', 'running', 'completed', 'failed']);
-export type JobStatus = z.infer<typeof JobStatusSchema>;
-
-// ❌ Avoid TypeScript enums
-enum JobStatus { Pending, Running, ... }
-```
-
-### MCP Tools
-
-- **Read tools**: `get_*`, `search_*`, `list_*`, `find_*`
-- **Write tools**: `propose_*` (never direct writes)
-- All tools must have `inputSchema` and `outputSchema` (Zod)
-- Tool names are snake_case
-
-### Jobs
-
-- 10 job types: `daily_brief`, `meeting_prep`, `feature_intelligence`, `competitor_research`, `roadmap_alignment`, `prd_draft`, `sprint_review`, `prototype_generation`, `release_notes`, `deck_content`
-- Job handlers implement `JobHandler` interface
-- All jobs produce artifacts in markdown format
-- Jobs run via `JobRunner.runJob()` which creates a `JobContext`
-
-### Artifacts
-
-- Generated documents from job runs
-- Types: `brief`, `meeting_pack`, `voc_report`, `competitor_report`, `alignment_memo`, `prd`, `sprint_review`, `release_notes`, `prototype`, `deck_content`
-- Format is typically markdown
-- Stored with `storageKey` for S3/local retrieval
-
-### Proposals
-
-- Represent pending writes to external systems
-- Types: `jira_epic`, `jira_story`, `confluence_page`, `slack_message`, `prd_document`
-- Status flow: `draft` → `pending_review` → `approved`/`rejected`
-- `bundle` field contains the full payload for execution
-
-## Key Files
-
-### Domain & Types
-- `packages/core/src/types/index.ts` - All domain type schemas
-- `packages/core/src/jobs/index.ts` - JobRunner, JobHandler, JobContext
-- `packages/core/src/rbac/index.ts` - Permission system
-- `packages/core/src/audit/index.ts` - Audit logging
-
-### MCP Framework
-- `packages/mcp/src/index.ts` - MCP server/client, tool helpers, policy enforcement
-- `packages/mcp/src/factory.ts` - Server factory for creating configured clients
-- `packages/mcp/src/remote.ts` - Remote MCP server connections
-
-### Connectors
-- `packages/mcp-servers/src/{connector}/index.ts` - Each connector's MCP server
-- `packages/mock-tenant/src/data/{connector}.ts` - Mock data for each connector
-
-### Prompts
-- `packages/prompts/src/index.ts` - All prompt templates and stub generators
-
-### Database
-- `prisma/schema.prisma` - Database schema (source of truth for data model)
-
-### Web App
-- `apps/web/src/app/(marketing)/` - Marketing pages (uses shared layout with header/footer)
-- `apps/web/src/app/demo/console/` - Demo console UI
-- `apps/web/src/app/demo/console/` - Demo console with PM Workflows and Slack/Teams command demo
-- `apps/web/src/components/layout/` - Header and Footer components
-- `apps/web/src/components/ui/` - Shared UI components (shadcn/ui)
-- `apps/web/src/lib/utils.ts` - Utilities including `cn()` and `siteConfig`
-- `apps/web/src/styles/globals.css` - CSS variables and base styles
-
-## Website & Brand Information
-
-### Site Configuration
-- **Name**: pmkit
-- **Tagline**: "Your daily PM toolkit - briefs, meetings, and PRDs made simple."
-- **URL**: https://getpmkit.com
-- **Twitter**: @getpmkit
-- **GitHub**: github.com/getpmkit
-
-### Navigation Structure
-Main nav: How It Works → Demo → Resources → Blog → Pricing
-
-Footer sections:
-- Product: How It Works, Demo, Pricing, Trust Center
-- Agents: Product Management Agent, AI PM Assistant, Agentic PM, Draft-Only Agents
-- PM Workflows: PRD Automation, Meeting Prep Packs, Roadmap Alignment, Product Ops Automation, Sprint Review Packs
-- Integrations: Slack to Jira, Gong Insights, Community to Roadmap, Jira & Confluence, MCP Connectors
-- VoC & Intel: VoC Clustering, Competitor Research, Customer Escalations, Search Analytics
-
-## Frontend Design System
-
-### Current Typography
-
-The site uses a deliberate font pairing:
-
-| Purpose | Font | CSS Variable | Usage |
-|---------|------|--------------|-------|
-| Body/Sans | Geist Sans | `--font-geist-sans` | All body text, paragraphs, lists |
-| Headings | Space Grotesk | `--font-space-grotesk` | h1-h6, section titles, card titles |
-| Monospace | Geist Mono | `--font-geist-mono` | Code blocks, audit logs, technical content |
-
-```typescript
-// Font configuration in layout.tsx
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
-import { Space_Grotesk } from 'next/font/google';
-```
-
-### Current Color Palette
-
-**Brand Color: Cobalt/Indigo** - The primary accent throughout the site.
-
-```css
-/* Cobalt scale (tailwind.config.ts) */
-cobalt-50:  #eef2ff   /* Backgrounds, badges */
-cobalt-100: #e0e7ff   /* Icon backgrounds, hover states */
-cobalt-200: #c7d2fe   /* Borders, subtle accents */
-cobalt-500: #6366f1   /* Primary buttons, links */
-cobalt-600: #4f46e5   /* Primary brand color, CTAs */
-cobalt-700: #4338ca   /* Hover states, emphasis */
-cobalt-950: #1e1b4b   /* Dark mode primary */
-```
-
-**CSS Variables (globals.css)**:
-```css
-/* Light mode */
---primary: 238 84% 60%;        /* Cobalt/Indigo */
---background: 0 0% 100%;       /* White */
---foreground: 222.2 84% 4.9%;  /* Near-black */
---muted: 210 40% 96.1%;        /* Light gray backgrounds */
---muted-foreground: 215.4 16.3% 46.9%;  /* Gray text */
-
-/* Dark mode */
---primary: 238 84% 67%;
---background: 222.2 84% 4.9%;
---foreground: 210 40% 98%;
-```
-
-### UI Components
-
-Located in `apps/web/src/components/ui/` (shadcn/ui based):
-
-| Component | File | Key Variants |
-|-----------|------|--------------|
-| Button | `button.tsx` | `default`, `destructive`, `outline`, `secondary`, `ghost`, `link` |
-| Badge | `badge.tsx` | `default`, `secondary`, `destructive`, `outline`, `cobalt` |
-| Card | `card.tsx` | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter |
-| Tabs | `tabs.tsx` | Tabs, TabsList, TabsTrigger, TabsContent |
-| Accordion | `accordion.tsx` | For collapsible content |
-| Separator | `separator.tsx` | Horizontal/vertical dividers |
-| ScrollArea | `scroll-area.tsx` | Custom scrollbars |
-| Textarea | `textarea.tsx` | Multi-line input |
-
-### Animation System
-
-Defined in `tailwind.config.ts`:
-
-```typescript
-// Keyframes
-'fade-in':  { from: { opacity: '0' }, to: { opacity: '1' } }
-'fade-up':  { from: { opacity: '0', transform: 'translateY(10px)' }, to: { opacity: '1', transform: 'translateY(0)' } }
-'slide-in-right': { from: { transform: 'translateX(100%)' }, to: { transform: 'translateX(0)' } }
-'accordion-down/up': Radix accordion animations
-
-// Animation classes
-animate-fade-in, animate-fade-up, animate-slide-in-right
-```
-
-**Staggered delays** (globals.css):
-```css
-.animate-delay-100 { animation-delay: 100ms; }
-.animate-delay-200 { animation-delay: 200ms; }
-/* ... up to 500ms */
-```
-
-### Layout Patterns
-
-**Container**: Centered, max-width 1400px, 2rem padding
-```typescript
-container: { center: true, padding: '2rem', screens: { '2xl': '1400px' } }
-```
-
-**Section spacing**: `py-20 md:py-32` for major sections
-
-**Hero pattern**:
-- Gradient background: `bg-gradient-to-b from-cobalt-50/50 to-background`
-- Blurred decorative circle: `bg-cobalt-100/30 blur-3xl`
-- Badge → h1 → description → CTA buttons
-
-**Card grid**: `grid gap-8 md:grid-cols-2 lg:grid-cols-3`
-
-**Feature cards**: Icon in cobalt-100 circle → Title → Description
-
-### Prose Styling
-
-For blog/resources content (`.prose` class):
-- Headings use `font-heading` (Space Grotesk)
-- Body uses `font-sans` (Geist Sans)
-- Links: `text-cobalt-600 hover:text-cobalt-700`
-- Blockquotes: `border-l-4 border-cobalt-500`
-- Code: `bg-muted` with rounded corners
-
-### Icon System
-
-Uses Lucide React icons throughout:
-```typescript
-import { FileText, Users, BarChart3, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
-```
-
-Common icons:
-- `ArrowRight` - CTAs and links
-- `CheckCircle2` - Benefits/features lists
-- `Shield` - Security/governance
-- `FileText` - Documents/PRDs
-- `Users` - Teams/meetings
-- `BarChart3` - Analytics/metrics
-
-### Design Principles for New Work
-
-When adding new pages or components:
-
-1. **Maintain cobalt as the accent** - Use `text-cobalt-600`, `bg-cobalt-100`, `border-cobalt-*`
-2. **Use the established font pairing** - Space Grotesk for headings, Geist Sans for body
-3. **Follow section rhythm** - Alternate between white and `bg-muted/30` backgrounds
-4. **Add motion thoughtfully** - Use `animate-fade-up` with staggered delays for card grids
-5. **Keep CTAs consistent** - Primary button for main action, outline for secondary
-6. **Use the Badge component** - `variant="cobalt"` for status indicators
-
-## Agent Page UI Pattern
-
-All 10 agent pages follow a standardized UI pattern with consistent action buttons.
-
-### Agent Categories
-
-| Category | Agents | Status |
-|----------|--------|--------|
-| **Fully Autonomous** | Daily Brief, Meeting Prep, Sprint Review | Fully functional with Agent Status toggle |
-| **Coming Soon** | PRD Draft, VoC Clustering, Competitor Research, Roadmap Alignment, Deck Content, Release Notes, Prototype Generation | Save button disabled with tooltip |
-
-### Agent Status Card (Fully Autonomous Only)
-
-Fully autonomous agents have an "Agent Status" card with a toggle switch to enable/disable the agent:
-
-```tsx
-{/* Agent Status */}
-<Card>
-  <CardHeader>
-    <div className="flex items-center gap-2">
-      <Settings2 className="h-5 w-5 text-muted-foreground" />
-      <CardTitle className="text-lg">Agent Status</CardTitle>
-    </div>
-  </CardHeader>
-  <CardContent>
-    <div className="flex items-center justify-between">
-      <div className="space-y-0.5">
-        <Label htmlFor="agent-active">Enable Daily Brief</Label>
-        <p className="text-sm text-muted-foreground">
-          When enabled, the agent will run automatically at your scheduled time
-        </p>
-      </div>
-      <Switch
-        id="agent-active"
-        checked={isActive}
-        onCheckedChange={setIsActive}
-      />
-    </div>
-  </CardContent>
-</Card>
-```
-
-### Standard Action Buttons
-
-All agent pages have a consistent footer:
-
-```tsx
-{/* Actions - Standard pattern for all agent pages */}
-<div className="flex items-center justify-between">
-  {/* Left side: Run Now (admin only) */}
-  <div className="flex items-center gap-3">
-    {isAdmin && (
-      <Button variant="outline" onClick={handleRun} disabled={isRunning || !canRun}>
-        {isRunning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-        Run Now
-      </Button>
-    )}
-  </div>
-  {/* Right side: Save Settings (primary) */}
-  <Button onClick={handleSave} disabled={isSaving || !canRun}>
-    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-    Save Agent Settings
-  </Button>
-</div>
-```
-
-For "Coming Soon" agents, the Save button is disabled:
-```tsx
-<Button disabled={true} title="Agent settings coming soon">
-  <Save className="mr-2 h-4 w-4" />
-  Save Agent Settings
-</Button>
-```
-
-### Admin Detection Pattern
-
-All agent pages check admin status via the workbench API:
-
-```typescript
-const [isAdmin, setIsAdmin] = useState(false);
-
-useEffect(() => {
-  async function checkAdmin() {
-    try {
-      const res = await fetch('/api/workbench/run-job');
-      if (res.ok) {
-        const data = await res.json();
-        setIsAdmin(data.isAdmin === true);
-      }
-    } catch {
-      setIsAdmin(false);
-    }
-  }
-  checkAdmin();
-}, []);
-```
-
-The `/api/workbench/run-job` GET endpoint returns `{ isAdmin: boolean }` based on `ADMIN_EMAILS` environment variable.
-
-### Button Behavior
-
-| Button | Position | Visibility | Enabled When | Action |
-|--------|----------|------------|--------------|--------|
-| Run Now | Left | Admin only | Form valid (`canRun`) | Trigger manual agent run |
-| Save Agent Settings | Right | Always | Fully autonomous agents only | Save config (includes `isActive` state) |
-
-### Required Imports
-
-```typescript
-import { Loader2, Play, Save, Settings2 } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-```
-
-### Key Files
-
-- `apps/web/src/app/(authenticated)/agents/{agent}/page.tsx` - Agent setup pages
-- `apps/web/src/app/(authenticated)/agents/{agent}/history/page.tsx` - History pages
-- `apps/web/src/app/api/agents/{agent}/trigger/route.ts` - Manual trigger endpoints
-
-## Adding a New Connector (End-to-End)
-
-**IMPORTANT**: Connectors must be built end-to-end as complete features. A connector is not complete until:
-1. OAuth flow works and stores encrypted credentials
-2. MCP server exists with read tools
-3. At least one agent/orchestrator can use the connector's data
-4. UI shows the connector as available (not "coming soon")
-
-### Phase 1: OAuth & Infrastructure
-
-1. **Create OAuth routes**
-   ```typescript
-   // apps/web/src/app/api/connectors/{connector}/authorize/route.ts
-   // apps/web/src/app/api/connectors/{connector}/callback/route.ts
-   ```
-
-2. **Add to integrations page**
-   ```typescript
-   // apps/web/src/app/(authenticated)/settings/integrations/page.tsx
-   // Add to oauthConnectors array and OAuth endpoints mapping
-   ```
-
-3. **Test OAuth flow end-to-end**
-   - Connect in UI → OAuth redirect → callback → credentials stored → UI shows "Connected"
-
-### Phase 2: MCP Server & Mock Data
-
-4. **Create the MCP server**
-   ```typescript
-   // packages/mcp-servers/src/{connector}/index.ts
-   import { BaseMCPServer, createProposalTool } from '@pmkit/mcp';
-
-   export class Mock{Connector}MCPServer extends BaseMCPServer {
-     constructor() {
-       super({
-         name: '{connector}',
-         description: '{Connector} integration',
-         version: '1.0.0',
-       });
-       this.registerTools();
-     }
-
-     private registerTools(): void {
-       // Read tools
-       this.registerTool({ name: 'get_item', ... });
-
-       // Write tools (proposals only)
-       this.registerTool(createProposalTool(...));
-     }
-   }
-   ```
-
-5. **Add mock data**
-   ```typescript
-   // packages/mock-tenant/src/data/{connector}.ts
-   export const mock{Connector}Data = { ... };
-   ```
-
-6. **Export from index**
-   ```typescript
-   // packages/mcp-servers/src/index.ts
-   export * from './{connector}';
-   ```
-
-7. **Add connector key** (if needed)
-   ```typescript
-   // packages/mcp/src/index.ts
-   export const ConnectorKeySchema = z.enum([
-     'jira', 'confluence', 'slack', 'gong', 'zendesk', '{connector}'
-   ]);
-   ```
-
-8. **Update Prisma schema** (if persisting connector state)
-   ```prisma
-   // prisma/schema.prisma - add to ConnectorStatus enum if needed
-   ```
-
-### Phase 3: Agent/Orchestrator Integration
-
-9. **Create a Fetcher class** (for autonomous agents)
-   ```typescript
-   // packages/core/src/agents/{agent-type}/{connector}-fetcher.ts
-   // Example: gmail-fetcher.ts for Daily Brief
-   export class {Connector}Fetcher {
-     constructor(private credentials: EncryptedCredentials) {}
-     async fetchData(since: Date, options: FetchOptions): Promise<FetchResult> {
-       // Decrypt credentials, call API, return structured data
-     }
-   }
-   ```
-
-10. **Update orchestrator to use new connector**
-    ```typescript
-    // packages/core/src/agents/{agent-type}/orchestrator.ts
-    // Accept new connector credentials, initialize fetcher, merge data
-    ```
-
-11. **Update trigger route**
-    ```typescript
-    // apps/web/src/app/api/agents/{agent-type}/trigger/route.ts
-    // Fetch connector credentials, pass to orchestrator
-    ```
-
-### Phase 4: UI & Marketing
-
-12. **Update agent setup UI** to show connector as available source
-13. **Update marketing pages** to list connector as "Available Now" (not "Coming Soon")
-14. **Update TODO.md** to mark connector as complete
-
-### Checklist for Complete Connector
-
-| Item | Required |
-|------|----------|
-| OAuth authorize route | ✅ |
-| OAuth callback route | ✅ |
-| Credentials encryption/storage | ✅ |
-| MCP server with read tools | ✅ |
-| Mock data for testing | ✅ |
-| Real API client (RealXMCPServer) | ✅ |
-| Fetcher class for agents | ✅ |
-| At least one agent uses it | ✅ |
-| Integrations page shows it | ✅ |
-| Agent setup UI shows it | ✅ |
-| Marketing says "Available Now" | ✅ |
-| TODO.md updated | ✅ |
-
-**Example**: See Slack connector for reference:
-- OAuth: `apps/web/src/app/api/connectors/slack/`
-- MCP Server: `packages/mcp-servers/src/slack/`
-- Fetcher: `packages/core/src/agents/daily-brief/slack-fetcher.ts`
-- Agent integration: `packages/core/src/agents/daily-brief/orchestrator.ts`
-
-## Adding a New Job Type
-
-1. **Add to JobTypeSchema**
-   ```typescript
-   // packages/core/src/types/index.ts
-   export const JobTypeSchema = z.enum([
-     'daily_brief', 'meeting_prep', ..., 'new_job_type'
-   ]);
-   ```
-
-2. **Add prompt template**
-   ```typescript
-   // packages/prompts/src/index.ts
-   export const PROMPT_TEMPLATES: Record<JobType, PromptTemplate> = {
-     // ... existing templates
-     new_job_type: {
-       id: 'new-job-type-v1',
-       name: 'New Job Type',
-       description: '...',
-       jobType: 'new_job_type',
-       systemPrompt: `...`,
-       userPromptTemplate: `...`,
-       outputFormat: 'markdown',
-       requiredContext: ['...'],
-     },
-   };
-   ```
-
-3. **Add stub generator**
-   ```typescript
-   // packages/prompts/src/index.ts
-   function generateNewJobTypeStub(context: PromptContext, date: string): string {
-     return `# New Job Type\n\n...`;
-   }
-   
-   // Update generateStubResponse switch statement
-   case 'new_job_type':
-     return generateNewJobTypeStub(context, date);
-   ```
-
-4. **Update Prisma enum**
-   ```prisma
-   // prisma/schema.prisma
-   enum JobType {
-     daily_brief
-     meeting_prep
-     // ...
-     new_job_type
-   }
-   ```
-
-5. **Create job handler**
-   ```typescript
-   const newJobHandler: JobHandler = {
-     type: 'new_job_type',
-     name: 'New Job Type',
-     description: '...',
-     execute: async (ctx: JobContext) => {
-       // 1. Call MCP tools to gather data
-       // 2. Generate artifact using prompts
-       // 3. Create proposals if needed
-     },
-   };
-   
-   jobRunner.registerHandler(newJobHandler);
-   ```
-
-## Adding a New Artifact Type
-
-1. **Add to ArtifactTypeSchema**
-   ```typescript
-   // packages/core/src/types/index.ts
-   export const ArtifactTypeSchema = z.enum([
-     'brief', 'meeting_pack', ..., 'new_artifact_type'
-   ]);
-   ```
-
-2. **Update Prisma enum**
-   ```prisma
-   // prisma/schema.prisma
-   enum ArtifactType {
-     brief
-     meeting_pack
-     // ...
-     new_artifact_type
-   }
-   ```
-
-## Common Patterns
-
-### Creating a Proposal Tool
-
-```typescript
-import { createProposalTool } from '@pmkit/mcp';
-import { z } from 'zod';
-
-this.registerTool(
-  createProposalTool(
-    'tool_name',           // Becomes propose_tool_name
-    'Description of what this proposes',
-    z.object({             // Input schema
-      field: z.string(),
-    }),
-    'target_system',       // e.g., 'jira', 'confluence', 'slack'
-    async (input, context) => ({
-      title: 'Proposal title',
-      preview: '**Markdown** preview for review',
-      diff: 'Optional diff string',
-      bundle: {            // Full payload for execution
-        ...input,
-        additionalData: '...',
-      },
-      targetId: 'optional-target-id',
-    })
-  )
-);
-```
-
-### Rendering Prompts
-
-```typescript
-import { renderPrompt, PROMPT_TEMPLATES } from '@pmkit/prompts';
-
-const { system, user } = renderPrompt(
-  PROMPT_TEMPLATES.daily_brief,
-  {
-    tenantName: 'Acme Corp',
-    userName: 'Jane PM',
-    currentDate: '2026-01-04',
-    slackMessages: '...',
-    jiraUpdates: '...',
-    // ... other context
-  }
-);
-```
-
-### Creating a Job Context
-
-```typescript
-// JobContext is created by JobRunner, but for testing:
-const ctx: JobContext = {
-  job,
-  user,
-  tenantId: job.tenantId,
-  auditLogger,
-  toolCalls: [],
-  artifacts: [],
-  proposals: [],
-  addToolCall: (tc) => { /* ... */ },
-  addArtifact: (a) => { /* ... */ },
-  addProposal: (p) => { /* ... */ },
-};
-```
-
-### Calling MCP Tools
-
-```typescript
-import { mcpClient } from '@pmkit/mcp';
-
-const result = await mcpClient.callTool(
-  'jira',           // Server name
-  'search_issues',  // Tool name
-  { jql: 'project = ACME' },  // Input
-  {                 // Context
-    tenantId: 'tenant-1',
-    userId: 'user-1',
-    jobId: 'job-1',
-    permissions: ['jira.read'],
-  }
-);
-
-if (result.success) {
-  console.log(result.data);
-} else {
-  console.error(result.error);
-}
-```
-
-### Permission Checks
-
-```typescript
-import { requirePermission, RBACService } from '@pmkit/core';
-
-// Throws if user lacks permission
-requirePermission('job.create')(user);
-
-// Returns boolean
-const canAccess = RBACService.canAccessTenant(user, tenantId);
-```
-
-## Database
-
-### Running Migrations
-
-```bash
-npm run db:generate   # Generate Prisma client
-npm run db:push       # Push schema to database (dev)
-npm run db:migrate    # Create and run migrations (prod)
-```
-
-### Schema Location
-
-The Prisma schema at `prisma/schema.prisma` is the source of truth for:
-- All database models
-- Enum definitions (JobType, JobStatus, UserRole, etc.)
-- Relationships between entities
-
-When adding new types, update both:
-1. Zod schemas in `packages/core/src/types/index.ts`
-2. Prisma schema in `prisma/schema.prisma`
-
-## Testing
-
-```bash
-npm run test          # Run all tests
-npm run test:watch    # Watch mode
-```
-
-- Demo mode uses mock servers - no external services needed
-- Mock data is in `packages/mock-tenant/src/data/`
-- Stub responses are in `packages/prompts/src/index.ts`
-
-## Build & Dev
-
-```bash
-npm install           # Install all dependencies
-npm run build         # Build all packages (Turborepo)
-npm run dev           # Start dev servers
-npm run lint          # Run ESLint
-npm run typecheck     # Run TypeScript checks
-```
-
-### Turborepo
-
-This is a Turborepo monorepo. Key commands:
-- `turbo run build` - Build all packages in dependency order
-- `turbo run dev --filter=web` - Run only the web app
-- `turbo run build --filter=@pmkit/core` - Build only core package
-
-### Environment Variables
-
-Copy `apps/web/env.example` to `apps/web/.env.local`:
-
-```bash
-# Required
-DATABASE_URL=postgresql://...
-NEXTAUTH_SECRET=...
-
-# OpenAI API Keys (use DEMO for demo/workbench, PROD for production)
-# Note: OPENAI_API_KEY alone is NOT used - always use _DEMO or _PROD suffix
-OPENAI_API_KEY_DEMO=sk-...   # For demo console and workbench
-OPENAI_API_KEY_PROD=sk-...   # For production tenant jobs
-USE_STUB_LLM=false           # Set to true to use stubs instead of real LLM
-
-# Optional
-REDIS_URL=...             # Uses inline fallback if not set
-
-# AI Crawlers (optional - free fallbacks available)
-SERPER_API_KEY=...        # Serper.dev for Google search (2,500 free/month)
-NEWSAPI_KEY=...           # NewsAPI.org for news (100 free/day)
-GNEWS_API_KEY=...         # GNews.io alternative (600 free/day)
-```
-
-## AI Crawlers
-
-Real-time web crawlers for competitive research with AI-powered analysis.
-
-### Crawler Types
-
-| Crawler | Free API | Fallback | Rate Limit |
-|---------|----------|----------|------------|
-| Social | Reddit API (official) | Hacker News API | 100 req/min |
-| Web Search | Serper.dev | DuckDuckGo | 2,500/month |
-| News | NewsAPI.org | Google News RSS | 100/day |
-| URL Scrape | Direct fetch | N/A | No limit |
-
-- **Social Crawler**: Searches Reddit and Hacker News for discussions, mentions, and sentiment
-- **Web Search Crawler**: Searches Google/DuckDuckGo for competitor pages and market research
-- **News Crawler**: Searches news sources for industry updates and press releases
-- **URL Scrape Crawler**: Fetches and analyzes specific URLs for deep competitive research (pricing pages, feature pages, blog posts)
-
-### AI Analysis
-
-After crawling, results are automatically analyzed by AI to produce:
-
-- **Executive Summary**: 2-3 sentence overview of findings
-- **Sentiment Analysis**: Overall sentiment with breakdown (positive/negative/neutral)
-- **Key Themes**: Identified topics with mention counts and representative quotes
-- **Insights**: Categorized as opportunities, threats, trends, or action items
-- **Competitor Mentions**: Tracked mentions with context and sentiment
-- **Notable Quotes**: Key quotes with source attribution
-- **Recommendations**: Actionable next steps for product teams
-
-### Usage
-
-**Demo Console** (`/demo/console` → AI Crawlers tab):
-- Uses mock data with real LLM analysis
-- Subject to demo rate limits (unauthenticated users get 2 free jobs total across all demo features)
-- Great for seeing the analysis output format
-
-**Workbench** (`/workbench` → AI Crawlers tab, admin only):
-1. Select crawler type (Social, Web Search, News, or URL Scrape)
-2. Enter keywords to search for (or URLs for URL Scrape)
-3. Select platforms (for Social crawler)
-4. Click "Start Crawl" (or "Start Scrape" for URL Scrape)
-5. Status shows: Crawling → Analyzing with AI → Completed
-6. View AI analysis and raw results
-
-### Key Files
-
-- `packages/prompts/src/crawler-analysis.ts` - AI analysis prompts and execution
-- `packages/core/src/crawlers/` - Real crawler implementations
-- `apps/web/src/app/api/demo/run-crawler/route.ts` - Demo crawler API (mock data + real LLM)
-- `apps/web/src/app/api/crawlers/start/route.ts` - Workbench crawler API (real data + real LLM)
-- `apps/web/src/lib/crawler-store.ts` - In-memory job state for workbench
-
-## Connectors Reference
-
-### Connector Status
-
-| Connector | OAuth | Fetcher | MCP Server | Status |
-|-----------|-------|---------|------------|--------|
-| Slack | ✅ | ✅ `SlackFetcher` | ✅ | Production ready |
-| Gmail | ✅ | ✅ `GmailFetcher` | ✅ | Production ready |
-| Google Calendar | ✅ | ✅ `CalendarFetcher` | ✅ | Production ready |
-| Google Drive | ✅ | ✅ `DriveFetcher` | ✅ | Production ready |
-| Jira | ✅ | ✅ `JiraFetcher` | ✅ | Production ready |
-| Confluence | ✅ | ✅ `ConfluenceFetcher` | ✅ | Production ready |
-| Gong | 🔲 | 🔲 | ✅ | OAuth pending |
-| Zendesk | 🔲 | 🔲 | ✅ | OAuth pending |
-| Figma | 🔲 | 🔲 | 🔲 | Coming soon |
-
-### Fetcher Classes
-
-Real data fetchers live in `packages/core/src/fetchers/`. Each implements `IFetcher<TMetadata, TOptions>`:
-
-| Fetcher | File | API | Key Features |
-|---------|------|-----|--------------|
-| `SlackFetcher` | `slack-fetcher.ts` | Slack Web API | Channel history, user info |
-| `GmailFetcher` | `gmail-fetcher.ts` | Gmail API v1 | Labels, threads, token refresh |
-| `CalendarFetcher` | `calendar-fetcher.ts` | Calendar API v3 | Events, attendees, token refresh |
-| `DriveFetcher` | `drive-fetcher.ts` | Drive API v3 | Files, folders, MIME filtering |
-| `JiraFetcher` | `jira-fetcher.ts` | Atlassian REST v3 | JQL queries, project filtering |
-| `ConfluenceFetcher` | `confluence-fetcher.ts` | Atlassian REST v3 | CQL queries, space filtering |
-
-**Fetcher Usage Pattern:**
-
-```typescript
-import { JiraFetcher, type FetchedItem } from '@pmkit/core/fetchers';
-
-// Create fetcher from encrypted credentials
-const fetcher = JiraFetcher.fromEncrypted(credentials);
-
-// Fetch data
-const result = await fetcher.fetch({
-  projectKeys: ['ACME'],
-  sinceHoursAgo: 24,
-  statuses: ['In Progress', 'Done'],
-});
-
-// Use items
-const items: FetchedItem[] = result.items;
-```
-
-### MCP Servers (Demo/Mock Data)
-
-| Connector | Server Class | Mock Data | Tools |
-|-----------|--------------|-----------|-------|
-| Jira | `MockJiraMCPServer` | `jira.ts` | `get_issue`, `search_issues`, `get_sprint`, `propose_jira_epic`, `propose_jira_story` |
-| Confluence | `MockConfluenceMCPServer` | `confluence.ts` | `get_page`, `search_pages`, `propose_confluence_page` |
-| Slack | `MockSlackMCPServer` | `slack.ts` | `get_messages`, `search_messages`, `propose_slack_message` |
-| Gong | `MockGongMCPServer` | `gong.ts` | `get_calls`, `get_call_transcript`, `search_calls` |
-| Zendesk | `MockZendeskMCPServer` | `zendesk.ts` | `get_ticket`, `search_tickets`, `get_ticket_comments` |
-| Analytics | `MockAnalyticsMCPServer` | `analytics.ts` | `get_metrics`, `get_funnel`, `get_cohort` |
-| Community | `MockCommunityMCPServer` | `community.ts` | `get_posts`, `search_posts`, `get_feature_requests` |
-| Competitor | `MockCompetitorMCPServer` | `competitor.ts` | `get_competitor`, `get_feature_comparison`, `get_recent_changes` |
-| pmkit | `PmkitMCPServer` | `pmkit.ts` | `get_artifact`, `list_artifacts`, `search_artifacts`, `get_job`, `list_jobs`, `get_proposal`, `list_proposals`, `propose_artifact_update`, `propose_artifact_link` |
-| Social Crawler | `MockSocialCrawlerMCPServer` | In-memory | `search_social_posts`, `get_trending_topics`, `get_competitor_mentions` |
-| Web Search | `MockWebSearchMCPServer` | In-memory | `search_web`, `get_page_content`, `compare_competitor_pages` |
-| News Crawler | `MockNewsCrawlerMCPServer` | In-memory | `search_news`, `get_competitor_news`, `get_press_releases`, `get_industry_reports` |
-| URL Scraper | `MockUrlScrapeMCPServer` | In-memory | `scrape_url`, `scrape_urls`, `compare_pages`, `extract_page_data` |
-
-## pmkit-desktop (Local CLI Tool)
-
-pmkit-desktop is a standalone CLI tool that runs the same 10 PM workflows locally, outputting markdown files with SIEM telemetry.
-
-### Overview
+The main product - published to npm as `openpmkit`:
 
 ```
 pmkit-desktop/
 ├── src/
-│   ├── cli/              # CLI interface (Commander.js)
-│   ├── scheduler/        # Autonomous scheduler (node-cron)
-│   ├── lib/              # Core library (types, storage, config, runner)
-│   ├── crawlers/         # AI Crawlers (Social, Web, News)
-│   └── integrations/     # MVP Integration clients (8 integrations)
-├── skills/               # Skill definitions (13 SKILL.md files)
-└── package.json
+│   ├── cli/index.ts       # CLI entry point (Commander.js)
+│   ├── lib/
+│   │   ├── types.ts       # TypeScript types, credential definitions
+│   │   ├── config.ts      # Config manager (~/.openpmkit/config.json)
+│   │   ├── runner.ts      # Workflow execution engine
+│   │   └── storage.ts     # Output file management
+│   ├── crawlers/          # Social, Web, News crawlers
+│   ├── integrations/      # Slack, Jira, etc. API clients
+│   └── workflows/         # 10 workflow definitions
+├── package.json           # Published as 'openpmkit'
+└── README.md
 ```
 
-### Key Files
+### Shared Packages (`packages/`)
 
-| File | Purpose |
-|------|---------|
-| `pmkit-desktop/README.md` | Full documentation with setup instructions |
-| `pmkit-desktop/src/cli/index.ts` | CLI entry point with all commands |
-| `pmkit-desktop/src/lib/runner.ts` | Workflow execution engine |
-| `pmkit-desktop/src/lib/storage.ts` | Markdown output and telemetry storage |
-| `pmkit-desktop/src/crawlers/index.ts` | Unified crawler interface |
-| `pmkit-desktop/src/crawlers/social.ts` | Extended social crawler (7 platforms) |
-| `pmkit-desktop/src/integrations/index.ts` | Integration client factory |
+```
+packages/
+├── core/                  # Shared utilities
+│   ├── src/crawlers/      # Crawler implementations
+│   ├── src/types/         # Domain types
+│   └── src/telemetry/     # SIEM telemetry
+├── prompts/               # LLM prompt templates
+└── content/               # Blog/marketing content
+```
 
-### Running pmkit-desktop
+### Marketing Website (`apps/web/`)
+
+Static Next.js site for getpmkit.com - SEO pages, blog, guides.
+
+## The 10 Workflows
+
+| # | Workflow | Command | Description |
+|---|----------|---------|-------------|
+| 1 | Daily Brief | `run daily-brief` | Morning context summary from connected sources |
+| 2 | Meeting Prep | `run meeting-prep` | Pre-meeting research and talking points |
+| 3 | Feature Intel | `run feature-intel` | Analyze feature requests and patterns |
+| 4 | PRD Draft | `run prd-draft` | Generate product requirements document |
+| 5 | Sprint Review | `run sprint-review` | Summarize sprint accomplishments |
+| 6 | Competitor | `run competitor` | Research competitor landscape |
+| 7 | Roadmap | `run roadmap` | Roadmap alignment analysis |
+| 8 | Release Notes | `run release-notes` | Generate release notes |
+| 9 | Deck Content | `run deck-content` | Presentation content generation |
+| 10 | Prototype | `run prototype` | Prototype suggestions |
+
+## BYOK Credential System
+
+All API keys are stored locally in `~/.openpmkit/config.json`:
+
+```typescript
+// Categories of credentials
+type CredentialCategory = 'ai' | 'crawler' | 'integration' | 'connector';
+
+// Example credentials
+OPENAI_API_KEY      // AI - Required
+REDDIT_CLIENT_ID    // Crawler - For social monitoring
+SLACK_BOT_TOKEN     // Integration - For Slack data
+JIRA_API_TOKEN      // Connector - For Jira data
+```
+
+Users manage credentials via:
+```bash
+openpmkit setup                    # Interactive wizard
+openpmkit settings set OPENAI_API_KEY sk-...
+openpmkit settings list
+```
+
+## Adding a New Workflow
+
+1. **Define the workflow** in `pmkit-desktop/src/workflows/{name}.ts`
+2. **Add prompt template** in `prompts/{nn}-{name}.md`
+3. **Register in runner** at `pmkit-desktop/src/lib/runner.ts`
+4. **Add CLI command** in `pmkit-desktop/src/cli/index.ts`
+
+## Adding a New Integration
+
+1. **Create client** in `pmkit-desktop/src/integrations/{name}.ts`
+2. **Define credential** in `pmkit-desktop/src/lib/types.ts` (add to CREDENTIALS array)
+3. **Update setup wizard** in `pmkit-desktop/src/cli/index.ts`
+
+## Website Development
+
+The marketing site at `apps/web/` is a static Next.js site:
 
 ```bash
-cd pmkit-desktop
-npm install
+cd apps/web
+npm run dev      # Development
+npm run build    # Production build
+```
 
-# Run with tsx (no build needed)
-npx tsx src/cli/index.ts list
+Key pages:
+- `/` - Landing page
+- `/blog/*` - Blog posts
+- `/compare/*` - Competitor comparisons
+- `/guides/*` - How-to guides
+- `/integrations/*` - Integration pages
+
+## Environment Variables
+
+For CLI development:
+```bash
+OPENAI_API_KEY=sk-...           # Required
+USE_STUB_LLM=true               # Use stubs (no API key needed)
+```
+
+For website:
+```bash
+# No env vars required - static site
+```
+
+## Testing
+
+```bash
+# Test with stubs (no API key)
+USE_STUB_LLM=true npx tsx src/cli/index.ts run daily-brief
+
+# Test with real API
 npx tsx src/cli/index.ts run daily-brief
-
-# Or use npm scripts
-npm run run:daily-brief
-npm run run:competitor
-
-# Start scheduler
-npm run scheduler:start
 ```
 
-### 10 PM Workflows
+## Common Patterns
 
-Same as pmkit web:
-- `daily-brief`, `meeting-prep`, `feature-intel`, `prd-draft`, `sprint-review`
-- `competitor`, `roadmap`, `release-notes`, `deck-content`, `prototype`
-
-### 3 AI Crawler Skills
-
-| Skill | Description | API Key Required |
-|-------|-------------|------------------|
-| `crawler-social` | Reddit, HN, X, LinkedIn, Discord, Bluesky, Threads | None (public APIs) |
-| `crawler-web` | Google search via Serper | `SERPER_API_KEY` |
-| `crawler-news` | NewsAPI, GNews, Google News RSS | `NEWSAPI_KEY` |
-
-### 8 MVP Integrations
-
-| Integration | Auth | Status |
-|-------------|------|--------|
-| Figma | OAuth2 | Fetch works, OAuth pending |
-| Loom | API Key | Fetch works, transcript pending |
-| Coda | API Key | Fetch works |
-| Amplitude | API Key | All methods pending |
-| Discourse | API Key | Fetch works |
-| Linear | API Key | Fetch works, mutations pending |
-| Notion | OAuth2 | Fetch works, write pending |
-| Zoom | OAuth2 | Fetch works, transcript pending |
-
-### Output Structure
-
-All outputs go to `~/pmkit/{workflow-id}/{timestamp}/`:
-
-```
-~/pmkit/
-├── daily-brief/
-│   └── 2026-01-31T07-00-00-000Z/
-│       ├── output.md          # Workflow output
-│       └── telemetry.json     # SIEM telemetry
-├── competitor/
-│   └── ...
-```
-
-### Environment Variables
-
-```bash
-# LLM (required for real responses)
-OPENAI_API_KEY=sk-...
-USE_STUB_LLM=true  # Use stubs instead
-
-# AI Crawlers (optional)
-SERPER_API_KEY=    # Web search
-NEWSAPI_KEY=       # News
-
-# Integrations (as needed)
-FIGMA_CLIENT_ID=
-LINEAR_API_KEY=
-# ... etc
-```
-
-### Differences from pmkit Web
-
-| Feature | pmkit Web | pmkit-desktop |
-|---------|-----------|---------------|
-| Output | Database + S3 | Local markdown files |
-| Telemetry | Database | JSON files |
-| Auth | NextAuth OAuth | Local config file |
-| Scheduler | BullMQ + Redis | node-cron |
-| Connectors | Full OAuth flows | API keys in `.env` |
-
----
-
-## User Roles
-
-| Role | Permissions |
-|------|-------------|
-| `admin` | Full access, manage users, configure connectors |
-| `pm` | Create/run jobs, approve proposals, view all data |
-| `eng` | View jobs and artifacts, limited proposal access |
-| `cs` | View customer-related data, limited job access |
-| `sales` | View customer data, meeting prep access |
-| `exec` | Read-only access to all data |
-| `viewer` | Read-only access to assigned resources |
-| `guest` | Minimal read-only access |
-
-## Troubleshooting
-
-### "Tool not found" error
-- Check the tool is registered in the MCP server
-- Verify server is registered with `mcpClient.registerServer()`
-- Check tool name spelling (snake_case)
-
-### "Permission denied" error
-- Check user role has required permission
-- Verify `tenantId` matches
-- Check RBAC configuration in `packages/core/src/rbac/`
-
-### Prisma errors
-- Run `npm run db:generate` after schema changes
-- Check `DATABASE_URL` is set correctly
-- Run `npm run db:push` to sync schema
-
-### Build failures
-- Run `npm run build` from root (Turborepo handles order)
-- Check for TypeScript errors with `npm run typecheck`
-- Ensure all package dependencies are correct in `package.json`
-
-## Common Pitfalls
-
-### ❌ Direct Write Tools
-
-Never create tools that write directly to external systems:
-
+### Running a workflow programmatically
 ```typescript
-// ❌ WRONG - Direct write
-this.registerTool({ name: 'create_jira_issue', ... });
+import { runWorkflow } from './lib/runner';
 
-// ✅ CORRECT - Proposal tool
-this.registerTool(createProposalTool('jira_issue', ...));
-```
-
-### ❌ TypeScript Enums
-
-Never use TypeScript enums. Use Zod schemas instead:
-
-```typescript
-// ❌ WRONG
-enum JobStatus { Pending, Running, Completed }
-
-// ✅ CORRECT
-export const JobStatusSchema = z.enum(['pending', 'running', 'completed']);
-export type JobStatus = z.infer<typeof JobStatusSchema>;
-```
-
-### ❌ Missing Schema Updates
-
-When adding new types, you must update BOTH:
-1. Zod schema in `packages/core/src/types/index.ts`
-2. Prisma enum in `prisma/schema.prisma`
-
-Forgetting either will cause runtime or build errors.
-
-### ❌ Hardcoded Tenant Data
-
-All data must be scoped by `tenantId`. Never hardcode tenant-specific values:
-
-```typescript
-// ❌ WRONG
-const issues = await getIssues('ACME-123');
-
-// ✅ CORRECT
-const issues = await getIssues(context.tenantId, 'ACME-123');
-```
-
-### ❌ Over-Engineering
-
-Keep changes minimal and focused:
-- Don't add features not requested
-- Don't refactor surrounding code when fixing bugs
-- Don't add error handling for impossible scenarios
-- Don't create abstractions for one-time operations
-
-## Testing Patterns
-
-### Unit Testing MCP Tools
-
-```typescript
-import { MockJiraMCPServer } from '@pmkit/mcp-servers';
-
-describe('Jira MCP Server', () => {
-  const server = new MockJiraMCPServer();
-
-  it('should search issues', async () => {
-    const result = await server.callTool('search_issues', {
-      jql: 'project = ACME',
-    });
-    expect(result.success).toBe(true);
-    expect(result.data.issues).toBeDefined();
-  });
+const result = await runWorkflow('daily-brief', {
+  sources: ['slack', 'jira'],
 });
 ```
 
-### Testing Job Handlers
-
+### Accessing configuration
 ```typescript
-import { JobRunner, createTestContext } from '@pmkit/core';
+import { getConfig, setCredential } from './lib/config';
 
-describe('Daily Brief Job', () => {
-  it('should generate brief artifact', async () => {
-    const ctx = createTestContext({
-      jobType: 'daily_brief',
-      tenantId: 'test-tenant',
-    });
-    
-    await jobRunner.runJob(ctx);
-    
-    expect(ctx.artifacts).toHaveLength(1);
-    expect(ctx.artifacts[0].type).toBe('brief');
-  });
+const config = getConfig();
+const apiKey = config.credentials?.OPENAI_API_KEY;
+
+setCredential('OPENAI_API_KEY', 'sk-...');
+```
+
+### Using a crawler
+```typescript
+import { SocialCrawler } from './crawlers/social';
+
+const crawler = new SocialCrawler();
+const results = await crawler.crawl({
+  platforms: ['reddit', 'hackernews'],
+  query: 'product management AI',
 });
 ```
-
-### Testing with Mock Data
-
-Demo mode uses mock servers from `packages/mock-tenant/src/data/`. All tests can run without external services:
-
-```typescript
-// Mock data is automatically available
-import { mockJiraData } from '@pmkit/mock-tenant';
-
-expect(mockJiraData.issues).toContainEqual(
-  expect.objectContaining({ key: 'ACME-101' })
-);
-```
-
-### Integration Testing
-
-For end-to-end tests, use the demo console at `/demo/console`:
-
-1. All connectors are simulated
-2. Jobs run with stub responses
-3. Proposals are created but not executed
-4. Full audit trail is logged
-
-## Environment Variables Reference
-
-### Required for Production
-
-| Variable | Purpose |
-|----------|---------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Session encryption key |
-
-### OpenAI API Keys
-
-**Important**: Use `OPENAI_API_KEY_DEMO` and `OPENAI_API_KEY_PROD` - NOT `OPENAI_API_KEY` alone.
-
-| Variable | Purpose | Fallback |
-|----------|---------|----------|
-| `OPENAI_API_KEY_DEMO` | LLM for demo console and workbench | Stub responses |
-| `OPENAI_API_KEY_PROD` | LLM for production tenant jobs | Stub responses |
-| `USE_STUB_LLM` | Set to `true` to bypass LLM entirely | `false` |
-
-### Optional (Demo Works Without)
-
-| Variable | Purpose | Fallback |
-|----------|---------|----------|
-| `REDIS_URL` | Job queue | Inline processing |
-| `S3_*` | Artifact storage | Local filesystem |
-| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth | Demo auth only |
-| `MICROSOFT_CLIENT_ID/SECRET` | Microsoft OAuth | Demo auth only |
-| `ADMIN_EMAILS` | Comma-separated admin emails for Workbench access | No workbench access |
-
-### Analytics & SEO
-
-| Variable | Purpose |
-|----------|---------|
-| `NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN` | Simple Analytics |
-| `NEXT_PUBLIC_GSC_VERIFICATION` | Google Search Console |
-| `NEXT_PUBLIC_BING_VERIFICATION` | Bing Webmaster Tools |
-
-### Demo Rate Limits
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `DEMO_LLM_CALLS_PER_HOUR` | 10 | Max LLM calls per hour for demo |
-| `DEMO_LLM_CALLS_PER_DAY` | 50 | Max LLM calls per day for demo |
-
-## LLM Configuration
-
-### Models
-
-| Model | Use Case | Context Window | Cost (per 1M tokens) |
-|-------|----------|----------------|---------------------|
-| `gpt-5.2` | Production | 400K | $1.75 in / $14.00 out |
-| `gpt-5-mini` | Demo | 128K | $0.25 in / $2.00 out |
-| `gpt-5-nano` | Testing | 64K | $0.10 in / $0.40 out |
-| `stub` | Development | N/A | Free (pre-generated) |
-
-> **Model Reference**: See [OpenAI Models Documentation](https://platform.openai.com/docs/models) for full details on GPT-5 series capabilities.
-
-### Token Limits by Job Type
-
-Demo jobs have per-job-type token limits to balance output quality and cost:
-
-| Job Type | Max Tokens | Rationale |
-|----------|------------|-----------|
-| `daily_brief` | 12,288 | Standard markdown output |
-| `meeting_prep` | 12,288 | Standard markdown output |
-| `feature_intelligence` | 12,288 | Standard markdown output |
-| `competitor_research` | 12,288 | Standard markdown output |
-| `roadmap_alignment` | 12,288 | Standard markdown output |
-| `prd_draft` | 12,288 | Standard markdown output |
-| `sprint_review` | 12,288 | Standard markdown output |
-| `release_notes` | 12,288 | Standard markdown output |
-| `prototype_generation` | 48,000 | Full HTML with inline CSS/JS for complex dashboards |
-
-Configuration is in `apps/web/src/app/api/demo/run-job/route.ts`:
-
-```typescript
-const JOB_MAX_TOKENS: Record<JobType, number> = {
-  daily_brief: 12288,
-  meeting_prep: 12288,
-  // ... etc
-  prototype_generation: 48000,
-};
-```
-
-### Cost Estimates (Demo)
-
-With default rate limits (50 calls/day) using GPT-5 Mini:
-
-| Scenario | Per Call | Daily Max | Monthly Max |
-|----------|----------|-----------|-------------|
-| Standard jobs (12K tokens) | ~$0.025 | ~$1.25 | ~$37 |
-| Prototype (48K tokens) | ~$0.098 | ~$4.90 | ~$147 |
-| Mixed usage (realistic) | ~$0.030 | ~$1.50 | ~$45 |
-
-### Timeout Configuration
-
-LLM requests have a **10-minute timeout** to accommodate large outputs like prototype generation (48K tokens). This is configured in `packages/core/src/llm/index.ts`:
-
-```typescript
-const timeoutMs = 600_000; // 10 minutes
-```
-
-### Workbench Model Selection
-
-The Workbench (`/workbench`) allows admins to select between models:
-
-| Model | Use Case | Notes |
-|-------|----------|-------|
-| **GPT-5 Nano** | Ultra-fast testing | Cheapest, good for quick iterations |
-| **GPT-5 Mini** (default) | Fast iteration | Cost-efficient, good for most jobs |
-| **GPT-5.2** | Impressive demos | Higher quality output, slower |
-
-The model selector is in the job toolbar next to the "Run Job" button. All models use `OPENAI_API_KEY_DEMO`.
-
-## Deployment Infrastructure
-
-**IMPORTANT**: This project is deployed on DigitalOcean App Platform, NOT run locally in production.
-
-### DigitalOcean Components
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| **pmkit** | Web Service | Next.js frontend (`apps/web`) |
-| **worker** | Worker | BullMQ job processor (`apps/worker`) |
-| **pmkit-db-postgresql** | Managed Database | PostgreSQL 17 |
-| **pmkit-db-valkey** | Managed Database | Valkey 8 (Redis-compatible) |
-
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `.do/app.yaml` | DigitalOcean App Platform spec |
-| `docker/Dockerfile.web` | Web service container |
-| `docker/Dockerfile.worker` | Worker service container |
-| `apps/web/Dockerfile` | Alternative web Dockerfile |
-
-### Environment Variables (DigitalOcean)
-
-The worker requires these environment variables set in DigitalOcean App Platform:
-
-| Variable | Source |
-|----------|--------|
-| `DATABASE_URL` | DigitalOcean PostgreSQL connection string |
-| `REDIS_URL` | DigitalOcean Valkey connection string (format: `rediss://default:PASSWORD@host:25061`) |
-| `OPENAI_API_KEY_PROD` | OpenAI API key for production jobs |
-
-### Deploying Changes
-
-1. Push to `main` branch
-2. DigitalOcean auto-deploys via `deploy_on_push: true`
-3. Both web service and worker are rebuilt and deployed
-
-### Adding the Worker (First Time)
-
-If the worker isn't deployed yet:
-
-1. Push the updated `.do/app.yaml` with the worker section
-2. In DigitalOcean console, go to your app → Settings → Components
-3. The worker should appear; if not, click "Add Component" and select Worker
-4. Configure environment variables for the worker
-5. Deploy
-
-### Debugging Scheduled Agents
-
-If scheduled agents aren't running:
-
-1. **Check worker is deployed**: DigitalOcean console → Components → Worker should be running
-2. **Check worker logs**: DigitalOcean console → Runtime Logs → Select "worker"
-3. **Check Redis connectivity**: Worker logs should show `[Worker] Redis connection established`
-4. **Check database connectivity**: Worker should log `Found N active {agent} configs`
-
-**Common Issues:**
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Worker not in components | `.do/app.yaml` missing worker section | Add worker to app.yaml, push, redeploy |
-| Redis connection failed | Wrong `REDIS_URL` format | Use `rediss://` (with TLS) for managed Valkey |
-| No scheduled jobs | No active agent configs | User must enable agent in UI |
-| Jobs not executing | Worker crashed | Check Runtime Logs for errors |
-
-### Local Development
-
-For local development only (not production):
-
-```bash
-# Start Redis locally (optional - worker has inline fallback)
-redis-server
-
-# Start the worker
-cd apps/worker && npm run dev
-
-# Or use docker-compose
-docker compose up redis
-```
-
-**Note**: Local development cannot connect to DigitalOcean's managed databases without VPN/trusted sources configuration.
-
-## Related Files
-
-- `TODO.md` - **Incomplete features tracking** (check before/after changes)
-- `CLAUDE.md` - Quick reference for Claude Code
-- `.cursorrules` - Cursor IDE configuration
-- `CONTRIBUTING.md` - Human contributor guide
-- `README.md` - Project overview
-
