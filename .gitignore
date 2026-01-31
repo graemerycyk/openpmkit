@@ -1,34 +1,26 @@
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
 
 # Build outputs
 dist/
-.next/
-out/
-build/
-
-# Turbo
-.turbo/
+*.tsbuildinfo
 
 # Environment variables (IMPORTANT: never commit API keys)
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env*.local
+.env.*
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+*.sublime-*
 
 # OS
 .DS_Store
 Thumbs.db
+*~
 
 # Testing
 coverage/
@@ -41,10 +33,18 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# openpmkit local config (user API keys stored here)
+# openpmkit user config (contains API keys)
 .openpmkit/
 
-# Lock files (optional - uncomment if you want to ignore)
+# Output directory (workflow results)
+# Note: Users may want to track their outputs, so this is commented
+# ~/openpmkit/
+
+# npm
+*.tgz
+.npmrc
+
+# Optional: Lock files
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml

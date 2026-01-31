@@ -1,6 +1,6 @@
-# Contributing to pmkit
+# Contributing to openpmkit
 
-Thank you for your interest in contributing to pmkit! This guide will help you get started.
+Thank you for your interest in contributing to openpmkit! This guide will help you get started.
 
 ## Getting Started
 
@@ -8,49 +8,39 @@ Thank you for your interest in contributing to pmkit! This guide will help you g
 
 - Node.js 20+
 - npm 10+
-- PostgreSQL 15+ (optional for dev - demo works without it)
-- Redis 7+ (optional for dev - uses inline fallback)
 
 ### Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/getpmkit/pmkit.git
-cd pmkit
+git clone https://github.com/graemerycyk/openpmkit.git
+cd openpmkit
 
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp apps/web/.env.example apps/web/.env.local
+# Build
+npm run build
 
-# Generate Prisma client
-npm run db:generate
-
-# Start development servers
-npm run dev
+# Run CLI in development
+npx tsx src/cli/index.ts list
 ```
-
-The development server runs at `http://localhost:3000`.
 
 ## Project Structure
 
-pmkit is a Turborepo monorepo:
-
 ```
-pmkit/
-├── apps/
-│   ├── web/              # Next.js 15 marketing + demo app
-│   └── worker/           # BullMQ job worker
+openpmkit/
+├── src/
+│   ├── cli/              # CLI commands (Commander.js)
+│   ├── lib/              # Core: types, config, runner, storage
+│   ├── crawlers/         # AI Crawlers (Social, Web, News)
+│   ├── integrations/     # Integration clients (Slack, Jira, etc.)
+│   └── workflows/        # Workflow definitions
 ├── packages/
-│   ├── core/             # Domain types, RBAC, audit, job runner, crawlers
-│   ├── mcp/              # MCP framework, tool helpers
-│   ├── mcp-servers/      # Demo MCP servers (Jira, Slack, etc.)
-│   ├── mock-tenant/      # Demo dataset
-│   ├── prompts/          # Prompt templates, stub generators, crawler analysis
-│   └── content/          # Marketing content, blog posts
-├── prisma/               # Database schema
-└── docker/               # Docker configuration
+│   ├── core/             # Shared utilities, crawlers, telemetry
+│   └── prompts/          # LLM prompt templates
+├── prompts/              # Workflow prompt definitions
+└── skills/               # Skill definitions (SKILL.md files)
 ```
 
 ## Development Workflow
@@ -58,136 +48,97 @@ pmkit/
 ### Running Commands
 
 ```bash
-# Build all packages
+# Build everything
 npm run build
 
-# Run development servers
-npm run dev
+# Run CLI in development (no build needed)
+npx tsx src/cli/index.ts <command>
 
-# Run tests
-npm run test
+# Run a specific workflow
+npm run run:daily-brief
+npm run run:competitor
 
 # Type check
 npm run typecheck
-
-# Lint
-npm run lint
 ```
 
-### Working with Turborepo
+### Testing with Stubs
 
 ```bash
-# Build only a specific package
-turbo run build --filter=@pmkit/core
+# Run without API key (uses stub responses)
+USE_STUB_LLM=true npx tsx src/cli/index.ts run daily-brief
 
-# Run dev for only the web app
-turbo run dev --filter=web
+# Run with real API
+npx tsx src/cli/index.ts run daily-brief
 ```
 
 ## Code Conventions
 
 ### TypeScript
 
-- Use Zod schemas for all domain types
-- Infer TypeScript types from Zod schemas
-- Use `z.enum()` instead of TypeScript enums
+- Use TypeScript strict mode
+- Define types in `src/lib/types.ts`
+- Use async/await for all async operations
 
-```typescript
-// ✅ Correct
-export const StatusSchema = z.enum(['pending', 'active', 'done']);
-export type Status = z.infer<typeof StatusSchema>;
+### CLI Commands
 
-// ❌ Avoid
-enum Status { Pending, Active, Done }
-```
+- Use Commander.js for command definitions
+- Commands are defined in `src/cli/index.ts`
+- Follow the existing command patterns
 
-### MCP Tools
+### Credentials
 
-- Read tools: `get_*`, `search_*`, `list_*`, `find_*`
-- Write tools: `propose_*` (never direct writes)
-- All tools must have `inputSchema` and `outputSchema`
-- Tool names are snake_case
-
-### Draft-Only Pattern
-
-All external writes must use proposal tools:
-
-```typescript
-// ✅ Correct: Proposal tool
-this.registerTool(
-  createProposalTool('jira_epic', 'Propose a new epic', schema, 'jira', ...)
-);
-
-// ❌ Wrong: Direct write tool
-this.registerTool({ name: 'create_jira_epic', ... });
-```
-
-### Frontend
-
-- Use shadcn/ui components from `apps/web/src/components/ui/`
-- Follow the cobalt/indigo color scheme
-- Headings use Space Grotesk, body uses Geist Sans
-- Use Tailwind animations with staggered delays
+- All credentials stored in `~/.openpmkit/config.json`
+- Use `getCredential()` and `setCredential()` from `src/lib/config.ts`
+- Never log or expose API keys
 
 ## Making Changes
 
-### Adding a New Connector
+### Adding a New Workflow
 
-1. Create MCP server in `packages/mcp-servers/src/{connector}/index.ts`
-2. Add mock data in `packages/mock-tenant/src/data/{connector}.ts`
-3. Export from `packages/mcp-servers/src/index.ts`
-4. Add connector key to schema if needed
+1. Create workflow definition in `src/workflows/{name}.ts`
+2. Add prompt template in `prompts/{nn}-{name}.md`
+3. Register in `src/lib/runner.ts`
+4. Add CLI command in `src/cli/index.ts`
+5. Add npm script in `package.json`
+6. Create skill definition in `skills/pm-{name}/SKILL.md`
 
-### Adding a New Job Type
+### Adding a New Integration
 
-1. Add to `JobTypeSchema` in `packages/core/src/types/index.ts`
-2. Add prompt template in `packages/prompts/src/index.ts`
-3. Add stub generator function
-4. Update Prisma enum in `prisma/schema.prisma`
-5. Create job handler
+1. Create client in `src/integrations/{name}.ts`
+2. Export from `src/integrations/index.ts`
+3. Add credential to `CREDENTIALS` array in `src/lib/types.ts`
+4. Update setup wizard in `src/cli/index.ts`
 
-### Adding a New Page
+### Adding a New Crawler
 
-1. Create in `apps/web/src/app/(marketing)/` for marketing pages
-2. Follow the established layout patterns
-3. Export metadata for SEO
-4. Use the design system (see AGENTS.md)
+1. Create crawler in `src/crawlers/{name}.ts`
+2. Export from `src/crawlers/index.ts`
+3. Add required credentials to `src/lib/types.ts`
+4. Create skill definition in `skills/crawler-{name}/SKILL.md`
 
 ## Pull Request Process
 
 1. Fork the repository
 2. Create a feature branch from `main`
 3. Make your changes
-4. Run tests: `npm run test`
-5. Run linting: `npm run lint`
-6. Run type check: `npm run typecheck`
-7. Submit a pull request
+4. Run type check: `npm run typecheck`
+5. Test your changes manually
+6. Submit a pull request
 
 ### PR Guidelines
 
 - Keep PRs focused on a single change
 - Write clear commit messages
 - Update documentation if needed
-- Add tests for new functionality
-- Ensure all checks pass
-
-## Testing
-
-```bash
-# Run all tests
-npm run test
-
-# Run tests in watch mode
-npm run test:watch
-```
-
-Demo mode uses mock servers - no external services needed for testing.
+- Test with both stub and real API modes
 
 ## Documentation
 
-- `AGENTS.md` - Complete documentation for AI agents and developers
-- `CLAUDE.md` - Quick reference for Claude Code
-- `.cursorrules` - Cursor IDE configuration
+- `README.md` - User-facing documentation
+- `CLAUDE.md` - Quick reference for AI agents
+- `AGENTS.md` - Detailed documentation for contributors
+- `skills/*/SKILL.md` - Individual skill documentation
 
 ## Questions?
 
@@ -198,4 +149,3 @@ Demo mode uses mock servers - no external services needed for testing.
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
-
