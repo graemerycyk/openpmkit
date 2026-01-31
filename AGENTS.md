@@ -1060,6 +1060,124 @@ const items: FetchedItem[] = result.items;
 | News Crawler | `MockNewsCrawlerMCPServer` | In-memory | `search_news`, `get_competitor_news`, `get_press_releases`, `get_industry_reports` |
 | URL Scraper | `MockUrlScrapeMCPServer` | In-memory | `scrape_url`, `scrape_urls`, `compare_pages`, `extract_page_data` |
 
+## pmkit-desktop (Local CLI Tool)
+
+pmkit-desktop is a standalone CLI tool that runs the same 10 PM workflows locally, outputting markdown files with SIEM telemetry.
+
+### Overview
+
+```
+pmkit-desktop/
+├── src/
+│   ├── cli/              # CLI interface (Commander.js)
+│   ├── scheduler/        # Autonomous scheduler (node-cron)
+│   ├── lib/              # Core library (types, storage, config, runner)
+│   ├── crawlers/         # AI Crawlers (Social, Web, News)
+│   └── integrations/     # MVP Integration clients (8 integrations)
+├── skills/               # Skill definitions (13 SKILL.md files)
+└── package.json
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `pmkit-desktop/README.md` | Full documentation with setup instructions |
+| `pmkit-desktop/src/cli/index.ts` | CLI entry point with all commands |
+| `pmkit-desktop/src/lib/runner.ts` | Workflow execution engine |
+| `pmkit-desktop/src/lib/storage.ts` | Markdown output and telemetry storage |
+| `pmkit-desktop/src/crawlers/index.ts` | Unified crawler interface |
+| `pmkit-desktop/src/crawlers/social.ts` | Extended social crawler (7 platforms) |
+| `pmkit-desktop/src/integrations/index.ts` | Integration client factory |
+
+### Running pmkit-desktop
+
+```bash
+cd pmkit-desktop
+npm install
+
+# Run with tsx (no build needed)
+npx tsx src/cli/index.ts list
+npx tsx src/cli/index.ts run daily-brief
+
+# Or use npm scripts
+npm run run:daily-brief
+npm run run:competitor
+
+# Start scheduler
+npm run scheduler:start
+```
+
+### 10 PM Workflows
+
+Same as pmkit web:
+- `daily-brief`, `meeting-prep`, `feature-intel`, `prd-draft`, `sprint-review`
+- `competitor`, `roadmap`, `release-notes`, `deck-content`, `prototype`
+
+### 3 AI Crawler Skills
+
+| Skill | Description | API Key Required |
+|-------|-------------|------------------|
+| `crawler-social` | Reddit, HN, X, LinkedIn, Discord, Bluesky, Threads | None (public APIs) |
+| `crawler-web` | Google search via Serper | `SERPER_API_KEY` |
+| `crawler-news` | NewsAPI, GNews, Google News RSS | `NEWSAPI_KEY` |
+
+### 8 MVP Integrations
+
+| Integration | Auth | Status |
+|-------------|------|--------|
+| Figma | OAuth2 | Fetch works, OAuth pending |
+| Loom | API Key | Fetch works, transcript pending |
+| Coda | API Key | Fetch works |
+| Amplitude | API Key | All methods pending |
+| Discourse | API Key | Fetch works |
+| Linear | API Key | Fetch works, mutations pending |
+| Notion | OAuth2 | Fetch works, write pending |
+| Zoom | OAuth2 | Fetch works, transcript pending |
+
+### Output Structure
+
+All outputs go to `~/pmkit/{workflow-id}/{timestamp}/`:
+
+```
+~/pmkit/
+├── daily-brief/
+│   └── 2026-01-31T07-00-00-000Z/
+│       ├── output.md          # Workflow output
+│       └── telemetry.json     # SIEM telemetry
+├── competitor/
+│   └── ...
+```
+
+### Environment Variables
+
+```bash
+# LLM (required for real responses)
+OPENAI_API_KEY=sk-...
+USE_STUB_LLM=true  # Use stubs instead
+
+# AI Crawlers (optional)
+SERPER_API_KEY=    # Web search
+NEWSAPI_KEY=       # News
+
+# Integrations (as needed)
+FIGMA_CLIENT_ID=
+LINEAR_API_KEY=
+# ... etc
+```
+
+### Differences from pmkit Web
+
+| Feature | pmkit Web | pmkit-desktop |
+|---------|-----------|---------------|
+| Output | Database + S3 | Local markdown files |
+| Telemetry | Database | JSON files |
+| Auth | NextAuth OAuth | Local config file |
+| Scheduler | BullMQ + Redis | node-cron |
+| Connectors | Full OAuth flows | API keys in `.env` |
+
+---
+
 ## User Roles
 
 | Role | Permissions |

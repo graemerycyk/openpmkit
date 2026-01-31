@@ -110,6 +110,13 @@ packages/
 apps/
 ├── web/           # Next.js 15 app (deployed as web service)
 └── worker/        # BullMQ job worker (deployed as worker service)
+
+pmkit-desktop/     # Standalone CLI tool (local markdown output)
+├── src/cli/       # CLI interface (Commander.js)
+├── src/lib/       # Types, storage, config, runner
+├── src/crawlers/  # AI Crawlers (Social, Web, News)
+├── src/integrations/  # MVP Integration clients (8 integrations)
+└── skills/        # Skill definitions (13 SKILL.md files)
 ```
 
 ## Connectors
@@ -138,6 +145,38 @@ apps/
 - Web Search Crawler
 - News Crawler
 - URL Scraper
+
+### pmkit-desktop Crawlers & Integrations
+- Extended Social Crawler (X, LinkedIn, Discord, Bluesky, Threads)
+- 8 MVP Integrations: Figma, Loom, Coda, Amplitude, Discourse, Linear, Notion, Zoom
+
+## pmkit-desktop Quick Start
+
+```bash
+cd pmkit-desktop
+npm install
+
+# Run workflows (no build needed)
+npx tsx src/cli/index.ts list
+npx tsx src/cli/index.ts run daily-brief
+
+# Or use npm scripts
+npm run run:daily-brief
+npm run run:competitor
+
+# Start scheduler
+npm run scheduler:start
+
+# Use stubs (no API key needed)
+USE_STUB_LLM=true npx tsx src/cli/index.ts run daily-brief
+```
+
+Key files:
+- `pmkit-desktop/README.md` - Full documentation
+- `pmkit-desktop/src/cli/index.ts` - CLI entry point
+- `pmkit-desktop/src/lib/runner.ts` - Workflow execution
+- `pmkit-desktop/src/crawlers/` - AI Crawlers
+- `pmkit-desktop/src/integrations/` - MVP Integrations
 
 ## Billing & Plans
 

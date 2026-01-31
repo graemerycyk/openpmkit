@@ -199,12 +199,175 @@ npm run scheduler:start
 npm run typecheck
 ```
 
+## AI Crawlers
+
+pmkit-desktop includes 3 AI-powered crawlers for gathering competitive intelligence and market research.
+
+### Crawler Types
+
+| Crawler | Description | Platforms |
+|---------|-------------|-----------|
+| 🌐 **Social Crawler** | Search social platforms for discussions, mentions, sentiment | Reddit, HackerNews, X/Twitter, LinkedIn, Discord, Bluesky, Threads |
+| 🔍 **Web Search Crawler** | Search the web for competitor pages and market research | Google (via Serper), Bing, DuckDuckGo |
+| 📰 **News Crawler** | Search news sources for industry updates and press releases | NewsAPI, GNews, Google News RSS |
+
+### Crawler Skills
+
+Skills are in `skills/crawler-*/SKILL.md`:
+
+```bash
+# Run crawlers via CLI (coming soon)
+pmkit crawl social --keywords "product management" --platforms reddit,hackernews
+pmkit crawl web --keywords "competitor features"
+pmkit crawl news --keywords "industry trends"
+```
+
+### API Keys Required for Crawlers
+
+| Crawler | API Key | Free Tier | Notes |
+|---------|---------|-----------|-------|
+| Web Search | `SERPER_API_KEY` | 2,500/month | Falls back to DuckDuckGo |
+| News | `NEWSAPI_KEY` | 100/day | Falls back to Google News RSS |
+| News (alt) | `GNEWS_API_KEY` | 600/day | Alternative to NewsAPI |
+| Social | None required | ✅ | Uses public APIs and RSS feeds |
+
+## MVP Integrations
+
+pmkit-desktop includes 8 integration clients for connecting to external tools.
+
+### Integration Status
+
+| Integration | Auth Type | Status | Capabilities |
+|-------------|-----------|--------|--------------|
+| 🎨 **Figma** | OAuth2 | 🔲 Implementation pending | Design files, comments, components |
+| 🎬 **Loom** | API Key | 🔲 Transcript pending | Videos, transcripts |
+| 📝 **Coda** | API Key | ✅ Fetch works | Docs, tables, rows |
+| 📊 **Amplitude** | API Key + Secret | 🔲 All methods pending | Analytics, events, charts |
+| 💬 **Discourse** | API Key | ✅ Fetch works | Forums, topics, posts |
+| 📋 **Linear** | API Key | ✅ Fetch works | Issues, projects, cycles |
+| 📓 **Notion** | OAuth2 | 🔲 Write pending | Pages, databases, blocks |
+| 🎥 **Zoom** | OAuth2 | 🔲 Transcript pending | Meetings, recordings |
+
+### Integration Files
+
+All integrations are in `src/integrations/`:
+
+```
+src/integrations/
+├── index.ts          # Unified interface
+├── types.ts          # Shared types
+├── figma.ts          # Figma client
+├── loom.ts           # Loom client
+├── coda.ts           # Coda client
+├── amplitude.ts      # Amplitude client
+├── discourse.ts      # Discourse client
+├── linear.ts         # Linear client
+├── notion.ts         # Notion client
+└── zoom.ts           # Zoom client
+```
+
+### Using Integrations
+
+```typescript
+import { createIntegrationClient } from './integrations';
+
+// Create client
+const figma = createIntegrationClient('figma');
+
+// Connect with credentials
+await figma.connect({ accessToken: 'your-token' });
+
+// Fetch data
+const files = await figma.fetchData({ action: 'list_files' });
+```
+
+## Environment Variables
+
+Create a `.env` file in the pmkit-desktop directory:
+
+```bash
+# LLM API Keys (required for real responses)
+OPENAI_API_KEY=sk-...
+
+# Use stub responses (for development without API key)
+USE_STUB_LLM=true
+
+# AI Crawlers (optional - free fallbacks available)
+SERPER_API_KEY=           # https://serper.dev - Web search
+NEWSAPI_KEY=              # https://newsapi.org - News
+GNEWS_API_KEY=            # https://gnews.io - News (alternative)
+
+# MVP Integrations - OAuth2
+FIGMA_CLIENT_ID=
+FIGMA_CLIENT_SECRET=
+ZOOM_CLIENT_ID=
+ZOOM_CLIENT_SECRET=
+NOTION_CLIENT_ID=
+NOTION_CLIENT_SECRET=
+
+# MVP Integrations - API Keys
+LOOM_API_KEY=             # https://dev.loom.com
+CODA_API_KEY=             # https://coda.io/developers
+AMPLITUDE_API_KEY=
+AMPLITUDE_SECRET_KEY=
+DISCOURSE_API_KEY=
+DISCOURSE_URL=            # Your Discourse instance URL
+LINEAR_API_KEY=           # https://linear.app/settings/api
+```
+
+## What's Still TODO
+
+### High Priority (Core Functionality)
+- [ ] `SERPER_API_KEY` setup - Web search is core for competitor research
+- [ ] `NEWSAPI_KEY` setup - News crawler is core for industry monitoring
+- [ ] Credential storage system - Users need a way to save API keys persistently
+- [ ] Config file loader - Load `.env` automatically on startup
+
+### Medium Priority (Nice to Have)
+- [ ] Figma OAuth flow - Full design integration
+- [ ] Linear API completion - Mutation methods
+- [ ] Notion write support - Export PRDs to Notion
+
+### Lower Priority (Limited Value Currently)
+- [ ] Amplitude - All methods unimplemented
+- [ ] Loom transcripts - Transcript fetch not working
+- [ ] Zoom transcripts - Transcript fetch not working
+
 ## Integration with pmkit Web
 
 pmkit-desktop uses the same prompts and fetcher infrastructure as pmkit web:
 
 - **Prompts**: `@pmkit/prompts` - All 10 workflow prompt templates
 - **Fetchers**: `@pmkit/core/fetchers` - Slack, Jira, Calendar, Gmail, Drive, Confluence, Zendesk
+- **Crawlers**: `@pmkit/core/crawlers` - Social, Web Search, News crawlers
+
+## Project Structure
+
+```
+pmkit-desktop/
+├── src/
+│   ├── cli/              # CLI interface (Commander.js)
+│   │   └── index.ts      # Main CLI entry point
+│   ├── scheduler/        # Autonomous scheduler (node-cron)
+│   │   └── index.ts      # Cron-based workflow runner
+│   ├── lib/              # Core library
+│   │   ├── types.ts      # Workflow types and configs
+│   │   ├── storage.ts    # Markdown and telemetry storage
+│   │   ├── config.ts     # User configuration
+│   │   └── runner.ts     # Workflow execution engine
+│   ├── crawlers/         # AI Crawlers
+│   │   ├── index.ts      # Unified crawler interface
+│   │   └── social.ts     # Extended social crawler
+│   └── integrations/     # MVP Integration clients
+│       ├── index.ts      # Client factory
+│       └── *.ts          # Individual clients
+├── skills/               # Skill definitions (SKILL.md files)
+│   ├── pm-daily-brief/
+│   ├── pm-meeting-prep/
+│   ├── crawler-social/
+│   └── ...
+└── package.json
+```
 
 ## License
 

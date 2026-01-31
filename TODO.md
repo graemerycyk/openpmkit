@@ -146,6 +146,94 @@ Last updated: 2026-01-20 (MVP Launch Readiness)
 
 ---
 
+## 🖥️ pmkit-desktop (Local CLI Tool)
+
+**Goal**: Standalone CLI tool for running PM workflows locally with markdown output and SIEM telemetry.
+
+### Overview
+
+pmkit-desktop is a local CLI tool (forked from OpenClaw) that runs the same 10 PM workflows as pmkit web, but outputs markdown files to `~/pmkit/{workflow-id}/{timestamp}/` with full telemetry logging.
+
+### Core Implementation ✅ COMPLETE
+
+| Item | Status | Notes |
+|------|--------|-------|
+| 10 PM workflow skills | ✅ Done | `skills/pm-*/SKILL.md` |
+| CLI interface (Commander.js) | ✅ Done | `src/cli/index.ts` |
+| Workflow runner | ✅ Done | `src/lib/runner.ts` |
+| Markdown storage | ✅ Done | `src/lib/storage.ts` |
+| SIEM telemetry logging | ✅ Done | JSON telemetry per run |
+| Autonomous scheduler | ✅ Done | `src/scheduler/index.ts` |
+| Configuration system | ✅ Done | `src/lib/config.ts` |
+
+### AI Crawlers ✅ IMPLEMENTED (API Keys Needed)
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Social Crawler (extended) | ✅ Done | Reddit, HN, X, LinkedIn, Discord, Bluesky, Threads |
+| Web Search Crawler | ✅ Done | Google (Serper), DuckDuckGo fallback |
+| News Crawler | ✅ Done | NewsAPI, GNews, Google News RSS fallback |
+| Crawler skill definitions | ✅ Done | `skills/crawler-*/SKILL.md` |
+| `SERPER_API_KEY` | 🔲 Needed | For web search (2,500 free/month) |
+| `NEWSAPI_KEY` | 🔲 Needed | For news (100 free/day) |
+
+### MVP Integrations 🔄 PARTIAL
+
+8 integration clients created but need API keys and some methods unimplemented.
+
+| Integration | OAuth/API | Fetch | Write | Notes |
+|-------------|-----------|-------|-------|-------|
+| Figma | 🔲 OAuth needed | ✅ | N/A | Design files, comments |
+| Loom | 🔲 API key needed | ✅ | N/A | `getTranscript()` pending |
+| Coda | 🔲 API key needed | ✅ | 🔲 | `create_row` pending |
+| Amplitude | 🔲 API key needed | 🔲 | N/A | All methods pending |
+| Discourse | 🔲 API key needed | ✅ | 🔲 | Works |
+| Linear | 🔲 API key needed | ✅ | 🔲 | Mutations pending |
+| Notion | 🔲 OAuth needed | ✅ | 🔲 | `pushData` pending |
+| Zoom | 🔲 OAuth needed | ✅ | N/A | `getTranscript()` pending |
+
+### Infrastructure 🔲 NEEDED
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Credential storage | 🔲 Pending | No secure storage for API keys/tokens |
+| OAuth flow for integrations | 🔲 Pending | No UI to connect OAuth integrations |
+| Token refresh | 🔲 Pending | OAuth tokens will expire |
+| `.env` auto-loader | 🔲 Pending | dotenv is installed but not wired up |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `pmkit-desktop/README.md` | Full documentation |
+| `pmkit-desktop/src/cli/index.ts` | CLI entry point |
+| `pmkit-desktop/src/lib/runner.ts` | Workflow execution |
+| `pmkit-desktop/src/lib/storage.ts` | Markdown + telemetry storage |
+| `pmkit-desktop/src/crawlers/` | AI Crawlers |
+| `pmkit-desktop/src/integrations/` | MVP Integration clients |
+| `pmkit-desktop/skills/` | Skill definitions |
+
+### Running pmkit-desktop
+
+```bash
+cd pmkit-desktop
+npm install
+npm run build
+
+# Run workflows
+npm run run:daily-brief
+npm run run:competitor
+
+# Or use CLI directly
+npx tsx src/cli/index.ts list
+npx tsx src/cli/index.ts run daily-brief
+
+# Start scheduler
+npm run scheduler:start
+```
+
+---
+
 ## 🔴 Critical / Blocking
 
 Items that block security reviews or make false claims.
