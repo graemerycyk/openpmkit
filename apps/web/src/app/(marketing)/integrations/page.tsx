@@ -206,7 +206,7 @@ export default function IntegrationsPage() {
               <span className="text-cobalt-600"> PM Stack</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              openopenpmkit works with the tools your team already uses. Pull data from Jira, Slack, Gong,
+              openpmkit works with the tools your team already uses. Pull data from Jira, Slack, Gong,
               and more—then generate artifacts with full traceability back to source.
             </p>
           </div>

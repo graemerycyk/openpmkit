@@ -1645,7 +1645,7 @@ export const resources: ResourcePage[] = [
       {
         question: 'Does openpmkit support Zendesk Suite and Support?',
         answer:
-          'Yes. openopenpmkit works with both Zendesk Suite and standalone Zendesk Support.',
+          'Yes. openpmkit works with both Zendesk Suite and standalone Zendesk Support.',
       },
     ],
   },

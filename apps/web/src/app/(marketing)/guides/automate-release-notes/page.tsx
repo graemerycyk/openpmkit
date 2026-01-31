@@ -218,7 +218,7 @@ export default function AutomateReleaseNotesPage() {
                         <div className="flex items-start gap-2">
                           <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />
                           <div>
-                            <span className="text-sm font-medium">How openopenpmkit helps:</span>
+                            <span className="text-sm font-medium">How openpmkit helps:</span>
                             <p className="text-sm text-muted-foreground">{step.pmkitHelp}</p>
                           </div>
                         </div>
@@ -266,7 +266,7 @@ export default function AutomateReleaseNotesPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl font-bold">Try Release Notes Generation</h2>
             <p className="mt-4 text-cobalt-100">
-              See how openopenpmkit generates release notes from Jira data in the demo.
+              See how openpmkit generates release notes from Jira data in the demo.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" asChild>

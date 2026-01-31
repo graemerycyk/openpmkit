@@ -22,20 +22,10 @@
     "paths": {
       "@/*": ["./src/*"],
       "@pmkit/content": ["../../packages/content/src/index.ts"],
-      "@pmkit/content/*": ["../../packages/content/src/*"],
-      "@pmkit/core": ["../../packages/core/src/index.ts"],
-      "@pmkit/core/*": ["../../packages/core/src/*"],
-      "@pmkit/mcp": ["../../packages/mcp/src/index.ts"],
-      "@pmkit/mcp/*": ["../../packages/mcp/src/*"],
-      "@pmkit/mcp-servers": ["../../packages/mcp-servers/src/index.ts"],
-      "@pmkit/mcp-servers/*": ["../../packages/mcp-servers/src/*"],
-      "@pmkit/mock-tenant": ["../../packages/mock-tenant/src/index.ts"],
-      "@pmkit/mock-tenant/*": ["../../packages/mock-tenant/src/*"],
-      "@pmkit/prompts": ["../../packages/prompts/src/index.ts"],
-      "@pmkit/prompts/*": ["../../packages/prompts/src/*"]
+      "@pmkit/content/*": ["../../packages/content/src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/*/src/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/content/src/**/*.ts"],
   "exclude": ["node_modules"]
 }
 

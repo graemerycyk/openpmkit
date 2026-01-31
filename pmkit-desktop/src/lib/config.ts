@@ -15,9 +15,9 @@ import * as readline from 'readline';
 import type { PMKitConfig, WorkflowId, CredentialInfo, CredentialCategory } from './types.js';
 import { WORKFLOWS, CREDENTIALS, CREDENTIAL_CATEGORY_NAMES, getCredentialsByCategory } from './types.js';
 
-const CONFIG_DIR = path.join(os.homedir(), '.openopenpmkit');
+const CONFIG_DIR = path.join(os.homedir(), '.openpmkit');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
-const DEFAULT_OUTPUT_DIR = path.join(os.homedir(), 'openopenpmkit');
+const DEFAULT_OUTPUT_DIR = path.join(os.homedir(), 'openpmkit');
 
 const DEFAULT_CONFIG: PMKitConfig = {
   outputDir: DEFAULT_OUTPUT_DIR,

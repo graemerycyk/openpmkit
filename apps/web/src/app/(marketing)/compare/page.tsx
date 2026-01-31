@@ -111,7 +111,7 @@ export default function ComparePage() {
               <span className="text-cobalt-600"> The Competition</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Honest feature comparisons and assessments. See where openopenpmkit shines
+              Honest feature comparisons and assessments. See where openpmkit shines
               and where alternatives might fit better. Open source, BYOK, runs locally.
             </p>
           </div>

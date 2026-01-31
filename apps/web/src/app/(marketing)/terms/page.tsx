@@ -91,7 +91,7 @@ export default function TermsPage() {
 
             <h2>8. Third-Party Integrations</h2>
             <p>
-              openopenpmkit integrates with third-party services (Jira, Slack, Gong, etc.). Your use of
+              openpmkit integrates with third-party services (Jira, Slack, Gong, etc.). Your use of
               these integrations is subject to the terms of service of those third parties. pmkit
               is not responsible for the availability or functionality of third-party services.
             </p>

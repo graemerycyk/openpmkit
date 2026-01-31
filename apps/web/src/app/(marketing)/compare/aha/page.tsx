@@ -52,8 +52,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'Aha! excels as comprehensive roadmap software for strategic planning and portfolio management. openopenpmkit excels at AI-powered automation of daily PM workflows with traceable artifacts.',
-    openopenpmkitBestFor:
+      'Aha! excels as comprehensive roadmap software for strategic planning and portfolio management. openpmkit excels at AI-powered automation of daily PM workflows with traceable artifacts.',
+    openpmkitBestFor:
       'You need AI to automate daily PM work: synthesizing feedback, drafting PRDs, generating briefs—all from your existing tools.',
     competitorBestFor:
       'You need comprehensive roadmap software with strategy planning, portfolio management, and stakeholder communication.',
@@ -208,7 +208,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Does openpmkit have roadmap features?',
       answer:
-        'No. openopenpmkit focuses on AI-powered workflows for synthesis and artifact creation. For visual roadmaps and strategy planning, Aha! or similar tools are better suited.',
+        'No. openpmkit focuses on AI-powered workflows for synthesis and artifact creation. For visual roadmaps and strategy planning, Aha! or similar tools are better suited.',
     },
     {
       question: 'What\'s the main difference?',
@@ -218,7 +218,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Which is better for PRDs?',
       answer:
-        'Aha! provides PRD templates and document management. openopenpmkit generates PRDs that cite actual customer evidence—specific Slack messages, support tickets, Gong calls—making them defensible in reviews.',
+        'Aha! provides PRD templates and document management. openpmkit generates PRDs that cite actual customer evidence—specific Slack messages, support tickets, Gong calls—making them defensible in reviews.',
     },
     {
       question: 'How does pricing compare?',

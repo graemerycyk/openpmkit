@@ -51,8 +51,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'Nalin excels as a flexible, conversational AI assistant for ad-hoc PM questions. openopenpmkit excels at structured, repeatable workflows with governance and audit trails.',
-    openopenpmkitBestFor:
+      'Nalin excels as a flexible, conversational AI assistant for ad-hoc PM questions. openpmkit excels at structured, repeatable workflows with governance and audit trails.',
+    openpmkitBestFor:
       'You need consistent, repeatable PM workflows that run automatically with governance, audit trails, and enterprise integrations.',
     competitorBestFor:
       'You want a flexible, conversational AI assistant for brainstorming, ad-hoc questions, and exploratory PM work.',

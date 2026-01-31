@@ -217,7 +217,7 @@ export default function PrioritizeFeaturesPage() {
                         <div className="flex items-start gap-2">
                           <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-cobalt-600" />
                           <div>
-                            <span className="text-sm font-medium">How openopenpmkit helps:</span>
+                            <span className="text-sm font-medium">How openpmkit helps:</span>
                             <p className="text-sm text-muted-foreground">{step.pmkitHelp}</p>
                           </div>
                         </div>

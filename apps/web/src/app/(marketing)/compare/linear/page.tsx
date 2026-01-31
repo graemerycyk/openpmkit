@@ -52,8 +52,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'Linear excels at fast, modern issue tracking for development teams. openopenpmkit excels at AI-powered PM workflows that synthesize data and produce artifacts.',
-    openopenpmkitBestFor:
+      'Linear excels at fast, modern issue tracking for development teams. openpmkit excels at AI-powered PM workflows that synthesize data and produce artifacts.',
+    openpmkitBestFor:
       'You need AI to automate PM workflows: daily briefs, PRDs, VoC clustering—all synthesizing data from your existing tools.',
     competitorBestFor:
       'You need fast, modern issue tracking for your development team with excellent UX and keyboard shortcuts.',
@@ -107,7 +107,7 @@ const comparisonData: ComparisonPageData = {
       name: 'Release notes automation',
       openpmkit: 'yes',
       competitor: 'partial',
-      note: 'Linear has release management; openopenpmkit generates notes',
+      note: 'Linear has release management; openpmkit generates notes',
     },
     {
       name: 'Slack integration',

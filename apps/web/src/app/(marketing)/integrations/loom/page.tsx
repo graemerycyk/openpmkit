@@ -75,7 +75,7 @@ const useCases = [
 const faqs = [
   {
     question: 'How does openpmkit connect to Loom?',
-    answer: 'openpmkit uses Atlassian OAuth 2.0 for secure authentication (Loom is part of Atlassian). You authorize openpmkit to access your Loom workspace, and credentials are encrypted at rest. openopenpmkit has read-only access to videos and transcripts.',
+    answer: 'openpmkit uses Atlassian OAuth 2.0 for secure authentication (Loom is part of Atlassian). You authorize openpmkit to access your Loom workspace, and credentials are encrypted at rest. openpmkit has read-only access to videos and transcripts.',
   },
   {
     question: 'What Loom permissions does openpmkit need?',

@@ -42,13 +42,14 @@ export function getReadingTime(content: string): number {
 }
 
 export const siteConfig = {
-  name: 'pmkit',
-  description: 'Your daily PM toolkit - briefs, PRDs, and prototypes made simple.',
+  name: 'openpmkit',
+  description: 'Open-source AI Product Management toolkit - 10 autonomous workflows for PMs.',
   url: 'https://getpmkit.com',
   ogImage: 'https://getpmkit.com/og.png',
   links: {
-    twitter: 'https://twitter.com/getpmkit',
-    github: 'https://github.com/getpmkit',
+    twitter: 'https://x.com/openpmkit',
+    github: 'https://github.com/openpmkit/openpmkit',
+    npm: 'https://www.npmjs.com/package/openpmkit',
   },
 };
 

@@ -52,8 +52,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'Notion AI excels as an AI-enhanced workspace for documentation and collaboration. openopenpmkit excels at purpose-built PM workflows that pull data from your tools and produce traceable artifacts.',
-    openopenpmkitBestFor:
+      'Notion AI excels as an AI-enhanced workspace for documentation and collaboration. openpmkit excels at purpose-built PM workflows that pull data from your tools and produce traceable artifacts.',
+    openpmkitBestFor:
       'You need AI workflows specifically designed for product management: daily briefs, PRDs with evidence, VoC clustering, sprint reviews—all with governance and audit trails.',
     competitorBestFor:
       'You want an AI-enhanced workspace for general documentation, notes, wikis, and collaboration across your entire organization.',
@@ -199,7 +199,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Can I use openpmkit and Notion together?',
       answer:
-        'Yes. Many teams use Notion for documentation and wikis while using openpmkit for automated PM workflows. openopenpmkit generates artifacts (PRDs, briefs, reports) that you can export or reference in Notion.',
+        'Yes. Many teams use Notion for documentation and wikis while using openpmkit for automated PM workflows. openpmkit generates artifacts (PRDs, briefs, reports) that you can export or reference in Notion.',
     },
     {
       question: 'What\'s the main difference between openpmkit and Notion AI?',
@@ -214,7 +214,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Which is better for PRDs?',
       answer:
-        'Notion AI can help write PRD content based on your prompts. openopenpmkit PRDs cite actual customer evidence—specific Slack messages, support tickets, Gong calls—making them defensible in stakeholder reviews.',
+        'Notion AI can help write PRD content based on your prompts. openpmkit PRDs cite actual customer evidence—specific Slack messages, support tickets, Gong calls—making them defensible in stakeholder reviews.',
     },
     {
       question: 'Does openpmkit replace Notion?',

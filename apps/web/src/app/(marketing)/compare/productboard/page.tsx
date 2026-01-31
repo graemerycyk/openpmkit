@@ -52,8 +52,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'Productboard excels as a centralized platform for feedback collection and roadmap visualization. openopenpmkit excels at automating repetitive PM workflows with AI while working with your existing tools.',
-    openopenpmkitBestFor:
+      'Productboard excels as a centralized platform for feedback collection and roadmap visualization. openpmkit excels at automating repetitive PM workflows with AI while working with your existing tools.',
+    openpmkitBestFor:
       'You want AI to automate daily briefs, PRD drafting, VoC clustering, and other PM workflows—without migrating to a new platform.',
     competitorBestFor:
       'You need a centralized product management platform with customer portals, feature voting, and visual roadmap tools.',
@@ -147,7 +147,7 @@ const comparisonData: ComparisonPageData = {
       description:
         'Productboard is a platform where you centralize all product data—feedback, ideas, roadmaps. openpmkit is an AI agent that works with your existing tools and automates workflows without requiring data migration.',
       pmkitAdvantage:
-        'No platform migration required. openopenpmkit connects to Jira, Slack, Gong, Zendesk and synthesizes insights from tools your team already uses.',
+        'No platform migration required. openpmkit connects to Jira, Slack, Gong, Zendesk and synthesizes insights from tools your team already uses.',
       competitorAdvantage:
         'Single source of truth for all product data. Clean interface for stakeholders to view roadmaps and submit feedback.',
     },
@@ -203,12 +203,12 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'What\'s the main difference between openpmkit and Productboard?',
       answer:
-        'The main difference is approach: Productboard is a platform you work within, while openpmkit is an AI agent that works with your existing tools. Productboard requires you to centralize data in their system. openopenpmkit connects to Jira, Slack, Gong, and other tools you already use and automates workflows from there.',
+        'The main difference is approach: Productboard is a platform you work within, while openpmkit is an AI agent that works with your existing tools. Productboard requires you to centralize data in their system. openpmkit connects to Jira, Slack, Gong, and other tools you already use and automates workflows from there.',
     },
     {
       question: 'Which is better for enterprise teams?',
       answer:
-        'Both serve enterprise teams but in different ways. Productboard offers a mature platform with established enterprise features. openopenpmkit offers AI automation with draft-only governance, RBAC, and full audit trails. Enterprise teams often use both for different purposes.',
+        'Both serve enterprise teams but in different ways. Productboard offers a mature platform with established enterprise features. openpmkit offers AI automation with draft-only governance, RBAC, and full audit trails. Enterprise teams often use both for different purposes.',
     },
     {
       question: 'Does Productboard have AI features?',

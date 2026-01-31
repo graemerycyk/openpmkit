@@ -52,8 +52,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'JPD excels at prioritizing ideas with native Jira integration. openopenpmkit excels at AI-powered synthesis of customer evidence into actionable artifacts that chain into Jira delivery.',
-    openopenpmkitBestFor:
+      'JPD excels at prioritizing ideas with native Jira integration. openpmkit excels at AI-powered synthesis of customer evidence into actionable artifacts that chain into Jira delivery.',
+    openpmkitBestFor:
       'You need AI to synthesize customer feedback into insights, draft artifacts, and propose Jira tickets—with governance and approval workflows.',
     competitorBestFor:
       'You need a prioritization and discovery board tightly integrated with Jira delivery, with manual idea management.',
@@ -200,7 +200,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Does openpmkit replace Jira?',
       answer:
-        'No. openopenpmkit integrates with Jira. It proposes Jira epics and stories based on synthesized customer evidence. You approve the proposals, then the tickets are created in your Jira instance. openpmkit enhances Jira, not replaces it.',
+        'No. openpmkit integrates with Jira. It proposes Jira epics and stories based on synthesized customer evidence. You approve the proposals, then the tickets are created in your Jira instance. openpmkit enhances Jira, not replaces it.',
     },
     {
       question: 'Is JPD free for Jira users?',
@@ -210,7 +210,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Which has better Atlassian integration?',
       answer:
-        'JPD is native Atlassian and has deeper integration with the Atlassian ecosystem. openopenpmkit integrates with Jira via APIs and can propose tickets, but it\'s not an Atlassian product.',
+        'JPD is native Atlassian and has deeper integration with the Atlassian ecosystem. openpmkit integrates with Jira via APIs and can propose tickets, but it\'s not an Atlassian product.',
     },
     {
       question: 'Can openpmkit help with prioritization?',

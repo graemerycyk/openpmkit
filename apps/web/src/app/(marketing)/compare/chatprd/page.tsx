@@ -48,12 +48,12 @@ const comparisonData: ComparisonPageData = {
 
   headline: 'openpmkit vs ChatPRD: Which AI PRD Tool is Right for You?',
   subheadline:
-    'ChatPRD generates PRDs from prompts using AI. openopenpmkit generates PRDs grounded in actual customer evidence, with full traceability and workflow chaining. Here\'s how they compare.',
+    'ChatPRD generates PRDs from prompts using AI. openpmkit generates PRDs grounded in actual customer evidence, with full traceability and workflow chaining. Here\'s how they compare.',
 
   verdict: {
     summary:
-      'ChatPRD excels at quickly generating PRD drafts from prompts. openopenpmkit excels at creating evidence-grounded PRDs that cite real customer feedback and chain into delivery workflows.',
-    openopenpmkitBestFor:
+      'ChatPRD excels at quickly generating PRD drafts from prompts. openpmkit excels at creating evidence-grounded PRDs that cite real customer feedback and chain into delivery workflows.',
+    openpmkitBestFor:
       'You need PRDs that cite actual customer evidence from Slack, Gong, and support tickets—and want artifacts that survive stakeholder scrutiny.',
     competitorBestFor:
       'You need quick PRD drafts for early-stage ideas and brainstorming without needing evidence trails or traceability.',
@@ -140,7 +140,7 @@ const comparisonData: ComparisonPageData = {
     {
       title: 'Approach to PRD Generation',
       description:
-        'ChatPRD uses conversational AI to generate PRDs from prompts you provide. openopenpmkit generates PRDs grounded in actual customer evidence pulled from your connected tools.',
+        'ChatPRD uses conversational AI to generate PRDs from prompts you provide. openpmkit generates PRDs grounded in actual customer evidence pulled from your connected tools.',
       pmkitAdvantage:
         'PRDs cite actual Slack messages, support tickets, and Gong calls. Every claim is traceable to real customer feedback, making PRDs defensible in stakeholder reviews.',
       competitorAdvantage:
@@ -158,7 +158,7 @@ const comparisonData: ComparisonPageData = {
     {
       title: 'Workflow Integration',
       description:
-        'PRDs don\'t exist in isolation. They inform roadmaps, create Jira tickets, and drive sprint planning. openopenpmkit chains these workflows together.',
+        'PRDs don\'t exist in isolation. They inform roadmaps, create Jira tickets, and drive sprint planning. openpmkit chains these workflows together.',
       pmkitAdvantage:
         'PRD → Jira epics → Sprint reviews in one flow. Context carries through the entire delivery chain so nothing falls through the cracks.',
       competitorAdvantage:
@@ -191,9 +191,9 @@ const comparisonData: ComparisonPageData = {
         'They serve different use cases. ChatPRD is great for quick PRD drafts when you don\'t need evidence trails. openpmkit is better when you need PRDs that cite real customer feedback and integrate with your delivery workflow. Some teams use ChatPRD for early brainstorming and openpmkit for production PRDs.',
     },
     {
-      question: 'What makes openopenpmkit PRDs different from ChatPRD?',
+      question: 'What makes openpmkit PRDs different from ChatPRD?',
       answer:
-        'openpmkit PRDs cite actual customer evidence—specific Slack messages, support tickets, and Gong call transcripts. ChatPRD generates PRDs from what you type in the prompt. When a stakeholder asks "where did this requirement come from?", openopenpmkit has the answer.',
+        'openpmkit PRDs cite actual customer evidence—specific Slack messages, support tickets, and Gong call transcripts. ChatPRD generates PRDs from what you type in the prompt. When a stakeholder asks "where did this requirement come from?", openpmkit has the answer.',
     },
     {
       question: 'Which is faster for generating PRDs?',
@@ -208,7 +208,7 @@ const comparisonData: ComparisonPageData = {
     {
       question: 'Does ChatPRD have workflow chaining?',
       answer:
-        'No, ChatPRD focuses specifically on PRD generation. openopenpmkit chains workflows together: VoC clustering → PRD drafting → Jira epics → Sprint reviews. Context carries through so your PRD requirements connect to delivered features.',
+        'No, ChatPRD focuses specifically on PRD generation. openpmkit chains workflows together: VoC clustering → PRD drafting → Jira epics → Sprint reviews. Context carries through so your PRD requirements connect to delivered features.',
     },
     {
       question: 'What about pricing differences?',

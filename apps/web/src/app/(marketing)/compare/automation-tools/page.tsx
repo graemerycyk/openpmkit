@@ -54,8 +54,8 @@ const comparisonData: ComparisonPageData = {
 
   verdict: {
     summary:
-      'Automation tools excel at simple, predictable workflows that can execute immediately. openopenpmkit excels at complex PM workflows that need judgment, traceability, and human oversight.',
-    openopenpmkitBestFor:
+      'Automation tools excel at simple, predictable workflows that can execute immediately. openpmkit excels at complex PM workflows that need judgment, traceability, and human oversight.',
+    openpmkitBestFor:
       'PM workflows that synthesize data from multiple tools, require human review before external writes, and chain into delivery artifacts.',
     competitorBestFor:
       'Simple trigger-action automations where immediate execution is fine and you need thousands of app connectors.',
