@@ -38,7 +38,7 @@ export default function TermsPage() {
 
             <h2>2. Description of Service</h2>
             <p>
-              pmkit is a PM toolkit that provides AI-powered workflows for product managers,
+              openpmkit is a PM toolkit that provides AI-powered workflows for product managers,
               including daily briefs, meeting summaries, PRD drafts, and more. The service
               integrates with third-party tools to aggregate and process data.
             </p>
@@ -65,7 +65,7 @@ export default function TermsPage() {
 
             <h2>5. Fair Use Policy</h2>
             <p>
-              pmkit subscriptions include generous usage allowances designed for normal business
+              openpmkit subscriptions include generous usage allowances designed for normal business
               use. We reserve the right to limit or suspend accounts that significantly exceed
               typical usage patterns or that we reasonably believe are being used in ways that
               negatively impact service quality for other customers.
@@ -77,21 +77,21 @@ export default function TermsPage() {
 
             <h2>6. Draft-Only Operations</h2>
             <p>
-              pmkit operates on a draft-only basis. All outputs are proposals that require your
-              review and approval before any action is taken in connected systems. pmkit does not
+              openpmkit operates on a draft-only basis. All outputs are proposals that require your
+              review and approval before any action is taken in connected systems. openpmkit does not
               directly write to external systems without explicit user action.
             </p>
 
             <h2>7. Intellectual Property</h2>
             <p>
-              The pmkit service, including all content, features, and functionality, is owned by
-              pmkit and protected by intellectual property laws. You retain ownership of your data
+              The openpmkit service, including all content, features, and functionality, is owned by
+              openpmkit and protected by intellectual property laws. You retain ownership of your data
               and content processed through the service.
             </p>
 
             <h2>8. Third-Party Integrations</h2>
             <p>
-              pmkit integrates with third-party services (Jira, Slack, Gong, etc.). Your use of
+              openopenpmkit integrates with third-party services (Jira, Slack, Gong, etc.). Your use of
               these integrations is subject to the terms of service of those third parties. pmkit
               is not responsible for the availability or functionality of third-party services.
             </p>
@@ -105,7 +105,7 @@ export default function TermsPage() {
 
             <h2>10. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, pmkit shall not be liable for any indirect,
+              To the maximum extent permitted by law, openpmkit shall not be liable for any indirect,
               incidental, special, consequential, or punitive damages arising from your use of the
               service.
             </p>

@@ -1,0 +1,262 @@
+# AI-Generated Release Notes: From Jira Tickets to Customer-Ready Updates
+
+Release notes are the bridge between your engineering work and your customers. They're also one of the most time-consuming artifacts PMs create. You've closed 47 Jira tickets, merged 23 PRs, and now you need to translate all of that into something customers actually want to read.
+
+Most PMs spend 2-4 hours per release writing notes. That's 4-8 hours per month for bi-weekly releases—time that could be spent talking to customers or planning the next iteration.
+
+What if release notes wrote themselves?
+
+## The Release Notes Problem
+
+### Why Release Notes Take So Long
+
+1. **Information gathering**: Scanning through dozens of tickets to understand what shipped
+2. **Translation**: Converting technical descriptions into customer-friendly language
+3. **Categorization**: Organizing changes into features, improvements, and fixes
+4. **Prioritization**: Deciding what to highlight vs. bury
+5. **Formatting**: Making it look professional and consistent
+
+### The Cost of Skipping Them
+
+When release notes are rushed or skipped:
+- Customers don't know about features they're paying for
+- Sales can't speak to recent improvements
+- Support gets tickets about "missing" features that actually shipped
+- CSMs miss opportunities for proactive outreach
+
+## How AI Changes Release Notes
+
+### From Tickets to Customer Language
+
+The key insight is that Jira tickets contain all the information needed for release notes—it's just in the wrong format. A ticket titled "ACME-342: Implement search filter UI component" becomes "Search Filters: Find content faster with new date range and content type filters."
+
+AI excels at this translation because:
+- It understands the intent behind technical descriptions
+- It can identify the customer benefit, not just the implementation
+- It maintains consistent tone and style across all entries
+
+### The openpmkit Approach
+
+pmkit's Release Notes workflow:
+
+1. **Pulls completed tickets** from Jira for the release version
+2. **Retrieves epic context** to understand the bigger picture
+3. **References related PRDs** to connect features to original customer problems
+4. **Generates customer-facing notes** in your team's format
+
+```typescript
+// Example tool calls for release notes generation
+const releaseData = await Promise.all([
+  jira.getIssues({ fixVersion: 'v2.4.0', status: 'Done' }),
+  jira.getEpics({ fixVersion: 'v2.4.0' }),
+  confluence.getPage({ title: 'Release Notes Template' }),
+  pmkit.getArtifacts({ type: 'prd', limit: 5 }),
+]);
+```
+
+## Anatomy of Great Release Notes
+
+### What Customers Want
+
+Research shows customers scan release notes for:
+1. **Features they requested** - "Did they finally add X?"
+2. **Problems they've experienced** - "Is that bug fixed?"
+3. **Breaking changes** - "Do I need to do anything?"
+
+### Structure That Works
+
+```markdown
+## 🎉 Highlights
+Top 2-3 most impactful changes with benefit statements
+
+## ✨ New Features
+New capabilities with clear descriptions
+
+## 🔧 Improvements
+Enhancements to existing features
+
+## 🐛 Bug Fixes
+Issues resolved (grouped if many)
+
+## ⚠️ Breaking Changes
+Required customer actions (if any)
+```
+
+### Language Guidelines
+
+| Instead of | Write |
+|------------|-------|
+| "Implemented search filter component" | "Filter search results by date and content type" |
+| "Fixed null pointer exception in dashboard" | "Dashboard now loads correctly for all users" |
+| "Optimized database queries" | "Search is now 23% faster" |
+| "Refactored authentication module" | (Don't include - no customer impact) |
+
+## Real-World Example
+
+### Input: Jira Tickets
+
+```
+ACME-342: Implement search date range filter
+ACME-343: Add content type filter to search
+ACME-344: Improve search ranking algorithm
+ACME-350: Fix search crash on special characters
+ACME-348: Resolve dashboard loading issue
+```
+
+### Output: Customer Release Notes
+
+```markdown
+## 🎉 Highlights
+
+### Search Filters Are Here!
+You can now filter search results by date range and content type,
+making it faster than ever to find exactly what you're looking for.
+
+### 23% Faster Search
+We've optimized our search infrastructure to deliver results faster.
+
+## ✨ New Features
+
+### Search Filters
+- Date range filters: All time, Last 7 days, 30 days, 90 days
+- Content type filters: Documents, Projects, Comments
+- Combine multiple filters for precise results
+
+## 🐛 Bug Fixes
+- Search no longer crashes when using special characters
+- Dashboard widgets now load correctly for all users
+```
+
+## Integrating Release Notes Into Your Workflow
+
+### Timing
+
+Run the Release Notes job:
+- **Before release**: Generate draft for review
+- **Day of release**: Finalize and publish
+- **After release**: Update with any last-minute changes
+
+### Distribution
+
+Once generated, release notes can flow to:
+- **Changelog page**: Customer-facing documentation
+- **In-app notifications**: "What's New" modals
+- **Email**: Release announcement campaigns
+- **Slack**: Internal #product-updates channel
+- **Sales enablement**: Talking points for customer calls
+
+### The Draft-Only Pattern
+
+openpmkit generates release notes as proposals, not direct publishes:
+
+```typescript
+// Creates a proposal for review, doesn't publish directly
+const proposal = await pmkit.proposeReleaseNotes({
+  version: 'v2.4.0',
+  content: generatedNotes,
+  targetSystem: 'confluence',
+  targetPage: 'Release Notes - v2.4.0',
+});
+
+// Human reviews and approves
+await proposal.approve();
+
+// Only then does it publish
+await proposal.execute();
+```
+
+This ensures a human always reviews customer-facing content before it goes live.
+
+## Beyond Basic Release Notes
+
+### Audience-Specific Versions
+
+Different stakeholders need different information:
+
+| Audience | Focus |
+|----------|-------|
+| Customers | Benefits, how-to, breaking changes |
+| Sales | Competitive advantages, talking points |
+| CSM | Proactive outreach opportunities |
+| Support | What changed, common questions |
+
+openpmkit can generate multiple versions from the same source data.
+
+### Connecting to Customer Feedback
+
+The most powerful release notes connect features to original customer requests:
+
+> **Search Filters**
+> Filter search results by date range and content type.
+> *This addresses feedback from 89 customers who requested better search capabilities.*
+
+This requires connecting Jira tickets back to VoC data—exactly what pmkit's artifact chaining enables.
+
+### Trend Analysis
+
+Over time, AI-generated release notes enable analysis:
+- What percentage of releases are features vs. fixes?
+- How long from customer request to shipped feature?
+- Which product areas see the most activity?
+
+## Getting Started
+
+### Prerequisites
+
+1. **Jira integration**: Tickets with fix versions and clear summaries
+2. **Consistent labeling**: Bug, Feature, Improvement labels
+3. **Release template**: Your preferred format in Confluence
+
+### First Release Notes Job
+
+1. Select a recent release version
+2. Run the Release Notes workflow
+3. Review the generated draft
+4. Edit for accuracy and tone
+5. Publish to your changelog
+
+### Iteration
+
+After a few releases:
+- Refine your Jira ticket conventions
+- Update the template based on what works
+- Train the team on writing better ticket summaries
+
+## Common Questions
+
+### How accurate are AI-generated release notes?
+
+AI generates a strong first draft that typically requires 10-15 minutes of review vs. 2-4 hours of writing from scratch. The accuracy depends on the quality of your Jira ticket descriptions.
+
+### Can it handle technical products?
+
+Yes. The AI adjusts language based on your audience. Developer tools can have more technical release notes than consumer products.
+
+### What about security-sensitive changes?
+
+pmkit respects your labeling. Tickets marked as security fixes can be summarized without exposing details: "Security improvements" rather than specific vulnerability descriptions.
+
+### How does it handle large releases?
+
+For releases with 50+ tickets, the AI groups related changes and summarizes categories rather than listing every fix individually.
+
+## The ROI of Automated Release Notes
+
+| Metric | Manual | AI-Assisted |
+|--------|--------|-------------|
+| Time per release | 2-4 hours | 15-30 minutes |
+| Consistency | Variable | High |
+| Customer coverage | Often incomplete | Comprehensive |
+| Sales enablement | Delayed | Same-day |
+
+For a team doing bi-weekly releases, that's 3-7 hours saved per month—time better spent on customer conversations and product strategy.
+
+## Conclusion
+
+Release notes shouldn't be an afterthought. They're how customers learn about the value you're delivering. But they also shouldn't consume hours of PM time.
+
+AI-generated release notes give you the best of both worlds: comprehensive, customer-friendly updates without the manual effort. Your customers get better communication. Your sales team gets faster enablement. And you get time back for higher-impact work.
+
+---
+
+*Ready to automate your release notes? Try the Release Notes workflow in the [pmkit demo](/demo/console).*

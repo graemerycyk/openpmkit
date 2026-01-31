@@ -1,0 +1,495 @@
+# Building a Competitive Research System with AI Crawlers
+
+Competitive research shouldn't be a quarterly project. It should be a continuous feed of insights that inform daily decisions—from roadmap priorities to sales battlecards to positioning updates.
+
+The problem? Manual competitive monitoring is unsustainable. By the time you've reviewed competitor websites, scanned news, and checked social mentions, the intel is already stale. And you've spent hours that should have gone to building product.
+
+AI crawlers change this equation. They monitor continuously, synthesize automatically, and surface only what matters. Here's how to build a competitive research system that runs itself.
+
+## The Three Pillars of Competitive Research
+
+Effective competitive research requires three types of data, each from different sources:
+
+### 1. Social Intelligence (What Users Say)
+
+| Source | Signal Type | Example |
+|--------|-------------|---------|
+| Reddit | User comparisons, complaints | "Switched from X to Y because..." |
+| Hacker News | Technical discussions | "X's API is limited compared to Y" |
+| Twitter/X | Real-time reactions | "Just tried X's new feature, disappointed" |
+| LinkedIn | B2B sentiment | "Our team evaluated X and Y..." |
+| G2/Capterra | Structured reviews | Feature comparisons, ratings |
+
+Social intelligence tells you how users perceive competitors—their strengths, weaknesses, and positioning in the market.
+
+### 2. Web Intelligence (What Competitors Do)
+
+| Source | Signal Type | Example |
+|--------|-------------|---------|
+| Pricing pages | Pricing changes | New tier, price increase |
+| Feature pages | Product updates | New capability launched |
+| Blog/changelog | Announcements | Integration, partnership |
+| Job postings | Investment areas | Hiring for AI team |
+| About/team pages | Leadership changes | New CPO hired |
+
+Web intelligence tells you what competitors are doing—their product direction, pricing strategy, and organizational changes.
+
+### 3. News Intelligence (What the Market Says)
+
+| Source | Signal Type | Example |
+|--------|-------------|---------|
+| Tech news | Funding, launches | "X raises $50M Series C" |
+| Industry publications | Market trends | "Enterprise adoption of Y accelerating" |
+| Press releases | Official announcements | Partnership, acquisition |
+| Analyst reports | Market positioning | Gartner/Forrester mentions |
+
+News intelligence tells you about market-level changes—funding, partnerships, and industry trends that affect competitive dynamics.
+
+## Architecture of an AI Crawler System
+
+A complete competitive research system combines four crawler types:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                       Competitive Research                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
+│  │  Social  │  │   Web    │  │   News   │  │   URL    │           │
+│  │  Crawler │  │  Search  │  │  Crawler │  │  Scraper │           │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘           │
+│       │             │             │             │                   │
+│       ▼             ▼             ▼             ▼                   │
+│  ┌─────────────────────────────────────────────────────────┐       │
+│  │                  Synthesis Engine                        │       │
+│  │  - Deduplicate across sources                           │       │
+│  │  - Classify by type and significance                    │       │
+│  │  - Score by business impact                             │       │
+│  │  - Generate actionable insights                         │       │
+│  └─────────────────────────────────────────────────────────┘       │
+│                            │                                        │
+│                            ▼                                        │
+│  ┌─────────────────────────────────────────────────────────┐       │
+│  │                  Output Channels                         │       │
+│  │  - Daily brief integration                              │       │
+│  │  - Weekly competitor digest                             │       │
+│  │  - Real-time alerts (high-impact)                       │       │
+│  │  - Battlecard updates                                   │       │
+│  └─────────────────────────────────────────────────────────┘       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Social Crawler
+
+Monitors social platforms for competitor mentions, user comparisons, and sentiment:
+
+**Platforms:**
+- Reddit (product subreddits, industry communities)
+- Hacker News (Show HN, comments, discussions)
+- Twitter/X (real-time mentions, threads)
+- LinkedIn (B2B discussions, company updates)
+
+**Keywords:**
+- Competitor names and variations
+- "vs" comparisons
+- "alternative to" searches
+- Problem space terms
+
+**Output:**
+- Mention volume and sentiment trends
+- Notable discussions with engagement metrics
+- Competitive comparison summaries
+
+### Web Search Crawler
+
+Monitors competitor web presence for changes:
+
+**Targets:**
+- Pricing pages (weekly)
+- Feature/product pages (weekly)
+- Blog/changelog (daily)
+- Job postings (weekly)
+- About/team pages (monthly)
+
+**Detection:**
+- Page content changes
+- New pages added
+- Pricing structure changes
+- Feature announcements
+
+**Output:**
+- Change alerts with before/after
+- New feature summaries
+- Pricing change analysis
+
+### URL Scraper
+
+Deep-dives into specific competitor pages for detailed analysis:
+
+**Targets:**
+- Pricing pages (extract tiers, features, pricing)
+- Feature comparison pages
+- Documentation pages
+- Blog posts and announcements
+- Landing pages (messaging, positioning)
+
+**Analysis:**
+- Content structure and hierarchy
+- Key messaging and value propositions
+- Pricing tier extraction
+- Feature list comparison
+- Social proof and testimonials
+
+**Output:**
+- Structured data extraction
+- Competitive positioning analysis
+- Pricing comparison tables
+- Feature gap analysis
+
+### News Crawler
+
+Monitors news sources for market intelligence:
+
+**Sources:**
+- Tech news (TechCrunch, VentureBeat, etc.)
+- Industry publications
+- Press release wires
+- Google News alerts
+
+**Keywords:**
+- Competitor names
+- Industry terms
+- Funding/acquisition terms
+- Partnership announcements
+
+**Output:**
+- Funding and M&A alerts
+- Partnership announcements
+- Market trend summaries
+
+## Setting Up Your Crawler System
+
+### Step 1: Define Your Competitive Set
+
+Not all competitors deserve equal monitoring:
+
+```markdown
+## Primary Competitors (Daily Monitoring)
+- Direct feature overlap
+- Same target customer
+- Frequently in deals against us
+
+## Secondary Competitors (Weekly Monitoring)
+- Partial overlap
+- Adjacent market
+- Occasional competitive encounters
+
+## Emerging Competitors (Monthly Monitoring)
+- New entrants
+- Well-funded startups
+- Big tech experiments
+```
+
+### Step 2: Configure Keywords
+
+For each competitor, define monitoring keywords:
+
+```markdown
+## Competitor: Acme Corp
+
+### Brand Keywords
+- "Acme"
+- "Acme Corp"
+- "AcmePM" (product name)
+- "@acmecorp" (social handles)
+
+### Comparison Keywords
+- "Acme vs"
+- "Acme alternative"
+- "switching from Acme"
+- "Acme competitor"
+
+### Product Keywords
+- "Acme pricing"
+- "Acme features"
+- "Acme integration"
+- "Acme API"
+```
+
+### Step 3: Set Monitoring Cadence
+
+Different signals need different frequencies:
+
+| Signal Type | Cadence | Rationale |
+|-------------|---------|-----------|
+| Social mentions | Hourly | Real-time issues, viral posts |
+| News articles | Daily | Funding, announcements |
+| Pricing pages | Weekly | Changes are infrequent |
+| Feature pages | Weekly | Product updates |
+| Job postings | Weekly | Hiring trends |
+| Review sites | Monthly | Reviews accumulate slowly |
+
+### Step 4: Define Alert Thresholds
+
+Not every mention needs attention. Set thresholds:
+
+```markdown
+## Real-Time Alerts
+- Funding announcement > $10M
+- Pricing change detected
+- Social mention > 100 engagements
+- Negative sentiment spike (> 2x baseline)
+
+## Daily Digest
+- All news mentions
+- Social mentions > 10 engagements
+- New blog posts/changelogs
+
+## Weekly Summary
+- All web changes
+- Sentiment trends
+- Mention volume trends
+- Competitive comparison summary
+```
+
+## Synthesizing Intelligence into Action
+
+Raw data isn't intelligence. Synthesis turns data into decisions.
+
+### Daily Brief Integration
+
+Include competitive signals in your daily brief:
+
+```markdown
+## Competitive Signals (Today)
+
+### High Priority
+🚨 Competitor Y announced $30M Series B (TechCrunch)
+   - Implications: Expect aggressive hiring, marketing push
+   - Action: Review competitive positioning
+
+### Notable Mentions
+- Reddit thread comparing us to Y (89 upvotes)
+  - Users praise our enterprise features
+  - Concern about our pricing vs Y's free tier
+  
+- HN comment about Y's new API
+  - Developer sentiment positive
+  - Our API mentioned as "more mature but complex"
+
+### Sentiment Trend
+Y mentions: ↑ 23% vs last week (product launch effect)
+Our mentions: Stable, sentiment neutral
+```
+
+### Weekly Competitor Digest
+
+Synthesize the week's intelligence:
+
+```markdown
+## Weekly Competitor Intelligence
+Week of January 6-12, 2026
+
+### Competitor Y
+
+**Product Changes**
+- Launched "Smart Search" feature (announced Tuesday)
+- Added Salesforce integration (changelog Friday)
+
+**Market Activity**
+- Series B announced ($30M, Sequoia led)
+- 3 new enterprise logos on website
+
+**Social Sentiment**
+- 156 mentions (+45% vs prior week)
+- Sentiment: 0.3 (positive, up from 0.1)
+- Top discussion: HN thread on new search (234 points)
+
+**Strategic Implications**
+1. Search is now a competitive gap for us
+2. Expect aggressive enterprise push with new funding
+3. Salesforce integration may affect our pipeline
+
+**Recommended Actions**
+- [ ] Review search roadmap priority
+- [ ] Update battlecard with search comparison
+- [ ] Brief sales on funding implications
+
+### Competitor Z
+
+**Product Changes**
+- Price increase announced (15% on Enterprise tier)
+- Deprecated legacy API (6-month sunset)
+
+**Market Activity**
+- No significant news
+
+**Social Sentiment**
+- 67 mentions (-12% vs prior week)
+- Sentiment: -0.2 (negative, pricing backlash)
+- Top discussion: Reddit thread on price increase (45 upvotes)
+
+**Strategic Implications**
+1. Pricing backlash creates opportunity
+2. API deprecation may cause migration interest
+
+**Recommended Actions**
+- [ ] Target Z customers with migration offer
+- [ ] Highlight our API stability in positioning
+```
+
+### Battlecard Updates
+
+Automatically suggest battlecard updates:
+
+```markdown
+## Suggested Battlecard Updates
+
+### Competitor Y - Search Comparison
+
+**Current Battlecard:**
+> "Y has basic search. We offer advanced filters and saved searches."
+
+**Suggested Update:**
+> "Y launched AI-powered search (Jan 2026). Key differences:
+> - Y: Natural language queries, auto-suggestions
+> - Us: Advanced filters, boolean operators, saved searches
+> 
+> **Positioning:** Emphasize precision and power user features.
+> Y's search is 'consumer-friendly' but lacks enterprise controls."
+
+**Evidence:**
+- Y changelog (Jan 7)
+- HN discussion (234 points, mixed sentiment)
+- 3 sales calls mentioning Y's search
+
+### Competitor Z - Pricing
+
+**Current Battlecard:**
+> "Z is 20% cheaper on Enterprise tier."
+
+**Suggested Update:**
+> "Z increased Enterprise pricing 15% (Jan 2026).
+> We are now price-competitive on Enterprise.
+> 
+> **Positioning:** Highlight pricing stability.
+> 'We haven't raised prices in 2 years.'"
+
+**Evidence:**
+- Z pricing page change (Jan 8)
+- Reddit backlash thread (45 upvotes)
+```
+
+## Measuring Competitive Research ROI
+
+How do you know if your CI system is working?
+
+### Leading Indicators
+
+- **Coverage**: % of competitive mentions captured
+- **Timeliness**: Hours from event to alert
+- **Accuracy**: False positive rate on alerts
+- **Actionability**: % of insights with clear actions
+
+### Lagging Indicators
+
+- **Win rate vs. tracked competitors**: Improving?
+- **Sales cycle length**: Shorter with better intel?
+- **Positioning effectiveness**: Differentiation clearer?
+- **Surprise rate**: Fewer "we didn't know they had that" moments?
+
+### Feedback Loop
+
+Track which insights led to action:
+
+```markdown
+## CI Impact Log
+
+### January 2026
+
+**Insight**: Y launched AI search (Jan 7)
+**Action**: Accelerated search roadmap, updated battlecard
+**Outcome**: Won 2 deals where search was key factor
+
+**Insight**: Z price increase (Jan 8)
+**Action**: Targeted Z customers with migration campaign
+**Outcome**: 5 qualified leads from Z base
+
+**Insight**: Reddit thread on our export limitations
+**Action**: Prioritized export improvements
+**Outcome**: Shipped in Feb, positive community response
+```
+
+## Common Pitfalls
+
+### Pitfall 1: Information Overload
+
+More data isn't better. Focus on:
+- High-impact signals (funding, pricing, major features)
+- Actionable insights (things you can respond to)
+- Trend changes (not absolute levels)
+
+### Pitfall 2: Reactive Roadmapping
+
+Competitive research informs, not dictates:
+- **Good**: "Y shipped search; let's evaluate if our customers need it"
+- **Bad**: "Y shipped search; we need to copy it immediately"
+
+### Pitfall 3: Ignoring Weak Signals
+
+Big announcements are obvious. Weak signals predict them:
+- Hiring patterns → Product direction
+- Job posting language → Strategic priorities
+- Social sentiment shifts → Market perception changes
+
+### Pitfall 4: Siloed Intelligence
+
+CI is useless if only one person sees it:
+- Share with sales (they face competitors daily)
+- Share with marketing (positioning context)
+- Share with product (roadmap input)
+- Share with leadership (strategic context)
+
+## Getting Started
+
+### Week 1: Foundation
+- Define competitive set (primary, secondary, emerging)
+- Configure keywords for top 3 competitors
+- Set up basic monitoring (social + news)
+
+### Week 2: Expansion
+- Add web monitoring for pricing/feature pages
+- Configure alert thresholds
+- Create first weekly digest
+
+### Week 3: Integration
+- Add CI section to daily briefs
+- Share weekly digest with stakeholders
+- Create battlecard update process
+
+### Week 4: Optimization
+- Review alert accuracy (tune thresholds)
+- Assess coverage gaps
+- Gather feedback from consumers of intel
+
+## FAQ
+
+**Q: How many competitors should we actively monitor?**
+A: 3-5 primary competitors with full monitoring. 5-10 secondary with lighter touch. More than that dilutes focus.
+
+**Q: What if competitors don't have public changelogs?**
+A: Monitor their marketing site, social mentions, job postings, and customer reviews. Customers often reveal competitive research in discussions.
+
+**Q: How do we handle information that might be confidential?**
+A: Stick to public sources. Don't use information from NDAs, leaked documents, or questionable sources. It's not worth the legal and ethical risk.
+
+**Q: Should we share competitive research externally?**
+A: Carefully. Factual comparisons are fine for sales. Never disparage competitors publicly—it damages credibility.
+
+**Q: How do we prioritize when multiple competitors make moves?**
+A: Focus on moves that affect your customers. A competitor's enterprise push matters if you're enterprise-focused. Their SMB pricing doesn't.
+
+---
+
+*See automated competitive research in action with openpmkit. The four AI crawlers—Social, Web Search, News, and URL Scraper—work together to surface competitive signals in your daily briefs and weekly digests.*

@@ -1,0 +1,365 @@
+# Product ops automation: what to standardize first in an enterprise team
+
+Product operations is the connective tissue of product management: the recurring processes, reports, and workflows that keep teams aligned and informed. In enterprise teams, these operations consume enormous time: sprint reviews, stakeholder updates, release notes, metrics reports, and more.
+
+The opportunity isn't just automation for its own sake. It's freeing PM time for strategic work while improving consistency and coverage of operational tasks.
+
+This guide provides a prioritization framework for product ops automation: which workflows to standardize first and how to measure success.
+
+## The Product Ops Landscape
+
+Enterprise product teams typically manage these recurring operations:
+
+### Daily Operations
+| Task | Time (Manual) | Frequency | Automation Potential |
+|------|---------------|-----------|---------------------|
+| Daily standup prep | 15 min | Daily | High |
+| Blocker identification | 20 min | Daily | High |
+| Customer escalation review | 30 min | Daily | Medium |
+| Metrics check | 15 min | Daily | High |
+
+### Weekly Operations
+| Task | Time (Manual) | Frequency | Automation Potential |
+|------|---------------|-----------|---------------------|
+| Sprint planning prep | 2 hours | Weekly | Medium |
+| Stakeholder updates | 1.5 hours | Weekly | High |
+| VoC synthesis | 3 hours | Weekly | High |
+| Competitive monitoring | 1 hour | Weekly | High |
+
+### Sprint/Bi-weekly Operations
+| Task | Time (Manual) | Frequency | Automation Potential |
+|------|---------------|-----------|---------------------|
+| Sprint review | 2.5 hours | Bi-weekly | High |
+| Retrospective prep | 1 hour | Bi-weekly | Medium |
+| Release notes | 2 hours | Bi-weekly | High |
+| Demo preparation | 1.5 hours | Bi-weekly | Medium |
+
+### Monthly/Quarterly Operations
+| Task | Time (Manual) | Frequency | Automation Potential |
+|------|---------------|-----------|---------------------|
+| Roadmap updates | 4 hours | Monthly | Medium |
+| OKR progress reports | 3 hours | Monthly | High |
+| Quarterly business review | 8 hours | Quarterly | Medium |
+| Annual planning inputs | 16 hours | Annually | Low |
+
+## Prioritization Framework
+
+Not all operations should be automated equally. Use this framework to prioritize:
+
+### Factor 1: Frequency × Time
+
+Calculate the annual time investment:
+
+```
+Annual Hours = Frequency per Year × Time per Instance
+
+Example: Weekly stakeholder updates
+52 weeks × 1.5 hours = 78 hours/year
+```
+
+Higher annual hours = higher automation priority.
+
+### Factor 2: Consistency Value
+
+Some operations benefit more from consistency:
+
+| Operation | Consistency Value | Why |
+|-----------|-------------------|-----|
+| Release notes | High | Customers expect predictable format |
+| Sprint reviews | High | Stakeholders compare across sprints |
+| Daily briefs | Medium | Format can vary by day's content |
+| Roadmap updates | Low | Each update has unique context |
+
+### Factor 3: Data Availability
+
+Automation requires data. Assess availability:
+
+| Data Source | Availability | Integration Effort |
+|-------------|--------------|-------------------|
+| Jira | High | Low (API) |
+| Slack | High | Low (API) |
+| Gong | Medium | Medium (API + processing) |
+| Manual notes | Low | High (requires capture) |
+
+### Factor 4: Error Cost
+
+What's the cost of automation errors?
+
+| Operation | Error Cost | Mitigation |
+|-----------|------------|------------|
+| Internal reports | Low | Easy to correct |
+| Customer communications | High | Require review |
+| Executive updates | Medium | Review before send |
+| Public release notes | High | Approval workflow |
+
+### Prioritization Matrix
+
+Plot operations on this matrix:
+
+```
+                    High Consistency Value
+                           ↑
+                           |
+    Automate First    |    Automate with Review
+    (Daily briefs,    |    (Release notes,
+     Sprint reviews)  |     Customer updates)
+                           |
+Low Frequency ←────────────┼────────────→ High Frequency
+                           |
+    Automate Later    |    Template + Assist
+    (Quarterly reviews,|    (Roadmap updates,
+     Annual planning) |     OKR reports)
+                           |
+                           ↓
+                    Low Consistency Value
+```
+
+## Recommended Automation Sequence
+
+Based on the framework, here's a recommended sequence:
+
+### Phase 1: Quick Wins (Weeks 1-4)
+
+**Daily Briefs**
+- High frequency, high automation potential
+- Low error cost (internal only)
+- Immediate time savings
+
+**Sprint Reviews**
+- High consistency value
+- Data readily available in Jira
+- Stakeholders appreciate predictability
+
+**Metrics Dashboards**
+- Fully automatable
+- No human judgment required
+- Foundation for other automations
+
+### Phase 2: High-Value Operations (Weeks 5-8)
+
+**Weekly Stakeholder Updates**
+- High time investment
+- Consistent format expected
+- Can template with human review
+
+**VoC Synthesis**
+- High time investment
+- Data available across systems
+- Enables better product decisions
+
+**Competitive Monitoring**
+- Tedious manual work
+- High value when consistent
+- Enables proactive response
+
+### Phase 3: Customer-Facing Operations (Weeks 9-12)
+
+**Release Notes**
+- High consistency value
+- Customer-facing (requires review)
+- Can draft automatically, approve manually
+
+**Customer Health Reports**
+- Combines multiple data sources
+- Enables proactive CS engagement
+- Requires validation before action
+
+### Phase 4: Strategic Operations (Ongoing)
+
+**Roadmap Updates**
+- Lower frequency
+- Requires significant human judgment
+- Automate data gathering, not decisions
+
+**Quarterly Reviews**
+- Complex, multi-source
+- High stakes
+- Automate preparation, not presentation
+
+## Implementation Patterns
+
+### Pattern 1: Scheduled Generation
+
+For predictable operations:
+
+```typescript
+// Daily brief - runs every morning at 7 AM
+schedule('0 7 * * *', async () => {
+  const brief = await generateDailyBrief({
+    sources: ['jira', 'slack', 'zendesk'],
+    timeRange: 'last_24_hours',
+  });
+  await deliver(brief, { channel: '#product-daily' });
+});
+```
+
+### Pattern 2: Event-Triggered Generation
+
+For operations tied to events:
+
+```typescript
+// Sprint review - triggered by sprint completion
+on('jira.sprint.completed', async (sprint) => {
+  const review = await generateSprintReview({
+    sprintId: sprint.id,
+    includeVelocity: true,
+    includeBlockers: true,
+  });
+  await createProposal('confluence', 'create_page', {
+    title: `Sprint ${sprint.name} Review`,
+    content: review,
+  });
+});
+```
+
+### Pattern 3: On-Demand with Defaults
+
+For operations that need flexibility:
+
+```typescript
+// Stakeholder update - on-demand with smart defaults
+async function generateStakeholderUpdate(options = {}) {
+  const defaults = {
+    timeRange: 'last_week',
+    includeMetrics: true,
+    includeRisks: true,
+    audience: 'executive',
+  };
+  
+  const config = { ...defaults, ...options };
+  return await generateUpdate(config);
+}
+```
+
+### Pattern 4: Draft and Review
+
+For customer-facing operations:
+
+```typescript
+// Release notes - draft for review
+async function generateReleaseNotes(version) {
+  const draft = await generateReleaseNotesDraft({
+    version,
+    includeFeatures: true,
+    includeFixs: true,
+    includeThanks: true,
+  });
+  
+  // Create proposal for human review
+  return await createProposal('release_notes', {
+    version,
+    content: draft,
+    reviewers: ['@pm', '@marketing'],
+  });
+}
+```
+
+## Measuring Automation Success
+
+Track these metrics to validate your automation investment:
+
+### Efficiency Metrics
+
+| Metric | How to Measure | Target |
+|--------|----------------|--------|
+| Time saved | Before/after time tracking | >50% reduction |
+| Coverage | Operations completed vs. planned | >95% |
+| Consistency | Variance in output quality | Decreasing |
+
+### Quality Metrics
+
+| Metric | How to Measure | Target |
+|--------|----------------|--------|
+| Accuracy | Errors caught in review | <5% error rate |
+| Completeness | Missing information flags | <10% incomplete |
+| Stakeholder satisfaction | Survey/feedback | >4/5 rating |
+
+### Business Metrics
+
+| Metric | How to Measure | Target |
+|--------|----------------|--------|
+| PM time reallocation | Time on strategic work | >20% increase |
+| Decision velocity | Time from data to decision | >30% faster |
+| Stakeholder alignment | Alignment survey scores | Improving |
+
+## Common Automation Mistakes
+
+### Mistake 1: Automating Before Standardizing
+
+Automation amplifies whatever process you have:
+- **Bad**: Automate inconsistent sprint reviews
+- **Good**: Standardize the template, then automate
+
+### Mistake 2: Over-Automating Judgment
+
+Some operations require human judgment:
+- **Automate**: Data gathering, formatting, distribution
+- **Don't automate**: Prioritization decisions, strategic recommendations
+
+### Mistake 3: Ignoring Edge Cases
+
+Automation that fails 10% of the time creates more work:
+- Build in fallbacks for missing data
+- Alert humans when automation can't proceed
+- Design for graceful degradation
+
+### Mistake 4: No Feedback Loop
+
+Automation should improve over time:
+- Collect feedback on automated outputs
+- Track which outputs get edited
+- Iterate on templates and logic
+
+### Mistake 5: Siloed Automation
+
+Disconnected automations create new problems:
+- Ensure automations share data sources
+- Avoid duplicate data entry
+- Build toward integrated workflows
+
+## How openpmkit Handles Product Ops
+
+openpmkit provides cadence jobs for common product operations:
+
+**Daily Operations**:
+- Daily Brief: Synthesizes overnight activity
+- Blocker Alert: Flags sprint blockers
+
+**Weekly Operations**:
+- VoC Themes: Clusters customer feedback
+- Competitor Digest: Tracks competitive changes
+- Stakeholder Update: Drafts weekly summary
+
+**Sprint Operations**:
+- Sprint Review: Generates review document
+- Release Notes: Drafts customer-facing notes
+
+Each job:
+- Runs on schedule or on-demand
+- Pulls from integrated data sources
+- Produces consistent, templated output
+- Operates in draft-only mode for review
+
+## FAQ
+
+**Q: How do I get buy-in for automation investment?**
+A: Start with time tracking. Show how many hours go to operational tasks. Calculate the ROI of automation.
+
+**Q: What if my team resists standardization?**
+A: Start with the operations that cause the most pain. Success builds momentum for broader standardization.
+
+**Q: How do I handle operations that vary by team?**
+A: Create a base template with team-specific customization options. Standardize the structure, not every detail.
+
+**Q: What about operations that span multiple tools?**
+A: This is where automation shines. Aggregating across tools manually is painful; automation makes it easy.
+
+**Q: How do I maintain automations over time?**
+A: Treat automation like code. Version control, testing, monitoring. Assign ownership for maintenance.
+
+**Q: What if the automation produces wrong outputs?**
+A: Draft-only mode catches errors before they reach stakeholders. Build in review steps for high-stakes operations.
+
+---
+
+*See product ops automation in action with the openpmkit demo. Run different cadence jobs to see how operational tasks are automated with full traceability.*

@@ -33,7 +33,7 @@ export default function PrivacyPage() {
           <div className="prose mt-12">
             <h2>1. Introduction</h2>
             <p>
-              pmkit ("we", "our", or "us") is committed to protecting your privacy. This Privacy
+              openpmkit ("we", "our", or "us") is committed to protecting your privacy. This Privacy
               Policy explains how we collect, use, disclose, and safeguard your information when
               you use our service.
             </p>
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
             <h2>3. How We Use Your Information</h2>
             <p>We use the information we collect to:</p>
             <ul>
-              <li>Provide and maintain the pmkit service</li>
+              <li>Provide and maintain the openpmkit service</li>
               <li>Run PM workflows and generate artifacts</li>
               <li>Improve and optimize the service</li>
               <li>Communicate with you about your account</li>

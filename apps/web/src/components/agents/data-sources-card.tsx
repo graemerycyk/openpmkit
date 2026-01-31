@@ -499,7 +499,7 @@ function SlackConfigUI({
 
         {channels.length === 0 ? (
           <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-            No channels found. Make sure the pmkit Slack app is added to the channels you
+            No channels found. Make sure the openpmkit Slack app is added to the channels you
             want to monitor.
           </p>
         ) : (

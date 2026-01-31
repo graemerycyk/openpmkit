@@ -1,0 +1,44 @@
+{
+  "name": "@pmkit/content",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./keywords": {
+      "types": "./dist/keywords.d.ts",
+      "require": "./dist/keywords.js",
+      "import": "./dist/keywords.js",
+      "default": "./dist/keywords.js"
+    },
+    "./resources": {
+      "types": "./dist/resources.d.ts",
+      "require": "./dist/resources.js",
+      "import": "./dist/resources.js",
+      "default": "./dist/resources.js"
+    },
+    "./blog": {
+      "types": "./dist/blog.d.ts",
+      "require": "./dist/blog.js",
+      "import": "./dist/blog.js",
+      "default": "./dist/blog.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}
+

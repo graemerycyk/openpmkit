@@ -1,0 +1,336 @@
+# Meeting prep packs for PMs: the fastest way to compound product insight
+
+The best product managers walk into every meeting prepared. They know the customer's history, their open issues, their expansion potential, and the landmines to avoid. This preparation compounds: each meeting builds on the last, creating deeper relationships and better product decisions.
+
+But preparation takes time. With 4-5 customer meetings per week, spending 30 minutes preparing for each adds up to 2-3 hours of context-gathering that could be automated.
+
+Meeting prep packs solve this. They synthesize everything you need to know about an account into a single document, delivered before you walk into the room.
+
+## What Makes a Great Meeting Prep Pack
+
+A meeting prep pack should answer five questions:
+
+### 1. Who am I meeting with?
+
+- **Contact details**: Name, title, tenure at company
+- **Meeting history**: Previous conversations, key topics discussed
+- **Communication style**: Preferences noted from past interactions
+- **Stakeholder map**: Who else is involved in decisions?
+
+### 2. What's the account context?
+
+- **Company overview**: Size, industry, use case
+- **Contract details**: Plan tier, ARR, renewal date
+- **Health indicators**: Usage trends, NPS scores, engagement
+- **Expansion potential**: Seats, features, upsell opportunities
+
+### 3. What issues are open?
+
+- **Support tickets**: Active issues, resolution status
+- **Feature requests**: What they've asked for, current status
+- **Escalations**: Any P1/P2 issues in flight
+- **Blockers**: What's preventing them from getting value?
+
+### 4. What happened recently?
+
+- **Recent calls**: Key points from last 2-3 conversations
+- **Product updates**: Features shipped that affect them
+- **Their news**: Company announcements, leadership changes
+- **Industry context**: Market trends affecting their business
+
+### 5. What should I discuss?
+
+- **Talking points**: Topics to cover based on context
+- **Questions to ask**: Gaps in our understanding
+- **Risks to address**: Issues that might come up
+- **Opportunities**: Upsell, case study, referral potential
+
+## Anatomy of a Meeting Prep Pack
+
+Here's what a complete prep pack looks like:
+
+```markdown
+# Meeting Prep: Globex Corp
+## QBR with VP of Operations
+**Date**: January 15, 2026 | 2:00 PM EST
+**Attendees**: Sarah Chen (VP Ops), Mike Torres (IT Director)
+
+---
+
+## Account Snapshot
+
+| Metric | Value | Trend |
+|--------|-------|-------|
+| ARR | $120,000 | → Stable |
+| Health Score | 72/100 | ↓ from 81 |
+| NPS | 7 | ↓ from 8 |
+| Active Users | 145/200 | ↑ 12% |
+| Renewal | March 15, 2026 | 60 days |
+
+**Risk Level**: Medium 🟡
+**Expansion Potential**: High (200 → 500 seats possible)
+
+---
+
+## Recent History
+
+### Last Meeting (Dec 1, 2025)
+- Discussed search performance issues
+- Sarah expressed frustration with date filtering
+- Committed to roadmap update by end of Q4
+- **Follow-up needed**: We promised date filters update
+
+### Support Activity (Last 30 Days)
+- **3 tickets opened** (vs. 1 avg for similar accounts)
+- Ticket #4521: Search date filters (Open, P2)
+- Ticket #4498: Export timeout (Resolved)
+- Ticket #4467: SSO configuration (Resolved)
+
+### Product Usage
+- Search queries up 34% (good engagement)
+- Export usage down 12% (timeout issues?)
+- New feature adoption: 23% using AI summaries
+
+---
+
+## Key Insights from Gong
+
+### Pain Points Mentioned (Last 3 Calls)
+1. **Search limitations** (mentioned 8 times)
+   > "I spend more time searching than actually working"
+   > - Sarah Chen, Dec 1 call
+
+2. **Reporting gaps** (mentioned 4 times)
+   > "We need better visibility into team usage"
+   > - Mike Torres, Nov 15 call
+
+3. **Mobile experience** (mentioned 2 times)
+   > "Field team can't use this effectively on tablets"
+   > - Sarah Chen, Oct 20 call
+
+### Competitive Mentions
+- Mentioned evaluating Competitor X in November call
+- Specifically cited their date filtering as superior
+
+### Expansion Signals
+- Sarah mentioned "rolling out to West Coast team" if issues resolved
+- Potential 300 additional seats ($180K ARR)
+
+---
+
+## Open Items
+
+### Our Commitments
+- [ ] Date filters roadmap update (overdue from Dec)
+- [ ] Usage reporting dashboard (promised for Q1)
+- [ ] Mobile improvements timeline
+
+### Their Commitments
+- [ ] Provide list of West Coast team requirements
+- [ ] Schedule IT security review for expansion
+
+---
+
+## Talking Points
+
+### Must Cover
+1. **Date filters update**: Ship date confirmed for Feb 15
+   - Acknowledge the delay, show progress
+   - Demo the beta if possible
+
+2. **Renewal conversation**: 60 days out
+   - Gauge satisfaction level
+   - Understand blockers to renewal
+
+3. **Expansion discussion**: West Coast rollout
+   - What do they need to move forward?
+   - Timeline for their decision
+
+### Questions to Ask
+- How is the team adapting to the new AI features?
+- What would make the mobile experience work for field team?
+- Who else should we include in expansion planning?
+
+### Risks to Address
+- They may raise Competitor X comparison again
+- Export timeout issue might still be frustrating
+- Health score drop needs acknowledgment
+
+### Opportunities
+- Case study potential (if search issues resolved)
+- Referral to similar companies in their industry
+- Beta access to new features as goodwill gesture
+
+---
+
+## Preparation Checklist
+
+- [ ] Review date filters beta demo
+- [ ] Prepare usage report for their account
+- [ ] Check with engineering on mobile timeline
+- [ ] Have expansion pricing ready
+```
+
+## Building Prep Packs with AI Agents
+
+Meeting prep is ideal for AI automation because it's:
+
+- **Data-intensive**: Requires pulling from 5+ systems
+- **Time-sensitive**: Needed before every meeting
+- **Structured**: Follows a consistent format
+- **Low-risk**: Review before use, no external writes
+
+### Data Sources for Prep Packs
+
+| Source | What It Provides |
+|--------|------------------|
+| CRM (Salesforce, HubSpot) | Account details, contacts, opportunities |
+| Gong/Chorus | Call recordings, pain points, quotes |
+| Zendesk/Intercom | Support tickets, resolution history |
+| Product analytics | Usage data, feature adoption |
+| Jira | Feature requests, roadmap status |
+| LinkedIn/News | Company updates, personnel changes |
+
+### Automation Workflow
+
+1. **Trigger**: Calendar event detected 30 min before meeting
+2. **Identify**: Match meeting attendees to account
+3. **Gather**: Pull data from all connected sources
+4. **Synthesize**: Generate prep pack with insights
+5. **Deliver**: Send via Slack, email, or calendar attachment
+
+### What AI Does Well
+
+- Aggregating data from multiple systems
+- Identifying patterns in call transcripts
+- Surfacing relevant quotes and pain points
+- Formatting consistent prep documents
+- Highlighting risks and opportunities
+
+### What Humans Add
+
+- Strategic context (why this meeting matters)
+- Relationship nuance (how to approach this person)
+- Judgment calls (what to emphasize or avoid)
+- Real-time adaptation (pivoting based on meeting flow)
+
+## Prep Pack Variations
+
+Different meeting types need different prep:
+
+### Customer QBR
+Focus on: Health metrics, renewal status, expansion potential, success stories
+
+### Sales Demo
+Focus on: Use case fit, competitive landscape, decision process, technical requirements
+
+### Executive Briefing
+Focus on: Strategic value, ROI metrics, industry trends, partnership opportunities
+
+### Support Escalation
+Focus on: Issue history, impact scope, resolution attempts, customer sentiment
+
+### Product Feedback Session
+Focus on: Feature requests, usage patterns, pain points, competitive gaps
+
+## Measuring Prep Pack Value
+
+Track these metrics to prove ROI:
+
+| Metric | Before | After | Impact |
+|--------|--------|-------|--------|
+| Prep time per meeting | 30 min | 5 min | 83% reduction |
+| Meetings with full context | 40% | 95% | Better conversations |
+| Follow-up completion | 60% | 85% | Improved trust |
+| Expansion close rate | 25% | 35% | Revenue impact |
+| Customer satisfaction | 7.2 | 8.1 | Relationship quality |
+
+## Common Prep Pack Mistakes
+
+### Mistake 1: Information Overload
+
+A 10-page prep pack defeats the purpose. Keep it scannable:
+- One page for quick reference
+- Expandable sections for deep dives
+- Clear hierarchy of importance
+
+### Mistake 2: Stale Data
+
+Prep packs must be fresh. A pack generated yesterday might miss:
+- This morning's support ticket
+- Yesterday's product release
+- Recent news about the company
+
+### Mistake 3: Missing the "So What"
+
+Data without insight is noise. Don't just list facts. Explain implications:
+- **Bad**: "3 support tickets this month"
+- **Good**: "3 support tickets this month (3x their average). Something's wrong"
+
+### Mistake 4: No Action Items
+
+Prep packs should drive action. Include:
+- Specific talking points
+- Questions to ask
+- Commitments to make or follow up on
+
+## Integration Tips
+
+### Calendar Integration
+
+Connect to Google Calendar or Outlook to:
+- Auto-detect upcoming meetings
+- Match attendees to accounts
+- Trigger prep pack generation
+- Attach packs to calendar events
+
+### CRM Sync
+
+After meetings, sync insights back:
+- Update contact records
+- Log meeting notes
+- Create follow-up tasks
+- Update opportunity stages
+
+### Team Sharing
+
+Make prep packs accessible to:
+- Account teams (CSM, AE, SE)
+- Leadership (for important accounts)
+- Product (for feedback sessions)
+
+## How openpmkit Handles Meeting Prep
+
+pmkit's Meeting Prep cadence job automates the entire workflow:
+
+1. **Detects upcoming meetings** from your calendar
+2. **Matches attendees** to accounts in your CRM
+3. **Pulls context** from Gong, Zendesk, Jira, and analytics
+4. **Generates prep pack** with insights and talking points
+5. **Delivers before the meeting** via your preferred channel
+
+Each prep pack includes full source traceability. Click any insight to see the original data.
+
+## FAQ
+
+**Q: How far in advance should prep packs be generated?**
+A: 30 minutes to 1 hour before the meeting. This balances freshness with preparation time.
+
+**Q: What if I have back-to-back meetings?**
+A: Generate packs for all meetings at the start of the day. Quick review between meetings.
+
+**Q: How do I handle meetings with new prospects (no history)?**
+A: Focus on company research, industry context, and similar customer patterns. Less history, more preparation questions.
+
+**Q: Should prep packs include competitive research?**
+A: Yes, especially if the account has mentioned competitors. Know what you're up against.
+
+**Q: How do I get my team to actually use prep packs?**
+A: Make them easy to access (Slack, calendar) and prove value quickly. One well-prepared meeting converts skeptics.
+
+**Q: What about internal meetings?**
+A: Prep packs work for internal meetings too: stakeholder updates, cross-team syncs, executive reviews. Adapt the template.
+
+---
+
+*Experience automated meeting prep with the openpmkit demo. Run the Meeting Prep job to see how customer context is synthesized into actionable prep packs.*

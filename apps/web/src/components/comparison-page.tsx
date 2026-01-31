@@ -17,7 +17,7 @@ import { siteConfig } from '@/lib/utils';
 
 export interface ComparisonFeature {
   name: string;
-  pmkit: 'yes' | 'no' | 'partial' | string;
+  openpmkit: 'yes' | 'no' | 'partial' | string;
   competitor: 'yes' | 'no' | 'partial' | string;
   note?: string;
 }
@@ -25,7 +25,7 @@ export interface ComparisonFeature {
 export interface ComparisonSection {
   title: string;
   description: string;
-  pmkitAdvantage: string;
+  openpmkitAdvantage: string;
   competitorAdvantage?: string;
 }
 
@@ -41,11 +41,11 @@ export interface ComparisonPageData {
     website?: string;
   };
   // SEO-optimized titles
-  headline: string; // e.g., "pmkit vs ProductBoard: Which AI PM Tool is Right for You?"
+  headline: string; // e.g., "openpmkit vs ProductBoard: Which AI PM Tool is Right for You?"
   subheadline: string;
   // Quick verdict for featured snippets
   verdict: {
-    pmkitBestFor: string;
+    openpmkitBestFor: string;
     competitorBestFor: string;
     summary: string;
   };
@@ -131,7 +131,7 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
               {
                 '@type': 'ListItem',
                 position: 3,
-                name: `pmkit vs ${competitor.name}`,
+                name: `openpmkit vs ${competitor.name}`,
                 item: `${siteConfig.url}/compare/${competitor.name.toLowerCase().replace(/\s+/g, '-')}`,
               },
             ],
@@ -169,11 +169,11 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
             description: subheadline,
             author: {
               '@type': 'Organization',
-              name: 'pmkit',
+              name: 'openpmkit',
             },
             publisher: {
               '@type': 'Organization',
-              name: 'pmkit',
+              name: 'openpmkit',
               logo: {
                 '@type': 'ImageObject',
                 url: `${siteConfig.url}/logo.png`,
@@ -226,9 +226,9 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
                       <div className="rounded-full bg-green-100 p-1">
                         <Check className="h-4 w-4 text-green-600" />
                       </div>
-                      <span className="font-semibold text-green-800">Choose pmkit if...</span>
+                      <span className="font-semibold text-green-800">Choose openpmkit if...</span>
                     </div>
-                    <p className="text-sm text-green-700">{verdict.pmkitBestFor}</p>
+                    <p className="text-sm text-green-700">{verdict.openpmkitBestFor}</p>
                   </div>
                   <div className="rounded-lg border bg-blue-50 p-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -251,7 +251,7 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
         <div className="container">
           <div className="mx-auto max-w-4xl">
             <h2 className="font-heading text-2xl font-bold text-center mb-8">
-              Feature Comparison: pmkit vs {competitor.name}
+              Feature Comparison: openpmkit vs {competitor.name}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -259,7 +259,7 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
                   <tr className="border-b-2 border-cobalt-200">
                     <th className="text-left py-4 px-4 font-semibold">Feature</th>
                     <th className="text-center py-4 px-4 font-semibold w-32">
-                      <span className="text-cobalt-600">pmkit</span>
+                      <span className="text-cobalt-600">openpmkit</span>
                     </th>
                     <th className="text-center py-4 px-4 font-semibold w-32">
                       {competitor.name}
@@ -279,7 +279,7 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
                         )}
                       </td>
                       <td className="py-4 px-4">
-                        <FeatureCell value={feature.pmkit} />
+                        <FeatureCell value={feature.openpmkit} />
                       </td>
                       <td className="py-4 px-4">
                         <FeatureCell value={feature.competitor} />
@@ -315,8 +315,8 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
                     <p className="text-muted-foreground">{section.description}</p>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-lg border-l-4 border-cobalt-500 bg-cobalt-50 p-4">
-                        <span className="font-semibold text-cobalt-700 text-sm">pmkit Advantage</span>
-                        <p className="text-sm mt-1">{section.pmkitAdvantage}</p>
+                        <span className="font-semibold text-cobalt-700 text-sm">openpmkit Advantage</span>
+                        <p className="text-sm mt-1">{section.openpmkitAdvantage}</p>
                       </div>
                       {section.competitorAdvantage && (
                         <div className="rounded-lg border-l-4 border-gray-400 bg-gray-50 p-4">
@@ -358,7 +358,7 @@ export function ComparisonPage({ data }: ComparisonPageProps) {
       <section className="bg-cobalt-600 py-16 text-white md:py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-bold">See pmkit in Action</h2>
+            <h2 className="font-heading text-3xl font-bold">See openpmkit in Action</h2>
             <p className="mt-4 text-cobalt-100">
               Try all 10 PM workflows in the interactive demo. No signup required.
             </p>

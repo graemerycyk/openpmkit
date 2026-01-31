@@ -1,0 +1,407 @@
+# AI for search products: using analytics signals to prioritize what matters
+
+Search is a window into user intent. Every query reveals what users want but can't find through navigation. Every no-results query is a content gap. Every low-CTR result is a relevance problem. For product teams, search analytics are a goldmine of prioritization signals, if you know how to read them.
+
+This guide shows you how to use search analytics to inform roadmap priorities and content strategy, with AI-powered analysis to surface actionable insights.
+
+## Why Search Analytics Matter
+
+Search behavior reveals user intent more directly than almost any other signal:
+
+### Users Tell You What They Want
+
+Navigation shows what you've built. Search shows what users actually need:
+
+```markdown
+## Top Search Queries (Last 30 Days)
+
+| Query | Searches | Results | CTR |
+|-------|----------|---------|-----|
+| "api documentation" | 1,247 | 15 | 12% |
+| "bulk export" | 892 | 3 | 8% |
+| "date filter" | 756 | 0 | 0% |
+| "sso setup" | 623 | 8 | 45% |
+| "pricing" | 589 | 2 | 67% |
+```
+
+This table tells you:
+- "date filter" is a feature gap (756 searches, 0 results)
+- "api documentation" needs better content (low CTR despite results)
+- "sso setup" content is working (high CTR)
+- "bulk export" might be a feature request or content gap
+
+### Search Failures Are Prioritization Signals
+
+No-results queries are explicit user needs you're not meeting:
+
+```markdown
+## No-Results Queries (Last 30 Days)
+
+| Query | Searches | Trend | Interpretation |
+|-------|----------|-------|----------------|
+| "date filter" | 756 | ↑ 34% | Feature gap |
+| "mobile app" | 412 | → stable | Feature gap |
+| "webhook" | 287 | ↑ 89% | Growing need |
+| "dark mode" | 234 | ↓ 12% | Declining interest |
+| "zapier" | 198 | ↑ 156% | Integration demand |
+```
+
+### Search Refinements Show Confusion
+
+When users refine searches, they're struggling:
+
+```markdown
+## Common Search Refinements
+
+"export" → "export csv" → "bulk export csv"
+Interpretation: Users don't know export supports CSV, or bulk export doesn't exist
+
+"api" → "api docs" → "api documentation" → "rest api"
+Interpretation: API documentation is hard to find or poorly named
+
+"filter" → "date filter" → "filter by date" → "search date"
+Interpretation: Date filtering doesn't exist or isn't discoverable
+```
+
+## Building a Search Analytics Pipeline
+
+### Step 1: Capture Search Events
+
+Log comprehensive search data:
+
+```typescript
+interface SearchEvent {
+  // Query information
+  queryId: string;
+  queryText: string;
+  queryTokens: string[];
+  timestamp: Date;
+  
+  // User context
+  userId: string;
+  userSegment: 'enterprise' | 'mid-market' | 'smb';
+  userRole: string;
+  sessionId: string;
+  
+  // Results information
+  resultCount: number;
+  resultsShown: SearchResult[];
+  
+  // Interaction
+  clickedResults: string[];
+  clickPositions: number[];
+  timeToFirstClick: number;
+  refinedQuery?: string;
+  
+  // Outcome
+  searchSuccess: boolean; // Did user find what they needed?
+}
+```
+
+### Step 2: Calculate Key Metrics
+
+Track these search health metrics:
+
+```typescript
+interface SearchMetrics {
+  // Volume metrics
+  totalSearches: number;
+  uniqueQueries: number;
+  searchesPerUser: number;
+  
+  // Quality metrics
+  noResultsRate: number;      // % of searches with 0 results
+  lowResultsRate: number;     // % of searches with <3 results
+  clickThroughRate: number;   // % of searches with clicks
+  meanReciprocalRank: number; // Average position of first click
+  
+  // Behavior metrics
+  refinementRate: number;     // % of searches that get refined
+  abandonmentRate: number;    // % of searches with no interaction
+  timeToClick: number;        // Average time to first click
+  
+  // Trend metrics
+  queryGrowth: number;        // Change in search volume
+  noResultsTrend: number;     // Change in no-results rate
+}
+```
+
+### Step 3: Segment and Analyze
+
+Different segments have different needs:
+
+```markdown
+## Search Analysis by Segment
+
+### Enterprise Users
+- Top queries: "audit log", "sso", "api", "bulk operations"
+- No-results rate: 12%
+- Key gaps: Audit log export, bulk user management
+
+### SMB Users
+- Top queries: "pricing", "templates", "getting started"
+- No-results rate: 8%
+- Key gaps: Template library, onboarding content
+
+### New Users (First 7 days)
+- Top queries: "how to", "tutorial", "example"
+- No-results rate: 23%
+- Key gaps: Onboarding content, example projects
+```
+
+### Step 4: Generate Insights
+
+Transform data into actionable insights:
+
+```markdown
+## Search Insights Report (Weekly)
+
+### 🔴 Critical Gaps (No results, high volume)
+
+**"date filter"** - 756 searches, 0 results
+- Trend: ↑ 34% week-over-week
+- Segment: 80% enterprise users
+- Related queries: "filter by date", "search date range"
+- Recommendation: Feature gap - prioritize for roadmap
+- Cross-reference: 28 Zendesk tickets, 12 Gong mentions
+
+**"bulk export"** - 892 searches, 3 results (low relevance)
+- Trend: ↑ 12% week-over-week
+- Segment: 60% enterprise, 40% mid-market
+- CTR on results: 8% (very low)
+- Recommendation: Either feature gap or content gap
+- Cross-reference: 15 Zendesk tickets asking about bulk export
+
+### 🟡 Content Opportunities (Results exist, low CTR)
+
+**"api documentation"** - 1,247 searches, 15 results, 12% CTR
+- Users click result #4 most often (API Reference page)
+- Results #1-3 are blog posts about API
+- Recommendation: Reorder results, improve API docs discoverability
+
+### 🟢 Working Well
+
+**"sso setup"** - 623 searches, 8 results, 45% CTR
+- Users find what they need quickly
+- No refinements needed
+- Recommendation: Use as template for other setup guides
+```
+
+## Connecting Search to Product Decisions
+
+### Pattern 1: Feature Prioritization
+
+Use search data to validate feature requests:
+
+```markdown
+## Feature Request: Date Filters in Search
+
+### Traditional Evidence
+- 28 Zendesk tickets
+- 12 Gong call mentions
+- 3 enterprise escalations
+
+### Search Evidence
+- 756 no-results searches for "date filter"
+- 34% week-over-week growth
+- 80% from enterprise segment
+- Related queries show consistent intent
+
+### Combined Signal Strength: Very High
+Recommendation: Prioritize for Q1
+```
+
+### Pattern 2: Content Strategy
+
+Use search data to guide content creation:
+
+```markdown
+## Content Gaps from Search
+
+### High Priority (>500 searches, no/poor results)
+1. "api documentation" - Improve existing docs
+2. "bulk export" - Create how-to guide
+3. "webhook setup" - Create tutorial
+
+### Medium Priority (200-500 searches)
+4. "zapier integration" - Create integration guide
+5. "custom fields" - Expand documentation
+6. "team permissions" - Create admin guide
+
+### Content Calendar
+- Week 1: API documentation overhaul
+- Week 2: Bulk export guide
+- Week 3: Webhook tutorial
+- Week 4: Integration guides
+```
+
+### Pattern 3: Navigation Improvement
+
+Use search as a navigation audit:
+
+```markdown
+## Navigation Issues from Search
+
+### Users searching for things in main nav
+- "pricing" (589 searches) - Pricing is in nav, but users search
+- "documentation" (445 searches) - Docs link may be unclear
+- "contact" (234 searches) - Contact should be more visible
+
+### Recommendations
+1. Make pricing link more prominent
+2. Rename "Resources" to "Documentation"
+3. Add contact link to header
+```
+
+## AI-Powered Search Analysis
+
+AI agents can automate search analytics:
+
+### What Agents Can Do
+
+- **Cluster similar queries**: Group "date filter", "filter by date", "search date range"
+- **Identify trends**: Detect emerging query patterns
+- **Cross-reference signals**: Connect search gaps to VoC data
+- **Generate reports**: Weekly search insights with recommendations
+- **Predict impact**: Estimate value of addressing gaps
+
+### Sample Analysis Workflow
+
+```typescript
+// Weekly Search Analysis Job
+
+async function analyzeSearchData() {
+  // Step 1: Get search events
+  const searches = await mcp.call('analytics', 'get_search_events', {
+    dateRange: { start: lastWeek, end: today },
+  });
+  
+  // Step 2: Calculate metrics
+  const metrics = calculateSearchMetrics(searches);
+  
+  // Step 3: Identify gaps
+  const noResultsQueries = searches.filter(s => s.resultCount === 0);
+  const clusteredGaps = clusterSimilarQueries(noResultsQueries);
+  
+  // Step 4: Cross-reference with VoC
+  const vocThemes = await mcp.call('internal', 'get_voc_themes', {});
+  const correlatedGaps = correlateWithVoC(clusteredGaps, vocThemes);
+  
+  // Step 5: Generate insights
+  const insights = generateSearchInsights({
+    metrics,
+    gaps: correlatedGaps,
+    trends: calculateTrends(searches),
+  });
+  
+  return {
+    type: 'search_insights',
+    content: insights,
+    recommendations: insights.recommendations,
+  };
+}
+```
+
+## Measuring Search Health
+
+Track these metrics over time:
+
+| Metric | Good | Warning | Critical |
+|--------|------|---------|----------|
+| No-results rate | <5% | 5-15% | >15% |
+| Click-through rate | >30% | 15-30% | <15% |
+| Refinement rate | <10% | 10-25% | >25% |
+| Time to first click | <5s | 5-15s | >15s |
+| Search abandonment | <20% | 20-40% | >40% |
+
+### Improvement Targets
+
+```markdown
+## Q1 Search Health Goals
+
+| Metric | Current | Target | Initiative |
+|--------|---------|--------|------------|
+| No-results rate | 12% | 8% | Address top 10 gaps |
+| CTR | 22% | 30% | Improve result ranking |
+| Refinement rate | 18% | 12% | Better query understanding |
+```
+
+## Common Search Analytics Mistakes
+
+### Mistake 1: Ignoring Long-Tail Queries
+
+The top 10 queries aren't the whole story:
+
+```markdown
+## Query Distribution
+
+Top 10 queries: 15% of volume
+Queries 11-100: 25% of volume
+Long-tail (100+): 60% of volume
+
+Long-tail often reveals niche but important needs.
+```
+
+### Mistake 2: Not Segmenting
+
+Aggregate metrics hide segment-specific issues:
+
+- Enterprise users might have 20% no-results rate
+- SMB users might have 5% no-results rate
+- Aggregate shows 10%, missing the enterprise problem
+
+### Mistake 3: Ignoring Search Refinements
+
+Refinements are failed searches in disguise:
+
+```markdown
+## Refinement Analysis
+
+"export" → "export csv" (45% refine)
+Users don't know CSV is the default format.
+Fix: Show format options in export UI.
+```
+
+### Mistake 4: Not Connecting to Other Signals
+
+Search data is most powerful when combined:
+
+- Search gap + VoC theme = Strong signal
+- Search gap alone = Needs validation
+- VoC theme + no search gap = Users don't know to look for it
+
+## How openpmkit Handles Search Analytics
+
+pmkit's analytics connector surfaces search insights:
+
+1. **Aggregates search events** from your analytics platform
+2. **Clusters similar queries** to identify patterns
+3. **Cross-references with VoC** data from other sources
+4. **Generates weekly insights** with prioritized recommendations
+5. **Tracks improvement** over time
+
+The output includes actionable recommendations tied to product and content decisions.
+
+## FAQ
+
+**Q: What if we don't have search analytics?**
+A: Start logging. Even basic query + results + clicks data is valuable. Most analytics platforms support custom events.
+
+**Q: How do I handle misspellings?**
+A: Cluster queries by intent, not exact match. "documnetation" and "documentation" are the same intent.
+
+**Q: What about internal vs. external search?**
+A: Analyze both. Internal search (in-app) shows feature gaps. External search (site) shows content gaps.
+
+**Q: How often should I review search data?**
+A: Weekly for tactical insights, monthly for trends, quarterly for strategic planning.
+
+**Q: What's a good sample size for insights?**
+A: For statistical significance, aim for 100+ searches per query cluster before drawing conclusions.
+
+**Q: How do I prioritize between search gaps?**
+A: Weight by volume, segment value, and cross-reference strength. A gap affecting enterprise users with VoC correlation is higher priority.
+
+---
+
+*See search analytics in action with the openpmkit demo. The demo includes sample search data showing how gaps are identified and prioritized.*

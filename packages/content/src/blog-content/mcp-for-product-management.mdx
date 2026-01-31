@@ -1,0 +1,320 @@
+# MCP for Product Management: Connecting Your PM Stack
+
+Product managers live in a fragmented tool landscape. Jira for tickets. Confluence for docs. Slack for communication. Gong for call recordings. Zendesk for support. Each tool holds a piece of the picture, but none of them talk to each other in a way that helps you do your job.
+
+Enter MCP—Model Context Protocol—a standard that lets AI agents connect to your tools and work across them seamlessly.
+
+## What is MCP?
+
+MCP (Model Context Protocol) is an open standard for connecting AI models to external data sources and tools. Think of it as a universal adapter that lets AI agents:
+
+- **Read data** from your existing tools
+- **Search across** multiple systems
+- **Propose changes** that humans can review
+- **Maintain context** across tool boundaries
+
+Instead of building custom integrations for every AI + tool combination, MCP provides a standard interface that any AI can use to interact with any tool.
+
+## Why PMs Should Care
+
+### The Integration Tax
+
+Every PM workflow involves multiple tools:
+
+**Daily Brief**
+- Check Slack for overnight messages
+- Review Jira for blockers
+- Scan calendar for meetings
+- Read Gong summaries from yesterday's calls
+
+**PRD Writing**
+- Pull customer quotes from Gong
+- Reference support tickets from Zendesk
+- Check existing specs in Confluence
+- Create epic in Jira
+
+**Meeting Prep**
+- Find customer's support history
+- Review their feature requests
+- Check recent calls in Gong
+- Prepare talking points
+
+Without integration, you're the integration layer. Copy-pasting. Tab-switching. Context-losing.
+
+### MCP Eliminates the Tax
+
+With MCP connectors, an AI agent can:
+
+```
+Agent: "Prepare for my 2pm call with Acme Corp"
+
+→ Queries Jira: Recent tickets for Acme
+→ Queries Gong: Last 3 calls with Acme
+→ Queries Zendesk: Open support issues
+→ Queries Slack: Recent mentions of Acme
+→ Generates: Meeting prep pack with context
+```
+
+One request. Multiple tools. Unified output.
+
+## How MCP Works
+
+### The Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                   AI Agent                       │
+│  (Claude, GPT, or other LLM)                    │
+└─────────────────┬───────────────────────────────┘
+                  │ MCP Protocol
+                  ▼
+┌─────────────────────────────────────────────────┐
+│              MCP Client                          │
+│  (Routes requests to appropriate servers)        │
+└──┬──────┬──────┬──────┬──────┬──────┬──────────┘
+   │      │      │      │      │      │
+   ▼      ▼      ▼      ▼      ▼      ▼
+┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐
+│Jira│ │Conf│ │Slck│ │Gong│ │Zndk│ │More│
+│MCP │ │MCP │ │MCP │ │MCP │ │MCP │ │... │
+└────┘ └────┘ └────┘ └────┘ └────┘ └────┘
+   │      │      │      │      │      │
+   ▼      ▼      ▼      ▼      ▼      ▼
+┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐
+│Jira│ │Conf│ │Slck│ │Gong│ │Zndk│ │APIs│
+│API │ │API │ │API │ │API │ │API │ │    │
+└────┘ └────┘ └────┘ └────┘ └────┘ └────┘
+```
+
+Each MCP server:
+1. Connects to one external tool
+2. Exposes standardized read/write operations
+3. Handles authentication and rate limiting
+4. Returns data in a consistent format
+
+### Tool Types
+
+MCP servers expose two types of tools:
+
+**Read Tools** (safe, no side effects)
+- `get_issue` - Retrieve a Jira issue
+- `search_messages` - Search Slack messages
+- `get_call_transcript` - Get a Gong transcript
+- `list_tickets` - List Zendesk tickets
+
+**Proposal Tools** (require human approval)
+- `propose_jira_epic` - Draft a new epic
+- `propose_confluence_page` - Draft a new page
+- `propose_slack_message` - Draft a message
+
+The distinction matters: read tools execute immediately, but proposal tools create drafts for human review.
+
+## MCP Connectors for PM Tools
+
+### Jira
+
+| Tool | Description |
+|------|-------------|
+| `get_issue` | Get issue details by key |
+| `search_issues` | JQL search across issues |
+| `get_sprint` | Get sprint details and issues |
+| `propose_jira_epic` | Draft a new epic |
+| `propose_jira_story` | Draft a new story |
+
+**Example Use Case**: PRD job searches for related issues, references them in the spec, then proposes an epic with linked stories.
+
+### Confluence
+
+| Tool | Description |
+|------|-------------|
+| `get_page` | Get page content by ID |
+| `search_pages` | Search pages by query |
+| `propose_confluence_page` | Draft a new page |
+
+**Example Use Case**: Meeting prep job searches for relevant docs, daily brief job proposes a summary page.
+
+### Slack
+
+| Tool | Description |
+|------|-------------|
+| `get_messages` | Get messages from a channel |
+| `search_messages` | Search across channels |
+| `propose_slack_message` | Draft a message |
+
+**Example Use Case**: Daily brief job scans channels for overnight activity, VoC job extracts customer mentions.
+
+### Gong
+
+| Tool | Description |
+|------|-------------|
+| `get_calls` | List recent calls |
+| `get_call_transcript` | Get full transcript |
+| `search_calls` | Search by participant or topic |
+
+**Example Use Case**: Meeting prep job pulls recent calls with the customer, VoC job extracts feature requests and pain points.
+
+### Zendesk
+
+| Tool | Description |
+|------|-------------|
+| `get_ticket` | Get ticket details |
+| `search_tickets` | Search tickets by query |
+| `get_ticket_comments` | Get ticket conversation |
+
+**Example Use Case**: VoC clustering job aggregates support themes, customer escalation job pulls ticket history.
+
+### Analytics (Amplitude, Mixpanel, etc.)
+
+| Tool | Description |
+|------|-------------|
+| `get_metrics` | Get metric values |
+| `get_funnel` | Get funnel conversion data |
+| `get_cohort` | Get cohort analysis |
+
+**Example Use Case**: Daily brief includes key metrics, PRD job references usage data for prioritization.
+
+## The Draft-Only Pattern
+
+MCP enables powerful automation, but power requires guardrails. openpmkit implements the **draft-only pattern**:
+
+1. **Read tools execute immediately** - Gathering data is safe
+2. **Write tools create proposals** - Changes require approval
+3. **Humans review before execution** - No autonomous writes
+
+This means an agent can:
+- ✅ Search Jira for related issues
+- ✅ Read Gong transcripts for customer quotes
+- ✅ Draft a PRD in Confluence format
+- ❌ Create the Confluence page directly
+- ❌ Post to Slack without approval
+- ❌ Create Jira tickets autonomously
+
+The proposal includes a preview, diff, and full payload. You review, edit if needed, and approve.
+
+## Building Your PM Stack with MCP
+
+### Minimum Viable Stack
+
+For most PM teams, start with:
+
+1. **Jira** - Work tracking and sprint management
+2. **Confluence** - Documentation and specs
+3. **Slack** - Team communication
+
+These three cover the core PM workflow: plan work, document decisions, communicate with the team.
+
+### Enhanced Stack
+
+Add based on your needs:
+
+4. **Gong/Chorus** - If you have sales calls to mine for insights
+5. **Zendesk/Intercom** - If support tickets inform product decisions
+6. **Analytics** - If usage data drives prioritization
+
+### Full Stack
+
+For enterprise teams:
+
+7. **Community forums** - Discourse, Reddit, etc.
+8. **Competitor monitoring** - Track competitor changes
+9. **Git/GitHub** - For release notes from commits
+10. **CRM** - Salesforce, HubSpot for customer context
+
+## Real-World MCP Workflows
+
+### Daily Brief (Every Morning)
+
+```
+Sources: Slack, Jira, Calendar, Gong
+Output: Morning brief with priorities and context
+
+1. get_messages(channel: "product-team", since: "yesterday")
+2. search_issues(jql: "assignee = currentUser() AND status != Done")
+3. get_calls(since: "yesterday", participant: "customer")
+4. Generate brief with key updates, blockers, and priorities
+```
+
+### Feature Intelligence (Weekly)
+
+```
+Sources: Gong, Zendesk, Slack, Community
+Output: Themed customer feedback report
+
+1. search_calls(topic: "feature request OR pain point")
+2. search_tickets(query: "feature request", created: "last 7 days")
+3. search_messages(query: "customer feedback")
+4. get_posts(forum: "ideas", since: "last week")
+5. Cluster into themes, rank by frequency, cite sources
+```
+
+### PRD Draft (On Demand)
+
+```
+Sources: Jira, Gong, Zendesk, Confluence, pmkit
+Output: Draft PRD with evidence
+
+1. get_artifact(type: "voc_report", recent: true)
+2. search_issues(jql: "labels = 'customer-request'")
+3. search_calls(topic: "feature name")
+4. search_pages(query: "related feature")
+5. Generate PRD with requirements, evidence, and open questions
+6. propose_confluence_page(content: prd)
+```
+
+### Release Notes (Per Release)
+
+```
+Sources: Jira, Confluence, pmkit
+Output: Customer-facing release notes
+
+1. search_issues(jql: "fixVersion = 'v2.4.0' AND status = Done")
+2. get_artifact(type: "prd", linkedEpic: "ACME-100")
+3. get_page(id: "release-notes-template")
+4. Generate release notes with features, improvements, fixes
+5. propose_confluence_page(content: release_notes)
+```
+
+## Getting Started
+
+### If You're Evaluating MCP
+
+1. **Inventory your tools** - What do you use daily?
+2. **Identify pain points** - Where do you copy-paste most?
+3. **Start small** - One connector, one workflow
+4. **Measure time saved** - Track before/after
+
+### If You're Using pmkit
+
+MCP connectors are built in. The demo shows simulated connectors; production connects to your real tools via OAuth.
+
+1. **Connect your tools** in Settings
+2. **Run a job** that uses those tools
+3. **Review the tool calls** in the audit log
+4. **Approve proposals** before they execute
+
+### If You're Building with MCP
+
+The [MCP specification](https://modelcontextprotocol.io) is open. You can:
+
+- Build custom connectors for internal tools
+- Extend existing connectors with new operations
+- Contribute to the open-source ecosystem
+
+## The Future of PM Tooling
+
+MCP represents a shift in how we think about tool integration:
+
+**Before MCP**: Build N×M integrations (every AI × every tool)
+**After MCP**: Build N+M integrations (each AI and each tool implements MCP once)
+
+For PMs, this means:
+- **Faster adoption** of new AI capabilities
+- **Consistent experience** across tools
+- **Portable workflows** that don't lock you into one vendor
+- **Compound value** as more tools join the ecosystem
+
+The fragmented PM tool landscape isn't going away. But with MCP, the fragmentation becomes a feature—each tool does what it does best, and AI agents stitch them together into coherent workflows.
+
+---
+
+*openpmkit uses  MCP connectors to integrate with Jira, Confluence, Slack, Gong, Zendesk, and more. [Try the demo](/demo) to see MCP in action, or [learn about our connector architecture](/how-it-works).*

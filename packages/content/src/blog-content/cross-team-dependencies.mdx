@@ -1,0 +1,454 @@
+# Cross-team dependencies: how agents detect drift before it burns a sprint
+
+Cross-team dependencies are where sprints go to die. Your feature depends on Platform's API. Platform is waiting on Infrastructure's deployment. Infrastructure is blocked by Security's review. By the time you discover the chain of blockers, your sprint is already at risk.
+
+AI agents can monitor these dependencies continuously, detecting drift before it becomes a crisis. This guide shows you how to build dependency monitoring that keeps your sprints on track.
+
+## The Dependency Problem
+
+Modern product development is inherently cross-functional. A typical feature might require:
+
+- **Platform team**: API endpoints
+- **Infrastructure**: Deployment pipeline
+- **Security**: Compliance review
+- **Design**: UI components
+- **Data**: Analytics instrumentation
+- **QA**: Test coverage
+
+Each dependency is a potential failure point. And dependencies have dependencies, creating chains that are impossible to track manually.
+
+### Why Dependencies Fail
+
+Dependencies fail for predictable reasons:
+
+**1. Silent Blockers**
+A team gets blocked but doesn't communicate it. Days pass before anyone notices.
+
+**2. Priority Shifts**
+Another team reprioritizes, and your dependency drops. You find out at the last minute.
+
+**3. Scope Changes**
+The dependency's scope expands, pushing out the timeline. No one updates the downstream teams.
+
+**4. Resource Constraints**
+Key people get pulled to other work. The dependency stalls without explicit communication.
+
+**5. Technical Surprises**
+Implementation reveals unexpected complexity. The estimate was wrong, but no one recalibrates.
+
+### The Cost of Late Discovery
+
+Discovering a blocked dependency late in a sprint creates cascading problems:
+
+- **Wasted work**: Features built against unavailable dependencies
+- **Replanning overhead**: Scrambling to find alternative work
+- **Stakeholder disappointment**: Commitments missed
+- **Team morale**: Frustration from preventable failures
+- **Velocity damage**: Sprint metrics become meaningless
+
+## Building Dependency Monitoring
+
+Effective dependency monitoring has three components:
+
+### Component 1: Dependency Mapping
+
+First, make dependencies explicit and trackable:
+
+```markdown
+## Dependency Record
+
+**Dependent ticket**: ACME-123 (Search Filters)
+**Dependency ticket**: PLATFORM-456 (Search API v2)
+**Dependency type**: Blocks
+**Expected completion**: Jan 15, 2026
+**Actual status**: In Progress
+**Risk level**: Medium
+
+**Dependency chain**:
+ACME-123 → PLATFORM-456 → INFRA-789 → SECURITY-012
+
+**Contacts**:
+- Platform: @mike (owner), @sarah (PM)
+- Infrastructure: @jane (owner)
+- Security: @bob (reviewer)
+```
+
+### Component 2: Status Monitoring
+
+Continuously track dependency status:
+
+```typescript
+interface DependencyStatus {
+  ticketId: string;
+  currentStatus: 'todo' | 'in_progress' | 'blocked' | 'done';
+  lastStatusChange: Date;
+  expectedCompletion: Date;
+  actualCompletion?: Date;
+  blockers: string[];
+  riskIndicators: {
+    statusStale: boolean;      // No update in X days
+    estimateSlipped: boolean;  // Completion date moved
+    assigneeChanged: boolean;  // Owner changed
+    priorityDropped: boolean;  // Priority lowered
+    scopeExpanded: boolean;    // Story points increased
+  };
+}
+```
+
+### Component 3: Alert Generation
+
+Generate alerts when risk indicators trigger:
+
+```markdown
+## Dependency Alert
+
+**Alert type**: Status Change
+**Severity**: High
+**Detected**: Jan 10, 2026 at 9:15 AM
+
+**Dependency**: PLATFORM-456 (Search API v2)
+**Change**: Status changed from "In Progress" to "Blocked"
+**Blocker**: "Waiting on security review for new auth pattern"
+
+**Impact**:
+- ACME-123 (Search Filters) - Sprint 24, due Jan 20
+- ACME-145 (Advanced Search) - Sprint 25, due Feb 3
+
+**Recommended actions**:
+1. Contact @bob in Security about review timeline
+2. Assess if ACME-123 can proceed with workaround
+3. Update sprint commitment if delay >2 days
+```
+
+## Dependency Monitoring Patterns
+
+### Pattern 1: Daily Dependency Scan
+
+Run a daily scan of all active dependencies:
+
+```typescript
+// Daily dependency health check
+async function scanDependencies() {
+  const activeSprints = await getActiveSprints();
+  const alerts = [];
+  
+  for (const sprint of activeSprints) {
+    const tickets = await getSprintTickets(sprint.id);
+    
+    for (const ticket of tickets) {
+      const dependencies = await getDependencies(ticket.id);
+      
+      for (const dep of dependencies) {
+        const status = await checkDependencyHealth(dep);
+        
+        if (status.hasRisk) {
+          alerts.push({
+            ticket: ticket.id,
+            dependency: dep.id,
+            risk: status.riskType,
+            severity: status.severity,
+            recommendation: status.recommendation,
+          });
+        }
+      }
+    }
+  }
+  
+  return alerts;
+}
+```
+
+### Pattern 2: Change-Triggered Alerts
+
+Alert immediately when dependency status changes:
+
+```typescript
+// Webhook handler for Jira status changes
+async function onTicketStatusChange(event) {
+  const { ticketId, oldStatus, newStatus } = event;
+  
+  // Find tickets that depend on this one
+  const dependents = await findDependentTickets(ticketId);
+  
+  if (dependents.length > 0 && isRiskyChange(oldStatus, newStatus)) {
+    for (const dependent of dependents) {
+      await createAlert({
+        type: 'dependency_status_change',
+        dependency: ticketId,
+        dependent: dependent.id,
+        change: { from: oldStatus, to: newStatus },
+        owners: [dependent.assignee, dependent.pm],
+      });
+    }
+  }
+}
+
+function isRiskyChange(oldStatus, newStatus) {
+  const riskyTransitions = [
+    ['in_progress', 'blocked'],
+    ['in_progress', 'on_hold'],
+    ['review', 'in_progress'], // Sent back
+    ['done', 'in_progress'],   // Reopened
+  ];
+  return riskyTransitions.some(([from, to]) => 
+    oldStatus === from && newStatus === to
+  );
+}
+```
+
+### Pattern 3: Proactive Risk Scoring
+
+Score dependencies by risk level:
+
+```typescript
+function calculateDependencyRisk(dependency) {
+  let riskScore = 0;
+  
+  // Time-based risks
+  const daysUntilDue = daysBetween(today, dependency.dueDate);
+  const daysInCurrentStatus = daysBetween(dependency.lastStatusChange, today);
+  
+  if (daysUntilDue < 3 && dependency.status !== 'done') {
+    riskScore += 30; // Due soon, not done
+  }
+  
+  if (daysInCurrentStatus > 5 && dependency.status === 'in_progress') {
+    riskScore += 20; // Stale in progress
+  }
+  
+  // Status-based risks
+  if (dependency.status === 'blocked') {
+    riskScore += 40;
+  }
+  
+  // Historical risks
+  if (dependency.previousSlips > 0) {
+    riskScore += 15 * dependency.previousSlips;
+  }
+  
+  // Team-based risks
+  if (dependency.assignee.currentLoad > 1.2) {
+    riskScore += 10; // Assignee overloaded
+  }
+  
+  return {
+    score: riskScore,
+    level: riskScore > 50 ? 'high' : riskScore > 25 ? 'medium' : 'low',
+  };
+}
+```
+
+### Pattern 4: Dependency Chain Analysis
+
+Analyze full dependency chains, not just direct dependencies:
+
+```typescript
+async function analyzeDependencyChain(ticketId, visited = new Set()) {
+  if (visited.has(ticketId)) {
+    return { circular: true, chain: [...visited, ticketId] };
+  }
+  
+  visited.add(ticketId);
+  const ticket = await getTicket(ticketId);
+  const dependencies = await getDependencies(ticketId);
+  
+  const chainAnalysis = {
+    ticket: ticketId,
+    status: ticket.status,
+    directDependencies: dependencies.length,
+    totalChainLength: 1,
+    criticalPath: [ticketId],
+    blockedInChain: ticket.status === 'blocked',
+    risks: [],
+  };
+  
+  for (const dep of dependencies) {
+    const subChain = await analyzeDependencyChain(dep.id, new Set(visited));
+    
+    chainAnalysis.totalChainLength += subChain.totalChainLength;
+    
+    if (subChain.blockedInChain) {
+      chainAnalysis.blockedInChain = true;
+      chainAnalysis.risks.push({
+        type: 'blocked_in_chain',
+        ticket: dep.id,
+        depth: subChain.criticalPath.length,
+      });
+    }
+    
+    if (subChain.criticalPath.length > chainAnalysis.criticalPath.length - 1) {
+      chainAnalysis.criticalPath = [ticketId, ...subChain.criticalPath];
+    }
+  }
+  
+  return chainAnalysis;
+}
+```
+
+## Integrating with Daily Workflows
+
+### In Daily Briefs
+
+Include dependency status in daily briefs:
+
+```markdown
+## Dependency Status
+
+### At Risk (2)
+🔴 **PLATFORM-456** (Search API v2)
+   - Status: Blocked since Jan 8
+   - Blocker: Security review
+   - Impact: ACME-123 (due Jan 20)
+   - Action: Escalate to @bob
+
+🟡 **INFRA-789** (Deployment Pipeline)
+   - Status: In Progress (stale 5 days)
+   - Risk: No updates since Jan 5
+   - Impact: ACME-145 (due Feb 3)
+   - Action: Check in with @jane
+
+### On Track (5)
+✅ DESIGN-234, DATA-567, QA-890, PLATFORM-111, SECURITY-222
+```
+
+### In Sprint Planning
+
+Surface dependency risks during planning:
+
+```markdown
+## Sprint 24 Dependency Analysis
+
+### Proposed Work: 8 tickets
+### Dependencies: 12 cross-team items
+
+### Risk Summary
+- High risk: 2 dependencies
+- Medium risk: 3 dependencies
+- Low risk: 7 dependencies
+
+### Recommendations
+1. **ACME-123**: Consider descoping if PLATFORM-456 not unblocked by Jan 12
+2. **ACME-156**: Add buffer for SECURITY-333 review (historically slow)
+3. **ACME-178**: No dependencies - safe to commit
+```
+
+### In Standups
+
+Provide dependency updates for standup:
+
+```markdown
+## Dependency Updates (Jan 10)
+
+### Changes Since Yesterday
+- PLATFORM-456: Now blocked (was in progress)
+- INFRA-789: Completed ✅
+- SECURITY-333: Started review
+
+### Action Items
+- [ ] @pm: Follow up on PLATFORM-456 blocker
+- [ ] @lead: Reallocate ACME-123 if needed
+```
+
+## Automation with AI Agents
+
+Dependency monitoring is ideal for AI automation:
+
+### What Agents Can Do
+
+- **Scan all dependencies** across sprints and teams
+- **Detect status changes** in real-time
+- **Calculate risk scores** based on multiple factors
+- **Generate alerts** with context and recommendations
+- **Summarize dependency health** in daily briefs
+
+### What Humans Must Do
+
+- **Resolve blockers** through communication
+- **Make trade-off decisions** when dependencies slip
+- **Escalate** when needed
+- **Update commitments** based on new information
+
+### Sample Agent Workflow
+
+```typescript
+// Daily Dependency Monitoring Job
+
+// Step 1: Get all active sprint tickets
+const sprints = await mcp.call('jira', 'get_active_sprints', {});
+const allTickets = [];
+
+for (const sprint of sprints) {
+  const tickets = await mcp.call('jira', 'get_sprint_tickets', {
+    sprintId: sprint.id,
+  });
+  allTickets.push(...tickets);
+}
+
+// Step 2: Analyze dependencies
+const dependencyReport = {
+  atRisk: [],
+  changed: [],
+  onTrack: [],
+};
+
+for (const ticket of allTickets) {
+  const deps = await mcp.call('jira', 'get_linked_issues', {
+    issueId: ticket.id,
+    linkType: 'blocks',
+  });
+  
+  for (const dep of deps) {
+    const risk = calculateDependencyRisk(dep);
+    const changed = await hasStatusChangedRecently(dep);
+    
+    if (risk.level === 'high' || changed) {
+      dependencyReport.atRisk.push({ ticket, dep, risk });
+    } else {
+      dependencyReport.onTrack.push({ ticket, dep });
+    }
+  }
+}
+
+// Step 3: Generate report
+return {
+  type: 'dependency_report',
+  content: formatDependencyReport(dependencyReport),
+  alerts: dependencyReport.atRisk,
+};
+```
+
+## How openpmkit Handles Dependencies
+
+pmkit's Daily Brief includes dependency monitoring:
+
+1. **Scans linked issues** across Jira projects
+2. **Identifies cross-team dependencies** by project/team
+3. **Calculates risk scores** based on status and timeline
+4. **Generates alerts** for at-risk dependencies
+5. **Includes in daily brief** with recommended actions
+
+The output shows dependency chains and highlights blockers before they impact sprints.
+
+## FAQ
+
+**Q: How do I get other teams to keep their tickets updated?**
+A: Make the value visible. When dependency monitoring catches a problem early, celebrate it. Show the cost of late discovery.
+
+**Q: What if dependencies aren't tracked in Jira?**
+A: Start tracking them. Create a "Depends On" link type. Make it part of ticket creation process.
+
+**Q: How do I handle dependencies on external vendors?**
+A: Create placeholder tickets for external dependencies. Update them based on vendor communication.
+
+**Q: What's the right alert threshold?**
+A: Start sensitive (more alerts) and tune down. It's better to catch false positives than miss real risks.
+
+**Q: How do I avoid alert fatigue?**
+A: Aggregate alerts by severity. Daily summary for low risk, immediate notification for high risk.
+
+**Q: What about dependencies that span multiple sprints?**
+A: Track them as epics with sprint-level milestones. Monitor milestone completion, not just final delivery.
+
+---
+
+*See dependency monitoring in action with the openpmkit demo. The Daily Brief job includes cross-team dependency analysis with risk scoring.*

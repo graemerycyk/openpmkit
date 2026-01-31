@@ -18,7 +18,7 @@ interface MailtoButtonProps {
  */
 export function MailtoButton({
   user,
-  domain = 'getpmkit.com',
+  domain = 'getopenpmkit.com',
   children,
   className,
   size = 'default',

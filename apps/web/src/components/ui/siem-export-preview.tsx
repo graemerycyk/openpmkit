@@ -141,7 +141,7 @@ function convertToSIEM(event: TelemetryEventInput): SIEMEvent {
   
   return {
     version: 'CEF:0',
-    deviceVendor: 'pmkit',
+    deviceVendor: 'openpmkit',
     deviceProduct: 'agent-platform',
     deviceVersion: '1.0.0',
     signatureId: signature.signatureId,
@@ -240,7 +240,7 @@ export function SIEMExportPreview({ events, className }: SIEMExportPreviewProps)
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pmkit-siem-export-${new Date().toISOString().split('T')[0]}.${format === 'json' ? 'json' : 'cef'}`;
+    a.download = `openpmkit-siem-export-${new Date().toISOString().split('T')[0]}.${format === 'json' ? 'json' : 'cef'}`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -1,0 +1,425 @@
+# From Reddit Thread to Roadmap: Mining Social Platforms for Product Signal
+
+The best product feedback often comes from places you're not looking. While you're analyzing NPS scores and support tickets, users are having unfiltered conversations on Reddit, debating your product on Hacker News, and sharing workarounds in Discord servers.
+
+These discussions contain gold: feature requests with upvotes that quantify demand, competitive comparisons that reveal positioning gaps, and pain points expressed in users' own words. The challenge is finding them, filtering the noise, and turning them into roadmap priorities.
+
+## Why Social Platforms Beat Traditional Feedback
+
+Traditional feedback channels have inherent biases:
+
+| Channel | Bias | What You Miss |
+|---------|------|---------------|
+| Support tickets | Problem-focused | Happy users, feature desires |
+| Sales calls | Deal-focused | Non-buyers, churned users |
+| NPS surveys | Prompted | Unprompted thoughts |
+| User interviews | Selection bias | Silent majority |
+| Feature requests | Squeaky wheels | Quiet needs |
+
+Social platforms are different. Users talk to each other, not to you. They're not trying to get a discount or escalate an issue. They're sharing genuine experiences.
+
+### The Reddit Advantage
+
+Reddit is particularly valuable for product teams:
+
+- **Upvotes quantify demand**: A feature request with 200 upvotes is stronger signal than one email
+- **Comments add context**: Users explain why they want something, not just what
+- **Comparisons are honest**: "I switched from X to Y because..." reveals real decision factors
+- **Workarounds reveal gaps**: "I use Z to work around X's limitation" shows unmet needs
+- **Sentiment is unfiltered**: No PR polish, no customer success mediation
+
+### The Hacker News Factor
+
+For technical products, Hacker News is essential:
+
+- **Technical depth**: Developers discuss implementation, not just features
+- **Early adopter signal**: HN users often predict mainstream needs
+- **Competitive context**: Products are compared on technical merits
+- **Credibility matters**: Upvotes from technical users carry weight
+
+## Finding Product Signal on Reddit
+
+### Step 1: Identify Relevant Subreddits
+
+Start with three types:
+
+**Product-specific subreddits:**
+- r/[YourProduct] if it exists
+- r/[CompetitorProduct] for competitive research
+- r/[ProductCategory] (e.g., r/projectmanagement, r/CRM)
+
+**Industry subreddits:**
+- r/[YourIndustry] (e.g., r/SaaS, r/startups)
+- r/[UserRole] (e.g., r/ProductManagement, r/webdev)
+- r/[UseCase] (e.g., r/productivity, r/selfhosted)
+
+**Meta subreddits:**
+- r/software for recommendations
+- r/AskReddit for broad discussions
+- r/technology for trends
+
+### Step 2: Define Search Queries
+
+Effective Reddit searches combine keywords with intent:
+
+```markdown
+## Direct Mentions
+- "[ProductName]"
+- "[ProductName] review"
+- "[ProductName] experience"
+
+## Comparison Searches
+- "[ProductName] vs"
+- "[ProductName] alternative"
+- "[ProductName] or [Competitor]"
+- "switching from [ProductName]"
+
+## Problem Searches
+- "[Problem you solve]"
+- "how to [task your product does]"
+- "best tool for [use case]"
+- "[pain point] frustrating"
+
+## Feature Searches
+- "[ProductName] [feature name]"
+- "[ProductName] wish"
+- "[ProductName] missing"
+- "does [ProductName] have"
+```
+
+### Step 3: Evaluate Signal Quality
+
+Not all Reddit posts are equal. Score by:
+
+| Factor | High Signal | Low Signal |
+|--------|-------------|------------|
+| Upvotes | 50+ | < 10 |
+| Comments | Substantive discussion | "Same" or jokes |
+| Subreddit | Relevant community | Random mention |
+| User history | Active, credible | New account, single post |
+| Recency | Last 6 months | > 1 year old |
+| Specificity | Detailed use case | Vague complaint |
+
+### Step 4: Extract Actionable Insights
+
+For each valuable thread, document:
+
+```markdown
+## Thread: "Frustrated with [Product] search"
+**URL**: reddit.com/r/productivity/...
+**Date**: January 5, 2026
+**Upvotes**: 127
+**Comments**: 45
+
+### Key Quotes
+> "I spend more time searching than actually working. 
+> The filters are useless."
+> — u/productivitynerd (89 upvotes)
+
+> "I switched to [Competitor] just for the search. 
+> Everything else is worse but search actually works."
+> — u/formeruser (56 upvotes)
+
+### Feature Requests Mentioned
+1. Date range filters (mentioned 8 times)
+2. Boolean search operators (mentioned 5 times)
+3. Saved searches (mentioned 3 times)
+
+### Competitive Context
+- [Competitor] mentioned positively for search (12 times)
+- [Competitor2] mentioned as "even worse" (3 times)
+
+### Sentiment
+Overall: Negative (-0.6)
+Specific to search: Very negative (-0.8)
+
+### Recommended Action
+Prioritize search improvements. Clear user demand with 
+competitive pressure. Date filters are table stakes.
+```
+
+## Mining Hacker News for Technical Products
+
+### Finding Relevant Discussions
+
+HN discussions happen in several contexts:
+
+**Show HN posts:**
+- Your product launches
+- Competitor launches
+- Related tools
+
+**Ask HN posts:**
+- "What do you use for [use case]?"
+- "Best [product category] in 2026?"
+- "How do you handle [problem]?"
+
+**Comment threads:**
+- Mentions in unrelated discussions
+- Comparisons in product threads
+- Technical debates
+
+### Search Strategies
+
+```markdown
+## Algolia Search (search.hn)
+- "[ProductName]" — direct mentions
+- "[ProductName] site:news.ycombinator.com" — Google fallback
+
+## Story Types
+- "Show HN: [ProductName]" — launches
+- "Ask HN: [use case]" — recommendations
+- "[Competitor] comments:>50" — active discussions
+
+## Time Filters
+- Past month: Recent sentiment
+- Past year: Trend analysis
+- All time: Historical context
+```
+
+### Evaluating HN Signal
+
+HN has unique dynamics:
+
+| Factor | Interpretation |
+|--------|----------------|
+| Points | Community interest (100+ is significant) |
+| Comments | Engagement depth |
+| Comment quality | Technical users provide detailed feedback |
+| Flagged/dead | Controversial or spam |
+| Who comments | Founders, employees, competitors often participate |
+
+### Example Analysis
+
+```markdown
+## Thread: "Show HN: [Competitor] 2.0 – Rebuilt from scratch"
+**URL**: news.ycombinator.com/item?id=...
+**Points**: 234
+**Comments**: 89
+
+### Mentions of Our Product
+- 3 comments mention us as alternative
+- Sentiment: Mixed (good features, complex UX)
+
+### Key Technical Feedback
+> "The API is much cleaner than [OurProduct]. 
+> I can actually understand the docs."
+> — techuser (45 points)
+
+> "[OurProduct] has more features but [Competitor] 
+> is easier to get started with."
+> — devops_eng (32 points)
+
+### Competitive Insights
+- Competitor positioning: "Simple and fast"
+- Our perceived weakness: Complexity, learning curve
+- Our perceived strength: Feature depth, enterprise
+
+### Recommended Actions
+1. Improve API documentation
+2. Create "quick start" guide
+3. Consider simplified onboarding flow
+```
+
+## Turning Social Signal into Roadmap Priorities
+
+### Quantifying Demand
+
+Social signal provides quantifiable demand data:
+
+```markdown
+## Feature: Date Range Filters
+
+### Social Evidence
+| Source | Mentions | Engagement | Sentiment |
+|--------|----------|------------|-----------|
+| Reddit | 47 | 890 upvotes | -0.6 |
+| HN | 12 | 156 points | -0.4 |
+| Twitter | 23 | 45 likes | -0.5 |
+
+### Total Demand Score
+- Mentions: 82
+- Weighted engagement: 1,091
+- Sentiment: Negative (frustration)
+
+### Competitive Context
+- Competitor Y: Has this feature
+- Competitor Z: Has this feature
+- Mentioned in 15 "vs" comparisons
+
+### Recommendation
+**Priority: High**
+Clear user demand, competitive gap, negative sentiment.
+Estimate: 2 weeks engineering.
+ROI: Addresses top social complaint.
+```
+
+### Prioritization Framework
+
+Combine social signal with other factors:
+
+| Factor | Weight | Source |
+|--------|--------|--------|
+| Social demand | 25% | Reddit, HN, Twitter |
+| Support volume | 25% | Zendesk, Intercom |
+| Revenue impact | 25% | Sales, churn data |
+| Strategic fit | 25% | Roadmap alignment |
+
+### Building the Business Case
+
+Social evidence strengthens roadmap proposals:
+
+```markdown
+## Feature Proposal: Advanced Search
+
+### Problem Statement
+Users struggle to find content, leading to frustration 
+and competitive losses.
+
+### Evidence
+
+**Quantitative:**
+- 82 social mentions in past 90 days
+- 1,091 weighted engagement (upvotes/points)
+- 34 support tickets mentioning search
+- 3 churned customers cited search in exit interviews
+
+**Qualitative:**
+> "I spend more time searching than working"
+> — Reddit user, 89 upvotes
+
+> "Switched to [Competitor] just for search"
+> — Reddit user, 56 upvotes
+
+**Competitive:**
+- Competitor Y launched "Smart Search" (Jan 2026)
+- Mentioned in 15 competitive comparisons
+- We lose on search in 40% of competitive deals
+
+### Recommendation
+Prioritize for Q1. Clear demand, competitive pressure, 
+and churn correlation.
+
+### Success Metrics
+- Reduce search-related support tickets by 50%
+- Improve search satisfaction score to 4.0+
+- Win 2+ competitive deals on search
+```
+
+## Building a Sustainable Process
+
+### Weekly Social Review
+
+Dedicate 30 minutes weekly to social signal:
+
+```markdown
+## Weekly Social Review Checklist
+
+### Reddit (15 min)
+- [ ] Check saved searches for new threads
+- [ ] Review top posts in key subreddits
+- [ ] Note threads with 50+ upvotes
+- [ ] Document feature requests and sentiment
+
+### Hacker News (10 min)
+- [ ] Search for product/competitor mentions
+- [ ] Check "Ask HN" for relevant questions
+- [ ] Review comments on competitor launches
+
+### Synthesis (5 min)
+- [ ] Update feature request tracker
+- [ ] Flag high-priority insights for team
+- [ ] Add notable quotes to evidence library
+```
+
+### Monthly Trend Analysis
+
+Look for patterns over time:
+
+```markdown
+## Monthly Social Trend Report
+
+### Mention Volume
+- Our product: 156 mentions (+12% vs last month)
+- Competitor Y: 234 mentions (+45% — launch effect)
+- Competitor Z: 89 mentions (-8%)
+
+### Sentiment Trends
+- Our product: -0.1 → 0.0 (improving)
+- Competitor Y: 0.2 → 0.3 (positive, new features)
+- Competitor Z: 0.1 → -0.2 (pricing backlash)
+
+### Top Themes
+1. Search functionality (stable, ongoing)
+2. Mobile experience (emerging, +200% mentions)
+3. Pricing concerns (declining, -30% mentions)
+
+### Competitive Positioning Shifts
+- Y now positioned as "AI-first"
+- Z facing pricing backlash
+- We're seen as "powerful but complex"
+
+### Recommended Focus
+Mobile experience emerging as concern. 
+Investigate and consider for Q2 roadmap.
+```
+
+### Quarterly Evidence Review
+
+Audit your social signal process:
+
+- **Coverage**: Are we monitoring the right platforms?
+- **Accuracy**: Did social signal predict actual needs?
+- **Impact**: Did social-informed features succeed?
+- **Efficiency**: Is the time investment worthwhile?
+
+## Common Mistakes
+
+### Mistake 1: Cherry-Picking
+
+Don't just find evidence for features you already want:
+- Look for disconfirming evidence too
+- Consider why some requests have low engagement
+- Balance social signal with other data sources
+
+### Mistake 2: Recency Bias
+
+Recent posts feel more urgent:
+- Weight by engagement, not just recency
+- Look for sustained themes, not one-off complaints
+- Compare to historical baseline
+
+### Mistake 3: Loud Minority
+
+Some users are very active on social:
+- Check if posters represent your target market
+- Look for breadth of voices, not just volume
+- Validate with other data sources
+
+### Mistake 4: Ignoring Context
+
+A feature request without context is incomplete:
+- Why do they want this?
+- What's their use case?
+- What workaround are they using?
+
+## FAQ
+
+**Q: How do I find discussions if our product is small?**
+A: Search for the problem you solve, not your product name. Users discuss problems even if they don't know your solution exists.
+
+**Q: Should we participate in Reddit/HN discussions?**
+A: Carefully. Be transparent about your affiliation. Answer questions helpfully. Never astroturf or argue with critics.
+
+**Q: How do we handle negative viral posts?**
+A: Don't panic. Assess if it's a real issue or isolated complaint. If real, acknowledge and fix. If isolated, monitor but don't amplify.
+
+**Q: What if competitors are monitoring the same discussions?**
+A: They probably are. The advantage goes to whoever acts on insights faster and better. Speed and execution matter more than exclusive access.
+
+**Q: How do we balance social signal with paying customer feedback?**
+A: Paying customers get more weight, but social signal reveals the broader market. Use social to identify themes, validate with customers.
+
+---
+
+*See social mining in action with openpmkit's Social Crawler. Configure keywords, monitor Reddit and Hacker News, and get synthesized insights in your daily briefs and VoC reports.*

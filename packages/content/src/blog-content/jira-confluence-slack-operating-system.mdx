@@ -1,0 +1,455 @@
+# Jira + Confluence + Slack: a practical operating system for product delivery
+
+Most product teams run on Jira, Confluence, and Slack. Separately, each tool does its job. Together, they should form an integrated operating system for product delivery. But for most teams, they don't. Information lives in silos, context gets lost at tool boundaries, and keeping everything in sync is a full-time job.
+
+This guide shows you how to configure Jira, Confluence, and Slack as an integrated system, with AI automation bridging the gaps.
+
+## The Integration Problem
+
+Each tool excels at something different:
+
+| Tool | Strength | Weakness |
+|------|----------|----------|
+| **Jira** | Tracking work, sprint management | Poor for discussion, context |
+| **Confluence** | Long-form documentation, decisions | Disconnected from active work |
+| **Slack** | Real-time discussion, quick decisions | Information disappears, no structure |
+
+The problem is the gaps between them:
+
+- **Slack → Jira**: Decisions made in Slack don't update tickets
+- **Jira → Confluence**: Completed work doesn't flow to release notes
+- **Confluence → Slack**: Document updates don't notify stakeholders
+- **All three**: No unified view of what's happening
+
+## The Integrated Operating System
+
+An integrated system connects these tools so information flows automatically:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Product Operating System                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐      ┌─────────────┐      ┌─────────────┐         │
+│  │  Slack  │◄────►│  AI Agent   │◄────►│    Jira     │         │
+│  │         │      │  (Bridge)   │      │             │         │
+│  └────┬────┘      └──────┬──────┘      └──────┬──────┘         │
+│       │                  │                    │                 │
+│       │                  ▼                    │                 │
+│       │          ┌─────────────┐              │                 │
+│       └─────────►│ Confluence  │◄─────────────┘                 │
+│                  │             │                                 │
+│                  └─────────────┘                                 │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Configuration Patterns
+
+### Pattern 1: Slack Channels Mirror Jira Projects
+
+Create a 1:1 mapping between Slack channels and Jira projects:
+
+```markdown
+## Channel Structure
+
+#product-acme          → ACME project (main product)
+#product-acme-sprint   → Current sprint discussion
+#product-acme-bugs     → Bug triage and escalations
+#product-platform      → PLATFORM project
+#product-platform-sprint → Platform sprint discussion
+```
+
+**Benefits**:
+- Clear ownership of discussions
+- Easy to find relevant context
+- Notifications go to the right people
+
+**Configuration**:
+```yaml
+# Jira-Slack integration settings
+project_channels:
+  ACME:
+    main: "#product-acme"
+    sprint: "#product-acme-sprint"
+    bugs: "#product-acme-bugs"
+  PLATFORM:
+    main: "#product-platform"
+    sprint: "#product-platform-sprint"
+```
+
+### Pattern 2: Jira Tickets Link to Slack Threads
+
+Every significant Jira ticket should have a linked Slack thread for discussion:
+
+```markdown
+## Ticket: ACME-123 - Search Date Filters
+
+**Slack thread**: [#product-acme thread](slack://...)
+**Confluence spec**: [PRD: Search Filters](confluence://...)
+
+### Discussion Summary
+Key decisions from Slack thread:
+- Date filter will use creation date, not modified date
+- Preset ranges: 7d, 30d, 90d, 1y, custom
+- Mobile UI will use bottom sheet picker
+```
+
+**Automation**:
+```typescript
+// When ticket created, create Slack thread
+on('jira.ticket.created', async (ticket) => {
+  if (ticket.type === 'Story' || ticket.type === 'Epic') {
+    const thread = await slack.postMessage({
+      channel: getProjectChannel(ticket.project),
+      text: `New ticket: ${ticket.key} - ${ticket.summary}`,
+      blocks: formatTicketBlocks(ticket),
+    });
+    
+    await jira.addComment(ticket.key, {
+      body: `Slack discussion: ${thread.permalink}`,
+    });
+  }
+});
+```
+
+### Pattern 3: Confluence Pages Track Jira Progress
+
+Confluence pages should show live Jira status:
+
+```markdown
+## PRD: Search Improvements
+
+### Implementation Status
+
+| Epic | Status | Progress |
+|------|--------|----------|
+| ACME-100 | In Progress | 60% |
+| ACME-101 | Done | 100% |
+| ACME-102 | To Do | 0% |
+
+*Auto-updated from Jira*
+
+### Related Tickets
+{jira:jql=project = ACME AND labels = search-improvements}
+```
+
+**Configuration**:
+- Use Jira macros in Confluence for live data
+- Set up page watchers for stakeholders
+- Link PRDs to epics bidirectionally
+
+### Pattern 4: Sprint Events Flow to All Three
+
+Sprint lifecycle events should update all systems:
+
+```typescript
+// Sprint started
+on('jira.sprint.started', async (sprint) => {
+  // Post to Slack
+  await slack.postMessage({
+    channel: getSprintChannel(sprint.project),
+    text: `🚀 Sprint ${sprint.name} started!`,
+    blocks: formatSprintStartBlocks(sprint),
+  });
+  
+  // Update Confluence
+  await confluence.updatePage({
+    pageId: getSprintPageId(sprint),
+    content: generateSprintPage(sprint),
+  });
+});
+
+// Sprint completed
+on('jira.sprint.completed', async (sprint) => {
+  // Generate review
+  const review = await generateSprintReview(sprint);
+  
+  // Post summary to Slack
+  await slack.postMessage({
+    channel: getSprintChannel(sprint.project),
+    text: `✅ Sprint ${sprint.name} completed!`,
+    blocks: formatSprintCompleteBlocks(sprint, review),
+  });
+  
+  // Create Confluence page
+  await confluence.createPage({
+    space: getProjectSpace(sprint.project),
+    title: `Sprint ${sprint.name} Review`,
+    content: review,
+    parent: getSprintReviewsParent(sprint.project),
+  });
+});
+```
+
+### Pattern 5: Decisions Captured in Confluence
+
+Important decisions from Slack should be captured in Confluence:
+
+```markdown
+## Decision Log: Search Improvements
+
+### Decision: Date Filter Implementation
+**Date**: Jan 10, 2026
+**Participants**: @sarah, @mike, @jane
+**Slack thread**: [Link](slack://...)
+
+**Context**: 
+Needed to decide between creation date and modified date for filtering.
+
+**Options Considered**:
+1. Creation date only
+2. Modified date only
+3. Both with toggle
+
+**Decision**: Creation date only for MVP
+
+**Rationale**:
+- 80% of use cases are "find documents from Q3"
+- Modified date adds complexity
+- Can add later based on feedback
+
+**Action Items**:
+- [ ] Update PRD with decision (@sarah)
+- [ ] Implement date filter (@mike)
+```
+
+**Automation**:
+```typescript
+// Capture decision from Slack
+slack.onReaction('decision', async (message, thread) => {
+  const decision = await extractDecision(thread);
+  
+  await confluence.addToDecisionLog({
+    space: getProjectSpace(message.channel),
+    decision: decision,
+    participants: thread.participants,
+    slackLink: thread.permalink,
+  });
+  
+  await slack.reply(message, {
+    text: `✅ Decision captured in Confluence: ${decision.confluenceLink}`,
+  });
+});
+```
+
+## Workflow Automations
+
+### Workflow 1: Feature Request to PRD
+
+```
+Slack message (feature idea)
+    ↓
+Jira epic created (draft)
+    ↓
+Confluence PRD page created (template)
+    ↓
+Slack thread for discussion
+    ↓
+PRD refined based on discussion
+    ↓
+Epic approved, stories created
+```
+
+### Workflow 2: Bug Escalation
+
+```
+Slack alert (customer escalation)
+    ↓
+Jira bug created (P1)
+    ↓
+Slack thread for triage
+    ↓
+Fix implemented, PR merged
+    ↓
+Jira ticket closed
+    ↓
+Slack notification to stakeholders
+    ↓
+Confluence incident report (if needed)
+```
+
+### Workflow 3: Release Communication
+
+```
+Jira tickets marked Done
+    ↓
+Release notes drafted (Confluence)
+    ↓
+Review in Slack thread
+    ↓
+Release notes published
+    ↓
+Slack announcement to customers
+    ↓
+Jira version released
+```
+
+## AI Agent Integration
+
+AI agents can bridge the gaps between tools:
+
+### What Agents Can Do
+
+**Slack → Jira**:
+- Extract action items from discussions
+- Draft tickets from conversation context
+- Update ticket status based on discussion
+
+**Jira → Confluence**:
+- Generate release notes from completed tickets
+- Update PRD status sections
+- Create sprint review documents
+
+**Confluence → Slack**:
+- Summarize document changes
+- Notify stakeholders of updates
+- Answer questions about documentation
+
+**Cross-tool**:
+- Daily briefs pulling from all three
+- Meeting prep with full context
+- Decision tracking across systems
+
+### Sample Integration Workflow
+
+```typescript
+// Daily sync job
+async function dailySync() {
+  // Gather from all sources
+  const slackActivity = await mcp.call('slack', 'get_messages', {
+    channels: productChannels,
+    since: yesterday,
+  });
+  
+  const jiraUpdates = await mcp.call('jira', 'search_issues', {
+    jql: 'updated >= -1d',
+  });
+  
+  const confluenceChanges = await mcp.call('confluence', 'get_recent_changes', {
+    spaces: productSpaces,
+    since: yesterday,
+  });
+  
+  // Identify sync gaps
+  const gaps = identifySyncGaps({
+    slack: slackActivity,
+    jira: jiraUpdates,
+    confluence: confluenceChanges,
+  });
+  
+  // Generate sync proposals
+  for (const gap of gaps) {
+    if (gap.type === 'slack_decision_not_in_confluence') {
+      await createProposal('confluence', 'add_decision', {
+        decision: gap.decision,
+        source: gap.slackThread,
+      });
+    }
+    
+    if (gap.type === 'jira_complete_no_release_notes') {
+      await createProposal('confluence', 'update_release_notes', {
+        tickets: gap.tickets,
+        version: gap.version,
+      });
+    }
+  }
+  
+  return { gaps, proposals: gaps.length };
+}
+```
+
+## Best Practices
+
+### Naming Conventions
+
+Consistent naming makes cross-referencing easier:
+
+```markdown
+## Naming Standards
+
+**Jira Projects**: ACME, PLATFORM, INFRA
+**Slack Channels**: #product-{project}, #product-{project}-sprint
+**Confluence Spaces**: {Project} Product, {Project} Engineering
+**Page Titles**: "{Type}: {Name}" (e.g., "PRD: Search Filters")
+```
+
+### Linking Standards
+
+Always create bidirectional links:
+
+```markdown
+## Linking Requirements
+
+**Jira tickets must link to**:
+- Confluence PRD (if applicable)
+- Slack discussion thread
+- Related tickets (blocks, relates to)
+
+**Confluence pages must link to**:
+- Jira epic/tickets
+- Decision Slack threads
+- Related documentation
+
+**Slack threads should reference**:
+- Jira ticket key
+- Confluence page (if exists)
+```
+
+### Notification Management
+
+Prevent notification overload:
+
+```markdown
+## Notification Rules
+
+**Immediate (Slack DM)**:
+- P0/P1 bugs assigned to you
+- Mentions in sprint channel
+- Blocked ticket you own
+
+**Batched (Daily digest)**:
+- Ticket status changes
+- Confluence page updates
+- Sprint progress
+
+**Weekly summary**:
+- Cross-team dependency status
+- Documentation gaps
+- Stale tickets
+```
+
+## How openpmkit Integrates the Stack
+
+openpmkit connects Jira, Confluence, and Slack through MCP:
+
+1. **Unified data access**: Single interface to all three tools
+2. **Cross-tool workflows**: Jobs that span multiple systems
+3. **Sync automation**: Keeps information consistent
+4. **Draft-only writes**: All changes proposed for review
+
+The demo shows how daily briefs pull from all three sources and how proposals can update multiple systems.
+
+## FAQ
+
+**Q: How do I migrate to this structure?**
+A: Start with one project. Set up the channel structure, linking conventions, and basic automations. Expand once the pattern is proven.
+
+**Q: What about teams using different tools?**
+A: The pattern adapts. Replace Jira with Linear, Confluence with Notion, etc. The principles remain the same.
+
+**Q: How do I handle private/sensitive information?**
+A: Use private channels and restricted Confluence spaces. Ensure automations respect access controls.
+
+**Q: What's the maintenance burden?**
+A: Initial setup takes effort. Once configured, automations reduce maintenance. Budget time for periodic review and tuning.
+
+**Q: How do I get buy-in from other teams?**
+A: Show the value. When information flows automatically, everyone benefits. Start with pain points (e.g., "release notes take forever").
+
+**Q: What about tool fatigue?**
+A: The goal is fewer manual updates, not more tools. Automation should reduce the feeling of juggling multiple systems.
+
+---
+
+*See the integrated stack in action with the openpmkit demo. Jobs pull from Jira, Confluence, and Slack to produce unified artifacts.*
