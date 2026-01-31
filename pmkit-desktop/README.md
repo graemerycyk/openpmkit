@@ -88,26 +88,29 @@ pmkit setup
 The wizard will guide you through:
 1. Your profile (name, company, product)
 2. OpenAI API Key (required for AI-powered content)
-3. Optional crawler and integration API keys
+3. Optional credentials for crawlers, integrations, and data connectors
 
-### Managing Settings
+### Managing Settings (BYOK)
+
+pmkit uses a **BYOK (Bring Your Own Key)** model - you manage your own credentials for all services. No `.env` files needed - everything is stored in `~/.pmkit/config.json`.
 
 ```bash
 # Show all settings
-pmkit config
+pmkit settings
 
-# View API key status
-pmkit config keys
+# List all credentials with status
+pmkit settings list
 
-# Set an API key
-pmkit config set-key openai sk-...
-pmkit config set-key linear your-linear-key
+# Set a credential (AI, crawler, integration, or connector)
+pmkit settings set openai sk-...
+pmkit settings set linear lin_api_...
+pmkit settings set slack xoxb-...
 
 # Update your profile
-pmkit config set-profile --name "Sarah Chen" --company "Acme Inc"
+pmkit settings profile --name "Sarah Chen" --company "Acme Inc"
 
 # Reset all settings
-pmkit config reset
+pmkit settings reset
 ```
 
 ## Output Structure
@@ -173,10 +176,14 @@ Config is stored at `~/.pmkit/config.json`:
   "tenantName": "Acme Inc",
   "productName": "Acme Platform",
   "userName": "Sarah Chen",
-  "apiKeys": {
+  "credentials": {
     "openai": "sk-...",
     "serper": "...",
-    "linear": "lin_api_..."
+    "linear": "lin_api_...",
+    "slack": "xoxb-...",
+    "jira": "...",
+    "jiraEmail": "you@company.com",
+    "jiraUrl": "https://company.atlassian.net"
   },
   "scheduler": {
     "enabled": true,
@@ -190,27 +197,59 @@ Config is stored at `~/.pmkit/config.json`:
 }
 ```
 
-## API Keys Reference
+## Credentials Reference (BYOK)
 
-All API keys are managed through the CLI - no `.env` files needed!
+All credentials are managed through the CLI - no `.env` files needed! This is a **BYOK (Bring Your Own Key)** platform where each user manages their own keys.
+
+### AI Providers
 
 | Key | Purpose | Get it at |
 |-----|---------|-----------|
 | **openai** | AI content generation (required) | https://platform.openai.com/api-keys |
-| **serper** | Web search crawler | https://serper.dev |
-| **newsapi** | News crawler | https://newsapi.org/register |
+| **anthropic** | Alternative AI (Claude) | https://console.anthropic.com/settings/keys |
+
+### Research Crawlers
+
+| Key | Purpose | Get it at |
+|-----|---------|-----------|
+| **serper** | Web search (2,500 free/month) | https://serper.dev |
+| **newsapi** | News search (100 free/day) | https://newsapi.org/register |
+| **gnews** | Alternative news (600 free/day) | https://gnews.io |
+
+### Integrations (PM Tools)
+
+| Key | Purpose | Get it at |
+|-----|---------|-----------|
 | **linear** | Issue tracking | https://linear.app/settings/api |
 | **notion** | Pages and databases | https://notion.so/my-integrations |
 | **figma** | Design files | https://figma.com/developers/api |
 | **coda** | Docs and tables | https://coda.io/developers/apis/v1 |
 | **discourse** | Community forums | Your Discourse admin settings |
+| **loom** | Video recordings | https://dev.loom.com |
+| **amplitude** | Product analytics | https://amplitude.com |
+| **zoom** | Meetings | https://marketplace.zoom.us |
+
+### Data Connectors
+
+| Key | Purpose | Get it at |
+|-----|---------|-----------|
+| **slack** | Team messages | https://api.slack.com/apps |
+| **jira** + **jiraEmail** + **jiraUrl** | Issues and sprints | https://id.atlassian.com/manage-profile/security/api-tokens |
+| **confluence** + **confluenceEmail** + **confluenceUrl** | Wiki pages | Same as Jira |
+| **gmail** | Email threads | https://console.cloud.google.com |
+| **googleCalendar** | Meeting schedules | Same as Gmail |
+| **googleDrive** | Documents | Same as Gmail |
+| **zendesk** + **zendeskEmail** + **zendeskSubdomain** | Support tickets | https://support.zendesk.com |
 
 ```bash
-# Set any key with:
-pmkit config set-key <name> <value>
+# Set any credential with:
+pmkit settings set <name> <value>
 
-# Example:
-pmkit config set-key openai sk-proj-abc123...
+# Examples:
+pmkit settings set openai sk-proj-abc123...
+pmkit settings set slack xoxb-your-bot-token
+pmkit settings set jira your-api-token
+pmkit settings set jiraUrl https://yourcompany.atlassian.net
 ```
 
 ## Development
@@ -253,14 +292,20 @@ pmkit crawl web --keywords "competitor features"
 pmkit crawl news --keywords "industry trends"
 ```
 
-### API Keys Required for Crawlers
+### Credentials Required for Crawlers
 
-| Crawler | API Key | Free Tier | Notes |
-|---------|---------|-----------|-------|
-| Web Search | `SERPER_API_KEY` | 2,500/month | Falls back to DuckDuckGo |
-| News | `NEWSAPI_KEY` | 100/day | Falls back to Google News RSS |
-| News (alt) | `GNEWS_API_KEY` | 600/day | Alternative to NewsAPI |
+| Crawler | Credential | Free Tier | Notes |
+|---------|-----------|-----------|-------|
+| Web Search | `serper` | 2,500/month | Falls back to DuckDuckGo |
+| News | `newsapi` | 100/day | Falls back to Google News RSS |
+| News (alt) | `gnews` | 600/day | Alternative to NewsAPI |
 | Social | None required | ✅ | Uses public APIs and RSS feeds |
+
+```bash
+# Set crawler credentials
+pmkit settings set serper your-serper-key
+pmkit settings set newsapi your-newsapi-key
+```
 
 ## MVP Integrations
 
@@ -299,14 +344,23 @@ src/integrations/
 
 ### Using Integrations
 
+Integrations use credentials from your settings:
+
+```bash
+# Set integration credentials
+pmkit settings set figma your-figma-token
+pmkit settings set linear your-linear-key
+pmkit settings set notion your-notion-token
+```
+
 ```typescript
 import { createIntegrationClient } from './integrations';
 
-// Create client
+// Create client - reads credentials from ~/.pmkit/config.json
 const figma = createIntegrationClient('figma');
 
-// Connect with credentials
-await figma.connect({ accessToken: 'your-token' });
+// Connect with credentials from config
+await figma.connect({ accessToken: configManager.getCredential('figma') });
 
 // Fetch data
 const files = await figma.fetchData({ action: 'list_files' });

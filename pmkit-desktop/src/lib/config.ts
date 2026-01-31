@@ -1,16 +1,19 @@
 /**
  * Configuration management for pmkit-desktop
  *
- * User-friendly settings system that stores API keys and preferences
+ * User-friendly settings system that stores all credentials and preferences
  * in ~/.pmkit/config.json instead of requiring .env files.
+ *
+ * This is a BYOK (Bring Your Own Key) platform - each user manages their own
+ * API keys and tokens for all services (AI, crawlers, integrations, connectors).
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as readline from 'readline';
-import type { PMKitConfig, WorkflowId, ApiKeyInfo } from './types.js';
-import { WORKFLOWS, API_KEY_INFO } from './types.js';
+import type { PMKitConfig, WorkflowId, CredentialInfo, CredentialCategory } from './types.js';
+import { WORKFLOWS, CREDENTIALS, CREDENTIAL_CATEGORY_NAMES, getCredentialsByCategory } from './types.js';
 
 const CONFIG_DIR = path.join(os.homedir(), '.pmkit');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
@@ -24,7 +27,7 @@ const DEFAULT_CONFIG: PMKitConfig = {
   tenantName: 'My Company',
   productName: 'My Product',
   userName: 'Product Manager',
-  apiKeys: {},
+  credentials: {},
   scheduler: {
     enabled: false,
     timezone: 'America/Los_Angeles',
@@ -165,17 +168,17 @@ export class ConfigManager {
   }
 
   // ============================================================================
-  // API Key Management
+  // Credential Management (BYOK - Bring Your Own Key)
   // ============================================================================
 
   /**
-   * Set an API key in the config
+   * Set a credential (API key, token, etc.)
    */
-  setApiKey(key: keyof NonNullable<PMKitConfig['apiKeys']>, value: string): void {
-    if (!this.config.apiKeys) {
-      this.config.apiKeys = {};
+  setCredential(key: keyof NonNullable<PMKitConfig['credentials']>, value: string): void {
+    if (!this.config.credentials) {
+      this.config.credentials = {};
     }
-    this.config.apiKeys[key] = value;
+    this.config.credentials[key] = value;
 
     // If setting OpenAI key, automatically disable stubs
     if (key === 'openai' && value) {
@@ -186,12 +189,16 @@ export class ConfigManager {
   }
 
   /**
-   * Get an API key from config (falls back to environment variables)
+   * Get a credential from config (falls back to environment variables)
    */
-  getApiKeyValue(key: keyof NonNullable<PMKitConfig['apiKeys']>): string | undefined {
-    // First check config
-    const configValue = this.config.apiKeys?.[key];
-    if (configValue) return configValue;
+  getCredential(key: keyof NonNullable<PMKitConfig['credentials']>): string | undefined {
+    // First check credentials (new)
+    const credValue = this.config.credentials?.[key];
+    if (credValue) return credValue;
+
+    // Check legacy apiKeys for backwards compatibility
+    const legacyValue = this.config.apiKeys?.[key as keyof NonNullable<PMKitConfig['apiKeys']>];
+    if (legacyValue) return legacyValue;
 
     // Fall back to environment variables for backwards compatibility
     const envMap: Record<string, string | undefined> = {
@@ -211,58 +218,82 @@ export class ConfigManager {
       linear: process.env.LINEAR_API_KEY,
       notion: process.env.NOTION_ACCESS_TOKEN,
       zoom: process.env.ZOOM_ACCESS_TOKEN,
+      slack: process.env.SLACK_TOKEN,
+      jira: process.env.JIRA_API_TOKEN,
+      jiraEmail: process.env.JIRA_EMAIL,
+      jiraUrl: process.env.JIRA_URL,
+      confluence: process.env.CONFLUENCE_API_TOKEN,
+      confluenceEmail: process.env.CONFLUENCE_EMAIL,
+      confluenceUrl: process.env.CONFLUENCE_URL,
+      gmail: process.env.GMAIL_ACCESS_TOKEN,
+      googleCalendar: process.env.GOOGLE_CALENDAR_TOKEN,
+      googleDrive: process.env.GOOGLE_DRIVE_TOKEN,
+      zendesk: process.env.ZENDESK_API_TOKEN,
+      zendeskEmail: process.env.ZENDESK_EMAIL,
+      zendeskSubdomain: process.env.ZENDESK_SUBDOMAIN,
     };
 
     return envMap[key];
   }
 
   /**
-   * Remove an API key from config
+   * Remove a credential from config
    */
-  removeApiKey(key: keyof NonNullable<PMKitConfig['apiKeys']>): void {
-    if (this.config.apiKeys) {
-      delete this.config.apiKeys[key];
+  removeCredential(key: keyof NonNullable<PMKitConfig['credentials']>): void {
+    if (this.config.credentials) {
+      delete this.config.credentials[key];
       this.saveConfig(this.config);
     }
   }
 
   /**
-   * Get all configured API keys (masked for display)
+   * Get all credentials status (masked for display)
    */
-  getApiKeysStatus(): Array<{
+  getCredentialsStatus(): Array<{
     key: string;
     name: string;
     configured: boolean;
     maskedValue: string;
-    category: string;
+    category: CredentialCategory;
     required: boolean;
+    emoji: string;
+    helpUrl: string;
   }> {
-    return API_KEY_INFO.map((info) => {
-      const value = this.getApiKeyValue(info.key);
+    return CREDENTIALS.map((info) => {
+      const value = this.getCredential(info.key);
       return {
         key: info.key,
         name: info.name,
         configured: !!value,
-        maskedValue: value ? maskApiKey(value) : '(not set)',
+        maskedValue: value ? maskCredential(value) : '(not set)',
         category: info.category,
         required: info.required,
+        emoji: info.emoji,
+        helpUrl: info.helpUrl,
       };
     });
   }
 
   /**
+   * Get credentials by category
+   */
+  getCredentialsByCategory(category: CredentialCategory): ReturnType<typeof this.getCredentialsStatus> {
+    return this.getCredentialsStatus().filter(c => c.category === category);
+  }
+
+  /**
    * Get LLM API key based on current provider
    */
-  getApiKey(): string | undefined {
+  getLLMKey(): string | undefined {
     const provider = this.config.llmProvider;
 
     switch (provider) {
       case 'openai':
-        return this.getApiKeyValue('openai');
+        return this.getCredential('openai');
       case 'anthropic':
-        return this.getApiKeyValue('anthropic');
+        return this.getCredential('anthropic');
       case 'google':
-        return this.getApiKeyValue('google');
+        return this.getCredential('google');
       default:
         return undefined;
     }
@@ -280,8 +311,8 @@ export class ConfigManager {
       return false;
     }
 
-    // If no API key is configured, use stubs
-    if (!this.getApiKey()) {
+    // If no LLM key is configured, use stubs
+    if (!this.getLLMKey()) {
       return true;
     }
 
@@ -290,17 +321,42 @@ export class ConfigManager {
   }
 
   /**
-   * Check if this is the first run (no config file exists)
+   * Check if this is the first run (no config file exists or no OpenAI key)
    */
   isFirstRun(): boolean {
-    return !fs.existsSync(CONFIG_FILE) || !this.config.apiKeys?.openai;
+    return !fs.existsSync(CONFIG_FILE) || !this.getCredential('openai');
   }
 
   /**
-   * Check if required API keys are configured
+   * Check if required credentials are configured
    */
+  hasRequiredCredentials(): boolean {
+    return !!this.getLLMKey();
+  }
+
+  // Legacy methods for backwards compatibility
+  setApiKey(key: keyof NonNullable<PMKitConfig['credentials']>, value: string): void {
+    this.setCredential(key, value);
+  }
+
+  getApiKeyValue(key: keyof NonNullable<PMKitConfig['credentials']>): string | undefined {
+    return this.getCredential(key);
+  }
+
+  removeApiKey(key: keyof NonNullable<PMKitConfig['credentials']>): void {
+    this.removeCredential(key);
+  }
+
+  getApiKeysStatus() {
+    return this.getCredentialsStatus();
+  }
+
+  getApiKey(): string | undefined {
+    return this.getLLMKey();
+  }
+
   hasRequiredApiKeys(): boolean {
-    return !!this.getApiKey();
+    return this.hasRequiredCredentials();
   }
 
   // ============================================================================
@@ -342,14 +398,17 @@ export class ConfigManager {
 // ============================================================================
 
 /**
- * Mask an API key for display (show first 4 and last 4 chars)
+ * Mask a credential for display (show first 4 and last 4 chars)
  */
-function maskApiKey(key: string): string {
+function maskCredential(key: string): string {
   if (key.length <= 12) {
     return '*'.repeat(key.length);
   }
   return `${key.slice(0, 4)}${'*'.repeat(key.length - 8)}${key.slice(-4)}`;
 }
+
+// Legacy alias
+const maskApiKey = maskCredential;
 
 /**
  * Prompt for user input (async)
@@ -415,44 +474,63 @@ export async function runSetupWizard(): Promise<void> {
   config.setProfile({ userName, tenantName, productName });
   console.log('\n✓ Profile saved!\n');
 
-  // API Key setup
-  console.log('🔑 Now let\'s set up your API keys:\n');
+  // Credential setup
+  console.log('🔑 Now let\'s set up your credentials:\n');
+  console.log('pmkit is a BYOK (Bring Your Own Key) platform.');
+  console.log('You provide your own API keys - they\'re stored locally.\n');
 
   // OpenAI (required)
-  console.log('OpenAI API Key is required to generate AI-powered content.');
-  console.log('Get one at: https://platform.openai.com/api-keys\n');
+  console.log('🤖 OpenAI API Key is required to generate AI-powered content.');
+  console.log('   Get one at: https://platform.openai.com/api-keys\n');
 
   const openaiKey = await promptSecret('Enter your OpenAI API Key (starts with sk-)');
   if (openaiKey) {
-    config.setApiKey('openai', openaiKey);
+    config.setCredential('openai', openaiKey);
     console.log('✓ OpenAI API Key saved!\n');
   } else {
     console.log('⚠ No OpenAI key provided. pmkit will use stub responses.\n');
   }
 
-  // Optional keys
-  console.log('Optional: Set up additional API keys for more features?\n');
-  const setupMore = await prompt('Set up crawler/integration keys? (y/N)', 'n');
+  // Optional: Set up more credentials
+  console.log('Would you like to set up additional credentials?\n');
+  const setupMore = await prompt('Set up crawlers, integrations, or data connectors? (y/N)', 'n');
 
   if (setupMore.toLowerCase() === 'y') {
-    console.log('\n📡 AI Crawlers (for web/news research):\n');
+    // Crawlers
+    console.log('\n🔍 Research Crawlers (for competitor/market research):\n');
 
-    const serperKey = await promptSecret('Serper API Key (web search, https://serper.dev) - press Enter to skip');
-    if (serperKey) config.setApiKey('serper', serperKey);
+    const serperKey = await promptSecret('Serper API Key (web search) - press Enter to skip');
+    if (serperKey) config.setCredential('serper', serperKey);
 
-    const newsapiKey = await promptSecret('NewsAPI Key (news, https://newsapi.org) - press Enter to skip');
-    if (newsapiKey) config.setApiKey('newsapi', newsapiKey);
+    const newsapiKey = await promptSecret('NewsAPI Key (news) - press Enter to skip');
+    if (newsapiKey) config.setCredential('newsapi', newsapiKey);
 
-    console.log('\n🔗 Integrations:\n');
+    // Integrations
+    console.log('\n🔗 Integrations (PM tools):\n');
 
-    const linearKey = await promptSecret('Linear API Key (https://linear.app/settings/api) - press Enter to skip');
-    if (linearKey) config.setApiKey('linear', linearKey);
+    const linearKey = await promptSecret('Linear API Key - press Enter to skip');
+    if (linearKey) config.setCredential('linear', linearKey);
 
-    const notionKey = await promptSecret('Notion Integration Token (https://notion.so/my-integrations) - press Enter to skip');
-    if (notionKey) config.setApiKey('notion', notionKey);
+    const notionKey = await promptSecret('Notion Integration Token - press Enter to skip');
+    if (notionKey) config.setCredential('notion', notionKey);
 
     const figmaKey = await promptSecret('Figma Access Token - press Enter to skip');
-    if (figmaKey) config.setApiKey('figma', figmaKey);
+    if (figmaKey) config.setCredential('figma', figmaKey);
+
+    // Data connectors
+    console.log('\n📊 Data Connectors (for daily briefs, etc.):\n');
+
+    const slackKey = await promptSecret('Slack Bot Token - press Enter to skip');
+    if (slackKey) config.setCredential('slack', slackKey);
+
+    const jiraKey = await promptSecret('Jira API Token - press Enter to skip');
+    if (jiraKey) {
+      config.setCredential('jira', jiraKey);
+      const jiraEmail = await prompt('Jira Email');
+      if (jiraEmail) config.setCredential('jiraEmail', jiraEmail);
+      const jiraUrl = await prompt('Jira URL (e.g., https://yourcompany.atlassian.net)');
+      if (jiraUrl) config.setCredential('jiraUrl', jiraUrl);
+    }
   }
 
   // Summary
@@ -462,59 +540,73 @@ export async function runSetupWizard(): Promise<void> {
 
   console.log('Your configuration has been saved to: ~/.pmkit/config.json\n');
   console.log('You can now run workflows:\n');
-  console.log('  pmkit list              # See available workflows');
-  console.log('  pmkit run daily-brief   # Run a workflow');
-  console.log('  pmkit config            # Manage settings\n');
+  console.log('  pmkit list                    # See available workflows');
+  console.log('  pmkit run daily-brief         # Run a workflow');
+  console.log('  pmkit settings                # View/edit all settings\n');
 
-  const status = config.getApiKeysStatus();
+  const status = config.getCredentialsStatus();
   const configured = status.filter(s => s.configured);
 
-  console.log(`API Keys configured: ${configured.length}/${status.length}`);
+  console.log(`Credentials configured: ${configured.length}/${status.length}`);
   configured.forEach(k => {
-    console.log(`  ✓ ${k.name}: ${k.maskedValue}`);
+    console.log(`  ${k.emoji} ${k.name}: ${k.maskedValue}`);
   });
 
-  console.log('');
+  console.log('\nTo add more credentials later: pmkit settings\n');
 }
 
 /**
- * Display current settings
+ * Display current settings (unified view)
  */
 export function showSettings(): void {
   const config = configManager;
   const profile = config.getProfile();
-  const apiKeys = config.getApiKeysStatus();
+  const credentials = config.getCredentialsStatus();
 
+  console.log('\n' + '='.repeat(60));
+  console.log('  pmkit Settings');
+  console.log('='.repeat(60));
+
+  // Profile
   console.log('\n📋 Profile:\n');
   console.log(`  Name:    ${profile.userName}`);
   console.log(`  Company: ${profile.tenantName}`);
   console.log(`  Product: ${profile.productName}`);
 
-  console.log('\n🔑 API Keys:\n');
+  // Credentials by category
+  console.log('\n🔑 Credentials:\n');
 
-  const categories = ['llm', 'crawler', 'integration'] as const;
-  const categoryNames = {
-    llm: 'LLM Providers',
-    crawler: 'AI Crawlers',
-    integration: 'Integrations',
-  };
+  const categories: CredentialCategory[] = ['ai', 'crawler', 'integration', 'connector'];
 
   for (const category of categories) {
-    const keys = apiKeys.filter(k => k.category === category);
-    console.log(`  ${categoryNames[category]}:`);
-    for (const key of keys) {
-      const status = key.configured ? '✓' : '○';
-      const required = key.required ? ' (required)' : '';
-      console.log(`    ${status} ${key.name}: ${key.maskedValue}${required}`);
+    const categoryCredentials = credentials.filter(c => c.category === category);
+    const configuredCount = categoryCredentials.filter(c => c.configured).length;
+    const categoryName = CREDENTIAL_CATEGORY_NAMES[category];
+
+    console.log(`  ${categoryName} (${configuredCount}/${categoryCredentials.length} configured):`);
+
+    for (const cred of categoryCredentials) {
+      const status = cred.configured ? '✓' : '○';
+      const required = cred.required ? ' (required)' : '';
+      console.log(`    ${status} ${cred.emoji} ${cred.name.padEnd(18)} ${cred.maskedValue}${required}`);
     }
     console.log('');
   }
 
-  console.log('⚙️  Settings:\n');
+  // General settings
+  console.log('⚙️  General Settings:\n');
   console.log(`  Output directory: ${config.getConfig().outputDir}`);
   console.log(`  LLM Provider:     ${config.getConfig().llmProvider}`);
   console.log(`  Use stubs:        ${config.shouldUseStubs()}`);
   console.log(`  Config file:      ${CONFIG_FILE}`);
+
+  // Help
+  console.log('\n💡 Commands:\n');
+  console.log('  pmkit settings set <key> <value>    # Set a credential');
+  console.log('  pmkit settings remove <key>         # Remove a credential');
+  console.log('  pmkit settings list                 # List all credentials');
+  console.log('  pmkit settings profile              # View/update profile');
+  console.log('  pmkit settings reset                # Reset all settings');
   console.log('');
 }
 

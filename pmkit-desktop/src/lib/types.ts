@@ -177,25 +177,27 @@ export interface PMKitConfig {
   llmModel?: string;
   useStubs: boolean;
 
-  // Tenant settings (your company/product info)
+  // User profile (your info)
   tenantId: string;
   tenantName: string;
   productName: string;
   userName: string;
 
-  // API Keys (stored securely in config)
-  apiKeys?: {
-    // LLM Providers
+  // All credentials in one place (BYOK - Bring Your Own Key)
+  // Each user manages their own keys - not shared across tenants
+  credentials?: {
+    // AI / LLM Providers
     openai?: string;
     anthropic?: string;
     google?: string;
 
     // AI Crawlers
-    serper?: string;       // Web search (serper.dev)
-    newsapi?: string;      // News (newsapi.org)
-    gnews?: string;        // News alternative (gnews.io)
+    serper?: string;
+    newsapi?: string;
+    gnews?: string;
 
-    // Integrations
+    // Integrations - all use simple token/key auth
+    // Users get these from each service's settings page
     figma?: string;
     loom?: string;
     coda?: string;
@@ -206,32 +208,21 @@ export interface PMKitConfig {
     linear?: string;
     notion?: string;
     zoom?: string;
-  };
 
-  // Connector credentials (for authenticated data sources)
-  connectors?: {
-    slack?: {
-      accessToken: string;
-    };
-    jira?: {
-      baseUrl: string;
-      email: string;
-      apiToken: string;
-    };
-    google?: {
-      accessToken: string;
-      refreshToken: string;
-    };
-    zendesk?: {
-      subdomain: string;
-      email: string;
-      apiToken: string;
-    };
-    confluence?: {
-      baseUrl: string;
-      email: string;
-      apiToken: string;
-    };
+    // Data source connectors
+    slack?: string;
+    jira?: string;
+    jiraEmail?: string;
+    jiraUrl?: string;
+    confluence?: string;
+    confluenceEmail?: string;
+    confluenceUrl?: string;
+    gmail?: string;
+    googleCalendar?: string;
+    googleDrive?: string;
+    zendesk?: string;
+    zendeskEmail?: string;
+    zendeskSubdomain?: string;
   };
 
   // Scheduler settings
@@ -243,126 +234,245 @@ export interface PMKitConfig {
       schedule?: string; // Override default schedule
     }>>;
   };
+
+  // Legacy - for backwards compatibility only
+  apiKeys?: PMKitConfig['credentials'];
+  connectors?: Record<string, unknown>;
 }
 
-// API Key metadata for the settings UI
-export interface ApiKeyInfo {
-  key: keyof NonNullable<PMKitConfig['apiKeys']>;
+// ============================================================================
+// Credential Definitions (for Settings UI)
+// ============================================================================
+
+export type CredentialCategory = 'ai' | 'crawler' | 'integration' | 'connector';
+
+export interface CredentialInfo {
+  key: keyof NonNullable<PMKitConfig['credentials']>;
   name: string;
   description: string;
-  url: string;
+  helpUrl: string;
   required: boolean;
-  category: 'llm' | 'crawler' | 'integration';
+  category: CredentialCategory;
+  emoji: string;
+  // For credentials that need multiple fields (e.g., Jira needs URL + email + token)
+  relatedKeys?: Array<keyof NonNullable<PMKitConfig['credentials']>>;
 }
 
-export const API_KEY_INFO: ApiKeyInfo[] = [
-  // LLM Providers
+export const CREDENTIALS: CredentialInfo[] = [
+  // ============================================================================
+  // AI / LLM Providers
+  // ============================================================================
   {
     key: 'openai',
-    name: 'OpenAI API Key',
-    description: 'Required for generating AI-powered content',
-    url: 'https://platform.openai.com/api-keys',
+    name: 'OpenAI',
+    description: 'Powers AI content generation (GPT-4, etc.)',
+    helpUrl: 'https://platform.openai.com/api-keys',
     required: true,
-    category: 'llm',
+    category: 'ai',
+    emoji: '🤖',
   },
   {
     key: 'anthropic',
-    name: 'Anthropic API Key',
-    description: 'Alternative LLM provider (Claude)',
-    url: 'https://console.anthropic.com/settings/keys',
+    name: 'Anthropic',
+    description: 'Alternative AI provider (Claude)',
+    helpUrl: 'https://console.anthropic.com/settings/keys',
     required: false,
-    category: 'llm',
+    category: 'ai',
+    emoji: '🧠',
   },
 
+  // ============================================================================
   // AI Crawlers
+  // ============================================================================
   {
     key: 'serper',
-    name: 'Serper API Key',
+    name: 'Serper',
     description: 'Web search for competitor research (2,500 free/month)',
-    url: 'https://serper.dev',
+    helpUrl: 'https://serper.dev',
     required: false,
     category: 'crawler',
+    emoji: '🔍',
   },
   {
     key: 'newsapi',
-    name: 'NewsAPI Key',
+    name: 'NewsAPI',
     description: 'News crawler for industry updates (100 free/day)',
-    url: 'https://newsapi.org/register',
+    helpUrl: 'https://newsapi.org/register',
     required: false,
     category: 'crawler',
+    emoji: '📰',
   },
   {
     key: 'gnews',
-    name: 'GNews API Key',
+    name: 'GNews',
     description: 'Alternative news source (600 free/day)',
-    url: 'https://gnews.io',
+    helpUrl: 'https://gnews.io',
     required: false,
     category: 'crawler',
+    emoji: '📰',
   },
 
-  // Integrations
-  {
-    key: 'figma',
-    name: 'Figma Access Token',
-    description: 'Access design files and comments',
-    url: 'https://www.figma.com/developers/api#access-tokens',
-    required: false,
-    category: 'integration',
-  },
-  {
-    key: 'loom',
-    name: 'Loom API Key',
-    description: 'Access video recordings',
-    url: 'https://dev.loom.com',
-    required: false,
-    category: 'integration',
-  },
-  {
-    key: 'coda',
-    name: 'Coda API Key',
-    description: 'Access docs and tables',
-    url: 'https://coda.io/developers/apis/v1',
-    required: false,
-    category: 'integration',
-  },
+  // ============================================================================
+  // Integrations (PM Tools)
+  // ============================================================================
   {
     key: 'linear',
-    name: 'Linear API Key',
-    description: 'Access issues and projects',
-    url: 'https://linear.app/settings/api',
+    name: 'Linear',
+    description: 'Issue tracking and project management',
+    helpUrl: 'https://linear.app/settings/api',
     required: false,
     category: 'integration',
+    emoji: '📋',
   },
   {
     key: 'notion',
-    name: 'Notion Integration Token',
-    description: 'Access pages and databases',
-    url: 'https://www.notion.so/my-integrations',
+    name: 'Notion',
+    description: 'Pages, databases, and docs',
+    helpUrl: 'https://www.notion.so/my-integrations',
     required: false,
     category: 'integration',
+    emoji: '📓',
   },
   {
-    key: 'discourse',
-    name: 'Discourse API Key',
-    description: 'Access community forums',
-    url: 'https://meta.discourse.org/t/create-and-configure-an-api-key/230124',
+    key: 'figma',
+    name: 'Figma',
+    description: 'Design files and comments',
+    helpUrl: 'https://www.figma.com/developers/api#access-tokens',
     required: false,
     category: 'integration',
+    emoji: '🎨',
+  },
+  {
+    key: 'coda',
+    name: 'Coda',
+    description: 'Docs and tables',
+    helpUrl: 'https://coda.io/developers/apis/v1',
+    required: false,
+    category: 'integration',
+    emoji: '📝',
+  },
+  {
+    key: 'loom',
+    name: 'Loom',
+    description: 'Video recordings and transcripts',
+    helpUrl: 'https://dev.loom.com',
+    required: false,
+    category: 'integration',
+    emoji: '🎬',
   },
   {
     key: 'amplitude',
-    name: 'Amplitude API Key',
-    description: 'Access product analytics',
-    url: 'https://help.amplitude.com/hc/en-us/articles/360058073772',
+    name: 'Amplitude',
+    description: 'Product analytics',
+    helpUrl: 'https://help.amplitude.com/hc/en-us/articles/360058073772',
     required: false,
     category: 'integration',
+    emoji: '📊',
+    relatedKeys: ['amplitudeSecret'],
+  },
+  {
+    key: 'discourse',
+    name: 'Discourse',
+    description: 'Community forums',
+    helpUrl: 'https://meta.discourse.org/t/create-and-configure-an-api-key/230124',
+    required: false,
+    category: 'integration',
+    emoji: '💬',
+    relatedKeys: ['discourseUrl'],
   },
   {
     key: 'zoom',
-    name: 'Zoom Access Token',
-    description: 'Access meetings and recordings',
-    url: 'https://marketplace.zoom.us/docs/guides/build/oauth-app',
+    name: 'Zoom',
+    description: 'Meetings and recordings',
+    helpUrl: 'https://marketplace.zoom.us/docs/guides/build/oauth-app',
     required: false,
     category: 'integration',
+    emoji: '🎥',
+  },
+
+  // ============================================================================
+  // Data Source Connectors
+  // ============================================================================
+  {
+    key: 'slack',
+    name: 'Slack',
+    description: 'Team messages and channels',
+    helpUrl: 'https://api.slack.com/apps',
+    required: false,
+    category: 'connector',
+    emoji: '💬',
+  },
+  {
+    key: 'jira',
+    name: 'Jira',
+    description: 'Issues and sprints',
+    helpUrl: 'https://id.atlassian.com/manage-profile/security/api-tokens',
+    required: false,
+    category: 'connector',
+    emoji: '🎯',
+    relatedKeys: ['jiraEmail', 'jiraUrl'],
+  },
+  {
+    key: 'confluence',
+    name: 'Confluence',
+    description: 'Wiki pages and spaces',
+    helpUrl: 'https://id.atlassian.com/manage-profile/security/api-tokens',
+    required: false,
+    category: 'connector',
+    emoji: '📚',
+    relatedKeys: ['confluenceEmail', 'confluenceUrl'],
+  },
+  {
+    key: 'gmail',
+    name: 'Gmail',
+    description: 'Email threads',
+    helpUrl: 'https://console.cloud.google.com/apis/credentials',
+    required: false,
+    category: 'connector',
+    emoji: '📧',
+  },
+  {
+    key: 'googleCalendar',
+    name: 'Google Calendar',
+    description: 'Meeting schedules',
+    helpUrl: 'https://console.cloud.google.com/apis/credentials',
+    required: false,
+    category: 'connector',
+    emoji: '📅',
+  },
+  {
+    key: 'googleDrive',
+    name: 'Google Drive',
+    description: 'Documents and files',
+    helpUrl: 'https://console.cloud.google.com/apis/credentials',
+    required: false,
+    category: 'connector',
+    emoji: '📁',
+  },
+  {
+    key: 'zendesk',
+    name: 'Zendesk',
+    description: 'Support tickets',
+    helpUrl: 'https://support.zendesk.com/hc/en-us/articles/4408889192858',
+    required: false,
+    category: 'connector',
+    emoji: '🎫',
+    relatedKeys: ['zendeskEmail', 'zendeskSubdomain'],
   },
 ];
+
+// Helper to get credentials by category
+export function getCredentialsByCategory(category: CredentialCategory): CredentialInfo[] {
+  return CREDENTIALS.filter(c => c.category === category);
+}
+
+// Category display names
+export const CREDENTIAL_CATEGORY_NAMES: Record<CredentialCategory, string> = {
+  ai: 'AI Providers',
+  crawler: 'Research Crawlers',
+  integration: 'Integrations',
+  connector: 'Data Connectors',
+};
+
+// Legacy export for backwards compatibility
+export const API_KEY_INFO = CREDENTIALS;

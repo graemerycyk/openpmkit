@@ -6,7 +6,7 @@
  *   pmkit setup              # First-time setup wizard
  *   pmkit run <workflow>     # Run a workflow
  *   pmkit list               # List all workflows
- *   pmkit config             # Manage settings
+ *   pmkit settings           # Manage credentials & settings (BYOK)
  *   pmkit scheduler start    # Start autonomous scheduler
  */
 
@@ -14,8 +14,8 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import * as fs from 'fs';
-import type { WorkflowId } from '../lib/types.js';
-import { WORKFLOWS, API_KEY_INFO } from '../lib/types.js';
+import type { WorkflowId, CredentialCategory } from '../lib/types.js';
+import { WORKFLOWS, CREDENTIALS, CREDENTIAL_CATEGORY_NAMES } from '../lib/types.js';
 import { PMKitStorage } from '../lib/storage.js';
 import { configManager, runSetupWizard, showSettings } from '../lib/config.js';
 import { WorkflowRunner } from '../lib/runner.js';
@@ -344,88 +344,93 @@ program
   });
 
 // ============================================================================
-// Config Command (Settings Management)
+// Settings Command (Unified BYOK Credential Management)
 // ============================================================================
 
-const configCmd = program
-  .command('config')
-  .description('Manage pmkit settings and API keys');
+const settingsCmd = program
+  .command('settings')
+  .description('Manage credentials and settings (BYOK - Bring Your Own Key)');
 
 // Default action: show settings
-configCmd
+settingsCmd
   .action(() => {
     showSettings();
   });
 
 // Show all settings
-configCmd
+settingsCmd
   .command('show')
-  .description('Show all settings')
+  .description('Show all settings and credentials')
   .action(() => {
     showSettings();
   });
 
-// Set an API key
-configCmd
-  .command('set-key <name> <value>')
-  .description('Set an API key (e.g., openai, serper, linear)')
+// Set a credential (API key, token, etc.)
+settingsCmd
+  .command('set <name> <value>')
+  .description('Set a credential (e.g., openai, linear, slack)')
   .action((name: string, value: string) => {
-    const validKeys = API_KEY_INFO.map(k => k.key);
+    const validKeys = CREDENTIALS.map(k => k.key);
     if (!validKeys.includes(name as any)) {
-      console.error(chalk.red(`\nUnknown API key: ${name}`));
-      console.log(chalk.gray(`\nValid keys: ${validKeys.join(', ')}\n`));
+      console.error(chalk.red(`\nUnknown credential: ${name}`));
+      console.log(chalk.gray(`\nValid credentials:\n`));
+
+      const categories: CredentialCategory[] = ['ai', 'crawler', 'integration', 'connector'];
+      for (const category of categories) {
+        const categoryCredentials = CREDENTIALS.filter(c => c.category === category);
+        console.log(chalk.cyan(`  ${CREDENTIAL_CATEGORY_NAMES[category]}:`));
+        console.log(chalk.gray(`    ${categoryCredentials.map(c => c.key).join(', ')}\n`));
+      }
       process.exit(1);
     }
 
-    configManager.setApiKey(name as any, value);
-    console.log(chalk.green(`\n✓ ${name} API key saved\n`));
+    configManager.setCredential(name as any, value);
+    const credential = CREDENTIALS.find(c => c.key === name);
+    console.log(chalk.green(`\n✓ ${credential?.emoji || ''} ${credential?.name || name} saved\n`));
   });
 
-// Remove an API key
-configCmd
-  .command('remove-key <name>')
-  .description('Remove an API key')
+// Remove a credential
+settingsCmd
+  .command('remove <name>')
+  .description('Remove a credential')
   .action((name: string) => {
-    configManager.removeApiKey(name as any);
-    console.log(chalk.yellow(`\n✓ ${name} API key removed\n`));
+    configManager.removeCredential(name as any);
+    console.log(chalk.yellow(`\n✓ ${name} removed\n`));
   });
 
-// List API keys
-configCmd
-  .command('keys')
-  .description('List all API keys and their status')
+// List all credentials with status
+settingsCmd
+  .command('list')
+  .description('List all credentials and their status')
   .action(() => {
-    const keys = configManager.getApiKeysStatus();
+    const credentials = configManager.getCredentialsStatus();
 
-    console.log(chalk.bold('\n🔑 API Keys\n'));
+    console.log(chalk.bold('\n🔑 All Credentials (BYOK - Bring Your Own Key)\n'));
 
-    const categories = ['llm', 'crawler', 'integration'] as const;
-    const categoryNames = {
-      llm: 'LLM Providers',
-      crawler: 'AI Crawlers',
-      integration: 'Integrations',
-    };
+    const categories: CredentialCategory[] = ['ai', 'crawler', 'integration', 'connector'];
 
     for (const category of categories) {
-      const categoryKeys = keys.filter(k => k.category === category);
-      console.log(chalk.cyan(`  ${categoryNames[category]}:`));
+      const categoryCredentials = credentials.filter(c => c.category === category);
+      const configuredCount = categoryCredentials.filter(c => c.configured).length;
 
-      for (const key of categoryKeys) {
-        const status = key.configured ? chalk.green('✓') : chalk.gray('○');
-        const required = key.required ? chalk.yellow(' (required)') : '';
-        console.log(`    ${status} ${key.name.padEnd(25)} ${key.maskedValue}${required}`);
+      console.log(chalk.cyan(`  ${CREDENTIAL_CATEGORY_NAMES[category]} (${configuredCount}/${categoryCredentials.length}):`));
+
+      for (const cred of categoryCredentials) {
+        const status = cred.configured ? chalk.green('✓') : chalk.gray('○');
+        const required = cred.required ? chalk.yellow(' (required)') : '';
+        console.log(`    ${status} ${cred.emoji} ${cred.name.padEnd(20)} ${cred.maskedValue}${required}`);
       }
       console.log('');
     }
 
-    console.log(chalk.gray('  Set a key: pmkit config set-key <name> <value>'));
-    console.log(chalk.gray('  Example:   pmkit config set-key openai sk-...\n'));
+    console.log(chalk.gray('  Set a credential:    pmkit settings set <name> <value>'));
+    console.log(chalk.gray('  Example:             pmkit settings set openai sk-...\n'));
   });
 
 // Set profile
-configCmd
-  .command('set-profile')
-  .description('Update your profile information')
+settingsCmd
+  .command('profile')
+  .description('View or update your profile information')
   .option('--name <name>', 'Your name')
   .option('--company <company>', 'Your company name')
   .option('--product <product>', 'Your product name')
@@ -454,8 +459,8 @@ configCmd
   });
 
 // Toggle stubs
-configCmd
-  .command('use-stubs <enabled>')
+settingsCmd
+  .command('stubs <enabled>')
   .description('Enable or disable stub responses (true/false)')
   .action((enabled: string) => {
     const useStubs = enabled === 'true';
@@ -464,16 +469,16 @@ configCmd
   });
 
 // Set output directory
-configCmd
-  .command('output-dir <path>')
+settingsCmd
+  .command('output <path>')
   .description('Set the output directory for workflow results')
-  .action((path: string) => {
-    configManager.updateConfig({ outputDir: path });
-    console.log(chalk.green(`\n✓ Output directory set to: ${path}\n`));
+  .action((dirPath: string) => {
+    configManager.updateConfig({ outputDir: dirPath });
+    console.log(chalk.green(`\n✓ Output directory set to: ${dirPath}\n`));
   });
 
-// Reset config
-configCmd
+// Reset settings
+settingsCmd
   .command('reset')
   .description('Reset all settings to defaults')
   .action(async () => {
@@ -488,8 +493,8 @@ configCmd
       if (answer.toLowerCase() === 'y') {
         // Delete the config file
         const os = require('os');
-        const path = require('path');
-        const configPath = path.join(os.homedir(), '.pmkit', 'config.json');
+        const pathModule = require('path');
+        const configPath = pathModule.join(os.homedir(), '.pmkit', 'config.json');
         if (fs.existsSync(configPath)) {
           fs.unlinkSync(configPath);
         }
@@ -498,6 +503,15 @@ configCmd
         console.log(chalk.gray('\nReset cancelled.\n'));
       }
     });
+  });
+
+// Legacy alias for 'config' command (backwards compatibility)
+program
+  .command('config')
+  .description('Alias for "settings" command')
+  .action(() => {
+    console.log(chalk.yellow('\n💡 Tip: Use "pmkit settings" instead of "pmkit config"\n'));
+    showSettings();
   });
 
 // ============================================================================
