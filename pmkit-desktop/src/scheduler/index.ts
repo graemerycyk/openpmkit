@@ -1,5 +1,5 @@
 /**
- * Autonomous scheduler for pmkit-desktop
+ * Autonomous scheduler for openpmkit-desktop
  *
  * Runs workflows on cron-like schedules for fully autonomous operation.
  */
@@ -30,7 +30,7 @@ export function startScheduler(): void {
 
   const scheduledWorkflows = configManager.getScheduledWorkflows();
 
-  console.log(chalk.bold('pmkit Scheduler Starting\n'));
+  console.log(chalk.bold('openpmkit Scheduler Starting\n'));
   console.log(chalk.gray('─'.repeat(50)));
   console.log(`Timezone: ${config.scheduler?.timezone || 'system default'}`);
   console.log(`Output:   ${config.outputDir}`);
@@ -106,7 +106,7 @@ export function startScheduler(): void {
 
   if (activeCount === 0) {
     console.log(chalk.yellow('No workflows are enabled for scheduling.'));
-    console.log(chalk.gray('Enable workflows with: pmkit scheduler enable <workflow>\n'));
+    console.log(chalk.gray('Enable workflows with: openpmkit scheduler enable <workflow>\n'));
     return;
   }
 

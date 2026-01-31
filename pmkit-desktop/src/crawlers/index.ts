@@ -1,7 +1,7 @@
 /**
- * AI Crawlers for pmkit-desktop
+ * AI Crawlers for openpmkit-desktop
  *
- * Re-exports @pmkit/core crawlers with extensions:
+ * Re-exports @openpmkit/core crawlers with extensions:
  * - Extended Social Crawler (X, LinkedIn, Discord, Bluesky, Threads)
  * - Web Search Crawler (Serper/Google, DuckDuckGo)
  * - News Crawler (NewsAPI, GNews, Google News RSS)
@@ -20,7 +20,7 @@ export {
   type WebSearchCrawlerInput,
   type NewsCrawlerInput,
   type UrlScrapeCrawlerInput,
-} from '@pmkit/core';
+} from '@openpmkit/core';
 
 // Export extended social crawler
 export {
@@ -38,12 +38,12 @@ import type {
   WebSearchCrawlerInput,
   NewsCrawlerInput,
   UrlScrapeCrawlerInput,
-} from '@pmkit/core';
+} from '@openpmkit/core';
 import {
   runWebSearchCrawler,
   runNewsCrawler,
   runUrlScrapeCrawler,
-} from '@pmkit/core';
+} from '@openpmkit/core';
 import { runExtendedSocialCrawler, type ExtendedSocialCrawlerInput } from './social.js';
 
 export type CrawlerType = 'social' | 'web_search' | 'news' | 'url_scrape';
@@ -108,7 +108,7 @@ export async function runCrawler(input: CrawlerRunInput): Promise<CrawlerRespons
 // Crawler Analysis with LLM
 // ============================================================================
 
-import { CRAWLER_ANALYSIS_PROMPTS } from '@pmkit/prompts';
+import { CRAWLER_ANALYSIS_PROMPTS } from '@openpmkit/prompts';
 
 export interface CrawlerAnalysisInput {
   results: CrawlerResponse;

@@ -1,7 +1,7 @@
 /**
- * Extended Social Crawler for pmkit-desktop
+ * Extended Social Crawler for openpmkit-desktop
  *
- * Extends @pmkit/core social crawler with additional platforms:
+ * Extends @openpmkit/core social crawler with additional platforms:
  * - X (Twitter) - via search API or nitter scraping
  * - LinkedIn - via search (limited)
  * - Discord - via public server search
@@ -13,8 +13,8 @@
  * - Hacker News (Algolia API)
  */
 
-import type { CrawlerResult, CrawlerResponse } from '@pmkit/core';
-import { runSocialCrawler as runCoreSocialCrawler } from '@pmkit/core';
+import type { CrawlerResult, CrawlerResponse } from '@openpmkit/core';
+import { runSocialCrawler as runCoreSocialCrawler } from '@openpmkit/core';
 
 // ============================================================================
 // Extended Social Platform Types
@@ -72,7 +72,7 @@ async function searchX(
       const url = `https://${instance}/search?f=tweets&q=${query}`;
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; pmkit-crawler/1.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; openpmkit-crawler/1.0)',
           Accept: 'text/html',
         },
       });
@@ -213,7 +213,7 @@ async function searchLinkedIn(
     const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; pmkit-crawler/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; openpmkit-crawler/1.0)',
       },
     });
 
@@ -276,7 +276,7 @@ async function searchDiscord(
     const url = `https://discordservers.com/search?query=${encodeURIComponent(query)}`;
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; pmkit-crawler/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; openpmkit-crawler/1.0)',
       },
     });
 
@@ -339,7 +339,7 @@ async function searchThreads(
     const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; pmkit-crawler/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; openpmkit-crawler/1.0)',
       },
     });
 

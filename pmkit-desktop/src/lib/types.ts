@@ -1,5 +1,5 @@
 /**
- * Core types for pmkit-desktop
+ * Core types for openpmkit
  */
 
 export type WorkflowId =

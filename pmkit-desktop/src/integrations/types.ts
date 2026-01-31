@@ -1,5 +1,5 @@
 /**
- * Integration Types for pmkit-desktop
+ * Integration Types for openpmkit-desktop
  */
 
 export type IntegrationStatus = 'connected' | 'not_connected' | 'coming_soon' | 'error' | 'not_found';

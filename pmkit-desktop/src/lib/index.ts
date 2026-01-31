@@ -1,5 +1,5 @@
 /**
- * pmkit-desktop library exports
+ * openpmkit-desktop library exports
  */
 
 export * from './types.js';

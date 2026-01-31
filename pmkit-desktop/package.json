@@ -1,11 +1,11 @@
 {
-  "name": "pmkit-desktop",
+  "name": "openpmkit",
   "version": "1.0.0",
-  "description": "PM-focused AI assistant desktop app - 10 autonomous workflows for Product Managers",
+  "description": "Open-source PM-focused AI assistant - 10 autonomous workflows for Product Managers",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "pmkit": "./dist/cli/index.js"
+    "openpmkit": "./dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",

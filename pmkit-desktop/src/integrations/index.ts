@@ -1,7 +1,7 @@
 /**
- * MVP Integrations for pmkit-desktop
+ * MVP Integrations for openpmkit-desktop
  *
- * These integrations connect pmkit to external tools:
+ * These integrations connect openpmkit to external tools:
  * - Figma: Generate prototypes from PRDs
  * - Loom: Extract insights from video transcripts
  * - Coda: Access docs and tables

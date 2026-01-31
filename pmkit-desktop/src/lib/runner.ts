@@ -1,16 +1,16 @@
 /**
- * Workflow runner for pmkit-desktop
+ * Workflow runner for openpmkit-desktop
  *
- * Executes PM workflows using pmkit prompts and fetchers
+ * Executes PM workflows using openpmkit prompts and fetchers
  */
 
-import type { JobType } from '@pmkit/core';
+import type { JobType } from '@openpmkit/core';
 import {
   type PromptContext,
   PROMPT_TEMPLATES,
   renderPrompt,
   generateStubResponse,
-} from '@pmkit/prompts';
+} from '@openpmkit/prompts';
 import type {
   WorkflowId,
   WorkflowRunInput,

@@ -1,8 +1,8 @@
 /**
- * Configuration management for pmkit-desktop
+ * Configuration management for openpmkit-desktop
  *
  * User-friendly settings system that stores all credentials and preferences
- * in ~/.pmkit/config.json instead of requiring .env files.
+ * in ~/.openpmkit/config.json instead of requiring .env files.
  *
  * This is a BYOK (Bring Your Own Key) platform - each user manages their own
  * API keys and tokens for all services (AI, crawlers, integrations, connectors).
@@ -15,9 +15,9 @@ import * as readline from 'readline';
 import type { PMKitConfig, WorkflowId, CredentialInfo, CredentialCategory } from './types.js';
 import { WORKFLOWS, CREDENTIALS, CREDENTIAL_CATEGORY_NAMES, getCredentialsByCategory } from './types.js';
 
-const CONFIG_DIR = path.join(os.homedir(), '.pmkit');
+const CONFIG_DIR = path.join(os.homedir(), '.openopenpmkit');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
-const DEFAULT_OUTPUT_DIR = path.join(os.homedir(), 'pmkit');
+const DEFAULT_OUTPUT_DIR = path.join(os.homedir(), 'openopenpmkit');
 
 const DEFAULT_CONFIG: PMKitConfig = {
   outputDir: DEFAULT_OUTPUT_DIR,
@@ -461,7 +461,7 @@ export async function runSetupWizard(): Promise<void> {
   const config = configManager;
 
   console.log('\n' + '='.repeat(60));
-  console.log('  Welcome to pmkit! Let\'s set up your configuration.');
+  console.log('  Welcome to openpmkit! Let\'s set up your configuration.');
   console.log('='.repeat(60) + '\n');
 
   // Profile setup
@@ -476,7 +476,7 @@ export async function runSetupWizard(): Promise<void> {
 
   // Credential setup
   console.log('🔑 Now let\'s set up your credentials:\n');
-  console.log('pmkit is a BYOK (Bring Your Own Key) platform.');
+  console.log('openpmkit is a BYOK (Bring Your Own Key) platform.');
   console.log('You provide your own API keys - they\'re stored locally.\n');
 
   // OpenAI (required)
@@ -488,7 +488,7 @@ export async function runSetupWizard(): Promise<void> {
     config.setCredential('openai', openaiKey);
     console.log('✓ OpenAI API Key saved!\n');
   } else {
-    console.log('⚠ No OpenAI key provided. pmkit will use stub responses.\n');
+    console.log('⚠ No OpenAI key provided. openpmkit will use stub responses.\n');
   }
 
   // Optional: Set up more credentials
@@ -538,11 +538,11 @@ export async function runSetupWizard(): Promise<void> {
   console.log('  Setup Complete!');
   console.log('='.repeat(60) + '\n');
 
-  console.log('Your configuration has been saved to: ~/.pmkit/config.json\n');
+  console.log('Your configuration has been saved to: ~/.openpmkit/config.json\n');
   console.log('You can now run workflows:\n');
-  console.log('  pmkit list                    # See available workflows');
-  console.log('  pmkit run daily-brief         # Run a workflow');
-  console.log('  pmkit settings                # View/edit all settings\n');
+  console.log('  openpmkit list                    # See available workflows');
+  console.log('  openpmkit run daily-brief         # Run a workflow');
+  console.log('  openpmkit settings                # View/edit all settings\n');
 
   const status = config.getCredentialsStatus();
   const configured = status.filter(s => s.configured);
@@ -552,7 +552,7 @@ export async function runSetupWizard(): Promise<void> {
     console.log(`  ${k.emoji} ${k.name}: ${k.maskedValue}`);
   });
 
-  console.log('\nTo add more credentials later: pmkit settings\n');
+  console.log('\nTo add more credentials later: openpmkit settings\n');
 }
 
 /**
@@ -564,7 +564,7 @@ export function showSettings(): void {
   const credentials = config.getCredentialsStatus();
 
   console.log('\n' + '='.repeat(60));
-  console.log('  pmkit Settings');
+  console.log('  openpmkit Settings');
   console.log('='.repeat(60));
 
   // Profile
@@ -602,11 +602,11 @@ export function showSettings(): void {
 
   // Help
   console.log('\n💡 Commands:\n');
-  console.log('  pmkit settings set <key> <value>    # Set a credential');
-  console.log('  pmkit settings remove <key>         # Remove a credential');
-  console.log('  pmkit settings list                 # List all credentials');
-  console.log('  pmkit settings profile              # View/update profile');
-  console.log('  pmkit settings reset                # Reset all settings');
+  console.log('  openpmkit settings set <key> <value>    # Set a credential');
+  console.log('  openpmkit settings remove <key>         # Remove a credential');
+  console.log('  openpmkit settings list                 # List all credentials');
+  console.log('  openpmkit settings profile              # View/update profile');
+  console.log('  openpmkit settings reset                # Reset all settings');
   console.log('');
 }
 

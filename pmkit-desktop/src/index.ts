@@ -1,11 +1,11 @@
 /**
- * pmkit-desktop
+ * openpmkit-desktop
  *
  * PM-focused AI assistant - 10 autonomous workflows for Product Managers
  *
  * @example
  * ```typescript
- * import { WorkflowRunner, PMKitStorage, configManager, WORKFLOWS } from 'pmkit-desktop';
+ * import { WorkflowRunner, PMKitStorage, configManager, WORKFLOWS } from 'openpmkit-desktop';
  *
  * const config = configManager.getConfig();
  * const storage = new PMKitStorage({ baseDir: config.outputDir });

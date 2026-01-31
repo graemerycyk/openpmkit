@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * pmkit CLI - Ad-hoc workflow runner for Product Managers
+ * openpmkit CLI - Ad-hoc workflow runner for Product Managers
  *
  * Usage:
- *   pmkit setup              # First-time setup wizard
- *   pmkit run <workflow>     # Run a workflow
- *   pmkit list               # List all workflows
- *   pmkit settings           # Manage credentials & settings (BYOK)
- *   pmkit scheduler start    # Start autonomous scheduler
+ *   openpmkit setup              # First-time setup wizard
+ *   openpmkit run <workflow>     # Run a workflow
+ *   openpmkit list               # List all workflows
+ *   openpmkit settings           # Manage credentials & settings (BYOK)
+ *   openpmkit scheduler start    # Start autonomous scheduler
  */
 
 import { Command } from 'commander';
@@ -39,7 +39,7 @@ program
   });
 
 program
-  .name('pmkit')
+  .name('openpmkit')
   .description('PM-focused AI assistant - 10 autonomous workflows for Product Managers')
   .version('1.0.0');
 
@@ -53,11 +53,11 @@ program
   .action(() => {
     // Check for first run
     if (configManager.isFirstRun()) {
-      console.log(chalk.yellow('\n⚠️  pmkit is not configured yet.'));
-      console.log(chalk.gray('Run "pmkit setup" to configure your API keys and profile.\n'));
+      console.log(chalk.yellow('\n⚠️  openpmkit is not configured yet.'));
+      console.log(chalk.gray('Run "openpmkit setup" to configure your API keys and profile.\n'));
     }
 
-    console.log(chalk.bold('\npmkit Workflows\n'));
+    console.log(chalk.bold('\nopenpmkit Workflows\n'));
 
     const categories = new Map<string, Array<{ id: WorkflowId; config: typeof WORKFLOWS[WorkflowId] }>>();
 
@@ -83,7 +83,7 @@ program
       }
     }
 
-    console.log(chalk.gray('\nRun a workflow: pmkit run <workflow-id> [options]\n'));
+    console.log(chalk.gray('\nRun a workflow: openpmkit run <workflow-id> [options]\n'));
   });
 
 // ============================================================================
@@ -100,7 +100,7 @@ program
     // Validate workflow ID
     if (!WORKFLOWS[workflowId as WorkflowId]) {
       console.error(chalk.red(`\nUnknown workflow: ${workflowId}`));
-      console.log(chalk.gray('Run "pmkit list" to see available workflows.\n'));
+      console.log(chalk.gray('Run "openpmkit list" to see available workflows.\n'));
       process.exit(1);
     }
 
@@ -298,7 +298,7 @@ program
       console.log();
     } else {
       // Show stats for all workflows
-      console.log(chalk.bold('\npmkit Workflow Statistics\n'));
+      console.log(chalk.bold('\nopenpmkit Workflow Statistics\n'));
       console.log(chalk.gray('─'.repeat(70)));
       console.log(
         chalk.gray(
@@ -423,8 +423,8 @@ settingsCmd
       console.log('');
     }
 
-    console.log(chalk.gray('  Set a credential:    pmkit settings set <name> <value>'));
-    console.log(chalk.gray('  Example:             pmkit settings set openai sk-...\n'));
+    console.log(chalk.gray('  Set a credential:    openpmkit settings set <name> <value>'));
+    console.log(chalk.gray('  Example:             openpmkit settings set openai sk-...\n'));
   });
 
 // Set profile
@@ -494,11 +494,11 @@ settingsCmd
         // Delete the config file
         const os = require('os');
         const pathModule = require('path');
-        const configPath = pathModule.join(os.homedir(), '.pmkit', 'config.json');
+        const configPath = pathModule.join(os.homedir(), '.openpmkit', 'config.json');
         if (fs.existsSync(configPath)) {
           fs.unlinkSync(configPath);
         }
-        console.log(chalk.green('\n✓ Settings reset. Run "pmkit setup" to reconfigure.\n'));
+        console.log(chalk.green('\n✓ Settings reset. Run "openpmkit setup" to reconfigure.\n'));
       } else {
         console.log(chalk.gray('\nReset cancelled.\n'));
       }
@@ -510,7 +510,7 @@ program
   .command('config')
   .description('Alias for "settings" command')
   .action(() => {
-    console.log(chalk.yellow('\n💡 Tip: Use "pmkit settings" instead of "pmkit config"\n'));
+    console.log(chalk.yellow('\n💡 Tip: Use "openpmkit settings" instead of "openpmkit config"\n'));
     showSettings();
   });
 
@@ -625,8 +625,8 @@ schedulerCmd
   .command('start')
   .description('Start the scheduler daemon')
   .action(async () => {
-    console.log(chalk.bold('\nStarting pmkit scheduler...\n'));
-    console.log(chalk.gray('Run "pmkit scheduler status" to see scheduled workflows.'));
+    console.log(chalk.bold('\nStarting openpmkit scheduler...\n'));
+    console.log(chalk.gray('Run "openpmkit scheduler status" to see scheduled workflows.'));
     console.log(chalk.gray('Press Ctrl+C to stop.\n'));
 
     // Import and start scheduler

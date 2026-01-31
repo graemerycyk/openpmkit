@@ -1,10 +1,23 @@
-# pmkit-desktop
+# openpmkit
 
-PM-focused AI assistant - 10 autonomous workflows for Product Managers.
+Open-source PM-focused AI assistant - 10 autonomous workflows for Product Managers.
+
+## Quick Start
+
+```bash
+# Install globally
+npm install -g openpmkit@latest
+
+# Run setup wizard
+openpmkit setup
+
+# Run your first workflow
+openpmkit run daily-brief
+```
 
 ## Overview
 
-pmkit-desktop provides 10 PM workflows that can run ad-hoc or on autonomous schedules. All outputs are saved as markdown files with SIEM telemetry for audit and analysis.
+openpmkit provides 10 PM workflows that can run ad-hoc or on autonomous schedules. All outputs are saved as markdown files with SIEM telemetry for audit and analysis.
 
 ## Workflows
 
@@ -23,10 +36,22 @@ pmkit-desktop provides 10 PM workflows that can run ad-hoc or on autonomous sche
 
 ## Installation
 
+### Global Install (recommended)
+
 ```bash
-cd pmkit-desktop
+npm install -g openpmkit@latest
+# or
+pnpm add -g openpmkit@latest
+```
+
+### From Source
+
+```bash
+git clone https://github.com/openpmkit/openpmkit.git
+cd openpmkit/pmkit-desktop
 npm install
 npm run build
+npm link  # Makes 'openpmkit' command available globally
 ```
 
 ## Usage
@@ -35,54 +60,54 @@ npm run build
 
 ```bash
 # List available workflows
-pmkit list
+openpmkit list
 
 # Run a workflow
-pmkit run daily-brief
+openpmkit run daily-brief
 
 # Run with parameters
-pmkit run meeting-prep --params '{"accountName": "Acme Corp"}'
+openpmkit run meeting-prep --params '{"accountName": "Acme Corp"}'
 
 # Run and open output
-pmkit run daily-brief --open
+openpmkit run daily-brief --open
 ```
 
 ### View history and stats
 
 ```bash
 # Show run history for a workflow
-pmkit history daily-brief
+openpmkit history daily-brief
 
 # Show statistics
-pmkit stats
-pmkit stats daily-brief
+openpmkit stats
+openpmkit stats daily-brief
 
 # Open latest output
-pmkit open daily-brief
+openpmkit open daily-brief
 ```
 
 ### Autonomous scheduler
 
 ```bash
 # Show scheduler status
-pmkit scheduler status
+openpmkit scheduler status
 
 # Enable/disable workflow schedules
-pmkit scheduler enable daily-brief
-pmkit scheduler disable competitor
+openpmkit scheduler enable daily-brief
+openpmkit scheduler disable competitor
 
 # Set custom schedule (cron format)
-pmkit scheduler set-schedule daily-brief "0 8 * * 1-5"
+openpmkit scheduler set-schedule daily-brief "0 8 * * 1-5"
 
 # Start the scheduler daemon
-pmkit scheduler start
+openpmkit scheduler start
 ```
 
 ### First-Time Setup
 
 ```bash
 # Run the interactive setup wizard
-pmkit setup
+openpmkit setup
 ```
 
 The wizard will guide you through:
@@ -92,33 +117,33 @@ The wizard will guide you through:
 
 ### Managing Settings (BYOK)
 
-pmkit uses a **BYOK (Bring Your Own Key)** model - you manage your own credentials for all services. No `.env` files needed - everything is stored in `~/.pmkit/config.json`.
+openpmkit uses a **BYOK (Bring Your Own Key)** model - you manage your own credentials for all services. No `.env` files needed - everything is stored in `~/.openpmkit/config.json`.
 
 ```bash
 # Show all settings
-pmkit settings
+openpmkit settings
 
 # List all credentials with status
-pmkit settings list
+openpmkit settings list
 
 # Set a credential (AI, crawler, integration, or connector)
-pmkit settings set openai sk-...
-pmkit settings set linear lin_api_...
-pmkit settings set slack xoxb-...
+openpmkit settings set openai sk-...
+openpmkit settings set linear lin_api_...
+openpmkit settings set slack xoxb-...
 
 # Update your profile
-pmkit settings profile --name "Sarah Chen" --company "Acme Inc"
+openpmkit settings profile --name "Sarah Chen" --company "Acme Inc"
 
 # Reset all settings
-pmkit settings reset
+openpmkit settings reset
 ```
 
 ## Output Structure
 
-All outputs are saved to `~/pmkit/{workflow-id}/{timestamp}/`:
+All outputs are saved to `~/openpmkit/{workflow-id}/{timestamp}/`:
 
 ```
-pmkit/
+openpmkit/
 ├── daily-brief/
 │   └── 2026-01-30T07-00-00-000Z/
 │       ├── output.md          # Workflow output
@@ -154,22 +179,22 @@ Each run generates a `telemetry.json` file for SIEM ingestion:
   },
   "estimatedCostUsd": 0.045,
   "isStub": false,
-  "outputPath": "/Users/you/pmkit/daily-brief/2026-01-30T07-00-00-000Z/output.md",
+  "outputPath": "/Users/you/openpmkit/daily-brief/2026-01-30T07-00-00-000Z/output.md",
   "environment": {
     "platform": "darwin",
     "nodeVersion": "v20.12.0",
-    "pmkitVersion": "1.0.0"
+    "openpmkitVersion": "1.0.0"
   }
 }
 ```
 
 ## Configuration File
 
-Config is stored at `~/.pmkit/config.json`:
+Config is stored at `~/.openpmkit/config.json`:
 
 ```json
 {
-  "outputDir": "/Users/you/pmkit",
+  "outputDir": "/Users/you/openpmkit",
   "llmProvider": "openai",
   "useStubs": false,
   "tenantId": "acme",
@@ -243,13 +268,13 @@ All credentials are managed through the CLI - no `.env` files needed! This is a 
 
 ```bash
 # Set any credential with:
-pmkit settings set <name> <value>
+openpmkit settings set <name> <value>
 
 # Examples:
-pmkit settings set openai sk-proj-abc123...
-pmkit settings set slack xoxb-your-bot-token
-pmkit settings set jira your-api-token
-pmkit settings set jiraUrl https://yourcompany.atlassian.net
+openpmkit settings set openai sk-proj-abc123...
+openpmkit settings set slack xoxb-your-bot-token
+openpmkit settings set jira your-api-token
+openpmkit settings set jiraUrl https://yourcompany.atlassian.net
 ```
 
 ## Development
@@ -271,7 +296,7 @@ npm run typecheck
 
 ## AI Crawlers
 
-pmkit-desktop includes 3 AI-powered crawlers for gathering competitive intelligence and market research.
+openpmkit includes 3 AI-powered crawlers for gathering competitive intelligence and market research.
 
 ### Crawler Types
 
@@ -287,9 +312,9 @@ Skills are in `skills/crawler-*/SKILL.md`:
 
 ```bash
 # Run crawlers via CLI (coming soon)
-pmkit crawl social --keywords "product management" --platforms reddit,hackernews
-pmkit crawl web --keywords "competitor features"
-pmkit crawl news --keywords "industry trends"
+openpmkit crawl social --keywords "product management" --platforms reddit,hackernews
+openpmkit crawl web --keywords "competitor features"
+openpmkit crawl news --keywords "industry trends"
 ```
 
 ### Credentials Required for Crawlers
@@ -303,13 +328,13 @@ pmkit crawl news --keywords "industry trends"
 
 ```bash
 # Set crawler credentials
-pmkit settings set serper your-serper-key
-pmkit settings set newsapi your-newsapi-key
+openpmkit settings set serper your-serper-key
+openpmkit settings set newsapi your-newsapi-key
 ```
 
 ## MVP Integrations
 
-pmkit-desktop includes 8 integration clients for connecting to external tools.
+openpmkit includes 8 integration clients for connecting to external tools.
 
 ### Integration Status
 
@@ -348,15 +373,15 @@ Integrations use credentials from your settings:
 
 ```bash
 # Set integration credentials
-pmkit settings set figma your-figma-token
-pmkit settings set linear your-linear-key
-pmkit settings set notion your-notion-token
+openpmkit settings set figma your-figma-token
+openpmkit settings set linear your-linear-key
+openpmkit settings set notion your-notion-token
 ```
 
 ```typescript
 import { createIntegrationClient } from './integrations';
 
-// Create client - reads credentials from ~/.pmkit/config.json
+// Create client - reads credentials from ~/.openpmkit/config.json
 const figma = createIntegrationClient('figma');
 
 // Connect with credentials from config
@@ -380,7 +405,7 @@ const files = await figma.fetchData({ action: 'list_files' });
 
 ## Integration with pmkit Web
 
-pmkit-desktop uses the same prompts and fetcher infrastructure as pmkit web:
+openpmkit uses the same prompts and fetcher infrastructure as pmkit web:
 
 - **Prompts**: `@pmkit/prompts` - All 10 workflow prompt templates
 - **Fetchers**: `@pmkit/core/fetchers` - Slack, Jira, Calendar, Gmail, Drive, Confluence, Zendesk

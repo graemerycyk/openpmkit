@@ -1,7 +1,7 @@
 /**
- * Storage system for pmkit-desktop
+ * Storage system for openpmkit-desktop
  *
- * Saves workflow outputs to: pmkit/{agent-name}/{timestamp}/
+ * Saves workflow outputs to: openpmkit/{agent-name}/{timestamp}/
  * - output.md (or output.html for prototypes)
  * - telemetry.json
  */
@@ -102,7 +102,7 @@ export class PMKitStorage {
       environment: {
         platform: process.platform,
         nodeVersion: process.version,
-        pmkitVersion: '1.0.0',
+        openpmkitVersion: '1.0.0',
       },
     };
   }
