@@ -1,22 +1,15 @@
 ---
-name: deck-content
-description: Generate slide content tailored to any audience (exec, customer, team, stakeholder). Use when preparing presentations, QBRs, board updates, or team meetings.
-argument-hint: "[topic] --audience [exec|customer|team|stakeholder]"
+description: Generate slide content tailored to any audience (exec, customer, team, stakeholder)
+argument-hint: "<topic> --audience [exec|customer|team|stakeholder]"
 ---
 
 # Deck Content
 
 Generate structured slide content for presentations.
 
-## Arguments
-
-- `$ARGUMENTS[0]` - Presentation topic (e.g., "Q4 Product Update")
-- `--audience` - One of: exec, customer, team, stakeholder (default: exec)
-- `--duration` - Approximate length in minutes (default: 30)
-
 ## Your Task
 
-Create slide content for: **$ARGUMENTS**
+Create slide content for the specified topic and audience.
 
 ## Data to Gather
 

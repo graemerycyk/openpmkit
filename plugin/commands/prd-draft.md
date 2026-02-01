@@ -1,21 +1,15 @@
 ---
-name: prd-draft
-description: Draft a PRD grounded in customer evidence and context. Use when starting a new feature, documenting requirements, or formalizing a product idea.
-argument-hint: "[feature name] [--epic JIRA-123]"
+description: Draft a PRD grounded in customer evidence and context
+argument-hint: "<feature name>"
 ---
 
 # PRD Draft
 
 Generate a comprehensive Product Requirements Document.
 
-## Arguments
-
-- `$ARGUMENTS[0]` - Feature name (e.g., "Search Filters")
-- `--epic` - Jira epic key (optional)
-
 ## Your Task
 
-Draft a PRD for: **$ARGUMENTS**
+Draft a PRD for the specified feature.
 
 ## Data to Gather
 
@@ -51,7 +45,6 @@ Create a PRD with these sections:
 **Author:** [User name]
 **Date:** [Today's date]
 **Status:** Draft
-**Epic:** [Epic key if provided]
 
 ---
 

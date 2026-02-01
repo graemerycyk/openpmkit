@@ -1,6 +1,5 @@
 ---
-name: sprint-review
-description: Generate a sprint review summary with accomplishments, metrics, and demo highlights. Use for sprint reviews, stakeholder updates, or team retrospectives.
+description: Generate a sprint review summary with accomplishments, metrics, and demo highlights
 argument-hint: "[--sprint 'Sprint 42']"
 ---
 
@@ -8,13 +7,9 @@ argument-hint: "[--sprint 'Sprint 42']"
 
 Generate a comprehensive sprint review summary.
 
-## Arguments
-
-- `--sprint` - Sprint name (optional, defaults to current sprint)
-
 ## Your Task
 
-Create a sprint review pack for: **$ARGUMENTS**
+Create a sprint review pack for the current or specified sprint.
 
 ## Data to Gather
 
@@ -79,10 +74,10 @@ Create a sprint review pack with these sections:
 
 | Metric | Committed | Completed | Status |
 |--------|-----------|-----------|--------|
-| Story Points | X | X | [emoji] X% |
-| Stories | X | X | [emoji] X% |
-| Bugs Resolved | X | X | [emoji] X% |
-| P1 Issues | X | X | [emoji] |
+| Story Points | X | X | X% |
+| Stories | X | X | X% |
+| Bugs Resolved | X | X | X% |
+| P1 Issues | X | X | |
 
 ### Velocity Trend
 - Sprint N-2: X pts

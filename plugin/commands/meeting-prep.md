@@ -1,21 +1,15 @@
 ---
-name: meeting-prep
-description: Generate a meeting prep pack with account context, talking points, and risks. Use before customer calls, QBRs, check-ins, or stakeholder meetings.
-argument-hint: "[account name] [--type QBR|check-in|escalation]"
+description: Generate a meeting prep pack with account context, talking points, and risks
+argument-hint: "<account name>"
 ---
 
 # Meeting Prep Pack
 
 Generate comprehensive meeting preparation materials.
 
-## Arguments
-
-- `$ARGUMENTS[0]` - Account or meeting name (e.g., "Acme Corp")
-- `--type` - Meeting type: QBR, check-in, escalation (optional, default: check-in)
-
 ## Your Task
 
-Create a meeting prep pack for: **$ARGUMENTS**
+Create a meeting prep pack for the specified account or meeting.
 
 ## Data to Gather
 

@@ -1,9 +1,6 @@
 ---
-name: pmkit-help
 description: Show all available openpmkit PM workflows and how to use them
 ---
-
-When the user runs /pmkit-help, display the following help documentation:
 
 # openpmkit - AI-Powered PM Workflows
 

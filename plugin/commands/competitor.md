@@ -1,6 +1,5 @@
 ---
-name: competitor
-description: Track competitor product changes with strategic implications. Use for competitive analysis, market research, or roadmap planning.
+description: Track competitor product changes with strategic implications
 argument-hint: "[--days 14] [--competitor 'Company Name']"
 ---
 
@@ -8,14 +7,9 @@ argument-hint: "[--days 14] [--competitor 'Company Name']"
 
 Generate a competitor intelligence report with strategic implications.
 
-## Arguments
-
-- `--days` - Time period to analyze (default: 14 days)
-- `--competitor` - Focus on specific competitor (optional)
-
 ## Your Task
 
-Create a competitor research report for: **$ARGUMENTS**
+Create a competitor research report.
 
 ## Data to Gather
 
@@ -95,7 +89,7 @@ Create an intel report with these sections:
 | [Feature 1] | [status] | [status] | [status] | [status] |
 | [Feature 2] | [status] | [status] | [status] | [status] |
 
-Legend: [checkmark] = Has, [x] = Doesn't have, [soon] = Coming soon
+Legend: ✓ = Has, ✗ = Doesn't have, 🔜 = Coming soon
 
 ---
 

@@ -1,20 +1,15 @@
 ---
-name: prototype
-description: Generate an interactive HTML prototype from a PRD or feature description. Use when visualizing features, getting stakeholder feedback, or testing UI concepts.
-argument-hint: "[feature description or paste PRD]"
+description: Generate an interactive HTML prototype from a PRD or feature description
+argument-hint: "<feature description or paste PRD>"
 ---
 
 # PRD to Prototype
 
 Generate an interactive HTML prototype from a PRD or feature description.
 
-## Arguments
-
-- `$ARGUMENTS` - Feature description or PRD content to prototype
-
 ## Your Task
 
-Create an interactive HTML prototype for: **$ARGUMENTS**
+Create an interactive HTML prototype for the specified feature.
 
 ## Data to Gather
 

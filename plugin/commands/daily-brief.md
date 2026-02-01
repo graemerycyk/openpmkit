@@ -1,6 +1,5 @@
 ---
-name: daily-brief
-description: Generate a morning brief synthesizing overnight activity from Slack, Jira, support tickets, and community. Use when starting the day, catching up on what happened, or preparing for standups.
+description: Generate a morning brief synthesizing overnight activity from Slack, Jira, support tickets, and community
 ---
 
 # Daily Brief

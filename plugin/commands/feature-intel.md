@@ -1,6 +1,5 @@
 ---
-name: feature-intel
-description: Cluster customer feedback into actionable themes with quantified demand. Use for VoC analysis, feature prioritization, or understanding customer pain points.
+description: Cluster customer feedback into actionable themes with quantified demand
 argument-hint: "[--days 30]"
 ---
 
@@ -8,13 +7,9 @@ argument-hint: "[--days 30]"
 
 Analyze customer feedback and identify key themes with quantified demand.
 
-## Arguments
-
-- `--days` - Time period to analyze (default: 30 days)
-
 ## Your Task
 
-Cluster customer feedback into actionable themes for: **$ARGUMENTS**
+Cluster customer feedback into actionable themes.
 
 ## Data to Gather
 

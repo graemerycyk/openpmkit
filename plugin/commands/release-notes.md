@@ -1,6 +1,5 @@
 ---
-name: release-notes
-description: Generate customer-facing release notes from completed work. Use when shipping features, preparing announcements, or updating customers on product changes.
+description: Generate customer-facing release notes from completed work
 argument-hint: "[--version v2.4.0]"
 ---
 
@@ -8,13 +7,9 @@ argument-hint: "[--version v2.4.0]"
 
 Generate customer-facing release notes from completed work.
 
-## Arguments
-
-- `--version` - Version number (e.g., "v2.4.0")
-
 ## Your Task
 
-Create release notes for: **$ARGUMENTS**
+Create release notes for the specified version or recent work.
 
 ## Data to Gather
 

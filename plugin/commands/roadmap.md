@@ -1,20 +1,15 @@
 ---
-name: roadmap
-description: Create an alignment memo with options and trade-offs for roadmap decisions. Use when prioritizing features, making build vs buy decisions, or aligning stakeholders.
-argument-hint: "[decision topic or question]"
+description: Create an alignment memo with options and trade-offs for roadmap decisions
+argument-hint: "<decision topic or question>"
 ---
 
 # Roadmap Alignment Memo
 
 Generate a decision memo with options, trade-offs, and recommendations.
 
-## Arguments
-
-- `$ARGUMENTS` - The decision or question to address (e.g., "Should we prioritize AI search or SSO for Q1?")
-
 ## Your Task
 
-Create a roadmap alignment memo for: **$ARGUMENTS**
+Create a roadmap alignment memo for the specified decision or question.
 
 ## Data to Gather
 
