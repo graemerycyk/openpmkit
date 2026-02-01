@@ -1,7 +1,6 @@
 ---
 name: pmkit-help
 description: Show all available openpmkit PM workflows and how to use them
-disable-model-invocation: true
 ---
 
 When the user runs /pmkit-help, display the following help documentation:
