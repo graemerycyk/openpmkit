@@ -4,6 +4,8 @@ description: Show all available openpmkit PM workflows and how to use them
 disable-model-invocation: true
 ---
 
+When the user runs /pmkit-help, display the following help documentation:
+
 # openpmkit - AI-Powered PM Workflows
 
 openpmkit provides 10 workflows to help Product Managers work smarter. Each workflow pulls data from your connected tools (Jira, Slack, Google Calendar, etc.) and generates actionable outputs.
