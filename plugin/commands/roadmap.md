@@ -1,67 +1,103 @@
 ---
 description: Create an alignment memo with options and trade-offs for roadmap decisions
-argument-hint: "<decision topic or question>"
+argument-hint: "<decision or question>"
 ---
 
 # Roadmap Alignment Memo
 
-Generate a decision memo with options, trade-offs, and recommendations.
+> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
 
-## Your Task
+Generate a decision memo with options, trade-offs, and a recommendation.
 
-Create a roadmap alignment memo for the specified decision or question.
+## Workflow
 
-## Data to Gather
+### 1. Understand the Decision
 
-Use Claude's connected integrations to pull:
+Accept decision questions like:
+- "Should we prioritize AI search or SSO for Q1?"
+- "Build vs buy for the analytics dashboard"
+- "How should we sequence the mobile roadmap?"
 
-1. **Jira** (via Atlassian connector):
-   - Related epics and their status
-   - Resource allocation and capacity
+If the question is vague, ask 1-2 clarifying questions.
 
-2. **Confluence** (via Atlassian connector):
-   - Strategy docs and OKRs
-   - Previous decision memos
+### 2. Pull Data from Connected Tools
 
-3. **Feature Intelligence** (from /feature-intel or ask user):
-   - Customer demand data
-   - VoC themes and quantification
+**Do this first — gather context to inform the options analysis.**
 
-4. **Competitor Intel** (from /competitor or ask user):
-   - Competitive landscape
-   - Feature gaps
+If **~~project tracker** (Jira, Linear) is connected:
+- Get related epics and their current status
+- Check resource allocation and team capacity
+- Find dependencies that affect sequencing
+- Get estimates if available
 
-If data is not available, ask the user to provide context on customer demand, resources, and constraints.
+If **~~knowledge base** (Confluence, Notion) is connected:
+- Find strategy docs and OKRs
+- Get previous decision memos on related topics
+- Find any existing analysis or research
 
-## Output Format
+If **~~support** (Zendesk, Intercom) is connected:
+- Get customer demand data for relevant features
+- Quantify which option addresses more customer pain
 
-Create an alignment memo with these sections:
+If **~~calls** (Gong, Fireflies) is connected:
+- Find customer quotes supporting each option
+- Get sales perspective on deal impact
+
+If **~~chat** (Slack) is connected:
+- Find relevant discussions or debates
+- Get stakeholder perspectives already shared
+
+**If a tool isn't connected, skip that source and proceed. Do NOT ask the user to connect tools.**
+
+### 3. Develop Options
+
+From the gathered data:
+- Identify 2-3 viable options (not just "do it" vs "don't")
+- Gather evidence for/against each option
+- Assess resources, timeline, and impact for each
+- Consider hybrid or phased approaches
+
+### 4. Generate the Alignment Memo
+
+Produce the memo in this format:
 
 ---
 
 # Roadmap Alignment Memo
 
-**Decision Required:** [Clear statement of what needs to be decided]
-**Date:** [Today's date]
-**Author:** [User name]
+| | |
+|---|---|
+| **Decision** | [Clear statement of what needs to be decided] |
+| **Author** | [Name] |
+| **Date** | [Today's date] |
+| **Decision Needed By** | [Date] |
+| **Stakeholders** | [Who needs to align] |
 
 ---
 
-## Decision Required
+## TL;DR
 
-[Clear description of what needs to be decided and by when]
+**Recommendation:** [Option X]
+
+[2-3 sentences: Why this option, what's the trade-off we're accepting]
 
 ---
 
 ## Context
 
-### Why Now
-- [Reason for urgency]
-- [Deadline or trigger]
+### Why This Decision Now
+- [Trigger or urgency]
+- [Deadline or dependency]
 
 ### Background
 - [Relevant history]
+- [Current state]
 - [Key constraints]
+
+### Strategic Alignment
+- **Company OKR:** [Relevant objective]
+- **Team OKR:** [Relevant objective]
+- **How this decision affects OKRs:** [Connection]
 
 ---
 
@@ -69,55 +105,63 @@ Create an alignment memo with these sections:
 
 ### Option A: [Name]
 
-**Description:** [What this option entails]
+**What:** [1-2 sentence description]
 
-**Pros:**
-- [Pro 1]
-- [Pro 2]
-- [Pro 3]
+**✅ Pros:**
+- [Pro with evidence/data]
+- [Pro with evidence/data]
+- [Pro with evidence/data]
 
-**Cons:**
-- [Con 1]
-- [Con 2]
+**❌ Cons:**
+- [Con with evidence/data]
+- [Con with evidence/data]
 
-**Evidence:**
-- [Data point supporting this option]
-- [Customer quote or demand signal]
+**📊 Evidence:**
+- [Data point] — *Source: [where this came from]*
+- [Customer quote] — *Source: [Gong/Support/etc.]*
 
-**Resources:** [X pods/engineers, Y weeks]
+**Resources & Timeline:**
+- **Effort:** [X] engineer-weeks
+- **Teams involved:** [List]
+- **Timeline:** [When it would ship]
 
-**Timeline:** [When it would ship]
-
-**Revenue/Impact:** [Expected outcome]
+**Impact:**
+- **Revenue impact:** [Estimate with rationale]
+- **Customer impact:** [# affected, how]
+- **Strategic impact:** [Positioning, competitive, etc.]
 
 ---
 
 ### Option B: [Name]
 
-**Description:** [What this option entails]
+**What:** [1-2 sentence description]
 
-**Pros:**
-- [Pro 1]
-- [Pro 2]
+**✅ Pros:**
+- [Pro with evidence/data]
+- [Pro with evidence/data]
 
-**Cons:**
-- [Con 1]
-- [Con 2]
-- [Con 3]
+**❌ Cons:**
+- [Con with evidence/data]
+- [Con with evidence/data]
+- [Con with evidence/data]
 
-**Evidence:**
-- [Data point supporting this option]
-- [Customer quote or demand signal]
+**📊 Evidence:**
+- [Data point] — *Source: [where this came from]*
+- [Customer quote] — *Source: [Gong/Support/etc.]*
 
-**Resources:** [X pods/engineers, Y weeks]
+**Resources & Timeline:**
+- **Effort:** [X] engineer-weeks
+- **Teams involved:** [List]
+- **Timeline:** [When it would ship]
 
-**Timeline:** [When it would ship]
-
-**Revenue/Impact:** [Expected outcome]
+**Impact:**
+- **Revenue impact:** [Estimate with rationale]
+- **Customer impact:** [# affected, how]
+- **Strategic impact:** [Positioning, competitive, etc.]
 
 ---
 
-### Option C: [Name] (if applicable)
+### Option C: [Name] *(if applicable)*
 
 [Same structure]
 
@@ -127,45 +171,73 @@ Create an alignment memo with these sections:
 
 | Criteria | Option A | Option B | Option C |
 |----------|----------|----------|----------|
-| Customer Impact | [H/M/L] | [H/M/L] | [H/M/L] |
-| Revenue Impact | [H/M/L] | [H/M/L] | [H/M/L] |
-| Effort | [H/M/L] | [H/M/L] | [H/M/L] |
-| Risk | [H/M/L] | [H/M/L] | [H/M/L] |
-| Time to Value | [X weeks] | [X weeks] | [X weeks] |
+| Customer Impact | 🟢 High | 🟡 Medium | 🟡 Medium |
+| Revenue Impact | 🟡 Medium | 🟢 High | 🔴 Low |
+| Effort | 🟡 Medium | 🔴 High | 🟢 Low |
+| Risk | 🟢 Low | 🟡 Medium | 🟡 Medium |
+| Time to Value | 8 weeks | 12 weeks | 4 weeks |
+| Strategic Fit | 🟢 High | 🟢 High | 🟡 Medium |
 
 ---
 
 ## Recommendation
 
-**Recommended Option:** [Option X]
+### Recommended: Option [X]
 
-**Reasoning:**
-1. [Key reason 1]
-2. [Key reason 2]
-3. [Key reason 3]
+**Why:**
+1. [Primary reason with evidence]
+2. [Secondary reason with evidence]
+3. [Third reason with evidence]
+
+**Trade-off we're accepting:**
+[What we're giving up by choosing this option]
+
+**Mitigations:**
+- [How we'll address the downsides]
+
+---
+
+## Risks & Mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| [Risk if we choose recommended option] | [H/M/L] | [H/M/L] | [How to mitigate] |
 
 ---
 
 ## Open Questions
 
-1. [Question that needs resolution]
-2. [Question that needs resolution]
+| Question | Owner | Needed By |
+|----------|-------|-----------|
+| [Question that affects decision] | [Who] | [When] |
 
 ---
 
-## Next Steps
+## Next Steps (if approved)
 
-If approved:
-1. [Action item with owner]
-2. [Action item with owner]
-3. [Action item with owner]
+| Action | Owner | Due |
+|--------|-------|-----|
+| [First action] | [Name] | [Date] |
+| [Second action] | [Name] | [Date] |
+| [Third action] | [Name] | [Date] |
 
 ---
 
-## Guidelines
+## Appendix
 
-- Present 2-3 clear options
-- Be explicit about trade-offs
-- Include evidence for each option
-- Make a recommendation with reasoning
-- Format for executive review
+### Data Sources
+- [Where the evidence came from]
+
+### Related Documents
+- [Link to relevant docs]
+
+---
+
+## Notes
+
+- Pull data FIRST to ground the options in evidence
+- Present real options, not strawmen — each option should be defensible
+- Be explicit about trade-offs — every choice has downsides
+- Quantify impact where possible — "high impact" is vague, "$500K ARR" is clear
+- Make a recommendation — don't just present options, have a point of view
+- Format for executive review — busy stakeholders should get the gist from headers

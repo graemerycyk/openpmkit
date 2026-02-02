@@ -1,91 +1,165 @@
 ---
 description: Generate a meeting prep pack with account context, talking points, and risks
-argument-hint: "<account name>"
+argument-hint: "<account or meeting name>"
 ---
 
-# Meeting Prep Pack
+# Meeting Prep
 
-Generate comprehensive meeting preparation materials.
+> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
 
-## Your Task
+Generate a comprehensive meeting prep pack for a customer or stakeholder meeting.
 
-Create a meeting prep pack for the specified account or meeting.
+## Workflow
 
-## Data to Gather
+### 1. Identify the Meeting
 
-Use Claude's connected integrations to pull:
+If the user provided an account name, use that. Otherwise:
 
-1. **Google Calendar** (via Google Workspace):
-   - Meeting details, attendees, agenda
-   - Previous meetings with this account
+If **~~calendar** is connected:
+- Get today's upcoming meetings
+- Ask user which meeting to prep for (or prep for the next one)
 
-2. **Jira** (via Atlassian connector):
-   - Open issues related to this account
-   - Recent feature requests or bugs
+### 2. Pull Data from Connected Tools
 
-3. **Support Tickets** (via Zendesk/Zapier):
-   - Open and recent tickets for this account
-   - Escalation history
+**Do this first — gather all available data before generating output.**
 
-4. **Gong/Call History** (via Zapier or ask user):
-   - Recent call summaries
-   - Key discussion points and sentiment
+If **~~project tracker** (Jira, Linear, etc.) is connected:
+- Search for tickets mentioning this account/customer
+- Find open issues, recent bugs, pending feature requests
+- Check for any escalations or P1s related to this account
 
-5. **CRM/Account Data** (ask user if not available):
-   - Contract value, renewal date
-   - Health score, NPS
+If **~~support** (Zendesk, Intercom) is connected:
+- Get open tickets for this account
+- Get recent ticket history (last 30 days)
+- Note any patterns in support requests
+- Check escalation history
 
-If data is not available from connectors, ask the user to provide context or skip that section.
+If **~~crm** (Salesforce, HubSpot) is connected:
+- Get account details: contract value, renewal date, plan tier
+- Get health score, NPS, engagement metrics
+- Get recent activity and touchpoints
 
-## Output Format
+If **~~calls** (Gong, Fireflies) is connected:
+- Get transcripts from recent calls with this account
+- Extract key discussion points and sentiment
+- Note any promises made or concerns raised
 
-Create a prep pack with these sections:
+If **~~chat** (Slack) is connected:
+- Search for recent discussions mentioning this account
+- Find any internal context or heads-ups
 
-### 1. Account Summary
+If **~~email** is connected:
+- Get recent email threads with this account
+- Note any outstanding requests or follow-ups
+
+**If a tool isn't connected, skip that data source and proceed. Do NOT ask the user to connect tools.**
+
+### 3. Analyze and Synthesize
+
+From the gathered data:
+- Identify relationship health (positive/neutral/at-risk)
+- Find open issues that might come up
+- Note opportunities to discuss
+- Flag risks or landmines to avoid
+- Generate talking points based on their recent activity
+
+### 4. Generate the Prep Pack
+
+Produce the meeting prep pack in this format:
+
+---
+
+# Meeting Prep: [Account/Meeting Name]
+
+**Date:** [Meeting date/time]
+**Attendees:** [List from calendar if available]
+**Last Contact:** [Date and type of last interaction]
+
+---
+
+## Account Snapshot
+
 | Metric | Value |
 |--------|-------|
-| Contract Value | $ |
-| Seats/Users | |
-| Health Score | |
-| NPS | |
-| Renewal Date | |
+| Contract Value | $[X] |
+| Plan/Tier | [Plan] |
+| Renewal Date | [Date] |
+| Health Score | [Score or Red/Yellow/Green] |
+| Account Age | [X months/years] |
 
-### 2. Recent History
-Last 3 interactions with outcomes:
-- Date, type, key points, outcome
+## Relationship Status: [🟢 Healthy / 🟡 Monitor / 🔴 At Risk]
 
-### 3. Open Issues
-- Unresolved support tickets
-- Pending feature requests
-- Known concerns or blockers
+[1-2 sentence summary of current relationship state]
 
-### 4. Key Insights
-- Pain points identified from calls
-- Feature requests and priorities
-- Overall sentiment and relationship health
+---
 
-### 5. Talking Points
-Suggested topics to cover:
-1. [Topic with context]
-2. [Topic with context]
-3. [Topic with context]
+## Recent History
 
-### 6. Questions to Ask
-1. [Strategic question]
-2. [Tactical question]
-3. [Relationship question]
+### Last 3 Interactions
+| Date | Type | Summary | Outcome |
+|------|------|---------|---------|
+| [Date] | [Call/Email/Ticket] | [Summary] | [Outcome] |
 
-### 7. Risks & Opportunities
-**Risks:**
-- [Risk with mitigation]
+### Recent Support Activity
+- **Open tickets:** [X]
+- **Resolved (30 days):** [Y]
+- **Trending issues:** [Pattern if any]
 
-**Opportunities:**
-- [Opportunity to explore]
+---
 
-## Guidelines
+## Open Issues
 
-- Focus on the specific customer/account
-- Include recent interactions and open issues
-- Suggest questions to ask
-- Highlight opportunities and risks
-- Be actionable and specific
+| Issue | Type | Age | Priority |
+|-------|------|-----|----------|
+| [Issue] | [Bug/Request/Question] | [X days] | [P0/P1/P2] |
+
+---
+
+## Key Insights
+
+### What They Care About
+- [Insight from calls/tickets/emails]
+- [Insight from calls/tickets/emails]
+
+### Recent Wins
+- [Positive outcome or success]
+
+### Pain Points
+- [Known frustration or blocker]
+
+---
+
+## Talking Points
+
+### Recommended Topics
+1. **[Topic]** — [Why discuss, what to say]
+2. **[Topic]** — [Why discuss, what to say]
+3. **[Topic]** — [Why discuss, what to say]
+
+### Questions to Ask
+1. [Strategic question to understand their needs]
+2. [Tactical question about current issues]
+3. [Relationship question to build rapport]
+
+---
+
+## Risks & Landmines
+
+⚠️ **Avoid/Handle Carefully:**
+- [Topic to avoid or handle delicately, with context]
+
+---
+
+## Opportunities
+
+💡 **Potential Upsell/Expansion:**
+- [Opportunity based on their usage or requests]
+
+---
+
+## Notes
+
+- Pull data FIRST from all connected tools, then synthesize
+- Be specific: include ticket numbers, dates, names
+- If data is limited, note "Limited data available" rather than guessing
+- Focus on actionable insights, not just data dumps

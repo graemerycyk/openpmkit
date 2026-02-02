@@ -1,96 +1,191 @@
 ---
 description: Cluster customer feedback into actionable themes with quantified demand
-argument-hint: "[--days 30]"
+argument-hint: "[--days 30] [--topic 'search']"
 ---
 
-# Feature Intelligence (Voice of Customer)
+# Feature Intel (Voice of Customer)
 
-Analyze customer feedback and identify key themes with quantified demand.
+> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
 
-## Your Task
+Analyze customer feedback across all channels and cluster into actionable themes with quantified demand.
 
-Cluster customer feedback into actionable themes.
+## Workflow
 
-## Data to Gather
+### 1. Determine Scope
 
-Use Claude's connected integrations to pull:
+- **Time period:** Use `--days` argument or default to last 30 days
+- **Topic filter:** Use `--topic` argument to focus on specific area, or analyze all feedback
 
-1. **Support Tickets** (via Zendesk/Zapier):
-   - Recent tickets and their categories
-   - Common complaints and requests
+### 2. Pull Data from Connected Tools
 
-2. **Jira** (via Atlassian connector):
-   - Feature requests and enhancements
-   - Customer-reported bugs
+**Do this first — gather ALL available feedback data before analyzing.**
 
-3. **Gong Call Insights** (via Zapier or ask user):
-   - Pain points mentioned in calls
-   - Feature requests from sales calls
-   - Competitive mentions
+If **~~support** (Zendesk, Intercom) is connected:
+- Get all tickets from the time period
+- Extract feature requests, complaints, and pain points
+- Note ticket volume and trends
+- Get customer segments (enterprise vs SMB, etc.)
 
-4. **Community Feedback** (ask user to provide):
-   - Forum posts and feature requests
-   - Upvote counts on requests
+If **~~project tracker** (Jira, Linear) is connected:
+- Get feature requests and enhancement tickets
+- Get customer-reported bugs
+- Check existing backlog for related items
+- Note vote counts or watchers on requests
 
-5. **NPS Verbatims** (ask user to provide):
-   - Survey responses and comments
-   - Promoter/detractor themes
+If **~~calls** (Gong, Fireflies) is connected:
+- Search call transcripts for feature requests
+- Extract pain points mentioned by customers
+- Note competitive mentions
+- Get sentiment from customer conversations
 
-If data is not available from connectors, ask the user to provide it or work with available data.
+If **~~chat** (Slack) is connected:
+- Search customer-facing channels for feedback
+- Find internal discussions about customer requests
+- Get context on known issues
 
-## Output Format
+If **~~knowledge base** (Confluence, Notion) is connected:
+- Find existing research or VoC documents
+- Get context on previous analyses
 
-Create a VoC report with these sections:
+**If a tool isn't connected, skip that data source and proceed. Do NOT ask the user to connect tools.**
 
-### 1. Executive Summary
+### 3. Cluster and Analyze
 
-| Theme | Mentions | Trend | Impact |
-|-------|----------|-------|--------|
-| [Theme 1] | X | [up/down/stable] | [Critical/High/Medium/Low] |
-| [Theme 2] | X | | |
+From the gathered data:
+- Group similar feedback into themes
+- Quantify each theme (# of mentions, # of customers, segments affected)
+- Identify trends (increasing, decreasing, new)
+- Assess business impact of each theme
+- Find representative quotes for each theme
 
-**Key Insight:** [One sentence summary of what customers are telling us]
+### 4. Generate the Feature Intel Report
 
-### 2. Theme Analysis
+Produce the report in this format:
 
-For each theme:
+---
 
-#### [Theme Name] (X% of mentions)
+# Feature Intel Report
 
-**Description:** What this theme represents
+**Period:** [Start date] → [End date] ([X] days)
+**Sources:** [List connected sources that provided data]
+**Generated:** [Today's date]
 
-**Quantification:**
-- Support tickets: X
-- Call mentions: X
-- Community votes: X
+---
+
+## Executive Summary
+
+### Top Themes by Demand
+
+| Rank | Theme | Mentions | Customers | Trend | Impact |
+|------|-------|----------|-----------|-------|--------|
+| 1 | [Theme] | [X] | [Y] | [📈/📉/➡️] | [Critical/High/Medium/Low] |
+| 2 | [Theme] | [X] | [Y] | [📈/📉/➡️] | [Critical/High/Medium/Low] |
+| 3 | [Theme] | [X] | [Y] | [📈/📉/➡️] | [Critical/High/Medium/Low] |
+| 4 | [Theme] | [X] | [Y] | [📈/📉/➡️] | [Critical/High/Medium/Low] |
+| 5 | [Theme] | [X] | [Y] | [📈/📉/➡️] | [Critical/High/Medium/Low] |
+
+**Key Insight:** [One sentence: What are customers telling us?]
+
+---
+
+## Theme Deep Dives
+
+### 1. [Theme Name]
+
+**Demand Signal:**
+- **Total mentions:** [X] across [Y] sources
+- **Unique customers:** [Z]
+- **Segments affected:** [Enterprise / SMB / All]
+- **Trend:** [📈 Increasing — up X% from last period]
 
 **Representative Quotes:**
-> "Quote 1" - Source
-> "Quote 2" - Source
-> "Quote 3" - Source
+> "[Verbatim quote]" — [Customer type], [Source]
 
-**Affected Segments:** [Enterprise, SMB, All users, etc.]
+> "[Verbatim quote]" — [Customer type], [Source]
+
+> "[Verbatim quote]" — [Customer type], [Source]
+
+**What They're Asking For:**
+- [Specific request or capability]
+- [Specific request or capability]
+
+**Root Cause / Pain Point:**
+[Why this matters to customers — the underlying job-to-be-done]
 
 **Product Implications:**
-- What this means for the product
-- Potential solutions or approaches
+- [What this means for the product]
+- [Potential approach or solution direction]
 
-### 3. Trend Analysis
-- What's increasing vs. last period
-- What's decreasing
-- New themes emerging
+**Related Backlog Items:**
+- [TICKET-123] [Title] — [Status]
 
-### 4. Recommendations
-Prioritized actions based on themes:
-1. [Action] - Addresses [theme], [effort], [impact]
-2. [Action] - ...
-3. [Action] - ...
+---
 
-## Guidelines
+### 2. [Theme Name]
 
-- Group similar feedback together
-- Quantify each theme (# of mentions, sources)
-- Include representative quotes
-- Assess impact and urgency
-- Connect to product implications
-- Be objective and evidence-based
+[Repeat structure]
+
+---
+
+## Trend Analysis
+
+### Rising 📈
+- **[Theme]** — Up [X]% from last period. [Why it's growing]
+
+### Declining 📉
+- **[Theme]** — Down [X]% from last period. [Why it's declining]
+
+### Emerging 🆕
+- **[Theme]** — New pattern appearing. [X] mentions in last [Y] days.
+
+---
+
+## Competitive Intel
+
+*Extracted from customer conversations*
+
+| Competitor | Mentions | Context |
+|------------|----------|---------|
+| [Competitor] | [X] | [What customers say about them] |
+
+---
+
+## Recommendations
+
+### Prioritized Actions
+
+1. **[Action]**
+   - Addresses: [Theme]
+   - Effort: [Low/Medium/High]
+   - Impact: [Low/Medium/High]
+   - Recommendation: [Ship / Investigate / Deprioritize]
+
+2. **[Action]**
+   - Addresses: [Theme]
+   - Effort: [Low/Medium/High]
+   - Impact: [Low/Medium/High]
+   - Recommendation: [Ship / Investigate / Deprioritize]
+
+### Quick Wins
+- [Small change that addresses feedback with low effort]
+
+### Needs More Research
+- [Theme that needs deeper investigation before action]
+
+---
+
+## Data Quality Notes
+
+- **Sources analyzed:** [List]
+- **Sources not available:** [List]
+- **Confidence level:** [High/Medium/Low based on data completeness]
+
+---
+
+## Notes
+
+- Pull ALL available data FIRST, then cluster and analyze
+- Quantify everything — "customers want X" is useless without numbers
+- Include verbatim quotes — they're more compelling than summaries
+- Be honest about data gaps and confidence levels
+- Connect themes to existing backlog items where possible

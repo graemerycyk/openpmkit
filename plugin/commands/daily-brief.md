@@ -1,67 +1,98 @@
 ---
-description: Generate a morning brief synthesizing overnight activity from Slack, Jira, support tickets, and community
+description: Generate a morning brief synthesizing overnight activity from Slack, Jira, support tickets, and calendar
 ---
 
 # Daily Brief
 
-Generate a morning context summary for the PM.
+> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
 
-## Your Task
+Generate a morning context summary synthesizing overnight activity.
 
-Create a daily brief that synthesizes overnight activity from multiple sources into a concise, actionable summary.
+## Workflow
 
-## Data to Gather
+### 1. Pull Data from Connected Tools
 
-Use Claude's connected integrations to pull:
+**Do this first — gather all available data before generating output.**
 
-1. **Jira** (via Atlassian connector):
-   - Recent ticket updates and status changes
-   - Sprint progress and blockers
-   - New bugs or escalations
+If **~~project tracker** (Jira, Linear, etc.) is connected:
+- Get tickets updated in the last 24 hours
+- Get current sprint status and progress
+- Identify blockers, P1/P0 issues, and escalations
+- Check for new bugs filed overnight
 
-2. **Slack** (via Zapier or ask user to paste):
-   - Key channel activity from the last 24 hours
-   - Important threads or decisions
-   - Mentions and direct messages
+If **~~chat** (Slack, Teams) is connected:
+- Get messages from key channels in the last 24 hours
+- Find threads with high activity or @mentions
+- Identify decisions made or questions pending
 
-3. **Support Tickets** (via Zendesk/Zapier or ask user):
-   - New and escalated tickets
-   - Trending issues
+If **~~calendar** (Google Calendar, Outlook) is connected:
+- Get today's meetings
+- Note meeting prep needed
+- Flag any conflicts or back-to-backs
 
-4. **Google Calendar** (via Google Workspace):
-   - Today's meetings and prep needed
+If **~~support** (Zendesk, Intercom) is connected:
+- Get new tickets from last 24 hours
+- Identify escalations or trending issues
+- Note any VIP customer activity
 
-If data is not available from connectors, ask the user to provide it or skip that section.
+**If a tool isn't connected, skip that section and proceed with available data. Do NOT ask the user to connect tools.**
 
-## Output Format
+### 2. Analyze and Prioritize
 
-Create a brief with these sections:
+From the gathered data:
+- Identify the 3-5 most important items requiring attention
+- Flag anything blocking team progress
+- Note patterns or trends (e.g., spike in bug reports, recurring customer complaint)
+- Connect related items across sources (e.g., Slack discussion about a Jira ticket)
 
-### 1. TL;DR
-2-3 sentence summary of the most important things to know.
+### 3. Generate the Brief
 
-### 2. Urgent Items
-- Blockers requiring immediate attention
-- Escalations or P1 issues
-- Critical decisions needed
+Produce the daily brief in this format:
 
-### 3. Sprint Progress
-- Current sprint status
-- Notable updates on key stories
-- Velocity check
+---
 
-### 4. Customer Signal
-- Key feedback from support and community
-- Trending themes or issues
+# Daily Brief — [Today's Date]
 
-### 5. Today's Focus
-- Top 3 recommended actions for today
-- Important meetings and prep needed
+## TL;DR
+[2-3 sentences: What's the one thing to know? Any fires? What's the day's focus?]
 
-## Guidelines
+## 🚨 Urgent / Blockers
+| Item | Source | Action Needed |
+|------|--------|---------------|
+| [Issue] | [Jira/Slack/etc] | [What to do] |
 
-- Be concise but comprehensive
-- Highlight blockers and urgent items first
-- Include specific numbers and quotes where relevant
-- Use markdown formatting with clear headers
-- End with actionable recommendations
+*If nothing urgent, say "No blockers identified."*
+
+## 📊 Sprint Progress
+- **Sprint:** [Name] — [X]% complete, [Y] days remaining
+- **Velocity:** [On track / Behind / Ahead]
+- **Completed yesterday:** [List key items]
+- **At risk:** [Items that may slip]
+
+## 💬 Key Discussions
+[Summarize 2-3 important Slack/Teams threads with links if available]
+
+## 🎫 Customer Signal
+- **New tickets:** [X] ([Y] high priority)
+- **Trending:** [Pattern or recurring issue]
+- **Notable:** [Any VIP or escalated items]
+
+## 📅 Today's Schedule
+| Time | Meeting | Prep Needed |
+|------|---------|-------------|
+| [Time] | [Meeting] | [Yes/No - what] |
+
+## ✅ Recommended Focus
+1. **[Action]** — [Why it's priority]
+2. **[Action]** — [Why it's priority]
+3. **[Action]** — [Why it's priority]
+
+---
+
+## Notes
+
+- Pull data FIRST, then synthesize — do not ask the user for data if tools are connected
+- Be specific: include ticket numbers, channel names, people's names
+- Quantify where possible (X tickets, Y% complete)
+- If a section has no data, say "No data available" rather than omitting it
+- Keep it scannable — busy PMs should get the gist in 30 seconds
