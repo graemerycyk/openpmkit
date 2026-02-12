@@ -10,7 +10,7 @@ pip install -e .                # install (runtime only)
 pip install -e ".[dev]"         # install with dev tools
 pmkit-mcp                       # run server (stdio)
 python -m pmkit_mcp             # alternative run
-pytest                          # run all 20 tests
+pytest                          # run all 24 tests
 pytest -v                       # verbose test output
 ruff check pmkit_mcp tests      # lint
 mypy pmkit_mcp                  # type check
