@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pmkit": {
+      "command": "/Users/grae/Developer/openpmkit/.venv/bin/pmkit-mcp",
+      "type": "stdio"
+    }
+  }
+}
