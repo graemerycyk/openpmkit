@@ -1,0 +1,8 @@
+{
+  "name": "openpmkit",
+  "version": "1.0.0",
+  "description": "AI-powered PM workflows - daily briefs, PRDs, meeting prep, competitor intel, sprint reviews, and more. 15 slash commands for Product Managers.",
+  "author": {
+    "name": "openpmkit"
+  }
+}
