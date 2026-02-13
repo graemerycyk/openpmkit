@@ -1,12 +1,12 @@
-# PM Kit MCP Server
+# OpenPMKit
 
-Your PM workflows, inside your AI assistant. This is a **Model Context Protocol (MCP) server** that gives Claude Desktop, Cursor, or any MCP-compatible tool access to 13 product management workflows — daily briefs, PRDs, sprint reviews, competitor reports, and more.
+Your PM workflows, inside your AI assistant. 13 product management workflows — daily briefs, PRDs, sprint reviews, competitor reports, and more — available as both an **MCP server** (for Claude Desktop, Cursor, Claude Code) and a **Claude Cowork/Code plugin** (slash commands, no server setup).
 
-You provide context (Slack messages, Jira tickets, customer feedback), and the server generates structured, evidence-grounded PM artifacts through your AI assistant.
+You provide context (Slack messages, Jira tickets, customer feedback), and OpenPMKit generates structured, evidence-grounded PM artifacts through your AI assistant.
 
 ## Who This Is For
 
-Product managers who use AI assistants (Claude Desktop, Cursor, etc.) and want structured, repeatable workflows instead of writing prompts from scratch every time.
+Product managers who use AI assistants (Claude Desktop, Cursor, Claude Cowork, Claude Code) and want structured, repeatable workflows instead of writing prompts from scratch every time.
 
 ## What You Get
 
@@ -61,19 +61,39 @@ You don't need to remember prompt formats. Just tell your assistant what you nee
 
 ## Installation
 
-### Prerequisites
+### Option A: Plugin (Claude Cowork / Claude Code)
+
+No Python or server setup required. Install directly as a plugin:
+
+**From GitHub:**
+```
+/plugin marketplace add graemerycyk/openpmkit
+/plugin install openpmkit
+```
+
+**From a direct URL:**
+```
+/plugin marketplace add https://raw.githubusercontent.com/graemerycyk/openpmkit/main/.claude-plugin/marketplace.json
+/plugin install openpmkit
+```
+
+All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
+
+### Option B: MCP Server (Claude Desktop / Cursor / Claude Code)
+
+#### Prerequisites
 
 - **Python 3.10 or newer** — Check with `python3 --version`
 - **pip** (comes with Python) or **uv** (faster alternative)
 
-### Step 1: Clone the Repo
+#### Step 1: Clone the Repo
 
 ```bash
-git clone https://github.com/graemerycyk/getpmkit.git
-cd getpmkit
+git clone https://github.com/graemerycyk/openpmkit.git
+cd openpmkit
 ```
 
-### Step 2: Set Up Python Environment
+#### Step 2: Set Up Python Environment
 
 ```bash
 # Create an isolated environment (keeps your system Python clean)
@@ -85,7 +105,7 @@ source .venv/bin/activate        # macOS / Linux
 # .venv\Scripts\activate.bat      # Windows CMD
 ```
 
-### Step 3: Install
+#### Step 3: Install
 
 ```bash
 pip install -e .
@@ -93,7 +113,7 @@ pip install -e .
 
 That's it. The server is now installed and ready.
 
-### Verify It Works
+#### Verify It Works
 
 ```bash
 pmkit-mcp
@@ -117,7 +137,7 @@ The server will start and wait for MCP client connections on stdio. Press `Ctrl+
 {
   "mcpServers": {
     "pmkit": {
-      "command": "/full/path/to/getpmkit/.venv/bin/pmkit-mcp"
+      "command": "/full/path/to/openpmkit/.venv/bin/pmkit-mcp"
     }
   }
 }
@@ -129,7 +149,7 @@ The server will start and wait for MCP client connections on stdio. Press `Ctrl+
 {
   "mcpServers": {
     "pmkit": {
-      "command": "C:\\full\\path\\to\\getpmkit\\.venv\\Scripts\\pmkit-mcp.exe"
+      "command": "C:\\full\\path\\to\\openpmkit\\.venv\\Scripts\\pmkit-mcp.exe"
     }
   }
 }
@@ -145,7 +165,7 @@ The server will start and wait for MCP client connections on stdio. Press `Ctrl+
   "mcpServers": {
     "pmkit": {
       "command": "uv",
-      "args": ["run", "--directory", "/full/path/to/getpmkit", "pmkit-mcp"]
+      "args": ["run", "--directory", "/full/path/to/openpmkit", "pmkit-mcp"]
     }
   }
 }
@@ -159,7 +179,7 @@ Add to `.cursor/mcp.json` in your project root:
 {
   "mcpServers": {
     "pmkit": {
-      "command": "/full/path/to/getpmkit/.venv/bin/pmkit-mcp"
+      "command": "/full/path/to/openpmkit/.venv/bin/pmkit-mcp"
     }
   }
 }
@@ -173,7 +193,7 @@ Add to `~/.claude/settings.json`:
 {
   "mcpServers": {
     "pmkit": {
-      "command": "/full/path/to/getpmkit/.venv/bin/pmkit-mcp"
+      "command": "/full/path/to/openpmkit/.venv/bin/pmkit-mcp"
     }
   }
 }
@@ -268,22 +288,29 @@ Newer, still being refined:
 ## Project Structure
 
 ```
-getpmkit/
-├── pmkit_mcp/                   # Python package
+openpmkit/
+├── pmkit_mcp/                   # MCP server package
 │   ├── __init__.py              # Version metadata
 │   ├── __main__.py              # python -m pmkit_mcp entry point
 │   ├── server.py                # MCP server — tool registration and handlers
 │   ├── renderer.py              # Template rendering and field validation
 │   └── workflows/
 │       ├── __init__.py          # Public API
-│       └── registry.py          # All 13 workflow definitions
+│       └── registry.py          # All 13 workflow definitions (source of truth)
+├── plugin/                      # Claude Cowork/Code plugin
+│   ├── .claude-plugin/
+│   │   └── plugin.json          # Plugin manifest
+│   ├── commands/                # 15 slash command .md files
+│   └── README.md                # Plugin installation and usage
+├── .claude-plugin/
+│   └── marketplace.json         # Plugin marketplace catalog
+├── scripts/
+│   └── build_plugin.py          # Generates command .md files from registry.py
 ├── tests/
-│   ├── test_registry.py         # Workflow definition integrity (8 tests)
-│   ├── test_renderer.py         # Prompt rendering correctness (6 tests)
-│   └── test_server.py           # MCP tool call integration (6 tests)
+│   ├── test_registry.py         # Workflow definition integrity
+│   ├── test_renderer.py         # Prompt rendering correctness
+│   └── test_server.py           # MCP tool call integration
 ├── pyproject.toml               # Package config, dependencies, tool settings
-├── requirements.txt             # Runtime dependencies
-├── requirements-dev.txt         # Dev dependencies (tests, lint, types)
 ├── CLAUDE.md                    # Quick reference for AI coding assistants
 ├── AGENTS.md                    # Full developer and contributor guide
 └── README.md                    # This file
@@ -332,12 +359,12 @@ The server is **stateless** (no database, no files, no sessions) and **LLM-agnos
 
 Make sure your virtual environment is activated:
 ```bash
-source /path/to/getpmkit/.venv/bin/activate
+source /path/to/openpmkit/.venv/bin/activate
 ```
 
 Or use the full path in your MCP config:
 ```json
-{ "command": "/full/path/to/getpmkit/.venv/bin/pmkit-mcp" }
+{ "command": "/full/path/to/openpmkit/.venv/bin/pmkit-mcp" }
 ```
 
 ### Claude Desktop doesn't show PM Kit tools
@@ -351,7 +378,7 @@ Or use the full path in your MCP config:
 
 You need to install the package:
 ```bash
-cd /path/to/getpmkit
+cd /path/to/openpmkit
 source .venv/bin/activate
 pip install -e .
 ```
@@ -373,8 +400,8 @@ For contributors and developers who want to modify workflows or add new ones.
 ### Setup
 
 ```bash
-git clone https://github.com/graemerycyk/getpmkit.git
-cd getpmkit
+git clone https://github.com/graemerycyk/openpmkit.git
+cd openpmkit
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
@@ -383,7 +410,7 @@ pip install -e ".[dev]"
 ### Run Tests
 
 ```bash
-pytest              # all 20 tests
+pytest              # all 24 tests
 pytest -v           # verbose output
 pytest tests/test_server.py  # just server tests
 ```

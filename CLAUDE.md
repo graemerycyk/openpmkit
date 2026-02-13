@@ -1,4 +1,4 @@
-# PM Kit MCP Server — Quick Reference
+# OpenPMKit — Quick Reference
 
 Read [AGENTS.md](AGENTS.md) for the full developer guide.
 
@@ -36,6 +36,10 @@ mypy pmkit_mcp                  # type check
 | `tests/test_server.py` | Server integration tests (tool calls via MCP SDK) |
 | `tests/test_renderer.py` | Prompt rendering tests |
 | `tests/test_registry.py` | Workflow definition integrity tests |
+| `plugin/.claude-plugin/plugin.json` | Plugin manifest |
+| `plugin/commands/*.md` | 15 slash command files (13 generated + 2 hand-written) |
+| `.claude-plugin/marketplace.json` | Plugin marketplace catalog |
+| `scripts/build_plugin.py` | Generates plugin commands from `registry.py` |
 
 ## Architecture
 

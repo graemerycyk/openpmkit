@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "source": {
         "source": "github",
-        "repo": "openpmkit/openpmkit",
+        "repo": "graemerycyk/openpmkit",
         "path": "plugin"
       }
     }

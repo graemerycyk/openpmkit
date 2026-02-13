@@ -121,9 +121,9 @@ MCP Client (Claude Desktop / Cursor / Claude Code)
 ## Directory Structure
 
 ```
-getpmkit/
+openpmkit/
 │
-├── pmkit_mcp/                       # Main Python package
+├── pmkit_mcp/                       # MCP server package
 │   ├── __init__.py                  # Package version: "1.0.0"
 │   ├── __main__.py                  # Enables: python -m pmkit_mcp
 │   ├── server.py                    # MCP server setup, tool registration, handlers
@@ -132,16 +132,25 @@ getpmkit/
 │       ├── __init__.py              # Re-exports WORKFLOW_REGISTRY, WorkflowDefinition
 │       └── registry.py             # 13 WorkflowDefinition instances + registry dict
 │
+├── plugin/                          # Claude Cowork/Code plugin (self-contained, no MCP)
+│   ├── .claude-plugin/
+│   │   └── plugin.json             # Plugin manifest
+│   ├── commands/                    # 15 slash command .md files (13 auto-generated + 2 hand-written)
+│   └── README.md                    # Plugin installation and usage
+│
+├── .claude-plugin/
+│   └── marketplace.json             # Plugin marketplace catalog
+│
+├── scripts/
+│   └── build_plugin.py              # Generates command .md files from registry.py
+│
 ├── tests/
 │   ├── __init__.py
-│   ├── test_registry.py             # 8 tests: registry integrity, field consistency
-│   ├── test_renderer.py             # 6 tests: rendering, missing fields, summaries
-│   └── test_server.py               # 6 tests: tool listing, calls, error handling
+│   ├── test_registry.py             # Registry integrity, field consistency
+│   ├── test_renderer.py             # Rendering, missing fields, summaries
+│   └── test_server.py               # Tool listing, calls, error handling
 │
 ├── pyproject.toml                   # Build config, dependencies, tool settings
-├── requirements.txt                 # Runtime deps (mcp, pydantic)
-├── requirements-dev.txt             # Dev deps (pytest, ruff, mypy)
-├── .gitignore                       # Python/IDE ignores
 ├── README.md                        # User-facing documentation
 ├── CLAUDE.md                        # Quick reference for AI assistants
 └── AGENTS.md                        # This file
@@ -528,9 +537,18 @@ pip install -e ".[dev]"    # runtime + dev
 
 ## Deployment and Distribution
 
-### For End Users (PMs)
+### Plugin (Claude Cowork / Claude Code)
 
-The simplest path:
+The simplest path — no Python, no server setup:
+
+```
+/plugin marketplace add graemerycyk/openpmkit
+/plugin install openpmkit
+```
+
+All 15 slash commands are available immediately. The plugin is self-contained (embeds prompts directly in command markdown files) with no MCP dependency.
+
+### MCP Server (Claude Desktop / Cursor / Claude Code)
 
 1. Clone the repo
 2. `python3 -m venv .venv && source .venv/bin/activate`
@@ -543,14 +561,23 @@ No Docker, no cloud, no API keys needed. Everything runs locally.
 
 Options for distributing to multiple PMs:
 
-1. **Shared repo** — everyone clones and installs locally
-2. **pip install from git** — `pip install git+https://github.com/graemerycyk/getpmkit.git`
-3. **PyPI** — publish the package for `pip install pmkit-mcp-server` (requires PyPI account setup)
-4. **Docker** — wrap in a container that exposes stdio (not typical for MCP but possible)
+1. **Plugin marketplace** — `/plugin marketplace add graemerycyk/openpmkit` (easiest)
+2. **Shared repo** — everyone clones and installs the MCP server locally
+3. **pip install from git** — `pip install git+https://github.com/graemerycyk/openpmkit.git`
 
 ### Environment Variables
 
-None required. The server has no external dependencies at runtime.
+None required. Neither the MCP server nor the plugin has external dependencies at runtime.
+
+### Plugin Build Pipeline
+
+The plugin's 13 workflow commands are auto-generated from `registry.py` (the same source of truth as the MCP server). To regenerate after modifying workflows:
+
+```bash
+python scripts/build_plugin.py
+```
+
+The 2 hand-written commands (`pmkit-help.md`, `pmkit-setup.md`) are preserved by the build script.
 
 ---
 

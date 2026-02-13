@@ -6,13 +6,13 @@ AI-powered PM workflows for Product Managers. Daily briefs, PRDs, meeting prep, 
 
 **From GitHub:**
 ```
-/plugin marketplace add openpmkit/openpmkit
+/plugin marketplace add graemerycyk/openpmkit
 /plugin install openpmkit
 ```
 
 **From a direct URL:**
 ```
-/plugin marketplace add https://raw.githubusercontent.com/openpmkit/openpmkit/main/.claude-plugin/marketplace.json
+/plugin marketplace add https://raw.githubusercontent.com/graemerycyk/openpmkit/main/.claude-plugin/marketplace.json
 /plugin install openpmkit
 ```
 
