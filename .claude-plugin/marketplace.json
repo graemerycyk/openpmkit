@@ -1,14 +1,16 @@
 {
-  "schema_version": "1.0",
   "name": "OpenPMKit Marketplace",
   "description": "AI-powered PM workflows for Product Managers",
   "plugins": [
     {
-      "id": "openpmkit",
-      "name": "OpenPMKit",
+      "name": "openpmkit",
       "description": "AI-powered PM workflows - daily briefs, PRDs, meeting prep, competitor intel, sprint reviews, and more. 15 slash commands for Product Managers.",
       "version": "1.0.0",
-      "source": "../plugin"
+      "source": {
+        "source": "github",
+        "repo": "openpmkit/openpmkit",
+        "path": "plugin"
+      }
     }
   ]
 }
