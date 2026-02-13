@@ -1,12 +1,23 @@
 # OpenPMKit
 
-Your PM workflows, inside your AI assistant. 13 product management workflows — daily briefs, PRDs, sprint reviews, competitor reports, and more — available as both an **MCP server** (for Claude Desktop, Cursor, Claude Code) and a **Claude Cowork/Code plugin** (slash commands, no server setup).
+Your PM workflows, inside your AI assistant. 13 product management workflows — daily briefs, PRDs, sprint reviews, competitor reports, and more — available through four distribution routes depending on your setup.
 
 You provide context (Slack messages, Jira tickets, customer feedback), and OpenPMKit generates structured, evidence-grounded PM artifacts through your AI assistant.
 
 ## Who This Is For
 
 Product managers who use AI assistants (Claude Desktop, Cursor, Claude Cowork, Claude Code) and want structured, repeatable workflows instead of writing prompts from scratch every time.
+
+## Four Ways to Use OpenPMKit
+
+| Route | Best For | Setup |
+|-------|----------|-------|
+| **A. [MCP Server](#option-a-mcp-server)** | Claude Desktop, Cursor, any MCP client | `pip install` + config |
+| **B. [Claude Code Plugin](#option-b-plugin-claude-code)** | Claude Code Desktop & CLI | `/plugin install` |
+| **C. [Claude Cowork Plugin](#option-c-plugin-claude-cowork)** | Claude Cowork | Marketplace install |
+| **D. [Product Management Plugin](#option-d-product-management-plugin)** | Cowork & Claude Code (via Anthropic) | Pending Anthropic PR |
+
+**Routes A-C** are fully under your control — install and use today. **Route D** merges OpenPMKit's workflows into Anthropic's first-party [product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management). If accepted, they ship to every user who installs that plugin — no separate install needed.
 
 ## What You Get
 
@@ -61,59 +72,7 @@ You don't need to remember prompt formats. Just tell your assistant what you nee
 
 ## Installation
 
-### Option A: Plugin (Claude Code / Claude Cowork)
-
-No Python or server setup required. Install directly as a plugin:
-
-#### Claude Code Desktop
-
-1. Start a session, then type `/plugin` to open the plugin manager
-2. Go to the **Marketplaces** tab → click **Add** → enter `graemerycyk/openpmkit`
-3. Go to the **Discover** tab → find **OpenPMKit** → click **Install**
-
-#### Claude Code CLI
-
-```bash
-/plugin marketplace add graemerycyk/openpmkit
-/plugin install openpmkit
-```
-
-Optionally specify a scope:
-
-| Scope | Flag | Effect |
-|-------|------|--------|
-| User (default) | `--scope user` | Available across all your projects |
-| Project | `--scope project` | Shared with collaborators via git |
-| Local | `--scope local` | This repo only, gitignored |
-
-#### Claude Cowork
-
-In the Cowork plugins sidebar, click **Add marketplace from GitHub** and enter:
-```
-graemerycyk/openpmkit
-```
-Or click **Add marketplace by URL** and enter:
-```
-https://github.com/graemerycyk/openpmkit.git
-```
-Then click **Sync** and install OpenPMKit from the marketplace list.
-
-> **Note:** Cowork plugin marketplace support is still in preview. If the above methods don't work, OpenPMKit is also pending submission to the official [knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) marketplace. Once accepted, it will appear in the Cowork sidebar automatically.
-
-All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
-
-### Option B: Standalone Skills (any Claude environment)
-
-Copy individual workflow skills into your personal skills folder — no plugin install or server needed:
-
-```bash
-git clone https://github.com/graemerycyk/openpmkit.git
-cp -r openpmkit/plugin/skills/* ~/.claude/skills/
-```
-
-Skills auto-activate when Claude detects a relevant task, or invoke directly with `/skill-name`.
-
-### Option C: MCP Server (Claude Desktop / Cursor / Claude Code)
+### Option A: MCP Server (Claude Desktop / Cursor / any MCP client)
 
 #### Prerequisites
 
@@ -157,7 +116,79 @@ The server will start and wait for MCP client connections on stdio. Press `Ctrl+
 
 ---
 
-## Connect to Your AI Assistant
+### Option B: Plugin (Claude Code Desktop & CLI)
+
+No Python or server setup required. Install directly as a plugin with slash commands and skills:
+
+**Claude Code Desktop:**
+
+1. Start a session, then type `/plugin` to open the plugin manager
+2. Go to the **Marketplaces** tab → click **Add** → enter `graemerycyk/openpmkit`
+3. Go to the **Discover** tab → find **OpenPMKit** → click **Install**
+
+**Claude Code CLI:**
+
+```bash
+/plugin marketplace add graemerycyk/openpmkit
+/plugin install openpmkit
+```
+
+Optionally specify a scope:
+
+| Scope | Flag | Effect |
+|-------|------|--------|
+| User (default) | `--scope user` | Available across all your projects |
+| Project | `--scope project` | Shared with collaborators via git |
+| Local | `--scope local` | This repo only, gitignored |
+
+All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
+
+### Option C: Plugin (Claude Cowork)
+
+In the Cowork plugins sidebar, click **Add marketplace from GitHub** and enter:
+```
+graemerycyk/openpmkit
+```
+Or click **Add marketplace by URL** and enter:
+```
+https://github.com/graemerycyk/openpmkit.git
+```
+Then click **Sync** and install OpenPMKit from the marketplace list.
+
+> **Note:** Cowork plugin marketplace support is still in preview. If the above methods don't work, see Option D below.
+
+### Option D: Product Management Plugin (Anthropic's knowledge-work-plugins)
+
+OpenPMKit's unique workflows have been contributed to Anthropic's first-party [product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) via a pull request. If accepted, this adds 8 commands and 5 skills to the existing plugin — bringing it from 6 commands to 14, and 6 skills to 11.
+
+**What gets added:**
+
+| Commands | Skills |
+|----------|--------|
+| `/daily-brief`, `/meeting-prep`, `/sprint-review` | `sprint-execution`, `meeting-preparation` |
+| `/prototype`, `/release-notes`, `/feature-ideation` | `release-communication`, `html-prototyping` |
+| `/one-pager`, `/tldr` | `executive-synthesis` |
+
+**If the PR is accepted**, these workflows ship to every Cowork and Claude Code user who installs the product-management plugin — no separate OpenPMKit install needed. See [product-management/README.md](product-management/README.md) for the full expanded plugin.
+
+**Status:** Pending PR submission to [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins).
+
+### Standalone Skills (any Claude environment)
+
+You can also copy individual workflow skills directly — no plugin install or server needed:
+
+```bash
+git clone https://github.com/graemerycyk/openpmkit.git
+cp -r openpmkit/plugin/skills/* ~/.claude/skills/
+```
+
+Skills auto-activate when Claude detects a relevant task, or invoke directly with `/skill-name`.
+
+---
+
+## Connect to Your AI Assistant (MCP Server)
+
+> The sections below apply to **Option A (MCP Server)** only. Options B-D handle connections automatically.
 
 ### Claude Desktop (Recommended)
 
@@ -323,7 +354,7 @@ Newer, still being refined:
 
 ```
 openpmkit/
-├── pmkit_mcp/                   # MCP server package
+├── pmkit_mcp/                   # Route A: MCP server package
 │   ├── __init__.py              # Version metadata
 │   ├── __main__.py              # python -m pmkit_mcp entry point
 │   ├── server.py                # MCP server — tool registration and handlers
@@ -331,11 +362,19 @@ openpmkit/
 │   └── workflows/
 │       ├── __init__.py          # Public API
 │       └── registry.py          # All 13 workflow definitions (source of truth)
-├── plugin/                      # Claude Cowork/Code plugin
+├── plugin/                      # Routes B & C: Claude Code / Cowork plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json          # Plugin manifest
 │   ├── commands/                # 15 slash command .md files
 │   └── README.md                # Plugin installation and usage
+├── product-management/          # Route D: Anthropic knowledge-work-plugins PR
+│   ├── .claude-plugin/
+│   │   └── plugin.json          # Anthropic's plugin manifest
+│   ├── commands/                # 14 slash commands (6 existing + 8 from OpenPMKit)
+│   ├── skills/                  # 11 skills (6 existing + 5 from OpenPMKit)
+│   ├── CONNECTORS.md            # Tool connector categories
+│   ├── .mcp.json                # Included MCP connections
+│   └── README.md                # Expanded plugin documentation
 ├── .claude-plugin/
 │   └── marketplace.json         # Plugin marketplace catalog
 ├── scripts/
