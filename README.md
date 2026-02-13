@@ -65,15 +65,28 @@ You don't need to remember prompt formats. Just tell your assistant what you nee
 
 No Python or server setup required. Install directly as a plugin:
 
-**From GitHub:**
+**Claude Code:**
 ```
 /plugin marketplace add graemerycyk/openpmkit
 /plugin install openpmkit
 ```
 
+**Claude Cowork:** Cowork uses a separate plugin ecosystem. OpenPMKit is pending submission to the official [knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) marketplace. Once accepted, install from the Cowork sidebar.
+
 All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
 
-### Option B: MCP Server (Claude Desktop / Cursor / Claude Code)
+### Option B: Standalone Skills (any Claude environment)
+
+Copy individual workflow skills into your personal skills folder — no plugin install or server needed:
+
+```bash
+git clone https://github.com/graemerycyk/openpmkit.git
+cp -r openpmkit/plugin/skills/* ~/.claude/skills/
+```
+
+Skills auto-activate when Claude detects a relevant task, or invoke directly with `/skill-name`.
+
+### Option C: MCP Server (Claude Desktop / Cursor / Claude Code)
 
 #### Prerequisites
 

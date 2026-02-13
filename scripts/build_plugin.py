@@ -22,6 +22,7 @@ from pmkit_mcp.workflows.registry import WORKFLOW_REGISTRY, WorkflowDefinition
 
 PLUGIN_DIR = PROJECT_ROOT / "plugin"
 COMMANDS_DIR = PLUGIN_DIR / "commands"
+SKILLS_DIR = PLUGIN_DIR / "skills"
 
 # Map workflow IDs to shorter slash-command names
 COMMAND_NAME_MAP: dict[str, str] = {
@@ -143,19 +144,84 @@ Then generate the full output following the template's structure and the system 
     return content
 
 
+def generate_skill_file(workflow: WorkflowDefinition, command_name: str) -> str:
+    """Generate a SKILL.md file for auto-invocation by Claude."""
+    # Build a keyword list from the workflow for the description
+    required_list = ", ".join(f.name for f in workflow.required_fields) if workflow.required_fields else "context"
+    optional_list = ", ".join(f.name for f in workflow.optional_fields) if workflow.optional_fields else ""
+
+    required_section = _build_required_fields_section(workflow)
+    optional_section = _build_optional_fields_section(workflow)
+    template = _indent_template(workflow.user_prompt_template)
+
+    if workflow.output_format == "html":
+        output_guidance = (
+            "Output a complete, standalone HTML file. No markdown wrapping, "
+            "no code fences — just the raw HTML that can be saved and opened in a browser."
+        )
+    else:
+        output_guidance = "Output in well-structured markdown format."
+
+    content = f"""---
+name: {command_name}
+description: "{workflow.description} Use when a PM needs help with {workflow.name.lower()}."
+---
+
+# {workflow.name}
+
+{workflow.system_prompt}
+
+## Required Information
+
+{required_section}
+
+## Optional Context
+
+{optional_section}
+
+## Output Template
+
+Fill in the following template with the collected values. Replace each {{{{placeholder}}}} with the user's input. For any optional field not provided, use "(not provided)".
+
+<template>
+{template}
+</template>
+
+## Output Format
+
+{output_guidance}
+"""
+    return content
+
+
 def main() -> None:
     COMMANDS_DIR.mkdir(parents=True, exist_ok=True)
+    SKILLS_DIR.mkdir(parents=True, exist_ok=True)
 
-    generated = []
+    generated_commands = []
+    generated_skills = []
+
     for wf_id, workflow in WORKFLOW_REGISTRY.items():
         command_name = COMMAND_NAME_MAP.get(wf_id, wf_id.replace("_", "-"))
+
+        # Generate command file
         filepath = COMMANDS_DIR / f"{command_name}.md"
         content = generate_command_file(workflow, command_name)
         filepath.write_text(content)
-        generated.append(command_name)
+        generated_commands.append(command_name)
         print(f"  Generated: commands/{command_name}.md")
 
-    print(f"\nGenerated {len(generated)} command files in {COMMANDS_DIR}")
+        # Generate skill file
+        skill_dir = SKILLS_DIR / command_name
+        skill_dir.mkdir(parents=True, exist_ok=True)
+        skill_filepath = skill_dir / "SKILL.md"
+        skill_content = generate_skill_file(workflow, command_name)
+        skill_filepath.write_text(skill_content)
+        generated_skills.append(command_name)
+        print(f"  Generated: skills/{command_name}/SKILL.md")
+
+    print(f"\nGenerated {len(generated_commands)} command files in {COMMANDS_DIR}")
+    print(f"Generated {len(generated_skills)} skill files in {SKILLS_DIR}")
     print("Hand-written commands (pmkit-help.md, pmkit-setup.md) are not overwritten.")
 
 

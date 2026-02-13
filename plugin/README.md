@@ -1,20 +1,40 @@
-# OpenPMKit — Claude Cowork Plugin
+# OpenPMKit — Claude Plugin
 
 AI-powered PM workflows for Product Managers. Daily briefs, PRDs, meeting prep, competitor intel, sprint reviews, and more.
 
 ## Installation
 
-**From GitHub:**
+### Claude Code
+
 ```
 /plugin marketplace add graemerycyk/openpmkit
 /plugin install openpmkit
 ```
 
-**From a local clone:**
+Or from a local clone:
+
 ```
 /plugin marketplace add /path/to/openpmkit
 /plugin install openpmkit
 ```
+
+### Claude Cowork
+
+Cowork uses a separate plugin ecosystem ([anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)). OpenPMKit is pending submission to this marketplace. Once accepted, install from the Cowork plugins sidebar.
+
+### Standalone Skills (any Claude environment)
+
+You can also use individual workflows as standalone skills without installing the full plugin. Copy any skill directory into your personal skills folder:
+
+```bash
+# Copy a single skill
+cp -r plugin/skills/prd-draft ~/.claude/skills/prd-draft
+
+# Or copy all 13 skills
+cp -r plugin/skills/* ~/.claude/skills/
+```
+
+Skills auto-activate when Claude detects a relevant task, or invoke them directly with `/skill-name`.
 
 ## Commands
 
