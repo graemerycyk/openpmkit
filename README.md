@@ -61,17 +61,34 @@ You don't need to remember prompt formats. Just tell your assistant what you nee
 
 ## Installation
 
-### Option A: Plugin (Claude Cowork / Claude Code)
+### Option A: Plugin (Claude Code / Claude Cowork)
 
 No Python or server setup required. Install directly as a plugin:
 
-**Claude Code (CLI):**
-```
+#### Claude Code Desktop
+
+1. Start a session, then type `/plugin` to open the plugin manager
+2. Go to the **Marketplaces** tab → click **Add** → enter `graemerycyk/openpmkit`
+3. Go to the **Discover** tab → find **OpenPMKit** → click **Install**
+
+#### Claude Code CLI
+
+```bash
 /plugin marketplace add graemerycyk/openpmkit
 /plugin install openpmkit
 ```
 
-**Claude Cowork (UI):** In the plugins sidebar, click **Add marketplace from GitHub** and enter:
+Optionally specify a scope:
+
+| Scope | Flag | Effect |
+|-------|------|--------|
+| User (default) | `--scope user` | Available across all your projects |
+| Project | `--scope project` | Shared with collaborators via git |
+| Local | `--scope local` | This repo only, gitignored |
+
+#### Claude Cowork
+
+In the Cowork plugins sidebar, click **Add marketplace from GitHub** and enter:
 ```
 graemerycyk/openpmkit
 ```
@@ -80,6 +97,8 @@ Or click **Add marketplace by URL** and enter:
 https://github.com/graemerycyk/openpmkit.git
 ```
 Then click **Sync** and install OpenPMKit from the marketplace list.
+
+> **Note:** Cowork plugin marketplace support is still in preview. If the above methods don't work, OpenPMKit is also pending submission to the official [knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) marketplace. Once accepted, it will appear in the Cowork sidebar automatically.
 
 All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
 

@@ -4,21 +4,32 @@ AI-powered PM workflows for Product Managers. Daily briefs, PRDs, meeting prep, 
 
 ## Installation
 
-### Claude Code (CLI)
+### Claude Code Desktop
 
-```
+1. Start a session, then type `/plugin` to open the plugin manager
+2. Go to the **Marketplaces** tab → click **Add** → enter `graemerycyk/openpmkit`
+3. Go to the **Discover** tab → find **OpenPMKit** → click **Install**
+
+### Claude Code CLI
+
+```bash
 /plugin marketplace add graemerycyk/openpmkit
 /plugin install openpmkit
 ```
 
+Optionally specify a scope:
+- `--scope user` (default) — available across all your projects
+- `--scope project` — shared with collaborators via git
+- `--scope local` — this repo only, gitignored
+
 Or from a local clone:
 
-```
+```bash
 /plugin marketplace add /path/to/openpmkit
 /plugin install openpmkit
 ```
 
-### Claude Cowork (UI)
+### Claude Cowork
 
 In the Cowork plugins sidebar, click **Add marketplace from GitHub** and enter:
 
