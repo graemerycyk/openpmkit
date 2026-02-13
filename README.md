@@ -65,13 +65,21 @@ You don't need to remember prompt formats. Just tell your assistant what you nee
 
 No Python or server setup required. Install directly as a plugin:
 
-**Claude Code:**
+**Claude Code (CLI):**
 ```
 /plugin marketplace add graemerycyk/openpmkit
 /plugin install openpmkit
 ```
 
-**Claude Cowork:** Cowork uses a separate plugin ecosystem. OpenPMKit is pending submission to the official [knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) marketplace. Once accepted, install from the Cowork sidebar.
+**Claude Cowork (UI):** In the plugins sidebar, click **Add marketplace from GitHub** and enter:
+```
+graemerycyk/openpmkit
+```
+Or click **Add marketplace by URL** and enter:
+```
+https://github.com/graemerycyk/openpmkit.git
+```
+Then click **Sync** and install OpenPMKit from the marketplace list.
 
 All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
 
