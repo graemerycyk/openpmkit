@@ -4,6 +4,24 @@ AI-powered PM workflows for Product Managers. Daily briefs, PRDs, meeting prep, 
 
 ## Installation
 
+### Option A: Install from marketplace (recommended)
+
+This works in both Claude Code and Claude Cowork.
+
+**From GitHub:**
+```
+/plugin marketplace add openpmkit/openpmkit
+/plugin install openpmkit
+```
+
+**From a local clone:**
+```
+/plugin marketplace add /path/to/openpmkit
+/plugin install openpmkit
+```
+
+### Option B: Upload zip file
+
 1. Download or build the `openpmkit-v1.0.0.zip` file
 2. In Claude Cowork, go to Settings > Plugins
 3. Click "Upload from file" and select the zip

@@ -25,10 +25,16 @@ echo "Total command files: $COMMAND_COUNT"
 VERSION=$(python -c "import json; print(json.load(open('plugin/.claude-plugin/plugin.json'))['version'])")
 ZIP_NAME="openpmkit-v${VERSION}.zip"
 
-# Step 4: Create zip
+# Step 4: Create zip with wrapper directory
+# Cowork expects: openpmkit/.claude-plugin/plugin.json (not .claude-plugin/plugin.json at root)
 mkdir -p dist
-cd plugin
-zip -r "../dist/${ZIP_NAME}" . -x ".DS_Store" "**/__pycache__/*"
+rm -f "dist/${ZIP_NAME}"
+rm -rf dist/openpmkit
+mkdir -p dist/openpmkit
+cp -r plugin/.claude-plugin plugin/commands plugin/README.md dist/openpmkit/
+cd dist
+zip -r "${ZIP_NAME}" openpmkit/ -x "openpmkit/.DS_Store" "openpmkit/**/__pycache__/*"
+rm -rf openpmkit
 cd ..
 
 echo ""
