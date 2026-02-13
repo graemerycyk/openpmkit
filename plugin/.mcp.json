@@ -35,6 +35,14 @@
     "ms365": {
       "type": "http",
       "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    "asana": {
+      "type": "http",
+      "url": "https://mcp.asana.com/mcp"
+    },
+    "monday": {
+      "type": "http",
+      "url": "https://mcp.monday.com/mcp"
     }
   }
 }

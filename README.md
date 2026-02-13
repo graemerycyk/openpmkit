@@ -43,6 +43,53 @@ Product managers who use AI assistants (Claude Desktop, Cursor, Claude Cowork, C
 - **`pmkit_help`** — Lists every available tool with its required and optional fields
 - **`pmkit_workflow_details`** — Shows full field descriptions and examples for any workflow
 
+## Integrations
+
+OpenPMKit connects to your PM stack through three methods:
+
+**MCP servers (pre-configured, connect automatically):**
+
+| Integration | What it provides |
+|-------------|-----------------|
+| Slack | Team messages, channel activity, stakeholder threads |
+| Jira / Confluence (Atlassian) | Sprint data, tickets, epics, existing docs |
+| Linear | Issues, projects, cycles |
+| Asana | Tasks, projects, milestones |
+| Monday.com | Boards, items, updates |
+| Notion | Pages, databases, meeting notes |
+| Figma | Design files, components, prototypes |
+| Amplitude | Usage metrics, funnels, cohorts |
+| Intercom | Support tickets, feature requests, conversations |
+| Fireflies | Meeting transcripts, action items |
+| Microsoft 365 | Email, calendar, documents |
+
+**Claude built-in integrations (connect in Claude's settings):**
+
+| Integration | What it provides |
+|-------------|-----------------|
+| Gmail | Email threads, customer communications |
+| Google Calendar | Meeting schedules, attendee context |
+| Google Drive | Documents, spreadsheets, presentations |
+
+**Supported via manual paste (no MCP endpoint yet):**
+
+| Integration | What it provides |
+|-------------|-----------------|
+| Gong | Call transcripts, revenue intelligence |
+| Loom | Video transcript insights |
+| Zendesk | Support ticket data |
+| Zoom | Meeting recordings, transcripts |
+
+**AI-powered research (built-in skills, no setup needed):**
+
+| Skill | What it does |
+|-------|-------------|
+| Competitive research | Searches competitor sites, Product Hunt, G2, changelogs |
+| Social monitoring | Scans Reddit, Twitter/X, Hacker News, community forums |
+| News tracking | Tracks industry news, analyst reports, market developments |
+
+> For full connector details including `~~category` placeholders, see [plugin/CONNECTORS.md](plugin/CONNECTORS.md).
+
 ## How It Works
 
 Each tool is **self-documenting and conversational**:
@@ -141,6 +188,16 @@ Optionally specify a scope:
 | Local | `--scope local` | This repo only, gitignored |
 
 All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
+
+**Direct download:** If the marketplace isn't working, download [openpmkit.zip](openpmkit.zip) from this repo and install manually:
+
+```bash
+# Claude Code CLI
+/plugin install /path/to/openpmkit.zip
+
+# Or unzip to your plugins directory
+unzip openpmkit.zip -d ~/.claude/plugins/
+```
 
 ### Option C: Plugin (Claude Cowork)
 

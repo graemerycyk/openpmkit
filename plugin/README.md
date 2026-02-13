@@ -28,6 +28,14 @@ Optionally specify a scope:
 - `--scope project` — shared with collaborators via git
 - `--scope local` — this repo only, gitignored
 
+### Direct Download
+
+If the marketplace isn't working, download [openpmkit.zip](https://github.com/graemerycyk/openpmkit/raw/main/openpmkit.zip) and install manually:
+
+```bash
+/plugin install /path/to/openpmkit.zip
+```
+
 ## What It Does
 
 This plugin gives you an AI-powered PM toolkit with structured, evidence-grounded workflows:
@@ -132,10 +140,10 @@ Claude: [Generates 3-5 bullet summary with emoji, optimized for Slack posting]
 
 Connect your PM and communication tools for the best experience. Without them, provide context manually by pasting data when prompted.
 
-**Included MCP connections:**
+**MCP connections (pre-configured, connect automatically):**
 
 - Chat (Slack, Microsoft 365) for team context, overnight activity, and stakeholder threads
-- Project tracker (Atlassian/Jira, Linear) for sprint progress, ticket status, and roadmap integration
+- Project tracker (Atlassian/Jira, Linear, Asana, Monday.com) for sprint progress, ticket status, and roadmap integration
 - Knowledge base (Notion, Confluence) for existing specs, research, and meeting notes
 - Design (Figma) for design context and prototype reference
 - Product analytics (Amplitude) for usage data, metrics, and feature adoption
@@ -143,8 +151,25 @@ Connect your PM and communication tools for the best experience. Without them, p
 - Meeting transcription (Fireflies) for call notes, meeting context, and discussion highlights
 - Microsoft 365 for email, calendar, and document context
 
-**Additional options:**
+**Claude built-in integrations (connect in Claude's settings):**
 
-- See [CONNECTORS.md](CONNECTORS.md) for alternative tools in each category
+- Gmail for email context in daily briefs and meeting prep
+- Google Calendar for meeting schedules and daily planning
+- Google Drive for documents, spreadsheets, and presentations
+
+**Supported via paste (no MCP endpoint yet):**
+
+- Gong — call transcripts and revenue intelligence
+- Loom — video transcript insights
+- Zendesk — support ticket data
+- Zoom — meeting recordings and transcripts
+
+**AI-powered research (built-in skills, no setup needed):**
+
+- Competitive research — web search across competitor sites, Product Hunt, G2, changelogs
+- Social monitoring — Reddit, Twitter/X, Hacker News, community forums
+- News tracking — industry news, analyst reports, market developments
+
+See [CONNECTORS.md](CONNECTORS.md) for the full connector reference.
 
 For an even richer integration, OpenPMKit also ships as an [MCP server](https://github.com/graemerycyk/openpmkit) that connects directly to Claude Desktop, Cursor, and Claude Code.
