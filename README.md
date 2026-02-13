@@ -71,12 +71,6 @@ No Python or server setup required. Install directly as a plugin:
 /plugin install openpmkit
 ```
 
-**From a direct URL:**
-```
-/plugin marketplace add https://raw.githubusercontent.com/graemerycyk/openpmkit/main/.claude-plugin/marketplace.json
-/plugin install openpmkit
-```
-
 All 15 slash commands will be available immediately. See [plugin/README.md](plugin/README.md) for the full command list.
 
 ### Option B: MCP Server (Claude Desktop / Cursor / Claude Code)
